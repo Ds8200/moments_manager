@@ -30,8 +30,7 @@ export const ORDERS_LABELS = {
   FORM_CUSTOMER:            'לקוח',
   FORM_CUSTOMER_PLACEHOLDER:'חפש לקוח...',
   FORM_DATE:                'תאריך',
-  FORM_TARGET:              'יעד / מועד',
-  FORM_TARGET_PLACEHOLDER:  'שישי, ראשון בלילה...',
+  FORM_DUE_DATETIME:        'יעד (תאריך ושעה)',
   FORM_NOTES:               'הערות',
   FORM_ITEMS_SECTION:       'פריטים',
   FORM_ADD_ITEM:            '+ הוסף פריט',
@@ -74,4 +73,10 @@ export const ORDERS_LABELS = {
   DETAIL_SECTION_FILES:     'קבצים',
   DETAIL_EDIT_TITLE:        'ערוך',
   DETAIL_CLOSE_TITLE:       'סגור',
+
+  URGENCY_CRITICAL:         'דחוף מאוד',
+  URGENCY_HIGH:             'דחוף',
+  URGENCY_MEDIUM:           'בינוני',
+  URGENCY_LOW:              'רגיל',
+  URGENCY_NONE:             '—',
 } as const

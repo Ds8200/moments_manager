@@ -21,6 +21,9 @@ export const OrdersTable = (): ReactElement => {
     onPageChange,
     formatAmount,
     formatDate,
+    formatDueDateTime,
+    getUrgencyLabel,
+    getUrgencyClass,
     getPaymentLabel,
   } = useOrdersTable()
 
@@ -69,7 +72,14 @@ export const OrdersTable = (): ReactElement => {
                 </td>
                 <td className={styles.cell}>{formatDate(order.date)}</td>
                 <td className={styles.cell}>
-                  <span className={styles.target}>{order.target_description ?? '—'}</span>
+                  <div className={styles.targetCell}>
+                    <span className={styles.target}>{formatDueDateTime(order.due_datetime)}</span>
+                    {order.urgency && (
+                      <span className={`${styles.urgencyBadge} ${styles[getUrgencyClass(order.urgency)]}`}>
+                        {getUrgencyLabel(order.urgency)}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className={styles.cell}>
                   <span className={styles.amount}>{formatAmount(order.total_amount)}</span>

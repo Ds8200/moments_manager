@@ -54,7 +54,7 @@ class OrderRepository:
 
         query = (
             query.options(selectinload(Order.items), selectinload(Order.customer))
-            .order_by(Order.date.desc(), Order.created_at.desc())
+            .order_by(Order.due_datetime.asc().nullslast(), Order.date.desc())
             .limit(limit)
             .offset(offset)
         )
@@ -74,7 +74,7 @@ class OrderRepository:
             select(Order)
             .options(selectinload(Order.items), selectinload(Order.customer))
             .where(Order.customer_id == customer_id, Order.is_deleted == False)
-            .order_by(Order.date.desc())
+            .order_by(Order.due_datetime.asc().nullslast(), Order.date.desc())
         )
         return result.scalars().all()
 

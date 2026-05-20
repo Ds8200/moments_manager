@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import type {
   Order,
   OrdersResponse,
-  OrderFormValues,
+  OrderPayload,
   OrderFilters,
   UpdateStatusPayload,
   UpdatePaymentPayload,
@@ -27,13 +27,13 @@ export const ordersApi = {
   get: (id: string): Promise<Order> =>
     apiClient<Order>(API_ENDPOINTS.ORDER(id)),
 
-  create: (payload: OrderFormValues): Promise<Order> =>
+  create: (payload: OrderPayload): Promise<Order> =>
     apiClient<Order>(API_ENDPOINTS.ORDERS, {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
 
-  update: (id: string, payload: Partial<OrderFormValues>): Promise<Order> =>
+  update: (id: string, payload: Partial<OrderPayload>): Promise<Order> =>
     apiClient<Order>(API_ENDPOINTS.ORDER(id), {
       method: 'PUT',
       body: JSON.stringify(payload),

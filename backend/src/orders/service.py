@@ -1,11 +1,12 @@
 import logging
 import os
+from datetime import datetime
 from decimal import Decimal
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import FileTooLargeError, InvalidFileTypeError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
-from src.orders.enums import OrderStatus
+from src.orders.enums import OrderStatus, OrderUrgency
 from src.orders.models import Order
 from src.orders.repository import OrderRepository
 from src.orders.schemas import (
@@ -33,6 +34,20 @@ def _compute_item_fields(item_data: dict) -> dict:
     return {**item_data, "total_price": total_price, "profit": profit}
 
 
+def _compute_urgency(due_datetime: datetime | None) -> OrderUrgency | None:
+    if due_datetime is None:
+        return None
+    now = datetime.now(due_datetime.tzinfo) if due_datetime.tzinfo else datetime.now()
+    hours = (due_datetime - now).total_seconds() / 3600
+    if hours <= 24:
+        return OrderUrgency.critical
+    if hours <= 72:
+        return OrderUrgency.high
+    if hours <= 168:
+        return OrderUrgency.medium
+    return OrderUrgency.low
+
+
 class OrderService:
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
@@ -55,7 +70,10 @@ class OrderService:
         items = []
         for o in orders:
             schema = OrderListResponseSchema.model_validate(o)
-            schema.item_count = len(o.items)
+            schema = schema.model_copy(update={
+                "item_count": len(o.items),
+                "urgency": _compute_urgency(o.due_datetime),
+            })
             items.append(schema)
         return PaginatedResponse(
             items=items, total=total, page=params.page,
@@ -66,14 +84,17 @@ class OrderService:
         order = await self._repo.get_by_id(order_id)
         if not order:
             raise NotFoundError("Order", order_id)
-        return OrderResponseSchema.model_validate(order)
+        return self._to_response(order)
 
     async def get_customer_orders(self, customer_id: str) -> list[OrderListResponseSchema]:
         orders = await self._repo.get_by_customer(customer_id)
         result = []
         for o in orders:
             schema = OrderListResponseSchema.model_validate(o)
-            schema.item_count = len(o.items)
+            schema = schema.model_copy(update={
+                "item_count": len(o.items),
+                "urgency": _compute_urgency(o.due_datetime),
+            })
             result.append(schema)
         return result
 
@@ -85,7 +106,7 @@ class OrderService:
         order = await self._repo.create(order_data, items_data)
         await self._db.commit()
         refreshed = await self._repo.get_by_id(order.id)
-        return OrderResponseSchema.model_validate(refreshed)
+        return self._to_response(refreshed)
 
     async def update_order(self, order_id: str, data: OrderUpdateSchema) -> OrderResponseSchema:
         order = await self._repo.get_by_id(order_id)
@@ -98,7 +119,7 @@ class OrderService:
         await self._repo.update(order, order_data, items_data)
         await self._db.commit()
         refreshed = await self._repo.get_by_id(order_id)
-        return OrderResponseSchema.model_validate(refreshed)
+        return self._to_response(refreshed)
 
     async def update_status(self, order_id: str, data: OrderStatusUpdateSchema) -> OrderResponseSchema:
         order = await self._repo.get_by_id(order_id)
@@ -109,7 +130,7 @@ class OrderService:
         await self._db.commit()
         logger.info(log_messages.ORDER_STATUS_CHANGED, order_id, old_status, data.status.value)
         refreshed = await self._repo.get_by_id(order_id)
-        return OrderResponseSchema.model_validate(refreshed)
+        return self._to_response(refreshed)
 
     async def update_payment(
         self, order_id: str, data: OrderPaymentUpdateSchema
@@ -122,7 +143,12 @@ class OrderService:
             order.payment_method = data.payment_method.value
         await self._db.commit()
         refreshed = await self._repo.get_by_id(order_id)
-        return OrderResponseSchema.model_validate(refreshed)
+        return self._to_response(refreshed)
+
+    @staticmethod
+    def _to_response(order: Order) -> OrderResponseSchema:
+        schema = OrderResponseSchema.model_validate(order)
+        return schema.model_copy(update={"urgency": _compute_urgency(order.due_datetime)})
 
     async def delete_order(self, order_id: str) -> None:
         order = await self._repo.get_by_id(order_id)

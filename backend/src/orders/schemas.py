@@ -5,7 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from src.orders.enums import OrderStatus, PaymentMethod
+from src.orders.enums import OrderStatus, OrderUrgency, PaymentMethod
 
 
 class OrderItemCreateSchema(BaseModel):
@@ -45,7 +45,7 @@ class OrderFileResponseSchema(BaseModel):
 class OrderCreateSchema(BaseModel):
     customer_id: Optional[str] = None
     date: Date
-    target_description: Optional[str] = None
+    due_datetime: Optional[datetime] = None
     notes: Optional[str] = None
     items: list[OrderItemCreateSchema] = []
 
@@ -53,7 +53,7 @@ class OrderCreateSchema(BaseModel):
 class OrderUpdateSchema(BaseModel):
     customer_id: Optional[str] = None
     date: Optional[Date] = None
-    target_description: Optional[str] = None
+    due_datetime: Optional[datetime] = None
     notes: Optional[str] = None
     items: Optional[list[OrderItemCreateSchema]] = None
 
@@ -75,7 +75,8 @@ class OrderResponseSchema(BaseModel):
     customer_id: Optional[str]
     customer_name: Optional[str] = None
     date: Date
-    target_description: Optional[str]
+    due_datetime: Optional[datetime]
+    urgency: Optional[OrderUrgency] = None
     status: str
     is_paid: bool
     payment_method: Optional[str]
@@ -97,7 +98,8 @@ class OrderListResponseSchema(BaseModel):
     customer_id: Optional[str]
     customer_name: Optional[str] = None
     date: Date
-    target_description: Optional[str]
+    due_datetime: Optional[datetime]
+    urgency: Optional[OrderUrgency] = None
     status: str
     is_paid: bool
     payment_method: Optional[str]

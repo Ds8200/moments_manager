@@ -3,7 +3,7 @@ import { useAtom, useSetAtom } from 'jotai'
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/useOrders'
 import { orderFiltersAtom, selectedOrderIdAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { formatCurrency, formatShortDate } from '@/shared/utils/formatters'
-import type { OrderSummary } from '../../types'
+import type { OrderSummary, OrderUrgency } from '../../types'
 import type { OrderStatus, PaymentMethod } from '@/shared/enums/statusEnums'
 import { STATUS_LABELS, PAYMENT_LABELS } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
@@ -22,8 +22,32 @@ export interface UseOrdersTableReturn {
   onPageChange: (page: number) => void
   formatAmount: (amount: string) => string
   formatDate: (date: string) => string
+  formatDueDateTime: (value: string | null) => string
+  getUrgencyLabel: (urgency: OrderUrgency | null) => string
+  getUrgencyClass: (urgency: OrderUrgency | null) => string
   getPaymentLabel: (method: PaymentMethod | null, isPaid: boolean) => string
 }
+
+const URGENCY_LABEL_MAP: Record<OrderUrgency, string> = {
+  critical: ORDERS_LABELS.URGENCY_CRITICAL,
+  high:     ORDERS_LABELS.URGENCY_HIGH,
+  medium:   ORDERS_LABELS.URGENCY_MEDIUM,
+  low:      ORDERS_LABELS.URGENCY_LOW,
+}
+
+const URGENCY_CLASS_MAP: Record<OrderUrgency, string> = {
+  critical: 'urgencyCritical',
+  high:     'urgencyHigh',
+  medium:   'urgencyMedium',
+  low:      'urgencyLow',
+}
+
+const dueDateTimeFormatter = new Intl.DateTimeFormat('he-IL', {
+  day:   '2-digit',
+  month: '2-digit',
+  hour:  '2-digit',
+  minute:'2-digit',
+})
 
 export const useOrdersTable = (): UseOrdersTableReturn => {
   const { data, isLoading, isError } = useOrders()
@@ -63,6 +87,23 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
 
     formatAmount: formatCurrency,
     formatDate: formatShortDate,
+
+    formatDueDateTime: (value) => {
+      if (!value) return ORDERS_LABELS.URGENCY_NONE
+      const parsed = new Date(value)
+      if (Number.isNaN(parsed.getTime())) return ORDERS_LABELS.URGENCY_NONE
+      return dueDateTimeFormatter.format(parsed)
+    },
+
+    getUrgencyLabel: (urgency) => {
+      if (!urgency) return ORDERS_LABELS.URGENCY_NONE
+      return URGENCY_LABEL_MAP[urgency]
+    },
+
+    getUrgencyClass: (urgency) => {
+      if (!urgency) return ''
+      return URGENCY_CLASS_MAP[urgency]
+    },
 
     getPaymentLabel: (method, isPaid) => {
       if (!isPaid) return '—'

@@ -10,7 +10,7 @@ import { useOrder, useCreateOrder, useUpdateOrder } from '../../queries/useOrder
 import { useCustomers } from '@/features/customers/queries/useCustomers'
 import type { AutocompleteOption } from '@/shared/components/Autocomplete/useAutocomplete'
 import type { Customer } from '@/features/customers/types'
-import type { OrderFormValues } from '../../types'
+import type { OrderFormValues, OrderPayload } from '../../types'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 
 const itemSchema = z.object({
@@ -23,11 +23,11 @@ const itemSchema = z.object({
 })
 
 const schema = z.object({
-  customer_id:        z.string().min(1, ORDERS_LABELS.VALIDATION_CUSTOMER),
-  date:               z.string().min(1, ORDERS_LABELS.VALIDATION_DATE),
-  target_description: z.string(),
-  notes:              z.string(),
-  items:              z.array(itemSchema).min(1, ORDERS_LABELS.VALIDATION_ITEMS_MIN),
+  customer_id:  z.string().min(1, ORDERS_LABELS.VALIDATION_CUSTOMER),
+  date:         z.string().min(1, ORDERS_LABELS.VALIDATION_DATE),
+  due_datetime: z.string(),
+  notes:        z.string(),
+  items:        z.array(itemSchema).min(1, ORDERS_LABELS.VALIDATION_ITEMS_MIN),
 })
 
 const DEFAULT_ITEM: OrderFormValues['items'][number] = {
@@ -40,11 +40,11 @@ const DEFAULT_ITEM: OrderFormValues['items'][number] = {
 }
 
 const DEFAULT_VALUES: OrderFormValues = {
-  customer_id:        '',
-  date:               new Date().toISOString().split('T')[0],
-  target_description: '',
-  notes:              '',
-  items:              [DEFAULT_ITEM],
+  customer_id:  '',
+  date:         new Date().toISOString().split('T')[0],
+  due_datetime: '',
+  notes:        '',
+  items:        [DEFAULT_ITEM],
 }
 
 export interface UseOrderFormReturn {
@@ -94,10 +94,10 @@ export const useOrderForm = (): UseOrderFormReturn => {
   useEffect(() => {
     if (isOpen && existingOrder) {
       reset({
-        customer_id:        existingOrder.customer_id,
-        date:               existingOrder.date,
-        target_description: existingOrder.target_description ?? '',
-        notes:              existingOrder.notes ?? '',
+        customer_id:  existingOrder.customer_id,
+        date:         existingOrder.date,
+        due_datetime: existingOrder.due_datetime ? existingOrder.due_datetime.slice(0, 16) : '',
+        notes:        existingOrder.notes ?? '',
         items: existingOrder.items.map((it) => ({
           product_id:   it.product_id,
           product_name: it.product_name,
@@ -118,10 +118,14 @@ export const useOrderForm = (): UseOrderFormReturn => {
   }
 
   const onSubmit = async (values: OrderFormValues): Promise<void> => {
+    const payload: OrderPayload = {
+      ...values,
+      due_datetime: values.due_datetime ? values.due_datetime : null,
+    }
     if (editingId) {
-      await updateOrder.mutateAsync({ id: editingId, payload: values })
+      await updateOrder.mutateAsync({ id: editingId, payload })
     } else {
-      await createOrder.mutateAsync(values)
+      await createOrder.mutateAsync(payload)
     }
     onClose()
   }

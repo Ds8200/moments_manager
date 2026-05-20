@@ -21,7 +21,7 @@ class Order(Base, TimestampMixin, SoftDeleteMixin):
         String, ForeignKey("customers.id"), nullable=True
     )
     date: Mapped[date] = mapped_column(Date, nullable=False)
-    target_description: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    due_datetime: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     status: Mapped[str] = mapped_column(
         String(50), default=OrderStatus.new, nullable=False
     )

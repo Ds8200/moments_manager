@@ -1,5 +1,7 @@
 import type { OrderStatus, PaymentMethod } from '@/shared/enums/statusEnums'
 
+export type OrderUrgency = 'critical' | 'high' | 'medium' | 'low'
+
 export interface OrderFile {
   id: string
   original_name: string
@@ -27,7 +29,8 @@ export interface Order {
   customer_id: string
   customer_name: string
   date: string
-  target_description: string | null
+  due_datetime: string | null
+  urgency: OrderUrgency | null
   status: OrderStatus
   is_paid: boolean
   payment_method: PaymentMethod | null
@@ -47,7 +50,8 @@ export interface OrderSummary {
   customer_id: string
   customer_name: string
   date: string
-  target_description: string | null
+  due_datetime: string | null
+  urgency: OrderUrgency | null
   status: OrderStatus
   is_paid: boolean
   payment_method: PaymentMethod | null
@@ -86,9 +90,13 @@ export interface OrderItemFormValues {
 export interface OrderFormValues {
   customer_id: string
   date: string
-  target_description: string
+  due_datetime: string
   notes: string
   items: OrderItemFormValues[]
+}
+
+export type OrderPayload = Omit<OrderFormValues, 'due_datetime'> & {
+  due_datetime: string | null
 }
 
 export interface UpdateStatusPayload {

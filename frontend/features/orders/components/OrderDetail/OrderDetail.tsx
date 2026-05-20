@@ -17,6 +17,8 @@ export const OrderDetail = (): ReactElement | null => {
     onStatusChange,
     formatAmount,
     formatOrderDate,
+    formatDueDateTime,
+    getUrgencyLabel,
   } = useOrderDetail()
 
   return isOpen ? (
@@ -45,7 +47,10 @@ export const OrderDetail = (): ReactElement | null => {
               </div>
               <div className={styles.metaRow}>
                 <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_TARGET}</span>
-                <span className={styles.metaValue}>{order.target_description ?? '—'}</span>
+                <span className={styles.metaValue}>
+                  {formatDueDateTime(order.due_datetime)}
+                  {order.urgency && ` · ${getUrgencyLabel(order.urgency)}`}
+                </span>
               </div>
               <div className={styles.metaRow}>
                 <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_STATUS}</span>

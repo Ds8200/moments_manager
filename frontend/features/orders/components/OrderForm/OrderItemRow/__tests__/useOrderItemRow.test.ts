@@ -36,7 +36,7 @@ describe('useOrderItemRow', () => {
     renderHook(
       () => {
         const form = useForm<OrderFormValues>({
-          defaultValues: { customer_id: '', date: '', target_description: '', notes: '', items: [DEFAULT_ITEM] },
+          defaultValues: { customer_id: '', date: '', due_datetime: '', notes: '', items: [DEFAULT_ITEM] },
         })
         return {
           hook: useOrderItemRow({

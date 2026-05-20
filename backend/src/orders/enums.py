@@ -15,3 +15,10 @@ class PaymentMethod(str, Enum):
     cash = "cash"
     transfer = "transfer"
     partial = "partial"
+
+
+class OrderUrgency(str, Enum):
+    critical = "critical"  # ≤ 24 שעות
+    high = "high"          # 1–3 ימים
+    medium = "medium"      # 3–7 ימים
+    low = "low"            # > 7 ימים

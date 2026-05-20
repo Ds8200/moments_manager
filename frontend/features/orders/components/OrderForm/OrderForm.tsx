@@ -54,11 +54,11 @@ export const OrderForm = (): ReactElement | null => {
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>{ORDERS_LABELS.FORM_TARGET}</label>
+              <label className={styles.label}>{ORDERS_LABELS.FORM_DUE_DATETIME}</label>
               <input
+                type="datetime-local"
                 className={styles.input}
-                placeholder={ORDERS_LABELS.FORM_TARGET_PLACEHOLDER}
-                {...register('target_description')}
+                {...register('due_datetime')}
               />
             </div>
 
