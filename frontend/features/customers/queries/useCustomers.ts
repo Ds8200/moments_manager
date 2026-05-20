@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { customersApi } from '../api'
 import type { CustomerFormValues } from '../types'
 
-export const useCustomers = (page = 1, search = '') =>
+export const useCustomers = (page = 1, search = '', page_size = 20) =>
   useQuery({
-    queryKey: ['customers', page, search],
-    queryFn: () => customersApi.list(page, search),
+    queryKey: ['customers', page, search, page_size],
+    queryFn: () => customersApi.list(page, search, page_size),
   })
 
 export const useCustomer = (id: string | null) =>

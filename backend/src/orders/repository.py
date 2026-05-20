@@ -15,13 +15,16 @@ class OrderRepository:
         self._db = db
 
     async def get_next_order_number(self) -> str:
-        result = await self._db.execute(
-            select(func.count(Order.id)).where(Order.is_deleted == False)
-        )
-        count = result.scalar_one()
-        from datetime import datetime
         year = datetime.now().year
-        return f"ORD-{year}-{count + 1:04d}"
+        prefix = f"ORD-{year}-"
+        result = await self._db.execute(
+            select(func.max(Order.order_number)).where(
+                Order.order_number.like(f"{prefix}%")
+            )
+        )
+        max_number = result.scalar_one_or_none()
+        last_seq = int(max_number.split("-")[-1]) if max_number else 0
+        return f"{prefix}{last_seq + 1:04d}"
 
     async def get_all(
         self,
@@ -50,7 +53,7 @@ class OrderRepository:
         total = (await self._db.execute(count_q)).scalar_one()
 
         query = (
-            query.options(selectinload(Order.items))
+            query.options(selectinload(Order.items), selectinload(Order.customer))
             .order_by(Order.date.desc(), Order.created_at.desc())
             .limit(limit)
             .offset(offset)
@@ -61,7 +64,7 @@ class OrderRepository:
     async def get_by_id(self, order_id: str) -> Order | None:
         result = await self._db.execute(
             select(Order)
-            .options(selectinload(Order.items), selectinload(Order.files))
+            .options(selectinload(Order.items), selectinload(Order.files), selectinload(Order.customer))
             .where(Order.id == order_id, Order.is_deleted == False)
         )
         return result.scalar_one_or_none()
@@ -69,7 +72,7 @@ class OrderRepository:
     async def get_by_customer(self, customer_id: str) -> list[Order]:
         result = await self._db.execute(
             select(Order)
-            .options(selectinload(Order.items))
+            .options(selectinload(Order.items), selectinload(Order.customer))
             .where(Order.customer_id == customer_id, Order.is_deleted == False)
             .order_by(Order.date.desc())
         )

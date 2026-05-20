@@ -1,15 +1,18 @@
 """
 Create a new user in the database.
 
-Usage (inside Docker container):
+Usage (from backend/ directory):
     uv run python scripts/create_user.py
 
-Usage (exec from host):
+Usage (exec from host via Docker):
     docker compose exec -e PYTHONPATH=/app backend uv run python scripts/create_user.py
 """
 
 import asyncio
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.core.security import hash_password
 from src.database import AsyncSessionLocal

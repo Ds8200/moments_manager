@@ -4,8 +4,8 @@ import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import type { Customer, CustomerDetail, CustomersResponse, CustomerFormValues } from './types'
 
 export const customersApi = {
-  list: (page = 1, search = ''): Promise<CustomersResponse> => {
-    const params = new URLSearchParams({ page: String(page), page_size: '20' })
+  list: (page = 1, search = '', page_size = 20): Promise<CustomersResponse> => {
+    const params = new URLSearchParams({ page: String(page), page_size: String(page_size) })
     if (search) params.set('search', search)
     return apiClient<CustomersResponse>(`${API_ENDPOINTS.CUSTOMERS}?${params}`)
   },

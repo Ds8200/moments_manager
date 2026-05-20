@@ -43,7 +43,8 @@ class ProductService:
     async def create_product(self, data: ProductCreateSchema) -> ProductResponseSchema:
         product = await self._repo.create(data.model_dump(exclude_none=True))
         await self._db.commit()
-        return ProductResponseSchema.model_validate(product)
+        refreshed = await self._repo.get_by_id(product.id)
+        return ProductResponseSchema.model_validate(refreshed)
 
     async def update_product(
         self, product_id: str, data: ProductUpdateSchema
@@ -51,9 +52,10 @@ class ProductService:
         product = await self._repo.get_by_id(product_id)
         if not product:
             raise NotFoundError("Product", product_id)
-        updated = await self._repo.update(product, data.model_dump(exclude_none=True))
+        await self._repo.update(product, data.model_dump(exclude_none=True))
         await self._db.commit()
-        return ProductResponseSchema.model_validate(updated)
+        refreshed = await self._repo.get_by_id(product_id)
+        return ProductResponseSchema.model_validate(refreshed)
 
     async def delete_product(self, product_id: str) -> None:
         product = await self._repo.get_by_id(product_id)

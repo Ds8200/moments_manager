@@ -3,6 +3,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { productsApi } from '../api'
 import type { ProductFormValues } from '../types'
 
+export const useProduct = (id: string | null) =>
+  useQuery({
+    queryKey: ['product', id],
+    queryFn: () => productsApi.get(id!),
+    enabled: id !== null,
+  })
+
 export const useProducts = (page = 1, search = '') =>
   useQuery({
     queryKey: ['products', page, search],

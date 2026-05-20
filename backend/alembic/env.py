@@ -1,12 +1,16 @@
 import asyncio
-import os
+import sys
+from pathlib import Path
 from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from src.database import Base
+from src.config import settings
 
 # Import all models so Alembic can detect them
 import src.users.models  # noqa: F401
@@ -21,7 +25,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 target_metadata = Base.metadata
 

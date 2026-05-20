@@ -17,6 +17,15 @@ export const useCreateExpense = () => {
   })
 }
 
+export const useUpdateExpense = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<ExpenseFormValues> }) =>
+      expensesApi.update(id, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses'] }),
+  })
+}
+
 export const useDeleteExpense = () => {
   const queryClient = useQueryClient()
   return useMutation({

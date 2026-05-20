@@ -41,6 +41,7 @@ class AuthService:
     async def logout(self, refresh_token_str: str) -> None:
         token_hash = hash_refresh_token(refresh_token_str)
         await self._tokens.revoke(token_hash)
+        await self._db.commit()
 
     async def _issue_token_pair(self, user_id: str) -> TokenResponseSchema:
         access_token = create_access_token(user_id)

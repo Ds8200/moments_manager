@@ -1,8 +1,8 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, startTransition } from 'react'
 import { useAtom, useSetAtom } from 'jotai'
 import { useRouter, usePathname } from 'next/navigation'
-import { accessTokenAtom, initAuthAtom } from '@/features/auth/store/authAtoms'
+import { accessTokenAtom, initAuthAtom, clearTokensAtom } from '@/features/auth/store/authAtoms'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
 import { ROUTES } from '@/shared/constants/routes'
 
@@ -15,11 +15,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname()
   const [accessToken] = useAtom(accessTokenAtom)
   const initAuth = useSetAtom(initAuthAtom)
+  const clearTokens = useSetAtom(clearTokensAtom)
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
     initAuth()
-    setChecked(true)
+    startTransition(() => setChecked(true))
   }, [initAuth])
 
   useEffect(() => {
@@ -27,6 +28,14 @@ export function AuthGuard({ children }: AuthGuardProps) {
       router.replace(ROUTES.LOGIN)
     }
   }, [checked, accessToken, pathname, router])
+
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      clearTokens()
+    }
+    window.addEventListener('auth:expired', handleAuthExpired)
+    return () => window.removeEventListener('auth:expired', handleAuthExpired)
+  }, [clearTokens])
 
   if (!checked) return <PageSkeleton rows={6} />
   if (accessToken === null) return null

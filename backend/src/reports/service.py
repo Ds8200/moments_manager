@@ -150,12 +150,15 @@ class ReportService:
         total_expenses = sum(m.total_expenses for m in monthly_data)
         net_profit = sum(m.net_profit for m in monthly_data)
 
+        annual_profit = sum(m.total_profit for m in monthly_data)
+
         return FinancialYearSchema(
             year=year,
-            monthly_data=monthly_data,
-            total_revenue=total_revenue,
-            total_expenses=total_expenses,
-            net_profit=net_profit,
+            months=monthly_data,
+            annual_revenue=total_revenue,
+            annual_profit=annual_profit,
+            annual_expenses=total_expenses,
+            annual_net=net_profit,
         )
 
     async def get_top_customers(self, limit: int = 10) -> list[TopCustomerSchema]:
@@ -177,8 +180,8 @@ class ReportService:
             TopCustomerSchema(
                 customer_id=row[0],
                 customer_name=row[1],
-                total_orders=row[2],
-                total_spent=Decimal(str(row[3])),
+                order_count=row[2],
+                total_revenue=Decimal(str(row[3])),
                 total_profit=Decimal(str(row[4])),
             )
             for row in result.all()

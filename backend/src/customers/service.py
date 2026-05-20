@@ -47,7 +47,8 @@ class CustomerService:
     async def create_customer(self, data: CustomerCreateSchema) -> CustomerResponseSchema:
         customer = await self._repo.create(data.model_dump(exclude_none=True))
         await self._db.commit()
-        return CustomerResponseSchema.model_validate(customer)
+        refreshed = await self._repo.get_by_id(customer.id)
+        return CustomerResponseSchema.model_validate(refreshed)
 
     async def update_customer(
         self, customer_id: str, data: CustomerUpdateSchema
@@ -55,9 +56,10 @@ class CustomerService:
         customer = await self._repo.get_by_id(customer_id)
         if not customer:
             raise NotFoundError("Customer", customer_id)
-        updated = await self._repo.update(customer, data.model_dump(exclude_none=True))
+        await self._repo.update(customer, data.model_dump(exclude_none=True))
         await self._db.commit()
-        return CustomerResponseSchema.model_validate(updated)
+        refreshed = await self._repo.get_by_id(customer_id)
+        return CustomerResponseSchema.model_validate(refreshed)
 
     async def delete_customer(self, customer_id: str) -> None:
         customer = await self._repo.get_by_id(customer_id)

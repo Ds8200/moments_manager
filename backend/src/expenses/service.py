@@ -38,7 +38,8 @@ class ExpenseService:
     async def create_expense(self, data: ExpenseCreateSchema) -> ExpenseResponseSchema:
         expense = await self._repo.create(data.model_dump())
         await self._db.commit()
-        return ExpenseResponseSchema.model_validate(expense)
+        refreshed = await self._repo.get_by_id(expense.id)
+        return ExpenseResponseSchema.model_validate(refreshed)
 
     async def update_expense(
         self, expense_id: str, data: ExpenseUpdateSchema
@@ -46,9 +47,10 @@ class ExpenseService:
         expense = await self._repo.get_by_id(expense_id)
         if not expense:
             raise NotFoundError("Expense", expense_id)
-        updated = await self._repo.update(expense, data.model_dump(exclude_none=True))
+        await self._repo.update(expense, data.model_dump(exclude_none=True))
         await self._db.commit()
-        return ExpenseResponseSchema.model_validate(updated)
+        refreshed = await self._repo.get_by_id(expense_id)
+        return ExpenseResponseSchema.model_validate(refreshed)
 
     async def delete_expense(self, expense_id: str) -> None:
         expense = await self._repo.get_by_id(expense_id)

@@ -7,6 +7,8 @@ import { z } from 'zod'
 import { useAtom } from 'jotai'
 import { isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { useOrder, useCreateOrder, useUpdateOrder } from '../../queries/useOrder'
+import { useCustomers } from '@/features/customers/queries/useCustomers'
+import type { Customer } from '@/features/customers/types'
 import type { OrderFormValues } from '../../types'
 
 const itemSchema = z.object({
@@ -56,12 +58,14 @@ export interface UseOrderFormReturn {
   appendItem: () => void
   removeItem: (index: number) => void
   onClose: () => void
+  customers: Customer[]
 }
 
 export const useOrderForm = (): UseOrderFormReturn => {
   const [isOpen, setOpen] = useAtom(isOrderFormOpenAtom)
   const [editingId, setEditingId] = useAtom(editingOrderIdAtom)
   const { data: existingOrder } = useOrder(editingId)
+  const { data: customersData } = useCustomers(1, '', 100)
   const createOrder = useCreateOrder()
   const updateOrder = useUpdateOrder()
 
@@ -127,5 +131,6 @@ export const useOrderForm = (): UseOrderFormReturn => {
     appendItem: () => append(DEFAULT_ITEM),
     removeItem: remove,
     onClose,
+    customers: customersData?.items ?? [],
   }
 }

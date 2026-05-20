@@ -1,6 +1,9 @@
 'use client'
 import { useState } from 'react'
+import { useSetAtom } from 'jotai'
 import { useProducts, useDeleteProduct } from '../../queries/useProducts'
+import { isProductFormOpenAtom, editingProductIdAtom } from '../../store/productsAtoms'
+import { ProductForm } from '../ProductForm/ProductForm'
 import { EmptyState } from '@/shared/components/EmptyState/EmptyState'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
 import { formatCurrency } from '@/shared/utils/formatters'
@@ -21,6 +24,11 @@ export function ProductsPage() {
   const [search, setSearch] = useState('')
   const { data, isLoading, isError } = useProducts(page, search)
   const deleteProduct = useDeleteProduct()
+  const setOpen = useSetAtom(isProductFormOpenAtom)
+  const setEditingId = useSetAtom(editingProductIdAtom)
+
+  const handleNew = (): void => setOpen(true)
+  const handleEdit = (id: string): void => { setEditingId(id); setOpen(true) }
 
   const calcProfit = (price: string, cost: string): string => {
     const p = parseFloat(price) - parseFloat(cost)
@@ -38,7 +46,7 @@ export function ProductsPage() {
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1) }}
         />
-        <button className={styles.newBtn}>{LABELS.NEW}</button>
+        <button className={styles.newBtn} onClick={handleNew}>{LABELS.NEW}</button>
       </div>
 
       {isLoading && <PageSkeleton rows={4} />}
@@ -69,7 +77,7 @@ export function ProductsPage() {
               </div>
 
               <div className={styles.cardActions}>
-                <button className={styles.actionBtn} title="עריכה">✏️ ערוך</button>
+                <button className={styles.actionBtn} title="עריכה" onClick={() => handleEdit(product.id)}>✏️ ערוך</button>
                 <button
                   className={styles.actionBtn}
                   title="מחיקה"
@@ -86,6 +94,7 @@ export function ProductsPage() {
           ))}
         </div>
       )}
+      <ProductForm />
     </div>
   )
 }

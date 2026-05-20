@@ -3,9 +3,10 @@ import { useOrderForm } from './useOrderForm'
 import styles from './OrderForm.module.scss'
 
 const FORM_LABELS = {
-  NEW_TITLE:    'הזמנה חדשה',
-  EDIT_TITLE:   'עריכת הזמנה',
-  CUSTOMER:     'לקוח (מזהה)',
+  NEW_TITLE:       'הזמנה חדשה',
+  EDIT_TITLE:      'עריכת הזמנה',
+  CUSTOMER:        'לקוח',
+  CUSTOMER_PLACEHOLDER: 'בחר לקוח...',
   DATE:         'תאריך',
   TARGET:       'יעד / מועד',
   NOTES:        'הערות',
@@ -33,6 +34,7 @@ export function OrderForm() {
     appendItem,
     removeItem,
     onClose,
+    customers,
   } = useOrderForm()
 
   if (!isOpen) return null
@@ -51,10 +53,15 @@ export function OrderForm() {
           <div className={styles.grid2}>
             <div className={styles.field}>
               <label className={styles.label}>{FORM_LABELS.CUSTOMER}</label>
-              <input
+              <select
                 className={`${styles.input}${errors.customer_id ? ` ${styles.error}` : ''}`}
                 {...register('customer_id')}
-              />
+              >
+                <option value="">{FORM_LABELS.CUSTOMER_PLACEHOLDER}</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
               {errors.customer_id && <span className={styles.errorText}>{errors.customer_id.message}</span>}
             </div>
 

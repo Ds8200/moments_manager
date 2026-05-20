@@ -73,6 +73,7 @@ class OrderResponseSchema(BaseModel):
     id: str
     order_number: str
     customer_id: Optional[str]
+    customer_name: Optional[str] = None
     date: Date
     target_description: Optional[str]
     status: str
@@ -94,6 +95,7 @@ class OrderListResponseSchema(BaseModel):
     id: str
     order_number: str
     customer_id: Optional[str]
+    customer_name: Optional[str] = None
     date: Date
     target_description: Optional[str]
     status: str

@@ -26,15 +26,16 @@ class MonthlyReportSchema(BaseModel):
 
 class FinancialYearSchema(BaseModel):
     year: int
-    monthly_data: list[MonthlyReportSchema]
-    total_revenue: Decimal
-    total_expenses: Decimal
-    net_profit: Decimal
+    months: list[MonthlyReportSchema]
+    annual_revenue: Decimal
+    annual_profit: Decimal
+    annual_expenses: Decimal
+    annual_net: Decimal
 
 
 class TopCustomerSchema(BaseModel):
     customer_id: str
     customer_name: str
-    total_orders: int
-    total_spent: Decimal
+    order_count: int
+    total_revenue: Decimal
     total_profit: Decimal

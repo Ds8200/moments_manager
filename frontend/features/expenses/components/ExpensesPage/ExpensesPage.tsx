@@ -1,10 +1,14 @@
 'use client'
 import { useState } from 'react'
+import { useSetAtom } from 'jotai'
 import { useExpenses, useDeleteExpense } from '../../queries/useExpenses'
+import { isExpenseFormOpenAtom, editingExpenseAtom } from '../../store/expensesAtoms'
+import { ExpenseForm } from '../ExpenseForm/ExpenseForm'
 import { EmptyState } from '@/shared/components/EmptyState/EmptyState'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
 import { formatCurrency, formatDate } from '@/shared/utils/formatters'
 import { EXPENSE_CATEGORY_LABELS } from '@/shared/enums/statusEnums'
+import type { Expense } from '../../types'
 import styles from './ExpensesPage.module.scss'
 
 const LABELS = {
@@ -24,6 +28,11 @@ export function ExpensesPage() {
   const [page, setPage] = useState(1)
   const { data, isLoading, isError } = useExpenses(page)
   const deleteExpense = useDeleteExpense()
+  const setOpen = useSetAtom(isExpenseFormOpenAtom)
+  const setEditingExpense = useSetAtom(editingExpenseAtom)
+
+  const handleNew = (): void => setOpen(true)
+  const handleEdit = (expense: Expense): void => { setEditingExpense(expense); setOpen(true) }
 
   const totalAmount = data?.items.reduce((sum, e) => sum + parseFloat(e.amount), 0) ?? 0
 
@@ -31,7 +40,7 @@ export function ExpensesPage() {
     <div className={styles.page}>
       <div className={styles.toolbar}>
         <h1 className={styles.title}>{LABELS.TITLE}</h1>
-        <button className={styles.newBtn}>{LABELS.NEW}</button>
+        <button className={styles.newBtn} onClick={handleNew}>{LABELS.NEW}</button>
       </div>
 
       {isLoading && <PageSkeleton rows={6} />}
@@ -67,6 +76,7 @@ export function ExpensesPage() {
                   </td>
                   <td className={styles.cell}>{expense.notes ?? '—'}</td>
                   <td className={styles.cell}>
+                    <button className={styles.actionBtn} title="עריכה" onClick={() => handleEdit(expense)}>✏️</button>
                     <button
                       className={styles.actionBtn}
                       title="מחיקה"
@@ -89,6 +99,7 @@ export function ExpensesPage() {
           </div>
         </div>
       )}
+      <ExpenseForm />
     </div>
   )
 }

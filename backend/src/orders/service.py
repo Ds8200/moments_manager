@@ -108,7 +108,8 @@ class OrderService:
         order.status = data.status.value
         await self._db.commit()
         logger.info(log_messages.ORDER_STATUS_CHANGED, order_id, old_status, data.status.value)
-        return OrderResponseSchema.model_validate(order)
+        refreshed = await self._repo.get_by_id(order_id)
+        return OrderResponseSchema.model_validate(refreshed)
 
     async def update_payment(
         self, order_id: str, data: OrderPaymentUpdateSchema
@@ -120,7 +121,8 @@ class OrderService:
         if data.payment_method:
             order.payment_method = data.payment_method.value
         await self._db.commit()
-        return OrderResponseSchema.model_validate(order)
+        refreshed = await self._repo.get_by_id(order_id)
+        return OrderResponseSchema.model_validate(refreshed)
 
     async def delete_order(self, order_id: str) -> None:
         order = await self._repo.get_by_id(order_id)
