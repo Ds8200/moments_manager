@@ -2,6 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+ENV PYTHONPATH=/app
+
 RUN pip install uv
 
 COPY backend/pyproject.toml backend/uv.lock* ./

@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     includePaths: [path.resolve(__dirname)],
   },
   output: 'standalone',
+  // Ensures server.js lands at .next/standalone/server.js regardless of turbopack.root
+  outputFileTracingRoot: path.resolve(__dirname),
   turbopack: {
     root: path.resolve(__dirname, '..'),
   },

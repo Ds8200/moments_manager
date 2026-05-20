@@ -1,31 +1,34 @@
-from datetime import date, datetime
+from datetime import date as Date
+from datetime import datetime
 from decimal import Decimal
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
 from src.orders.enums import OrderStatus, PaymentMethod
 
 
 class OrderItemCreateSchema(BaseModel):
-    product_id: str | None = None
+    product_id: Optional[str] = None
     product_name: str
     quantity: int = 1
     unit_price: Decimal = Decimal("0")
     unit_cost: Decimal = Decimal("0")
-    design_notes: str | None = None
+    design_notes: Optional[str] = None
 
 
 class OrderItemResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    product_id: str | None
+    product_id: Optional[str]
     product_name: str
     quantity: int
     unit_price: Decimal
     unit_cost: Decimal
     total_price: Decimal
     profit: Decimal
-    design_notes: str | None
+    design_notes: Optional[str]
 
 
 class OrderFileResponseSchema(BaseModel):
@@ -40,19 +43,19 @@ class OrderFileResponseSchema(BaseModel):
 
 
 class OrderCreateSchema(BaseModel):
-    customer_id: str | None = None
-    date: date
-    target_description: str | None = None
-    notes: str | None = None
+    customer_id: Optional[str] = None
+    date: Date
+    target_description: Optional[str] = None
+    notes: Optional[str] = None
     items: list[OrderItemCreateSchema] = []
 
 
 class OrderUpdateSchema(BaseModel):
-    customer_id: str | None = None
-    date: date | None = None
-    target_description: str | None = None
-    notes: str | None = None
-    items: list[OrderItemCreateSchema] | None = None
+    customer_id: Optional[str] = None
+    date: Optional[Date] = None
+    target_description: Optional[str] = None
+    notes: Optional[str] = None
+    items: Optional[list[OrderItemCreateSchema]] = None
 
 
 class OrderStatusUpdateSchema(BaseModel):
@@ -61,7 +64,7 @@ class OrderStatusUpdateSchema(BaseModel):
 
 class OrderPaymentUpdateSchema(BaseModel):
     is_paid: bool
-    payment_method: PaymentMethod | None = None
+    payment_method: Optional[PaymentMethod] = None
 
 
 class OrderResponseSchema(BaseModel):
@@ -69,16 +72,16 @@ class OrderResponseSchema(BaseModel):
 
     id: str
     order_number: str
-    customer_id: str | None
-    date: date
-    target_description: str | None
+    customer_id: Optional[str]
+    date: Date
+    target_description: Optional[str]
     status: str
     is_paid: bool
-    payment_method: str | None
+    payment_method: Optional[str]
     total_amount: Decimal
     total_cost: Decimal
     total_profit: Decimal
-    notes: str | None
+    notes: Optional[str]
     created_at: datetime
     updated_at: datetime
     items: list[OrderItemResponseSchema] = []
@@ -90,14 +93,14 @@ class OrderListResponseSchema(BaseModel):
 
     id: str
     order_number: str
-    customer_id: str | None
-    date: date
-    target_description: str | None
+    customer_id: Optional[str]
+    date: Date
+    target_description: Optional[str]
     status: str
     is_paid: bool
-    payment_method: str | None
+    payment_method: Optional[str]
     total_amount: Decimal
     total_profit: Decimal
-    notes: str | None
+    notes: Optional[str]
     created_at: datetime
     item_count: int = 0
