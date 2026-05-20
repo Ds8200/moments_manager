@@ -1,0 +1,89 @@
+@use '../../styles/variables' as v;
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.inputWrapper {
+  position: relative;
+
+  &.hasError .input {
+    border-color: v.$danger;
+  }
+}
+
+.input {
+  width: 100%;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  transition: border-color v.$transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+  }
+
+  &:disabled {
+    background: v.$gray-100;
+    color: v.$text-disabled;
+    cursor: not-allowed;
+  }
+}
+
+.errorText {
+  font-size: v.$font-size-xs;
+  color: v.$danger;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + v.$space-1);
+  right: 0;
+  left: 0;
+  background: v.$bg-card;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  box-shadow: v.$shadow-dropdown;
+  z-index: v.$z-dropdown;
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: v.$space-1 0;
+}
+
+.option {
+  padding: v.$space-2 v.$space-3;
+  font-size: v.$font-size-sm;
+  color: v.$text-primary;
+  cursor: pointer;
+  transition: background v.$transition-fast;
+
+  &:hover,
+  &.highlighted {
+    background: v.$primary-light;
+    color: v.$primary;
+  }
+}
+
+.statusItem {
+  padding: v.$space-3 v.$space-3;
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  text-align: center;
+}

@@ -1,13 +1,14 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
-import type { Resolver } from 'react-hook-form'
+import type { Resolver, UseFormSetValue } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAtom } from 'jotai'
 import { isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { useOrder, useCreateOrder, useUpdateOrder } from '../../queries/useOrder'
 import { useCustomers } from '@/features/customers/queries/useCustomers'
+import type { AutocompleteOption } from '@/shared/components/Autocomplete/useAutocomplete'
 import type { Customer } from '@/features/customers/types'
 import type { OrderFormValues } from '../../types'
 
@@ -50,6 +51,7 @@ export interface UseOrderFormReturn {
   isEditing: boolean
   register: ReturnType<typeof useForm<OrderFormValues>>['register']
   control: ReturnType<typeof useForm<OrderFormValues>>['control']
+  setValue: UseFormSetValue<OrderFormValues>
   handleSubmit: ReturnType<typeof useForm<OrderFormValues>>['handleSubmit']
   onSubmit: (values: OrderFormValues) => Promise<void>
   errors: ReturnType<typeof useForm<OrderFormValues>>['formState']['errors']
@@ -58,14 +60,18 @@ export interface UseOrderFormReturn {
   appendItem: () => void
   removeItem: (index: number) => void
   onClose: () => void
-  customers: Customer[]
+  customerOptions: AutocompleteOption<Customer>[]
+  customersLoading: boolean
+  setCustomerSearch: (query: string) => void
+  customerDefaultLabel: string
 }
 
 export const useOrderForm = (): UseOrderFormReturn => {
   const [isOpen, setOpen] = useAtom(isOrderFormOpenAtom)
   const [editingId, setEditingId] = useAtom(editingOrderIdAtom)
   const { data: existingOrder } = useOrder(editingId)
-  const { data: customersData } = useCustomers(1, '', 100)
+  const [customerSearch, setCustomerSearch] = useState('')
+  const { data: customersData, isPending: customersLoading } = useCustomers(1, customerSearch, 20)
   const createOrder = useCreateOrder()
   const updateOrder = useUpdateOrder()
 
@@ -74,6 +80,7 @@ export const useOrderForm = (): UseOrderFormReturn => {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<OrderFormValues>({
     // z.coerce.number() input type is unknown; cast to align with OrderFormValues
@@ -118,11 +125,16 @@ export const useOrderForm = (): UseOrderFormReturn => {
     onClose()
   }
 
+  const customerOptions: AutocompleteOption<Customer>[] = (customersData?.items ?? []).map(
+    (c) => ({ value: c.id, label: c.name, data: c })
+  )
+
   return {
     isOpen,
     isEditing: !!editingId,
     register,
     control,
+    setValue,
     handleSubmit,
     onSubmit,
     errors,
@@ -131,6 +143,9 @@ export const useOrderForm = (): UseOrderFormReturn => {
     appendItem: () => append(DEFAULT_ITEM),
     removeItem: remove,
     onClose,
-    customers: customersData?.items ?? [],
+    customerOptions,
+    customersLoading,
+    setCustomerSearch,
+    customerDefaultLabel: existingOrder?.customer_name ?? '',
   }
 }

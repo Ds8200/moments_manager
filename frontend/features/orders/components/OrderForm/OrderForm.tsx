@@ -1,40 +1,30 @@
 'use client'
+import { Controller } from 'react-hook-form'
 import { useOrderForm } from './useOrderForm'
+import { OrderItemRow } from './OrderItemRow/OrderItemRow'
+import { Autocomplete } from '@/shared/components/Autocomplete/Autocomplete'
 import styles from './OrderForm.module.scss'
 
-const FORM_LABELS = {
-  NEW_TITLE:       'הזמנה חדשה',
-  EDIT_TITLE:      'עריכת הזמנה',
-  CUSTOMER:        'לקוח',
-  CUSTOMER_PLACEHOLDER: 'בחר לקוח...',
-  DATE:         'תאריך',
-  TARGET:       'יעד / מועד',
-  NOTES:        'הערות',
-  ITEMS:        'פריטים',
-  ITEM_NAME:    'מוצר',
-  ITEM_QTY:     'כמות',
-  ITEM_PRICE:   'מחיר',
-  ITEM_COST:    'עלות',
-  ADD_ITEM:     '+ הוסף פריט',
-  CANCEL:       'ביטול',
-  SAVE:         'שמור',
-  SAVING:       'שומר...',
+const LABELS = {
+  NEW_TITLE:            'הזמנה חדשה',
+  EDIT_TITLE:           'עריכת הזמנה',
+  CUSTOMER:             'לקוח',
+  CUSTOMER_PLACEHOLDER: 'חפש לקוח...',
+  DATE:                 'תאריך',
+  TARGET:               'יעד / מועד',
+  NOTES:                'הערות',
+  ITEMS:                'פריטים',
+  ADD_ITEM:             '+ הוסף פריט',
+  CANCEL:               'ביטול',
+  SAVE:                 'שמור',
+  SAVING:               'שומר...',
 } as const
 
 export function OrderForm() {
   const {
-    isOpen,
-    isEditing,
-    register,
-    handleSubmit,
-    onSubmit,
-    errors,
-    isSubmitting,
-    fields,
-    appendItem,
-    removeItem,
-    onClose,
-    customers,
+    isOpen, isEditing, register, control, setValue, handleSubmit, onSubmit,
+    errors, isSubmitting, fields, appendItem, removeItem, onClose,
+    customerOptions, customersLoading, setCustomerSearch, customerDefaultLabel,
   } = useOrderForm()
 
   if (!isOpen) return null
@@ -43,30 +33,33 @@ export function OrderForm() {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>
-            {isEditing ? FORM_LABELS.EDIT_TITLE : FORM_LABELS.NEW_TITLE}
-          </h2>
+          <h2 className={styles.title}>{isEditing ? LABELS.EDIT_TITLE : LABELS.NEW_TITLE}</h2>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.grid2}>
-            <div className={styles.field}>
-              <label className={styles.label}>{FORM_LABELS.CUSTOMER}</label>
-              <select
-                className={`${styles.input}${errors.customer_id ? ` ${styles.error}` : ''}`}
-                {...register('customer_id')}
-              >
-                <option value="">{FORM_LABELS.CUSTOMER_PLACEHOLDER}</option>
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-              {errors.customer_id && <span className={styles.errorText}>{errors.customer_id.message}</span>}
-            </div>
+            <Controller
+              control={control}
+              name="customer_id"
+              render={({ field }) => (
+                <Autocomplete
+                  id="customer"
+                  label={LABELS.CUSTOMER}
+                  value={field.value || null}
+                  onChange={(value) => field.onChange(value ?? '')}
+                  options={customerOptions}
+                  onSearch={setCustomerSearch}
+                  defaultLabel={customerDefaultLabel}
+                  isLoading={customersLoading}
+                  placeholder={LABELS.CUSTOMER_PLACEHOLDER}
+                  error={errors.customer_id?.message}
+                />
+              )}
+            />
 
             <div className={styles.field}>
-              <label className={styles.label}>{FORM_LABELS.DATE}</label>
+              <label className={styles.label}>{LABELS.DATE}</label>
               <input
                 type="date"
                 className={`${styles.input}${errors.date ? ` ${styles.error}` : ''}`}
@@ -76,7 +69,7 @@ export function OrderForm() {
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>{FORM_LABELS.TARGET}</label>
+              <label className={styles.label}>{LABELS.TARGET}</label>
               <input
                 className={styles.input}
                 placeholder="שישי, ראשון בלילה..."
@@ -85,73 +78,36 @@ export function OrderForm() {
             </div>
 
             <div className={`${styles.field} ${styles.fieldFull}`}>
-              <label className={styles.label}>{FORM_LABELS.NOTES}</label>
+              <label className={styles.label}>{LABELS.NOTES}</label>
               <textarea className={styles.textarea} {...register('notes')} />
             </div>
           </div>
 
-          <div className={styles.sectionTitle}>{FORM_LABELS.ITEMS}</div>
+          <div className={styles.sectionTitle}>{LABELS.ITEMS}</div>
 
           {fields.map((field, idx) => (
-            <div key={field.id} className={styles.itemRow}>
-              <div className={styles.field}>
-                {idx === 0 && <label className={styles.label}>{FORM_LABELS.ITEM_NAME}</label>}
-                <input
-                  className={`${styles.input}${errors.items?.[idx]?.product_name ? ` ${styles.error}` : ''}`}
-                  placeholder="שם המוצר"
-                  {...register(`items.${idx}.product_name`)}
-                />
-              </div>
-              <div className={styles.field}>
-                {idx === 0 && <label className={styles.label}>{FORM_LABELS.ITEM_QTY}</label>}
-                <input
-                  type="number"
-                  min={1}
-                  className={styles.input}
-                  {...register(`items.${idx}.quantity`)}
-                />
-              </div>
-              <div className={styles.field}>
-                {idx === 0 && <label className={styles.label}>{FORM_LABELS.ITEM_PRICE}</label>}
-                <input
-                  type="number"
-                  step="0.01"
-                  className={`${styles.input}${errors.items?.[idx]?.unit_price ? ` ${styles.error}` : ''}`}
-                  placeholder="₪"
-                  {...register(`items.${idx}.unit_price`)}
-                />
-              </div>
-              <div className={styles.field}>
-                {idx === 0 && <label className={styles.label}>{FORM_LABELS.ITEM_COST}</label>}
-                <input
-                  type="number"
-                  step="0.01"
-                  className={styles.input}
-                  placeholder="₪"
-                  {...register(`items.${idx}.unit_cost`)}
-                />
-              </div>
-              <button
-                type="button"
-                className={styles.removeItemBtn}
-                onClick={() => removeItem(idx)}
-                disabled={fields.length === 1}
-              >
-                ✕
-              </button>
-            </div>
+            <OrderItemRow
+              key={field.id}
+              index={idx}
+              control={control}
+              register={register}
+              setValue={setValue}
+              errors={errors}
+              isOnly={fields.length === 1}
+              onRemove={() => removeItem(idx)}
+            />
           ))}
 
           <button type="button" className={styles.addItemBtn} onClick={appendItem}>
-            {FORM_LABELS.ADD_ITEM}
+            {LABELS.ADD_ITEM}
           </button>
 
           <div className={styles.footer}>
             <button type="button" className={styles.cancelBtn} onClick={onClose}>
-              {FORM_LABELS.CANCEL}
+              {LABELS.CANCEL}
             </button>
             <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-              {isSubmitting ? FORM_LABELS.SAVING : FORM_LABELS.SAVE}
+              {isSubmitting ? LABELS.SAVING : LABELS.SAVE}
             </button>
           </div>
         </form>
