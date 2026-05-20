@@ -51,6 +51,72 @@ between a shared rule and a layer rule, the layer rule takes precedence for that
 - Only `.env.example` files (with placeholder values) are committed.
 - Firmware secrets: `firmware/include/secrets.h` is gitignored; `firmware/include/secrets.h.example` is committed.
 
+### API Contract & Schema Consistency
+
+**This rule applies whenever a task touches both the frontend and backend layers — a full end-to-end feature, a schema change, or any modification to an API endpoint.**
+
+#### Source of truth
+
+The backend `ResponseSchema` (Pydantic) is the single source of truth for every API contract. Frontend TypeScript types that represent API responses must mirror it exactly. The backend defines the shape; the frontend follows.
+
+#### Planning gate — schema first
+
+Before writing any implementation code for an end-to-end feature, the API contract must be fully defined and locked:
+
+1. Define the backend `ResponseSchema`, `CreateSchema`, and `UpdateSchema` in `{domain}/schemas.py`.
+2. Derive the matching TypeScript types in `features/{domain}/types.ts` from those schemas — field names, field types, and nullable/optional markers must match exactly.
+3. Define the error response shape if the endpoint introduces new error cases.
+4. Only after all three schemas are written and reviewed may implementation begin.
+
+Starting implementation before the contract is defined is forbidden — do not write a frontend component against an assumed shape.
+
+#### Field naming and types
+
+| Rule | Detail |
+|------|--------|
+| Field names | Must be identical on both sides — no renaming between layers without an explicit adapter |
+| Casing | Backend uses `snake_case`; FastAPI's default JSON serialization preserves `snake_case`. Frontend TypeScript types must also use `snake_case` to match the wire format — do not silently camelCase fields in types |
+| Optional fields | A field marked `Optional` / `None` in Pydantic must be typed `field?: Type` or `field: Type \| null` in TypeScript |
+| Enum values | Enum string values must be identical on both sides — define a shared string enum in `features/{domain}/enums/` that matches the Python enum values exactly |
+| Dates | Backend sends ISO 8601 strings; frontend types must be `string`, not `Date` — parse at the display layer only |
+
+#### Error response uniformity
+
+All backend error responses must follow one shape, defined once in `core/exception_handlers.py`:
+```json
+{ "detail": "human-readable message", "code": "MACHINE_READABLE_CODE" }
+```
+The frontend `ApiError` class in `shared/utils/apiClient.ts` must parse this shape. Ad-hoc error formats per endpoint are forbidden.
+
+#### Runtime validation at the API boundary
+
+Every `api.ts` function must validate the API response against a zod schema before returning it to the caller. A mismatch between the declared TypeScript type and the actual response must throw an `ApiError`, not silently pass through as `unknown`.
+
+```ts
+// in features/{domain}/api.ts
+const response = await apiClient<unknown>('/api/v1/devices');
+return DeviceResponseSchema.parse(response); // zod throws if shape drifts
+```
+
+The zod schema (`DeviceResponseSchema`) must be defined in `features/{domain}/types.ts` alongside the TypeScript type inferred from it.
+
+#### Same-PR rule
+
+A PR that modifies a backend schema (`schemas.py`, `models.py`, or a new endpoint) **must** include the corresponding frontend type update (`types.ts`, zod schema, and any affected `api.ts`) in the same PR. Split PRs that leave the frontend temporarily out of sync are forbidden.
+
+#### Cross-layer planning checklist
+
+When planning any end-to-end feature, the Plan phase must explicitly verify:
+- [ ] Backend `ResponseSchema` defined and matches frontend TypeScript type field-for-field
+- [ ] Zod schema in `features/{domain}/types.ts` mirrors the Pydantic schema
+- [ ] Error cases covered by the uniform error shape — no custom error format
+- [ ] Enum values identical on both sides
+- [ ] No field is optional on one side and required on the other
+
+Do not advance to the Implement phase until all checklist items are confirmed.
+
+---
+
 ### Docker
 
 - `docker-compose.yml` at repo root defines all services.
@@ -221,3 +287,6 @@ Both commands run in CI. Coverage regressions fail the build automatically.
 - When a shared rule conflicts with a layer rule, apply the layer rule for that layer and document the conflict in the PR description.
 - Use existing implementation patterns. Create a new pattern only when no existing pattern satisfies the requirement; document the justification in the PR description.
 - Escalate missing requirements — do not fill gaps with guesses.
+- A frontend type that diverges from the backend `ResponseSchema` (renamed field, wrong nullability, missing field) is a hard contract violation — fix the type before proceeding, never adjust the code to work around the mismatch.
+- A PR that changes a backend schema without a matching frontend type update is incomplete — do not merge until both sides are in sync.
+- Implementation started before the API contract is defined is a planning violation — stop, define the schemas, get confirmation, then implement.

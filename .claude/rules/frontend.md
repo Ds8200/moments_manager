@@ -29,24 +29,33 @@ paths: ["frontend/**"]
 ### Stack
 
 - Next.js 14+ (App Router), TypeScript (strict mode)
-- SCSS Modules for all styling — Tailwind CSS is forbidden in this project
+- CSS Modules + SCSS for all component styles — Tailwind CSS is forbidden
 - Jotai for client UI state management
 - TanStack Query v5 for server state (fetching, caching, mutations)
 - react-hook-form + zod for forms and validation
+- next-intl for i18n (internationalization)
 - ESLint + Prettier for linting
-- No shadcn/ui — all UI components are hand-built in `shared/components/` using SCSS Modules
+- shadcn/ui — default UI component library; initialize once with `npx shadcn@latest init`, then add components individually with `npx shadcn@latest add <component>`. shadcn generates files into `components/ui/` by default. Every shadcn-generated component must be immediately moved into `shared/components/{ComponentName}/` and wrapped in the standard component folder structure (`.tsx`, `useComponentName.ts`, `.module.scss`). The generated file in `components/ui/` must be deleted. The `components/ui/` directory must not exist after initialization.
 
 ### Directory Structure
 
 ```
 frontend/
-├── app/                              Next.js App Router
-│   ├── (routes)/
-│   │   ├── page.tsx                  Server Component by default
-│   │   ├── loading.tsx               Suspense boundary for this route segment
-│   │   └── error.tsx                 error boundary per route segment
-│   ├── layout.tsx
-│   └── providers.tsx                 QueryClientProvider + JotaiProvider + other wrappers
+├── messages/                         i18n translation files
+│   ├── he.json                       Hebrew (default locale)
+│   └── en.json                       English
+├── i18n/
+│   ├── routing.ts                    next-intl locale config and pathnames
+│   └── request.ts                    getRequestConfig — loads messages per locale
+├── middleware.ts                     next-intl locale detection and routing
+├── app/
+│   └── [locale]/                     locale segment wraps all routes
+│       ├── (routes)/
+│       │   ├── page.tsx              Server Component by default
+│       │   ├── loading.tsx           Suspense boundary for this route segment
+│       │   └── error.tsx             error boundary per route segment
+│       ├── layout.tsx                sets <html lang={locale}>
+│       └── providers.tsx             NextIntlClientProvider + QueryClientProvider + JotaiProvider
 ├── features/
 │   └── {featureName}/
 │       ├── components/
@@ -60,7 +69,7 @@ frontend/
 │       │           └── ChildComponent.module.scss
 │       ├── store/featureAtoms.ts     Jotai atoms for this feature
 │       ├── queries/                  TanStack Query hooks for this feature
-│       ├── constants/                UI labels, API paths, config values
+│       ├── constants/                non-translatable constants (API paths, config values)
 │       ├── enums/                    status/type enums for this feature
 │       ├── types.ts
 │       ├── api.ts
@@ -69,7 +78,7 @@ frontend/
     ├── components/                   generic reusable UI primitives
     │   └── {ComponentName}/          same folder structure as above
     ├── store/globalAtoms.ts          global Jotai atoms
-    ├── constants/                    app-wide constants (routes, errors)
+    ├── constants/                    app-wide non-translatable constants (routes, errors)
     ├── enums/                        app-wide enums
     ├── hooks/
     ├── utils/
@@ -78,28 +87,58 @@ frontend/
 
 ### Component Folder Rule
 
-Every component lives in its own folder. No exceptions.
+**Every component lives in its own folder containing exactly these three files. No exceptions.**
 
-Required files per component:
-- `ComponentName.tsx` — JSX only, no logic, no inline strings
-- `useComponentName.ts` — all logic, handlers, atom access, query hooks, types
-- `ComponentName.module.scss` — component styles
+```
+ComponentName/
+├── ComponentName.tsx          JSX structure only
+├── useComponentName.ts        all logic, state, and handlers
+└── ComponentName.module.scss  all styles
+```
 
-`useComponentName.ts` is required when the component meets any of these conditions:
-- Has 2 or more hooks
-- Has any `useEffect`
-- Accesses Jotai atoms
-- Performs data fetching
+#### `ComponentName.tsx` — JSX only
 
-A single `useState` for a purely local toggle is the only case where inline hook usage in `.tsx` is acceptable.
+**What is forbidden inside `.tsx`:**
+- Logic of any kind — no `if/else` outside JSX, no data transformations, no calculations
+- Hook calls (except the single `use` hook that returns everything from `useComponentName.ts`)
+- `try/catch` blocks
+- Inline styles — `style={{}}` props are forbidden
+- Hardcoded strings — every text value comes from `t('key')` via the hook or from a constants file
+- Direct imports of atoms, query hooks, API functions, or services
 
-Additional constraints:
-- `try/catch` is permitted in event handlers inside `useComponentName.ts` — it is forbidden in JSX render functions.
-- Pure display components (icons, badges, static cards with no logic) do not require a hook file.
-- `ComponentName.tsx` must only import from `./useComponentName` and the style file.
-- The props interface (`{ComponentName}Props`) is defined in `useComponentName.ts` and exported to `.tsx`.
-- `.tsx` files must not exceed 60 lines of JSX — extract child sub-components when this limit is reached.
-- No component must render more than 8 direct children — split into sub-components when this limit is reached.
+**What `.tsx` may contain:**
+- The component declaration: `export const ComponentName = (props: ComponentNameProps): JSX.Element => { ... }`
+- A single destructure of the hook: `const { ... } = useComponentName(props)`
+- JSX return — structure, class names from the SCSS module, and values from the hook
+- Imports: `useComponentName`, the SCSS module, child components, and Next.js/React types only
+
+#### `useComponentName.ts` — all logic
+
+Everything that is not JSX structure lives here:
+- All hook calls (`useState`, `useEffect`, `useTranslations`, TanStack Query hooks, Jotai atoms)
+- Event handlers and callbacks
+- Derived values and data transformations
+- The `ComponentNameProps` interface (exported for use in `.tsx`)
+- The return type interface `UseComponentNameReturn` (exported and declared explicitly)
+
+The hook signature must always be: `export const useComponentName = (props: ComponentNameProps): UseComponentNameReturn => { ... }`
+
+#### `ComponentName.module.scss` — all styles
+
+All visual styling lives here. Nothing visual goes elsewhere:
+- No inline `style={{}}` in `.tsx`
+- No Tailwind utility classes anywhere
+- Use CSS logical properties (`margin-inline-start`, `padding-block`) for RTL compatibility
+
+#### When each file is required
+
+| File | Required when |
+|------|---------------|
+| `ComponentName.tsx` | Always |
+| `useComponentName.ts` | Component has any hook, handler, atom access, query, or derived value. Omit only for pure static display (icon, badge, static text card with zero interactivity). |
+| `ComponentName.module.scss` | Component has any visual styling. Omit only if all styling is inherited from a parent scope with no component-specific classes needed. |
+
+A pure static display component with no logic and no unique styles is the only case where one or two of the three files may be absent. When in doubt, create all three.
 
 ### State Management
 
@@ -130,7 +169,7 @@ Additional constraints:
 - Use `interface` for object shapes, `type` for unions and intersections.
 - Type assertions (`as`) require a comment explaining why narrowing cannot be used.
 
-Scaffold config files required at project init: `frontend/tsconfig.json`, `frontend/package.json` (replace `<project-slug>`), `frontend/next.config.ts`, `frontend/eslint.config.mjs`. No `tailwind.config.ts` — Tailwind is not used.
+Scaffold config files required at project init: `frontend/tsconfig.json`, `frontend/package.json` (replace `<project-slug>`), `frontend/next.config.ts`, `frontend/eslint.config.mjs`, `frontend/middleware.ts`, `frontend/i18n/routing.ts`, `frontend/i18n/request.ts`, `frontend/messages/he.json`, `frontend/messages/en.json`.
 
 `frontend/package.json` must define the npm scripts: `dev`, `build`, `lint`, `test`, `test:run`, `test:coverage`.
 
@@ -140,14 +179,11 @@ Scaffold config files required at project init: `frontend/tsconfig.json`, `front
 
 `app/providers.tsx` must be a Client Component (`"use client"`). It must wrap children with `QueryClientProvider` (TanStack Query) and `Provider` (Jotai) in that order. No data fetching or business logic is permitted in this file.
 
-### SCSS Modules
+### CSS Modules + SCSS
 
-- Tailwind CSS is forbidden — do not install it, do not import it, do not use utility class names in JSX.
-- All styling must be written in `.module.scss` files — one per component.
+- **Tailwind CSS is forbidden** — do not install it, do not use utility classes in JSX.
+- All styling must be done exclusively via CSS Modules + SCSS.
 - Style files must be named `{ComponentName}.module.scss`.
-- Global design tokens (colors, spacing, typography, shadows, breakpoints) must be defined in `shared/styles/_variables.scss` and imported via `@use` in each module file.
-- Shared mixins (responsive breakpoints, flex/grid helpers) must live in `shared/styles/_mixins.scss`.
-- A global reset and base typography must live in `app/globals.scss`.
 - Inline `style={{}}` props are forbidden.
 - Global class names are forbidden — all selectors must be scoped via CSS Modules.
 - `!important` is forbidden.
@@ -155,19 +191,91 @@ Scaffold config files required at project init: `frontend/tsconfig.json`, `front
 ### Export Rules
 
 - `export const` is required for all exports — `export default` is forbidden except in Next.js-required files (`page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`).
-- Components must use named function expressions — arrow function components are forbidden because they display as anonymous in React DevTools.
-- Arrow functions must be used for hooks — hooks do not appear in React DevTools.
+- **All components and hooks must use the `export const Name = () => ...` arrow function syntax** — named function expressions (`export function Name()`) are forbidden. Modern React DevTools resolves the variable name from `export const`, so there is no DevTools display issue.
+- Example component: `export const UserCard = ({ user }: UserCardProps): JSX.Element => { ... }`
+- Example hook: `export const useUserCard = (): UseUserCardReturn => { ... }`
+- The return type must always be declared explicitly on every exported function and hook.
 
 ### No Inline Strings
 
-Raw strings in JSX or logic are forbidden. Every string must come from a constants or enums file.
+**Zero inline strings are permitted anywhere in the codebase.** Every string that appears in JSX, logic, or hooks must come from one of the sources below — no exceptions.
 
-Constants file naming:
-- UI labels → `constants/{topic}Labels.ts`
-- Status/type values → `enums/{topic}Enums.ts`
-- Route paths → `shared/constants/routes.ts`
-- API endpoints → `shared/constants/apiEndpoints.ts`
-- Error messages → `shared/constants/errorMessages.ts`
+| String type | Source |
+|-------------|--------|
+| UI text visible to the user (labels, titles, placeholders, button text, error messages shown in UI) | `messages/he.json` (and its locale siblings) via `next-intl` — see i18n section |
+| Status / type values used in logic | `enums/{topic}Enums.ts` |
+| Route paths | `shared/constants/routes.ts` |
+| API endpoint paths | `shared/constants/apiEndpoints.ts` |
+| Non-translatable error codes or internal keys | `shared/constants/errorCodes.ts` |
+| Feature-specific non-translatable constants | `features/{name}/constants/{topic}.ts` |
+
+**Applying the rule:**
+- If a string is ever visible to the user → it goes in the messages JSON and is accessed via `t('key')`.
+- If a string is a code-internal value (enum member, config key, URL path) → it goes in a constants or enums file.
+- A string literal typed directly in a `.tsx`, `.ts`, or `.test.ts` file is a hard violation.
+
+### i18n — Internationalization (next-intl)
+
+**Package:** `next-intl` — install with `npm install next-intl`.
+
+**Default locale:** `he` (Hebrew). English (`en`) is the secondary locale. Additional locales are added by creating a new `messages/{locale}.json` file and registering the locale in `i18n/routing.ts`.
+
+**Setup files (scaffold once):**
+
+`i18n/routing.ts` — defines supported locales and default:
+```ts
+import { defineRouting } from 'next-intl/routing';
+export const routing = defineRouting({
+  locales: ['he', 'en'],
+  defaultLocale: 'he',
+});
+```
+
+`i18n/request.ts` — loads the correct message file per request:
+```ts
+import { getRequestConfig } from 'next-intl/server';
+import { routing } from './routing';
+export default getRequestConfig(async ({ requestLocale }) => {
+  const locale = (await requestLocale) ?? routing.defaultLocale;
+  return { locale, messages: (await import(`../messages/${locale}.json`)).default };
+});
+```
+
+`middleware.ts` (repo root of `frontend/`) — handles locale detection and redirects:
+```ts
+import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
+export default createMiddleware(routing);
+export const config = { matcher: ['/((?!api|_next|.*\\..*).*)'] };
+```
+
+**Directory layout for messages:**
+- `messages/he.json` — Hebrew strings (source of truth for all UI text)
+- `messages/en.json` — English translation (mirrors the exact key structure of `he.json`)
+- Keys must be namespaced by feature/domain: `{ "Auth": { "loginButton": "כניסה" }, "Devices": { "title": "מכשירים" } }`
+- Flat keys at the root level are forbidden — every key must be under a namespace.
+
+**Usage in Server Components:**
+```ts
+import { getTranslations } from 'next-intl/server';
+const t = await getTranslations('Auth');
+return <h1>{t('loginButton')}</h1>;
+```
+
+**Usage in Client Components (`"use client"`):**
+```ts
+import { useTranslations } from 'next-intl';
+const t = useTranslations('Auth');
+return <button>{t('loginButton')}</button>;
+```
+
+**Rules:**
+- `useTranslations` requires `"use client"` — it is a hook. When a component only needs translations and has no other client-side requirement, keep it as a Server Component and use `getTranslations` instead.
+- `NextIntlClientProvider` must wrap the app in `app/[locale]/providers.tsx`, receiving `messages` and `locale` props from the Server Component layout.
+- `app/[locale]/layout.tsx` must pass `messages` to `NextIntlClientProvider` and set `<html lang={locale} dir={locale === 'he' ? 'rtl' : 'ltr'}>`.
+- RTL support: when `locale === 'he'`, `dir="rtl"` must be set on `<html>`. SCSS styles must use logical properties (`margin-inline-start`, `padding-inline-end`) instead of directional properties (`margin-left`, `padding-right`) so layout flips automatically with RTL.
+- Adding a new user-visible string requires adding the key to **both** `he.json` and `en.json` in the same commit — partial translations that break one locale are forbidden.
+- `next.config.ts` must wrap the config with `createNextIntlPlugin`: `import createNextIntlPlugin from 'next-intl/plugin'; const withNextIntl = createNextIntlPlugin(); export default withNextIntl(nextConfig);`
 
 ---
 
@@ -308,6 +416,9 @@ MSW setup: `shared/mocks/handlers.ts` for handler definitions, `shared/mocks/ser
 
 ## Layer 5 — Failure and Decision
 
+- Logic found inside a `.tsx` file (hook calls beyond the single `useComponentName`, data transformations, `if/else` outside JSX) must be moved to `useComponentName.ts` before the task is reported done.
+- `style={{}}` found anywhere in a `.tsx` file must be replaced with a CSS Module class — do not leave it as a temporary fix.
+- A component file found outside its own folder (e.g., a bare `Button.tsx` in a `components/` directory without a `Button/` subfolder) must be restructured into the three-file folder layout before proceeding.
 - A missing MSW handler causes a test failure. Do not suppress it — add the missing handler.
 - When a component's JSX exceeds 60 lines, extract child sub-components. The limit must not be raised.
 - When no shared component exists for a reusable element, build it in `shared/` first. Creating a feature-scoped duplicate is forbidden.
@@ -316,3 +427,7 @@ MSW setup: `shared/mocks/handlers.ts` for handler definitions, `shared/mocks/ser
 - When component or feature requirements are unclear, stop and report — do not assume intent or invent UI behavior not specified in the task.
 - When a frontend rule conflicts with a shared rule, apply the frontend rule for this layer and flag the conflict explicitly in the PR description before proceeding.
 - When a specification gap is found (missing route, unspecified state shape, undefined error behavior), escalate — do not fill the gap with guesses.
+- A string literal typed directly in a `.tsx` or `.ts` file is a hard violation — move it to the correct messages JSON or constants/enums file before proceeding.
+- A missing translation key in `he.json` or `en.json` is a build-time error with `next-intl` — add it to both files in the same change.
+- Tailwind utility classes found in JSX must be removed and replaced with CSS Module classes — do not leave them as a "quick fix".
+- `export function ComponentName()` (named function expression) found in a component file must be converted to `export const ComponentName = () => ...` — no exceptions.
