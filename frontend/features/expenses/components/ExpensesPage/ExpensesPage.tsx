@@ -1,53 +1,32 @@
 'use client'
-import { useState } from 'react'
-import { useSetAtom } from 'jotai'
-import { useExpenses, useDeleteExpense } from '../../queries/useExpenses'
-import { isExpenseFormOpenAtom, editingExpenseAtom } from '../../store/expensesAtoms'
+import type { ReactElement } from 'react'
+import { useExpensesPage } from './useExpensesPage'
 import { ExpenseForm } from '../ExpenseForm/ExpenseForm'
 import { EmptyState } from '@/shared/components/EmptyState/EmptyState'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
-import { formatCurrency, formatDate } from '@/shared/utils/formatters'
 import { EXPENSE_CATEGORY_LABELS } from '@/shared/enums/statusEnums'
-import type { Expense } from '../../types'
+import { EXPENSES_LABELS } from '../../constants/expensesLabels'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './ExpensesPage.module.scss'
 
-const LABELS = {
-  TITLE:       'הוצאות',
-  NEW:         '+ הוצאה חדשה',
-  EMPTY_TITLE: 'אין הוצאות',
-  EMPTY_DESC:  'הוסף הוצאה ראשונה',
-  COL_DATE:    'תאריך',
-  COL_CATEGORY:'קטגוריה',
-  COL_AMOUNT:  'סכום',
-  COL_NOTES:   'הערות',
-  COL_ACTIONS: '',
-  TOTAL:       'סה"כ הוצאות:',
-} as const
-
-export function ExpensesPage() {
-  const [page, setPage] = useState(1)
-  const { data, isLoading, isError } = useExpenses(page)
-  const deleteExpense = useDeleteExpense()
-  const setOpen = useSetAtom(isExpenseFormOpenAtom)
-  const setEditingExpense = useSetAtom(editingExpenseAtom)
-
-  const handleNew = (): void => setOpen(true)
-  const handleEdit = (expense: Expense): void => { setEditingExpense(expense); setOpen(true) }
-
-  const totalAmount = data?.items.reduce((sum, e) => sum + parseFloat(e.amount), 0) ?? 0
+export const ExpensesPage = (): ReactElement => {
+  const {
+    data, isLoading, isError, totalAmount,
+    onNew, onEdit, onDelete, formatAmount, formatExpenseDate,
+  } = useExpensesPage()
 
   return (
     <div className={styles.page}>
       <div className={styles.toolbar}>
-        <h1 className={styles.title}>{LABELS.TITLE}</h1>
-        <button className={styles.newBtn} onClick={handleNew}>{LABELS.NEW}</button>
+        <h1 className={styles.title}>{EXPENSES_LABELS.PAGE_TITLE}</h1>
+        <button className={styles.newBtn} onClick={onNew}>{EXPENSES_LABELS.NEW_EXPENSE}</button>
       </div>
 
       {isLoading && <PageSkeleton rows={6} />}
-      {isError && <EmptyState title="שגיאה בטעינת הוצאות" description="" icon="⚠️" />}
+      {isError && <EmptyState title={EXPENSES_LABELS.ERROR_LOAD} description="" icon="⚠️" />}
 
       {data && data.items.length === 0 && (
-        <EmptyState title={LABELS.EMPTY_TITLE} description={LABELS.EMPTY_DESC} icon="💸" />
+        <EmptyState title={EXPENSES_LABELS.EMPTY_TITLE} description={EXPENSES_LABELS.EMPTY_DESC} icon="💸" />
       )}
 
       {data && data.items.length > 0 && (
@@ -55,47 +34,37 @@ export function ExpensesPage() {
           <table className={styles.table}>
             <thead className={styles.thead}>
               <tr>
-                <th>{LABELS.COL_DATE}</th>
-                <th>{LABELS.COL_CATEGORY}</th>
-                <th>{LABELS.COL_AMOUNT}</th>
-                <th>{LABELS.COL_NOTES}</th>
-                <th>{LABELS.COL_ACTIONS}</th>
+                <th>{EXPENSES_LABELS.COL_DATE}</th>
+                <th>{EXPENSES_LABELS.COL_CATEGORY}</th>
+                <th>{EXPENSES_LABELS.COL_AMOUNT}</th>
+                <th>{EXPENSES_LABELS.COL_NOTES}</th>
+                <th>{EXPENSES_LABELS.COL_ACTIONS}</th>
               </tr>
             </thead>
             <tbody>
               {data.items.map((expense) => (
                 <tr key={expense.id} className={styles.row}>
-                  <td className={styles.cell}>{formatDate(expense.date)}</td>
+                  <td className={styles.cell}>{formatExpenseDate(expense.date)}</td>
                   <td className={styles.cell}>
                     <span className={styles.categoryBadge}>
                       {EXPENSE_CATEGORY_LABELS[expense.category] ?? expense.category}
                     </span>
                   </td>
                   <td className={styles.cell}>
-                    <span className={styles.amount}>{formatCurrency(expense.amount)}</span>
+                    <span className={styles.amount}>{formatAmount(expense.amount)}</span>
                   </td>
                   <td className={styles.cell}>{expense.notes ?? '—'}</td>
                   <td className={styles.cell}>
-                    <button className={styles.actionBtn} title="עריכה" onClick={() => handleEdit(expense)}>✏️</button>
-                    <button
-                      className={styles.actionBtn}
-                      title="מחיקה"
-                      onClick={() => {
-                        if (window.confirm('למחוק הוצאה זו?')) {
-                          deleteExpense.mutate(expense.id)
-                        }
-                      }}
-                    >
-                      🗑️
-                    </button>
+                    <button className={styles.actionBtn} title={UI_LABELS.EDIT} onClick={() => onEdit(expense)}>✏️</button>
+                    <button className={styles.actionBtn} title={UI_LABELS.DELETE} onClick={() => onDelete(expense.id)}>🗑️</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <div className={styles.totalRow}>
-            <span className={styles.totalLabel}>{LABELS.TOTAL}</span>
-            <span className={styles.totalAmount}>{formatCurrency(totalAmount)}</span>
+            <span className={styles.totalLabel}>{EXPENSES_LABELS.TOTAL_LABEL}</span>
+            <span className={styles.totalAmount}>{totalAmount}</span>
           </div>
         </div>
       )}

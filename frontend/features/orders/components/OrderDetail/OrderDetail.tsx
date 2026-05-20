@@ -1,10 +1,12 @@
 'use client'
+import type { ReactElement } from 'react'
 import { useOrderDetail } from './useOrderDetail'
 import { StatusBadge } from '@/shared/components/StatusBadge/StatusBadge'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
+import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrderDetail.module.scss'
 
-export function OrderDetail() {
+export const OrderDetail = (): ReactElement | null => {
   const {
     isOpen,
     order,
@@ -17,9 +19,7 @@ export function OrderDetail() {
     formatOrderDate,
   } = useOrderDetail()
 
-  if (!isOpen) return null
-
-  return (
+  return isOpen ? (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
@@ -28,8 +28,8 @@ export function OrderDetail() {
             <span className={styles.customerName}>{order?.customer_name}</span>
           </div>
           <div>
-            <button className={styles.closeBtn} onClick={onEdit} title="ערוך">✏️</button>
-            <button className={styles.closeBtn} onClick={onClose} title="סגור">✕</button>
+            <button className={styles.closeBtn} onClick={onEdit} title={ORDERS_LABELS.DETAIL_EDIT_TITLE}>✏️</button>
+            <button className={styles.closeBtn} onClick={onClose} title={ORDERS_LABELS.DETAIL_CLOSE_TITLE}>✕</button>
           </div>
         </div>
 
@@ -38,17 +38,17 @@ export function OrderDetail() {
         ) : (
           <div className={styles.body}>
             <div className={styles.section}>
-              <div className={styles.sectionTitle}>פרטי הזמנה</div>
+              <div className={styles.sectionTitle}>{ORDERS_LABELS.DETAIL_SECTION_INFO}</div>
               <div className={styles.metaRow}>
-                <span className={styles.metaLabel}>תאריך</span>
+                <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_DATE}</span>
                 <span className={styles.metaValue}>{formatOrderDate(order.date)}</span>
               </div>
               <div className={styles.metaRow}>
-                <span className={styles.metaLabel}>יעד</span>
+                <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_TARGET}</span>
                 <span className={styles.metaValue}>{order.target_description ?? '—'}</span>
               </div>
               <div className={styles.metaRow}>
-                <span className={styles.metaLabel}>סטטוס</span>
+                <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_STATUS}</span>
                 <div>
                   <select
                     className={styles.statusSelect}
@@ -62,13 +62,13 @@ export function OrderDetail() {
                 </div>
               </div>
               <div className={styles.metaRow}>
-                <span className={styles.metaLabel}>תשלום</span>
+                <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_PAYMENT}</span>
                 <StatusBadge status={order.status} />
               </div>
             </div>
 
             <div className={styles.section}>
-              <div className={styles.sectionTitle}>פריטים</div>
+              <div className={styles.sectionTitle}>{ORDERS_LABELS.DETAIL_SECTION_ITEMS}</div>
               {order.items.map((item) => (
                 <div key={item.id} className={styles.itemRow}>
                   <div>
@@ -84,31 +84,31 @@ export function OrderDetail() {
             </div>
 
             <div className={styles.section}>
-              <div className={styles.sectionTitle}>סיכום</div>
+              <div className={styles.sectionTitle}>{ORDERS_LABELS.DETAIL_SECTION_SUMMARY}</div>
               <div className={styles.totalsRow}>
-                <span className={styles.totalsLabel}>סה"כ</span>
+                <span className={styles.totalsLabel}>{ORDERS_LABELS.DETAIL_LABEL_TOTAL}</span>
                 <span className={styles.totalsValue}>{formatAmount(order.total_amount)}</span>
               </div>
               <div className={styles.totalsRow}>
-                <span className={styles.totalsLabel}>עלות</span>
+                <span className={styles.totalsLabel}>{ORDERS_LABELS.DETAIL_LABEL_COST}</span>
                 <span className={styles.totalsValue}>{formatAmount(order.total_cost)}</span>
               </div>
               <div className={styles.totalsRow}>
-                <span className={styles.totalsLabel}>רווח</span>
+                <span className={styles.totalsLabel}>{ORDERS_LABELS.DETAIL_LABEL_PROFIT}</span>
                 <span className={`${styles.totalsValue} ${styles.totalProfit}`}>{formatAmount(order.total_profit)}</span>
               </div>
             </div>
 
             {order.notes && (
               <div className={styles.section}>
-                <div className={styles.sectionTitle}>הערות</div>
+                <div className={styles.sectionTitle}>{ORDERS_LABELS.DETAIL_SECTION_NOTES}</div>
                 <p>{order.notes}</p>
               </div>
             )}
 
             {order.files.length > 0 && (
               <div className={styles.section}>
-                <div className={styles.sectionTitle}>קבצים</div>
+                <div className={styles.sectionTitle}>{ORDERS_LABELS.DETAIL_SECTION_FILES}</div>
                 <div>
                   {order.files.map((f) => (
                     <a
@@ -128,5 +128,5 @@ export function OrderDetail() {
         )}
       </div>
     </div>
-  )
+  ) : null
 }

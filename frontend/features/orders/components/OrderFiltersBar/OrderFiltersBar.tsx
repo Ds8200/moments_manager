@@ -1,9 +1,10 @@
 'use client'
+import type { ReactElement } from 'react'
 import { useOrderFiltersBar } from './useOrderFiltersBar'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrderFiltersBar.module.scss'
 
-export function OrderFiltersBar() {
+export const OrderFiltersBar = (): ReactElement => {
   const {
     filters,
     statusOptions,

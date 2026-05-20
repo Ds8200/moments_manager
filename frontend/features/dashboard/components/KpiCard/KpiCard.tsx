@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react'
 import styles from './KpiCard.module.scss'
 
 export interface KpiCardProps {
@@ -7,7 +8,7 @@ export interface KpiCardProps {
   color?: 'default' | 'primary' | 'success' | 'warning' | 'danger'
 }
 
-export function KpiCard({ label, value, icon, color = 'default' }: KpiCardProps) {
+export const KpiCard = ({ label, value, icon, color = 'default' }: KpiCardProps): ReactElement => {
   return (
     <div className={`${styles.card} ${styles[color]}`}>
       <span className={styles.icon}>{icon}</span>

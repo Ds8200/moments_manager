@@ -1,9 +1,10 @@
 'use client'
+import type { ReactElement } from 'react'
 import { useLoginForm } from './useLoginForm'
 import { AUTH_LABELS } from '../../constants/authLabels'
 import styles from './LoginForm.module.scss'
 
-export function LoginForm() {
+export const LoginForm = (): ReactElement => {
   const { register, handleSubmit, onSubmit, errors, submitError, isSubmitting } = useLoginForm()
 
   return (

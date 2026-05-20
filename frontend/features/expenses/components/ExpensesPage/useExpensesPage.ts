@@ -4,7 +4,7 @@ import { useSetAtom } from 'jotai'
 import { useExpenses, useDeleteExpense } from '../../queries/useExpenses'
 import { isExpenseFormOpenAtom, editingExpenseAtom } from '../../store/expensesAtoms'
 import { EXPENSES_LABELS } from '../../constants/expensesLabels'
-import { formatCurrency } from '@/shared/utils/formatters'
+import { formatCurrency, formatDate } from '@/shared/utils/formatters'
 import type { Expense, ExpensesResponse } from '../../types'
 
 export interface UseExpensesPageReturn {
@@ -17,6 +17,8 @@ export interface UseExpensesPageReturn {
   onNew: () => void
   onEdit: (expense: Expense) => void
   onDelete: (id: string) => void
+  formatAmount: (value: string | number) => string
+  formatExpenseDate: (date: string) => string
 }
 
 export const useExpensesPage = (): UseExpensesPageReturn => {
@@ -53,5 +55,7 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
     onNew,
     onEdit,
     onDelete,
+    formatAmount: formatCurrency,
+    formatExpenseDate: formatDate,
   }
 }

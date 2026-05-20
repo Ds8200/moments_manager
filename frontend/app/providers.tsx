@@ -1,10 +1,11 @@
 'use client'
 
+import type { ReactElement } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Provider } from 'jotai'
 import { useState } from 'react'
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export const Providers = ({ children }: { children: React.ReactNode }): ReactElement => {
   const [queryClient] = useState(
     () =>
       new QueryClient({

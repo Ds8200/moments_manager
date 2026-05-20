@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react'
 import styles from './Card.module.scss'
 
 interface CardProps {
@@ -6,7 +7,7 @@ interface CardProps {
   padding?: 'sm' | 'md' | 'lg'
 }
 
-export function Card({ children, className = '', padding = 'md' }: CardProps) {
+export const Card = ({ children, className = '', padding = 'md' }: CardProps): ReactElement => {
   return (
     <div className={`${styles.card} ${styles[`padding-${padding}`]} ${className}`}>
       {children}

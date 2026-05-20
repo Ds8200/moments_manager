@@ -1,9 +1,10 @@
 'use client'
 
+import type { ReactElement } from 'react'
 import { useHeader } from './useHeader'
 import styles from './Header.module.scss'
 
-export function Header() {
+export const Header = (): ReactElement => {
   const { pageTitle } = useHeader()
 
   return (

@@ -2,7 +2,11 @@
 
 import { usePathname } from 'next/navigation'
 
-export function useSidebar() {
+interface UseSidebarReturn {
+  pathname: string
+}
+
+export const useSidebar = (): UseSidebarReturn => {
   const pathname = usePathname()
   return { pathname }
 }

@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react'
 import styles from './Button.module.scss'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -7,7 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
-export function Button({
+export const Button = ({
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -15,7 +16,7 @@ export function Button({
   className = '',
   disabled,
   ...rest
-}: ButtonProps) {
+}: ButtonProps): ReactElement => {
   return (
     <button
       className={`${styles.btn} ${styles[variant]} ${styles[size]} ${className}`}

@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react'
 import styles from './EmptyState.module.scss'
 
 interface EmptyStateProps {
@@ -7,7 +8,7 @@ interface EmptyStateProps {
   action?: React.ReactNode
 }
 
-export function EmptyState({ icon = '📭', title, description, action }: EmptyStateProps) {
+export const EmptyState = ({ icon = '📭', title, description, action }: EmptyStateProps): ReactElement => {
   return (
     <div className={styles.wrapper}>
       <span className={styles.icon}>{icon}</span>

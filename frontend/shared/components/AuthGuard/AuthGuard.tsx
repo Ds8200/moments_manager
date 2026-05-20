@@ -1,4 +1,5 @@
 'use client'
+import type { ReactElement } from 'react'
 import { useEffect, useState, startTransition } from 'react'
 import { useAtom, useSetAtom } from 'jotai'
 import { useRouter, usePathname } from 'next/navigation'
@@ -10,7 +11,7 @@ export interface AuthGuardProps {
   children: React.ReactNode
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
+export const AuthGuard = ({ children }: AuthGuardProps): ReactElement | null => {
   const router = useRouter()
   const pathname = usePathname()
   const [accessToken] = useAtom(accessTokenAtom)

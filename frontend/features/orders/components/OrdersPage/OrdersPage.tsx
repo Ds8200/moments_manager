@@ -1,4 +1,5 @@
 'use client'
+import type { ReactElement } from 'react'
 import { OrderFiltersBar } from '../OrderFiltersBar/OrderFiltersBar'
 import { OrdersTable } from '../OrdersTable/OrdersTable'
 import { OrderDetail } from '../OrderDetail/OrderDetail'
@@ -6,7 +7,7 @@ import { OrderForm } from '../OrderForm/OrderForm'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrdersPage.module.scss'
 
-export function OrdersPage() {
+export const OrdersPage = (): ReactElement => {
   return (
     <div className={styles.page}>
       <div className={styles.header}>

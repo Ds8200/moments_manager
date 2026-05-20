@@ -1,59 +1,38 @@
 'use client'
-import { useState } from 'react'
-import { useSetAtom } from 'jotai'
-import { useProducts, useDeleteProduct } from '../../queries/useProducts'
-import { isProductFormOpenAtom, editingProductIdAtom } from '../../store/productsAtoms'
+import type { ReactElement } from 'react'
+import { useProductsPage } from './useProductsPage'
 import { ProductForm } from '../ProductForm/ProductForm'
 import { EmptyState } from '@/shared/components/EmptyState/EmptyState'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
-import { formatCurrency } from '@/shared/utils/formatters'
+import { PRODUCTS_LABELS } from '../../constants/productsLabels'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './ProductsPage.module.scss'
 
-const LABELS = {
-  TITLE:       'מוצרים',
-  NEW:         '+ מוצר חדש',
-  SEARCH:      'חיפוש מוצר...',
-  EMPTY_TITLE: 'אין מוצרים בקטלוג',
-  EMPTY_DESC:  'הוסף מוצר ראשון',
-  PROFIT:      'רווח:',
-  INACTIVE:    'לא פעיל',
-} as const
-
-export function ProductsPage() {
-  const [page, setPage] = useState(1)
-  const [search, setSearch] = useState('')
-  const { data, isLoading, isError } = useProducts(page, search)
-  const deleteProduct = useDeleteProduct()
-  const setOpen = useSetAtom(isProductFormOpenAtom)
-  const setEditingId = useSetAtom(editingProductIdAtom)
-
-  const handleNew = (): void => setOpen(true)
-  const handleEdit = (id: string): void => { setEditingId(id); setOpen(true) }
-
-  const calcProfit = (price: string, cost: string): string => {
-    const p = parseFloat(price) - parseFloat(cost)
-    return formatCurrency(p)
-  }
+export const ProductsPage = (): ReactElement => {
+  const {
+    data, isLoading, isError, search,
+    onSearchChange, onNew, onEdit, onDelete, calcProfit, formatAmount,
+  } = useProductsPage()
 
   return (
     <div className={styles.page}>
       <div className={styles.toolbar}>
-        <h1 className={styles.title}>{LABELS.TITLE}</h1>
+        <h1 className={styles.title}>{PRODUCTS_LABELS.PAGE_TITLE}</h1>
         <input
           type="search"
           className={styles.searchInput}
-          placeholder={LABELS.SEARCH}
+          placeholder={PRODUCTS_LABELS.SEARCH_PLACEHOLDER}
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+          onChange={(e) => onSearchChange(e.target.value)}
         />
-        <button className={styles.newBtn} onClick={handleNew}>{LABELS.NEW}</button>
+        <button className={styles.newBtn} onClick={onNew}>{PRODUCTS_LABELS.NEW_PRODUCT}</button>
       </div>
 
       {isLoading && <PageSkeleton rows={4} />}
-      {isError && <EmptyState title="שגיאה בטעינת מוצרים" description="" icon="⚠️" />}
+      {isError && <EmptyState title={PRODUCTS_LABELS.ERROR_LOAD} description="" icon="⚠️" />}
 
       {data && data.items.length === 0 && (
-        <EmptyState title={LABELS.EMPTY_TITLE} description={LABELS.EMPTY_DESC} icon="🎨" />
+        <EmptyState title={PRODUCTS_LABELS.EMPTY_TITLE} description={PRODUCTS_LABELS.EMPTY_DESC} icon="🎨" />
       )}
 
       {data && data.items.length > 0 && (
@@ -66,29 +45,16 @@ export function ProductsPage() {
                   <span className={styles.categoryBadge}>{product.category}</span>
                 )}
               </div>
-
               <div className={styles.priceRow}>
-                <span className={styles.price}>{formatCurrency(product.base_price)}</span>
-                <span className={styles.cost}>עלות: {formatCurrency(product.base_cost)}</span>
+                <span className={styles.price}>{formatAmount(product.base_price)}</span>
+                <span className={styles.cost}>{PRODUCTS_LABELS.COST_PREFIX} {formatAmount(product.base_cost)}</span>
               </div>
-
               <div className={styles.profit}>
-                {LABELS.PROFIT} {calcProfit(product.base_price, product.base_cost)}
+                {PRODUCTS_LABELS.PROFIT_PREFIX} {calcProfit(product.base_price, product.base_cost)}
               </div>
-
               <div className={styles.cardActions}>
-                <button className={styles.actionBtn} title="עריכה" onClick={() => handleEdit(product.id)}>✏️ ערוך</button>
-                <button
-                  className={styles.actionBtn}
-                  title="מחיקה"
-                  onClick={() => {
-                    if (window.confirm(`למחוק את ${product.name}?`)) {
-                      deleteProduct.mutate(product.id)
-                    }
-                  }}
-                >
-                  🗑️ מחק
-                </button>
+                <button className={styles.actionBtn} title={UI_LABELS.EDIT} onClick={() => onEdit(product.id)}>✏️ {UI_LABELS.EDIT}</button>
+                <button className={styles.actionBtn} title={UI_LABELS.DELETE} onClick={() => onDelete(product.id, product.name)}>🗑️ {UI_LABELS.DELETE}</button>
               </div>
             </div>
           ))}

@@ -1,4 +1,5 @@
 'use client'
+import type { ReactElement } from 'react'
 import { useOrdersTable } from './useOrdersTable'
 import { StatusBadge } from '@/shared/components/StatusBadge/StatusBadge'
 import { EmptyState } from '@/shared/components/EmptyState/EmptyState'
@@ -6,7 +7,7 @@ import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrdersTable.module.scss'
 
-export function OrdersTable() {
+export const OrdersTable = (): ReactElement => {
   const {
     orders,
     total,
@@ -82,8 +83,8 @@ export function OrdersTable() {
                   </span>
                 </td>
                 <td className={`${styles.cell} ${styles.actionsCell}`} onClick={(e) => e.stopPropagation()}>
-                  <button className={styles.actionBtn} onClick={() => onEditOrder(order.id)} title="עריכה">✏️</button>
-                  <button className={styles.actionBtn} onClick={() => onDeleteOrder(order.id)} title="מחיקה">🗑️</button>
+                  <button className={styles.actionBtn} onClick={() => onEditOrder(order.id)} title={ORDERS_LABELS.TABLE_EDIT_TITLE}>✏️</button>
+                  <button className={styles.actionBtn} onClick={() => onDeleteOrder(order.id)} title={ORDERS_LABELS.TABLE_DELETE_TITLE}>🗑️</button>
                 </td>
               </tr>
             ))}
@@ -93,14 +94,14 @@ export function OrdersTable() {
 
       {totalPages > 1 && (
         <div className={styles.pagination}>
-          <span>סה"כ {total} הזמנות</span>
+          <span>{ORDERS_LABELS.TABLE_TOTAL} {total} {ORDERS_LABELS.TABLE_ORDERS_SUFFIX}</span>
           <div className={styles.pageButtons}>
             <button
               className={styles.pageBtn}
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage <= 1}
             >
-              הקודם
+              {ORDERS_LABELS.TABLE_PREV}
             </button>
             <span className={styles.pageBtn}>{currentPage} / {totalPages}</span>
             <button
@@ -108,7 +109,7 @@ export function OrdersTable() {
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage >= totalPages}
             >
-              הבא
+              {ORDERS_LABELS.TABLE_NEXT}
             </button>
           </div>
         </div>

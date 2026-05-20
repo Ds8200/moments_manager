@@ -1,13 +1,11 @@
 'use client'
-
+import type { ReactElement } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useMobileBottomNav } from './useMobileBottomNav'
 import styles from './MobileBottomNav.module.scss'
-import { NAV_ITEMS } from '@/shared/constants/routes'
 
-export function MobileBottomNav() {
-  const pathname = usePathname()
-  const visibleItems = NAV_ITEMS.slice(0, 5)
+export const MobileBottomNav = (): ReactElement => {
+  const { visibleItems, pathname } = useMobileBottomNav()
 
   return (
     <nav className={styles.nav}>

@@ -18,6 +18,7 @@ export interface UseProductsPageReturn {
   onEdit: (id: string) => void
   onDelete: (id: string, name: string) => void
   calcProfit: (price: string, cost: string) => string
+  formatAmount: (value: string | number) => string
 }
 
 export const useProductsPage = (): UseProductsPageReturn => {
@@ -60,5 +61,6 @@ export const useProductsPage = (): UseProductsPageReturn => {
     onEdit,
     onDelete,
     calcProfit,
+    formatAmount: formatCurrency,
   }
 }

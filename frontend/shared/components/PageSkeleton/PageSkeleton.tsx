@@ -1,10 +1,11 @@
+import type { ReactElement } from 'react'
 import styles from './PageSkeleton.module.scss'
 
 export interface PageSkeletonProps {
   rows?: number
 }
 
-export function PageSkeleton({ rows = 5 }: PageSkeletonProps) {
+export const PageSkeleton = ({ rows = 5 }: PageSkeletonProps): ReactElement => {
   return (
     <div className={styles.wrapper}>
       <div className={`${styles.bar} ${styles.header}`} />
