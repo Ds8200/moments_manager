@@ -1,6 +1,7 @@
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.constants.http_messages import RESOURCE_CUSTOMER
 from src.core.exceptions import NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.customers.repository import CustomerRepository
@@ -35,7 +36,7 @@ class CustomerService:
     async def get_customer(self, customer_id: str) -> CustomerWithStatsSchema:
         customer = await self._repo.get_by_id(customer_id)
         if not customer:
-            raise NotFoundError("Customer", customer_id)
+            raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
         from src.orders.repository import OrderRepository
         order_repo = OrderRepository(self._db)
         stats = await order_repo.get_customer_stats(customer_id)
@@ -55,7 +56,7 @@ class CustomerService:
     ) -> CustomerResponseSchema:
         customer = await self._repo.get_by_id(customer_id)
         if not customer:
-            raise NotFoundError("Customer", customer_id)
+            raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
         await self._repo.update(customer, data.model_dump(exclude_none=True))
         await self._db.commit()
         refreshed = await self._repo.get_by_id(customer_id)
@@ -64,6 +65,6 @@ class CustomerService:
     async def delete_customer(self, customer_id: str) -> None:
         customer = await self._repo.get_by_id(customer_id)
         if not customer:
-            raise NotFoundError("Customer", customer_id)
+            raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
         await self._repo.soft_delete(customer)
         await self._db.commit()

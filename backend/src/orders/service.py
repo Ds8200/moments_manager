@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.constants.http_messages import RESOURCE_FILE, RESOURCE_ORDER
 from src.core.exceptions import FileTooLargeError, InvalidFileTypeError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.orders.enums import OrderStatus, OrderUrgency
@@ -83,7 +84,7 @@ class OrderService:
     async def get_order(self, order_id: str) -> OrderResponseSchema:
         order = await self._repo.get_by_id(order_id)
         if not order:
-            raise NotFoundError("Order", order_id)
+            raise NotFoundError(RESOURCE_ORDER, order_id)
         return self._to_response(order)
 
     async def get_customer_orders(self, customer_id: str) -> list[OrderListResponseSchema]:
@@ -111,7 +112,7 @@ class OrderService:
     async def update_order(self, order_id: str, data: OrderUpdateSchema) -> OrderResponseSchema:
         order = await self._repo.get_by_id(order_id)
         if not order:
-            raise NotFoundError("Order", order_id)
+            raise NotFoundError(RESOURCE_ORDER, order_id)
         items_data = None
         if data.items is not None:
             items_data = [_compute_item_fields(i.model_dump(exclude_none=True)) for i in data.items]
@@ -124,7 +125,7 @@ class OrderService:
     async def update_status(self, order_id: str, data: OrderStatusUpdateSchema) -> OrderResponseSchema:
         order = await self._repo.get_by_id(order_id)
         if not order:
-            raise NotFoundError("Order", order_id)
+            raise NotFoundError(RESOURCE_ORDER, order_id)
         old_status = order.status
         order.status = data.status.value
         await self._db.commit()
@@ -137,7 +138,7 @@ class OrderService:
     ) -> OrderResponseSchema:
         order = await self._repo.get_by_id(order_id)
         if not order:
-            raise NotFoundError("Order", order_id)
+            raise NotFoundError(RESOURCE_ORDER, order_id)
         order.is_paid = data.is_paid
         if data.payment_method:
             order.payment_method = data.payment_method.value
@@ -153,7 +154,7 @@ class OrderService:
     async def delete_order(self, order_id: str) -> None:
         order = await self._repo.get_by_id(order_id)
         if not order:
-            raise NotFoundError("Order", order_id)
+            raise NotFoundError(RESOURCE_ORDER, order_id)
         await self._repo.soft_delete(order)
         await self._db.commit()
 
@@ -163,7 +164,7 @@ class OrderService:
         import uuid
         order = await self._repo.get_by_id(order_id)
         if not order:
-            raise NotFoundError("Order", order_id)
+            raise NotFoundError(RESOURCE_ORDER, order_id)
 
         max_bytes = settings.MAX_FILE_SIZE_MB * 1024 * 1024
         if len(content) > max_bytes:
@@ -196,7 +197,7 @@ class OrderService:
     async def delete_file(self, order_id: str, file_id: str) -> None:
         order_file = await self._repo.get_file(file_id, order_id)
         if not order_file:
-            raise NotFoundError("File", file_id)
+            raise NotFoundError(RESOURCE_FILE, file_id)
         full_path = os.path.join(settings.UPLOADS_DIR, order_file.storage_path)
         if os.path.exists(full_path):
             os.remove(full_path)

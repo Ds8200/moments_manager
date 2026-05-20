@@ -1,6 +1,7 @@
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.constants.http_messages import RESOURCE_PRODUCT
 from src.core.exceptions import NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.products.repository import ProductRepository
@@ -37,7 +38,7 @@ class ProductService:
     async def get_product(self, product_id: str) -> ProductResponseSchema:
         product = await self._repo.get_by_id(product_id)
         if not product:
-            raise NotFoundError("Product", product_id)
+            raise NotFoundError(RESOURCE_PRODUCT, product_id)
         return ProductResponseSchema.model_validate(product)
 
     async def create_product(self, data: ProductCreateSchema) -> ProductResponseSchema:
@@ -51,7 +52,7 @@ class ProductService:
     ) -> ProductResponseSchema:
         product = await self._repo.get_by_id(product_id)
         if not product:
-            raise NotFoundError("Product", product_id)
+            raise NotFoundError(RESOURCE_PRODUCT, product_id)
         await self._repo.update(product, data.model_dump(exclude_none=True))
         await self._db.commit()
         refreshed = await self._repo.get_by_id(product_id)
@@ -60,6 +61,6 @@ class ProductService:
     async def delete_product(self, product_id: str) -> None:
         product = await self._repo.get_by_id(product_id)
         if not product:
-            raise NotFoundError("Product", product_id)
+            raise NotFoundError(RESOURCE_PRODUCT, product_id)
         await self._repo.soft_delete(product)
         await self._db.commit()

@@ -2,6 +2,7 @@ import logging
 from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.constants.http_messages import RESOURCE_EXPENSE
 from src.core.exceptions import NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.expenses.repository import ExpenseRepository
@@ -46,7 +47,7 @@ class ExpenseService:
     ) -> ExpenseResponseSchema:
         expense = await self._repo.get_by_id(expense_id)
         if not expense:
-            raise NotFoundError("Expense", expense_id)
+            raise NotFoundError(RESOURCE_EXPENSE, expense_id)
         await self._repo.update(expense, data.model_dump(exclude_none=True))
         await self._db.commit()
         refreshed = await self._repo.get_by_id(expense_id)
@@ -55,6 +56,6 @@ class ExpenseService:
     async def delete_expense(self, expense_id: str) -> None:
         expense = await self._repo.get_by_id(expense_id)
         if not expense:
-            raise NotFoundError("Expense", expense_id)
+            raise NotFoundError(RESOURCE_EXPENSE, expense_id)
         await self._repo.soft_delete(expense)
         await self._db.commit()

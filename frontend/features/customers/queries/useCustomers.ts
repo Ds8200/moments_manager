@@ -1,23 +1,41 @@
 'use client'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseMutationResult,
+  type UseQueryResult,
+} from '@tanstack/react-query'
 import { customersApi } from '../api'
-import type { CustomerFormValues } from '../types'
+import type {
+  Customer,
+  CustomerDetail,
+  CustomerFormValues,
+  CustomersResponse,
+} from '../types'
 
-export const useCustomers = (page = 1, search = '', page_size = 20) =>
+export const useCustomers = (
+  page = 1,
+  search = '',
+  page_size = 20,
+): UseQueryResult<CustomersResponse> =>
   useQuery({
     queryKey: ['customers', page, search, page_size],
     queryFn: () => customersApi.list(page, search, page_size),
   })
 
-export const useCustomer = (id: string | null) =>
+export const useCustomer = (id: string | null): UseQueryResult<CustomerDetail> =>
   useQuery({
     queryKey: ['customer', id],
     queryFn: () => customersApi.get(id!),
     enabled: id !== null,
   })
 
-export const useCreateCustomer = () => {
+export const useCreateCustomer = (): UseMutationResult<
+  Customer,
+  Error,
+  CustomerFormValues
+> => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: CustomerFormValues) => customersApi.create(payload),
@@ -25,7 +43,11 @@ export const useCreateCustomer = () => {
   })
 }
 
-export const useUpdateCustomer = () => {
+export const useUpdateCustomer = (): UseMutationResult<
+  Customer,
+  Error,
+  { id: string; payload: Partial<CustomerFormValues> }
+> => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: Partial<CustomerFormValues> }) =>
@@ -37,7 +59,7 @@ export const useUpdateCustomer = () => {
   })
 }
 
-export const useDeleteCustomer = () => {
+export const useDeleteCustomer = (): UseMutationResult<void, Error, string> => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => customersApi.delete(id),

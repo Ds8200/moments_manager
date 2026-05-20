@@ -41,7 +41,7 @@ export const OrderItemRow = (props: OrderItemRowProps): ReactElement => {
           type="number"
           min={1}
           className={styles.input}
-          {...register(`items.${index}.quantity`)}
+          {...register(`items.${index}.quantity`, { valueAsNumber: true })}
         />
       </div>
       <div className={styles.field}>

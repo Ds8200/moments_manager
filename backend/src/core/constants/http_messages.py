@@ -1,3 +1,10 @@
+RESOURCE_CUSTOMER = "Customer"
+RESOURCE_ORDER = "Order"
+RESOURCE_PRODUCT = "Product"
+RESOURCE_EXPENSE = "Expense"
+RESOURCE_FILE = "File"
+RESOURCE_USER = "User"
+
 CUSTOMER_NOT_FOUND = "Customer not found"
 CUSTOMER_CREATED = "Customer created"
 ORDER_NOT_FOUND = "Order not found"

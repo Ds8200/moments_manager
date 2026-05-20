@@ -1,20 +1,24 @@
 'use client'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { reportsApi } from '../api'
+import type { FinancialReport, MonthlyReport, TopCustomer } from '../types'
 
-export const useMonthlyReport = (year: number, month: number) =>
+export const useMonthlyReport = (
+  year: number,
+  month: number,
+): UseQueryResult<MonthlyReport> =>
   useQuery({
     queryKey: ['reports', 'monthly', year, month],
     queryFn: () => reportsApi.monthly(year, month),
   })
 
-export const useFinancialReport = (year: number) =>
+export const useFinancialReport = (year: number): UseQueryResult<FinancialReport> =>
   useQuery({
     queryKey: ['reports', 'financial', year],
     queryFn: () => reportsApi.financial(year),
   })
 
-export const useTopCustomers = (limit = 5) =>
+export const useTopCustomers = (limit = 5): UseQueryResult<TopCustomer[]> =>
   useQuery({
     queryKey: ['reports', 'top-customers', limit],
     queryFn: () => reportsApi.topCustomers(limit),

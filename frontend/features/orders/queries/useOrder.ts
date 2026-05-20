@@ -1,16 +1,22 @@
 'use client'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseMutationResult,
+  type UseQueryResult,
+} from '@tanstack/react-query'
 import { ordersApi } from '../api'
-import type { OrderPayload } from '../types'
+import type { Order, OrderPayload } from '../types'
 
-export const useOrder = (id: string | null) =>
+export const useOrder = (id: string | null): UseQueryResult<Order> =>
   useQuery({
     queryKey: ['order', id],
     queryFn: () => ordersApi.get(id!),
     enabled: id !== null,
   })
 
-export const useCreateOrder = () => {
+export const useCreateOrder = (): UseMutationResult<Order, Error, OrderPayload> => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: OrderPayload) => ordersApi.create(payload),
@@ -21,7 +27,11 @@ export const useCreateOrder = () => {
   })
 }
 
-export const useUpdateOrder = () => {
+export const useUpdateOrder = (): UseMutationResult<
+  Order,
+  Error,
+  { id: string; payload: Partial<OrderPayload> }
+> => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: Partial<OrderPayload> }) =>

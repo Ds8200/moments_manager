@@ -53,7 +53,7 @@ async def update_expense(
     return await svc.update_expense(expense_id, body)
 
 
-@router.delete("/{expense_id}", status_code=204)
+@router.delete("/{expense_id}", status_code=204, response_model=None)
 async def delete_expense(
     expense_id: str,
     db: AsyncSession = Depends(get_db),

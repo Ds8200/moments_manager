@@ -59,7 +59,7 @@ async def update_customer(
     return await svc.update_customer(customer_id, body)
 
 
-@router.delete("/{customer_id}", status_code=204)
+@router.delete("/{customer_id}", status_code=204, response_model=None)
 async def delete_customer(
     customer_id: str,
     db: AsyncSession = Depends(get_db),

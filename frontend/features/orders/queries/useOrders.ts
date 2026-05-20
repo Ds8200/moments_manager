@@ -1,11 +1,22 @@
 'use client'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseMutationResult,
+  type UseQueryResult,
+} from '@tanstack/react-query'
 import { useAtomValue } from 'jotai'
 import { ordersApi } from '../api'
 import { orderFiltersAtom } from '../store/ordersAtoms'
-import type { UpdateStatusPayload, UpdatePaymentPayload } from '../types'
+import type {
+  Order,
+  OrdersResponse,
+  UpdatePaymentPayload,
+  UpdateStatusPayload,
+} from '../types'
 
-export const useOrders = () => {
+export const useOrders = (): UseQueryResult<OrdersResponse> => {
   const filters = useAtomValue(orderFiltersAtom)
   return useQuery({
     queryKey: ['orders', filters],
@@ -13,7 +24,11 @@ export const useOrders = () => {
   })
 }
 
-export const useUpdateOrderStatus = () => {
+export const useUpdateOrderStatus = (): UseMutationResult<
+  Order,
+  Error,
+  { id: string; payload: UpdateStatusPayload }
+> => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateStatusPayload }) =>
@@ -25,7 +40,11 @@ export const useUpdateOrderStatus = () => {
   })
 }
 
-export const useUpdateOrderPayment = () => {
+export const useUpdateOrderPayment = (): UseMutationResult<
+  Order,
+  Error,
+  { id: string; payload: UpdatePaymentPayload }
+> => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdatePaymentPayload }) =>
@@ -36,7 +55,7 @@ export const useUpdateOrderPayment = () => {
   })
 }
 
-export const useDeleteOrder = () => {
+export const useDeleteOrder = (): UseMutationResult<void, Error, string> => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => ordersApi.delete(id),
