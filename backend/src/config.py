@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     TEST_DATABASE_URL: str | None = None
     LOG_LEVEL: str = "INFO"
-    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: list[str] = ["http://localhost:3000", "https://moments-manager.vercel.app"]
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
