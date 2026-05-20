@@ -1,39 +1,24 @@
 'use client'
+import type { ReactElement } from 'react'
 import { Controller } from 'react-hook-form'
 import { useOrderForm } from './useOrderForm'
 import { OrderItemRow } from './OrderItemRow/OrderItemRow'
 import { Autocomplete } from '@/shared/components/Autocomplete/Autocomplete'
+import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrderForm.module.scss'
 
-const LABELS = {
-  NEW_TITLE:            'הזמנה חדשה',
-  EDIT_TITLE:           'עריכת הזמנה',
-  CUSTOMER:             'לקוח',
-  CUSTOMER_PLACEHOLDER: 'חפש לקוח...',
-  DATE:                 'תאריך',
-  TARGET:               'יעד / מועד',
-  NOTES:                'הערות',
-  ITEMS:                'פריטים',
-  ADD_ITEM:             '+ הוסף פריט',
-  CANCEL:               'ביטול',
-  SAVE:                 'שמור',
-  SAVING:               'שומר...',
-} as const
-
-export function OrderForm() {
+export const OrderForm = (): ReactElement | null => {
   const {
     isOpen, isEditing, register, control, setValue, handleSubmit, onSubmit,
     errors, isSubmitting, fields, appendItem, removeItem, onClose,
     customerOptions, customersLoading, setCustomerSearch, customerDefaultLabel,
   } = useOrderForm()
 
-  if (!isOpen) return null
-
-  return (
+  return isOpen ? (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>{isEditing ? LABELS.EDIT_TITLE : LABELS.NEW_TITLE}</h2>
+          <h2 className={styles.title}>{isEditing ? ORDERS_LABELS.FORM_EDIT_TITLE : ORDERS_LABELS.FORM_NEW_TITLE}</h2>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
@@ -45,21 +30,21 @@ export function OrderForm() {
               render={({ field }) => (
                 <Autocomplete
                   id="customer"
-                  label={LABELS.CUSTOMER}
+                  label={ORDERS_LABELS.FORM_CUSTOMER}
                   value={field.value || null}
                   onChange={(value) => field.onChange(value ?? '')}
                   options={customerOptions}
                   onSearch={setCustomerSearch}
                   defaultLabel={customerDefaultLabel}
                   isLoading={customersLoading}
-                  placeholder={LABELS.CUSTOMER_PLACEHOLDER}
+                  placeholder={ORDERS_LABELS.FORM_CUSTOMER_PLACEHOLDER}
                   error={errors.customer_id?.message}
                 />
               )}
             />
 
             <div className={styles.field}>
-              <label className={styles.label}>{LABELS.DATE}</label>
+              <label className={styles.label}>{ORDERS_LABELS.FORM_DATE}</label>
               <input
                 type="date"
                 className={`${styles.input}${errors.date ? ` ${styles.error}` : ''}`}
@@ -69,21 +54,21 @@ export function OrderForm() {
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>{LABELS.TARGET}</label>
+              <label className={styles.label}>{ORDERS_LABELS.FORM_TARGET}</label>
               <input
                 className={styles.input}
-                placeholder="שישי, ראשון בלילה..."
+                placeholder={ORDERS_LABELS.FORM_TARGET_PLACEHOLDER}
                 {...register('target_description')}
               />
             </div>
 
             <div className={`${styles.field} ${styles.fieldFull}`}>
-              <label className={styles.label}>{LABELS.NOTES}</label>
+              <label className={styles.label}>{ORDERS_LABELS.FORM_NOTES}</label>
               <textarea className={styles.textarea} {...register('notes')} />
             </div>
           </div>
 
-          <div className={styles.sectionTitle}>{LABELS.ITEMS}</div>
+          <div className={styles.sectionTitle}>{ORDERS_LABELS.FORM_ITEMS_SECTION}</div>
 
           {fields.map((field, idx) => (
             <OrderItemRow
@@ -99,19 +84,19 @@ export function OrderForm() {
           ))}
 
           <button type="button" className={styles.addItemBtn} onClick={appendItem}>
-            {LABELS.ADD_ITEM}
+            {ORDERS_LABELS.FORM_ADD_ITEM}
           </button>
 
           <div className={styles.footer}>
             <button type="button" className={styles.cancelBtn} onClick={onClose}>
-              {LABELS.CANCEL}
+              {ORDERS_LABELS.FORM_CANCEL}
             </button>
             <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-              {isSubmitting ? LABELS.SAVING : LABELS.SAVE}
+              {isSubmitting ? ORDERS_LABELS.FORM_SAVING : ORDERS_LABELS.FORM_SAVE}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
+  ) : null
 }

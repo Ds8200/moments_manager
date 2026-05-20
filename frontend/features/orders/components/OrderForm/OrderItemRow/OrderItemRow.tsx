@@ -1,18 +1,12 @@
 'use client'
+import type { ReactElement } from 'react'
 import { useOrderItemRow } from './useOrderItemRow'
 import type { OrderItemRowProps } from './useOrderItemRow'
 import { Autocomplete } from '@/shared/components/Autocomplete/Autocomplete'
+import { ORDERS_LABELS } from '@/features/orders/constants/ordersLabels'
 import styles from './OrderItemRow.module.scss'
 
-const LABELS = {
-  PRODUCT:         'מוצר',
-  QTY:             'כמות',
-  PRICE:           'מחיר',
-  COST:            'עלות',
-  SEARCH_PRODUCT:  'חפש מוצר...',
-} as const
-
-export function OrderItemRow(props: OrderItemRowProps) {
+export const OrderItemRow = (props: OrderItemRowProps): ReactElement => {
   const { index, register, errors, isOnly, onRemove } = props
   const {
     productOptions,
@@ -28,7 +22,7 @@ export function OrderItemRow(props: OrderItemRowProps) {
   return (
     <div className={styles.row}>
       <div className={styles.productField}>
-        {index === 0 && <span className={styles.label}>{LABELS.PRODUCT}</span>}
+        {index === 0 && <span className={styles.label}>{ORDERS_LABELS.ITEM_PRODUCT}</span>}
         <Autocomplete
           id={`product-${index}`}
           value={currentProductId}
@@ -37,12 +31,12 @@ export function OrderItemRow(props: OrderItemRowProps) {
           onSearch={onProductSearch}
           defaultLabel={currentProductName}
           isLoading={isProductsLoading}
-          placeholder={LABELS.SEARCH_PRODUCT}
+          placeholder={ORDERS_LABELS.ITEM_SEARCH_PRODUCT}
           error={itemErrors?.product_name?.message}
         />
       </div>
       <div className={styles.field}>
-        {index === 0 && <span className={styles.label}>{LABELS.QTY}</span>}
+        {index === 0 && <span className={styles.label}>{ORDERS_LABELS.ITEM_QTY}</span>}
         <input
           type="number"
           min={1}
@@ -51,7 +45,7 @@ export function OrderItemRow(props: OrderItemRowProps) {
         />
       </div>
       <div className={styles.field}>
-        {index === 0 && <span className={styles.label}>{LABELS.PRICE}</span>}
+        {index === 0 && <span className={styles.label}>{ORDERS_LABELS.ITEM_PRICE}</span>}
         <input
           type="number"
           step="0.01"
@@ -61,7 +55,7 @@ export function OrderItemRow(props: OrderItemRowProps) {
         />
       </div>
       <div className={styles.field}>
-        {index === 0 && <span className={styles.label}>{LABELS.COST}</span>}
+        {index === 0 && <span className={styles.label}>{ORDERS_LABELS.ITEM_COST}</span>}
         <input
           type="number"
           step="0.01"
@@ -75,7 +69,7 @@ export function OrderItemRow(props: OrderItemRowProps) {
         className={styles.removeBtn}
         onClick={onRemove}
         disabled={isOnly}
-        aria-label="הסר פריט"
+        aria-label={ORDERS_LABELS.ITEM_REMOVE}
       >
         ✕
       </button>

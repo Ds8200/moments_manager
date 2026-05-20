@@ -7,15 +7,16 @@ import { useAtom } from 'jotai'
 import { isExpenseFormOpenAtom, editingExpenseAtom } from '../../store/expensesAtoms'
 import { useCreateExpense, useUpdateExpense } from '../../queries/useExpenses'
 import type { ExpenseFormValues, ExpenseCategory } from '../../types'
+import { EXPENSES_LABELS } from '../../constants/expensesLabels'
 
 const EXPENSE_CATEGORIES: ExpenseCategory[] = [
   'ink', 'materials', 'equipment', 'shipping', 'utilities', 'other',
 ]
 
 const schema = z.object({
-  date:     z.string().min(1, 'נדרש תאריך'),
+  date:     z.string().min(1, EXPENSES_LABELS.VALIDATION_DATE),
   category: z.enum(['ink', 'materials', 'equipment', 'shipping', 'utilities', 'other']),
-  amount:   z.string().min(1, 'נדרש סכום'),
+  amount:   z.string().min(1, EXPENSES_LABELS.VALIDATION_AMOUNT),
   notes:    z.string(),
 })
 

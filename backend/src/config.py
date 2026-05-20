@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     DATABASE_URL: str
-    TEST_DATABASE_URL: str
+    TEST_DATABASE_URL: str | None = None
     LOG_LEVEL: str = "INFO"
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
     SECRET_KEY: str

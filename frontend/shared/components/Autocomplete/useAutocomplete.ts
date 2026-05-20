@@ -23,6 +23,14 @@ export interface AutocompleteProps<T = unknown> {
 }
 
 export interface UseAutocompleteReturn<T> {
+  inputId: string
+  listboxId: string
+  label: string | undefined
+  error: string | undefined
+  placeholder: string | undefined
+  disabled: boolean | undefined
+  isLoading: boolean | undefined
+  options: AutocompleteOption<T>[]
   inputValue: string
   isOpen: boolean
   highlightedIndex: number
@@ -37,7 +45,10 @@ export interface UseAutocompleteReturn<T> {
 export const useAutocomplete = <T = unknown>(
   props: AutocompleteProps<T>
 ): UseAutocompleteReturn<T> => {
-  const { value, onChange, options, onSearch, defaultLabel } = props
+  const { value, onChange, options, onSearch, defaultLabel, id, label, error, placeholder, disabled, isLoading } = props
+
+  const inputId   = id ?? 'autocomplete'
+  const listboxId = `${inputId}-listbox`
 
   // typedValue: what the user is currently typing
   // isUserTyping: whether the input shows typed text vs. the selected label
@@ -152,6 +163,14 @@ export const useAutocomplete = <T = unknown>(
   }, [])
 
   return {
+    inputId,
+    listboxId,
+    label,
+    error,
+    placeholder,
+    disabled,
+    isLoading,
+    options,
     inputValue,
     isOpen,
     highlightedIndex,

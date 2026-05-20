@@ -6,6 +6,7 @@ import { formatCurrency, formatShortDate } from '@/shared/utils/formatters'
 import type { OrderSummary } from '../../types'
 import type { OrderStatus, PaymentMethod } from '@/shared/enums/statusEnums'
 import { STATUS_LABELS, PAYMENT_LABELS } from '@/shared/enums/statusEnums'
+import { ORDERS_LABELS } from '../../constants/ordersLabels'
 
 export interface UseOrdersTableReturn {
   orders: OrderSummary[]
@@ -49,7 +50,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     },
 
     onDeleteOrder: (id) => {
-      if (window.confirm('האם למחוק הזמנה זו?')) {
+      if (window.confirm(ORDERS_LABELS.CONFIRM_DELETE)) {
         deleteOrder.mutate(id)
       }
     },
@@ -66,7 +67,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     getPaymentLabel: (method, isPaid) => {
       if (!isPaid) return '—'
       if (method && PAYMENT_LABELS[method]) return PAYMENT_LABELS[method]
-      return 'שולם'
+      return ORDERS_LABELS.PAID
     },
   }
 }

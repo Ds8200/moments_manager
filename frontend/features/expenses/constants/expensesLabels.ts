@@ -1,0 +1,27 @@
+export const EXPENSES_LABELS = {
+  PAGE_TITLE:               'הוצאות',
+  NEW_EXPENSE:              '+ הוצאה חדשה',
+  EMPTY_TITLE:              'אין הוצאות',
+  EMPTY_DESC:               'הוסף הוצאה ראשונה',
+  COL_DATE:                 'תאריך',
+  COL_CATEGORY:             'קטגוריה',
+  COL_AMOUNT:               'סכום',
+  COL_NOTES:                'הערות',
+  COL_ACTIONS:              '',
+  TOTAL_LABEL:              'סה"כ הוצאות:',
+  ERROR_LOAD:               'שגיאה בטעינת הוצאות',
+  CONFIRM_DELETE:           'למחוק הוצאה זו?',
+
+  FORM_NEW_TITLE:           'הוצאה חדשה',
+  FORM_EDIT_TITLE:          'עריכת הוצאה',
+  FORM_DATE:                'תאריך',
+  FORM_CATEGORY:            'קטגוריה',
+  FORM_AMOUNT:              'סכום',
+  FORM_NOTES:               'הערות',
+  FORM_CANCEL:              'ביטול',
+  FORM_SAVE:                'שמור',
+  FORM_SAVING:              'שומר...',
+
+  VALIDATION_DATE:          'נדרש תאריך',
+  VALIDATION_AMOUNT:        'נדרש סכום',
+} as const

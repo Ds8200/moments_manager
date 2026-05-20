@@ -7,6 +7,7 @@ from src.core.dependencies import get_current_user, get_db
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.orders.schemas import (
     OrderCreateSchema,
+    OrderFileResponseSchema,
     OrderListResponseSchema,
     OrderPaymentUpdateSchema,
     OrderResponseSchema,
@@ -91,7 +92,7 @@ async def update_payment(
     return await svc.update_payment(order_id, body)
 
 
-@router.delete("/{order_id}", status_code=204)
+@router.delete("/{order_id}", status_code=204, response_model=None)
 async def delete_order(
     order_id: str,
     db: AsyncSession = Depends(get_db),
@@ -101,7 +102,7 @@ async def delete_order(
     await svc.delete_order(order_id)
 
 
-@router.post("/{order_id}/files", status_code=201)
+@router.post("/{order_id}/files", status_code=201, response_model=OrderFileResponseSchema)
 async def upload_file(
     order_id: str,
     file: UploadFile = File(...),
@@ -113,7 +114,7 @@ async def upload_file(
     return await svc.upload_file(order_id, file.filename or "file", content)
 
 
-@router.delete("/{order_id}/files/{file_id}", status_code=204)
+@router.delete("/{order_id}/files/{file_id}", status_code=204, response_model=None)
 async def delete_file(
     order_id: str,
     file_id: str,

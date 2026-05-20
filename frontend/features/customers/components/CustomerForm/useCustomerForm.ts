@@ -8,10 +8,12 @@ import { isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../store/custo
 import { useCustomer, useCreateCustomer, useUpdateCustomer } from '../../queries/useCustomers'
 import type { CustomerFormValues } from '../../types'
 
+import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
+
 const schema = z.object({
-  name:  z.string().min(1, 'נדרש שם לקוח'),
+  name:  z.string().min(1, CUSTOMERS_LABELS.VALIDATION_NAME_REQUIRED),
   phone: z.string(),
-  email: z.string().email('כתובת אימייל לא תקינה').or(z.literal('')),
+  email: z.string().email(CUSTOMERS_LABELS.VALIDATION_EMAIL_INVALID).or(z.literal('')),
   notes: z.string(),
 })
 

@@ -13,6 +13,7 @@ from src.core.security import (
 )
 from src.config import settings
 from src.users.repository import UserRepository
+from src.core.constants.http_messages import INVALID_CREDENTIALS, REFRESH_TOKEN_INVALID
 
 logger = logging.getLogger(__name__)
 
@@ -26,14 +27,14 @@ class AuthService:
     async def login(self, email: str, password: str) -> TokenResponseSchema:
         user = await self._users.get_by_email(email)
         if not user or not verify_password(password, user.hashed_password):
-            raise UnauthorizedError("Invalid email or password")
+            raise UnauthorizedError(INVALID_CREDENTIALS)
         return await self._issue_token_pair(user.id)
 
     async def refresh(self, refresh_token_str: str) -> TokenResponseSchema:
         token_hash = hash_refresh_token(refresh_token_str)
         token = await self._tokens.get_valid_by_hash(token_hash)
         if not token:
-            raise UnauthorizedError("Invalid or expired refresh token")
+            raise UnauthorizedError(REFRESH_TOKEN_INVALID)
         await self._tokens.revoke(token_hash)
         await self._db.flush()
         return await self._issue_token_pair(token.user_id)

@@ -11,22 +11,23 @@ import { useCustomers } from '@/features/customers/queries/useCustomers'
 import type { AutocompleteOption } from '@/shared/components/Autocomplete/useAutocomplete'
 import type { Customer } from '@/features/customers/types'
 import type { OrderFormValues } from '../../types'
+import { ORDERS_LABELS } from '../../constants/ordersLabels'
 
 const itemSchema = z.object({
   product_id:   z.string().nullable(),
-  product_name: z.string().min(1, 'נדרש שם מוצר'),
-  quantity:     z.number().min(1, 'כמות מינימלית 1'),
-  unit_price:   z.string().min(1, 'נדרש מחיר'),
+  product_name: z.string().min(1, ORDERS_LABELS.VALIDATION_PRODUCT_NAME),
+  quantity:     z.number().min(1, ORDERS_LABELS.VALIDATION_QTY_MIN),
+  unit_price:   z.string().min(1, ORDERS_LABELS.VALIDATION_PRICE),
   unit_cost:    z.string(),
   design_notes: z.string(),
 })
 
 const schema = z.object({
-  customer_id:        z.string().min(1, 'נדרש לקוח'),
-  date:               z.string().min(1, 'נדרש תאריך'),
+  customer_id:        z.string().min(1, ORDERS_LABELS.VALIDATION_CUSTOMER),
+  date:               z.string().min(1, ORDERS_LABELS.VALIDATION_DATE),
   target_description: z.string(),
   notes:              z.string(),
-  items:              z.array(itemSchema).min(1, 'נדרש לפחות פריט אחד'),
+  items:              z.array(itemSchema).min(1, ORDERS_LABELS.VALIDATION_ITEMS_MIN),
 })
 
 const DEFAULT_ITEM: OrderFormValues['items'][number] = {

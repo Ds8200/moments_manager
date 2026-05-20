@@ -1,29 +1,16 @@
 'use client'
+import type { ReactElement } from 'react'
 import { useAutocomplete } from './useAutocomplete'
 import type { AutocompleteProps } from './useAutocomplete'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './Autocomplete.module.scss'
 
-const LABELS = {
-  LOADING:    'טוען...',
-  NO_RESULTS: 'לא נמצאו תוצאות',
-} as const
-
-export function Autocomplete<T = unknown>(props: AutocompleteProps<T>) {
-  const { label, error, placeholder, disabled, id, isLoading, options } = props
+export const Autocomplete = <T = unknown>(props: AutocompleteProps<T>): ReactElement => {
   const {
-    inputValue,
-    isOpen,
-    highlightedIndex,
-    containerRef,
-    onInputChange,
-    onOptionSelect,
-    onKeyDown,
-    onInputFocus,
-    onBlur,
+    inputId, listboxId, label, error, placeholder, disabled, isLoading, options,
+    inputValue, isOpen, highlightedIndex, containerRef,
+    onInputChange, onOptionSelect, onKeyDown, onInputFocus, onBlur,
   } = useAutocomplete(props)
-
-  const inputId   = id ?? 'autocomplete'
-  const listboxId = `${inputId}-listbox`
 
   return (
     <div className={styles.container} ref={containerRef}>
@@ -59,10 +46,10 @@ export function Autocomplete<T = unknown>(props: AutocompleteProps<T>) {
       {isOpen && (
         <ul id={listboxId} className={styles.dropdown} role="listbox">
           {isLoading && (
-            <li className={styles.statusItem}>{LABELS.LOADING}</li>
+            <li className={styles.statusItem}>{UI_LABELS.LOADING}</li>
           )}
           {!isLoading && options.length === 0 && (
-            <li className={styles.statusItem}>{LABELS.NO_RESULTS}</li>
+            <li className={styles.statusItem}>{UI_LABELS.NO_RESULTS}</li>
           )}
           {!isLoading && options.map((option, idx) => (
             <li

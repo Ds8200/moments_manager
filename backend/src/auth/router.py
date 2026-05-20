@@ -24,7 +24,7 @@ async def refresh(body: RefreshSchema, db: AsyncSession = Depends(get_db)):
     return await svc.refresh(body.refresh_token)
 
 
-@router.post("/logout", status_code=204)
+@router.post("/logout", status_code=204, response_model=None)
 async def logout(body: RefreshSchema, db: AsyncSession = Depends(get_db)):
     svc = AuthService(db)
     await svc.logout(body.refresh_token)

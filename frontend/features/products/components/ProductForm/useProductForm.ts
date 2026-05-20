@@ -8,12 +8,13 @@ import { useAtom } from 'jotai'
 import { isProductFormOpenAtom, editingProductIdAtom } from '../../store/productsAtoms'
 import { useProduct, useCreateProduct, useUpdateProduct } from '../../queries/useProducts'
 import type { ProductFormValues } from '../../types'
+import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 
 const schema = z.object({
-  name:     z.string().min(1, 'נדרש שם מוצר'),
+  name:     z.string().min(1, PRODUCTS_LABELS.VALIDATION_NAME_REQUIRED),
   category: z.string(),
-  base_price: z.string().min(1, 'נדרש מחיר'),
-  base_cost:  z.string().min(1, 'נדרשת עלות'),
+  base_price: z.string().min(1, PRODUCTS_LABELS.VALIDATION_PRICE),
+  base_cost:  z.string().min(1, PRODUCTS_LABELS.VALIDATION_COST),
   avg_production_days: z.preprocess(
     (val) =>
       val === '' || val === null || (typeof val === 'number' && isNaN(val as number))

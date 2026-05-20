@@ -1,0 +1,28 @@
+export const PRODUCTS_LABELS = {
+  PAGE_TITLE:               'מוצרים',
+  NEW_PRODUCT:              '+ מוצר חדש',
+  SEARCH_PLACEHOLDER:       'חיפוש מוצר...',
+  EMPTY_TITLE:              'אין מוצרים בקטלוג',
+  EMPTY_DESC:               'הוסף מוצר ראשון',
+  COST_PREFIX:              'עלות:',
+  PROFIT_PREFIX:            'רווח:',
+  INACTIVE:                 'לא פעיל',
+  ERROR_LOAD:               'שגיאה בטעינת מוצרים',
+  CONFIRM_DELETE:           'למחוק את',
+
+  FORM_NEW_TITLE:           'מוצר חדש',
+  FORM_EDIT_TITLE:          'עריכת מוצר',
+  FORM_NAME:                'שם מוצר',
+  FORM_CATEGORY:            'קטגוריה',
+  FORM_PRICE:               'מחיר בסיס',
+  FORM_COST:                'עלות בסיס',
+  FORM_PROD_DAYS:           'ימי ייצור ממוצע',
+  FORM_IS_ACTIVE:           'מוצר פעיל',
+  FORM_CANCEL:              'ביטול',
+  FORM_SAVE:                'שמור',
+  FORM_SAVING:              'שומר...',
+
+  VALIDATION_NAME_REQUIRED: 'נדרש שם מוצר',
+  VALIDATION_PRICE:         'נדרש מחיר',
+  VALIDATION_COST:          'נדרשת עלות',
+} as const
