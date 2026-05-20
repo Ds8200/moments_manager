@@ -1,0 +1,27 @@
+@use '../../../../shared/styles/variables' as v;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.card {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-card;
+  border: 1px solid v.$border-color;
+  overflow: hidden;
+}

@@ -1,0 +1,47 @@
+@use '../../../shared/styles/variables' as v;
+@use 'sass:color';
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  white-space: nowrap;
+}
+
+.new {
+  background: color.adjust(#339AF0, $lightness: 35%);
+  color: color.adjust(#339AF0, $lightness: -10%);
+}
+
+.waiting_approval {
+  background: color.adjust(#F59F00, $lightness: 38%);
+  color: color.adjust(#F59F00, $lightness: -15%);
+}
+
+.approved {
+  background: color.adjust(#20C997, $lightness: 42%);
+  color: color.adjust(#20C997, $lightness: -10%);
+}
+
+.printing {
+  background: color.adjust(#7950F2, $lightness: 38%);
+  color: color.adjust(#7950F2, $lightness: -5%);
+}
+
+.ready {
+  background: color.adjust(#51CF66, $lightness: 38%);
+  color: color.adjust(#51CF66, $lightness: -15%);
+}
+
+.completed {
+  background: v.$gray-100;
+  color: v.$gray-600;
+}
+
+.cancelled {
+  background: color.adjust(#FA5252, $lightness: 32%);
+  color: color.adjust(#FA5252, $lightness: -10%);
+}

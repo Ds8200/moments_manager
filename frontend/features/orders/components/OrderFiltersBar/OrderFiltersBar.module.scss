@@ -1,0 +1,93 @@
+@use '../../../../shared/styles/variables' as v;
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  flex-wrap: wrap;
+}
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.searchIcon {
+  position: absolute;
+  right: v.$space-3;
+  top: 50%;
+  transform: translateY(-50%);
+  color: v.$text-secondary;
+  pointer-events: none;
+  font-style: normal;
+}
+
+.searchInput {
+  width: 100%;
+  padding: v.$space-2 v.$space-4 v.$space-2 v.$space-3;
+  padding-right: calc(v.$space-3 + 20px);
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+  }
+}
+
+.select {
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  cursor: pointer;
+  min-width: 130px;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+.dateInput {
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+.newButton {
+  padding: v.$space-2 v.$space-4;
+  background: v.$primary;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background v.$transition-fast;
+  margin-right: auto;
+
+  &:hover {
+    background: v.$primary-dark;
+  }
+}

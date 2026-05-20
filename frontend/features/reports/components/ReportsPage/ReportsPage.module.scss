@@ -1,0 +1,128 @@
+@use '../../../../shared/styles/variables' as v;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+}
+
+.title {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.yearSelect {
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  margin-right: auto;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: v.$space-4;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.kpiCard {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-card;
+  border: 1px solid v.$border-color;
+  padding: v.$space-5;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.kpiLabel {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  font-weight: v.$font-weight-medium;
+}
+
+.kpiValue {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.kpiPositive { color: #2F9E44; }
+.kpiNegative { color: v.$danger; }
+
+.tableCard {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-card;
+  border: 1px solid v.$border-color;
+  overflow: hidden;
+}
+
+.tableTitle {
+  padding: v.$space-4 v.$space-5;
+  font-size: v.$font-size-md;
+  font-weight: v.$font-weight-semibold;
+  border-bottom: 1px solid v.$border-color;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: v.$font-size-sm;
+}
+
+.thead th {
+  padding: v.$space-3 v.$space-4;
+  text-align: right;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-secondary;
+  background: v.$gray-50;
+  border-bottom: 1px solid v.$border-color;
+  white-space: nowrap;
+}
+
+.row {
+  border-bottom: 1px solid v.$border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cell {
+  padding: v.$space-3 v.$space-4;
+  color: v.$text-primary;
+}
+
+.monthName {
+  font-weight: v.$font-weight-medium;
+}
+
+.profit {
+  color: #2F9E44;
+  font-weight: v.$font-weight-semibold;
+}
+
+.topCustomerName {
+  font-weight: v.$font-weight-medium;
+}

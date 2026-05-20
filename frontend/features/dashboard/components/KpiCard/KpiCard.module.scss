@@ -1,0 +1,75 @@
+@use '../../../../shared/styles/variables' as v;
+@use 'sass:color';
+
+.card {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-card;
+  border: 1px solid v.$border-color;
+  padding: v.$space-5;
+  display: flex;
+  align-items: center;
+  gap: v.$space-4;
+  transition: box-shadow v.$transition-fast;
+
+  &:hover {
+    box-shadow: v.$shadow-elevated;
+  }
+}
+
+.icon {
+  font-size: 32px;
+  width: 52px;
+  height: 52px;
+  border-radius: v.$border-radius;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: v.$gray-100;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.value {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  line-height: 1.1;
+  color: v.$text-primary;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  font-weight: v.$font-weight-medium;
+}
+
+// Color variants
+.primary {
+  border-color: v.$primary-light;
+  .icon { background: v.$primary-light; }
+  .value { color: v.$primary-dark; }
+}
+
+.success {
+  border-color: color.adjust(#51CF66, $lightness: 32%);
+  .icon { background: color.adjust(#51CF66, $lightness: 40%); }
+  .value { color: color.adjust(#51CF66, $lightness: -15%); }
+}
+
+.warning {
+  border-color: color.adjust(#F59F00, $lightness: 38%);
+  .icon { background: color.adjust(#F59F00, $lightness: 42%); }
+  .value { color: color.adjust(#F59F00, $lightness: -10%); }
+}
+
+.danger {
+  border-color: color.adjust(#FA5252, $lightness: 30%);
+  .icon { background: color.adjust(#FA5252, $lightness: 38%); }
+  .value { color: color.adjust(#FA5252, $lightness: -10%); }
+}

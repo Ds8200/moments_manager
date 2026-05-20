@@ -1,0 +1,7 @@
+APP_START = "Application starting — DB: %s | CORS: %s | LOG: %s"
+APP_STOP = "Application shutting down"
+DB_CONNECTED = "Database connection verified"
+DB_CONNECT_FAILED = "Database connection failed: %s"
+ORDER_STATUS_CHANGED = "Order %s status changed: %s → %s"
+FILE_UPLOADED = "File uploaded for order %s: %s (%d bytes)"
+FILE_DELETED = "File deleted: %s"

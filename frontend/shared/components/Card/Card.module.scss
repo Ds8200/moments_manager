@@ -1,0 +1,12 @@
+@use '../../../shared/styles/variables' as v;
+
+.card {
+  background: v.$bg-card;
+  border-radius: v.$border-radius;
+  box-shadow: v.$shadow-card;
+  border: 1px solid v.$border-color;
+}
+
+.padding-sm { padding: v.$space-3; }
+.padding-md { padding: v.$space-5; }
+.padding-lg { padding: v.$space-8; }

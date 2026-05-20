@@ -1,0 +1,32 @@
+@use '../../../shared/styles/variables' as v;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-16 v.$space-8;
+  text-align: center;
+  gap: v.$space-3;
+}
+
+.icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.title {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-primary;
+}
+
+.description {
+  font-size: v.$font-size-base;
+  color: v.$text-secondary;
+  max-width: 320px;
+}
+
+.action {
+  margin-top: v.$space-2;
+}

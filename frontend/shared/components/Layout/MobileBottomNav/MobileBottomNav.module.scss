@@ -1,0 +1,43 @@
+@use '../../../../shared/styles/variables' as v;
+
+.nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: v.$bg-card;
+  border-top: 1px solid v.$border-color;
+  z-index: v.$z-header;
+  padding-bottom: env(safe-area-inset-bottom);
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    display: flex;
+  }
+}
+
+.item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-2 0;
+  gap: 2px;
+  color: v.$text-secondary;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  transition: color v.$transition-fast;
+
+  &.active {
+    color: v.$primary;
+  }
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.label {
+  font-size: 10px;
+}

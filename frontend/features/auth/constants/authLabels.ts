@@ -1,0 +1,14 @@
+export const AUTH_LABELS = {
+  TITLE:            'Moments',
+  SUBTITLE:         'ניהול עסק גרפיקה ויצירה',
+  EMAIL_LABEL:      'אימייל',
+  EMAIL_PLACEHOLDER:'admin@moments.co.il',
+  EMAIL_REQUIRED:   'נדרשת כתובת אימייל',
+  EMAIL_INVALID:    'כתובת אימייל לא תקינה',
+  PASSWORD_LABEL:   'סיסמה',
+  PASSWORD_PLACEHOLDER: '••••••••',
+  PASSWORD_REQUIRED:'נדרשת סיסמה',
+  SUBMIT:           'התחברות',
+  SUBMITTING:       'מתחבר...',
+  LOGIN_FAILED:     'שם משתמש או סיסמה שגויים',
+} as const

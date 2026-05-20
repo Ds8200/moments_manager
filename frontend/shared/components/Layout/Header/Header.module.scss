@@ -1,0 +1,19 @@
+@use '../../../../shared/styles/variables' as v;
+
+.header {
+  height: v.$header-height;
+  background: v.$bg-card;
+  border-bottom: 1px solid v.$border-color;
+  display: flex;
+  align-items: center;
+  padding: 0 v.$space-6;
+  position: sticky;
+  top: 0;
+  z-index: v.$z-header;
+}
+
+.title {
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-primary;
+}

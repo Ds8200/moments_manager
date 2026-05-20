@@ -1,0 +1,14 @@
+.git
+node_modules
+.venv
+__pycache__
+.next
+frontend/out
+frontend/build
+coverage
+.pytest_cache
+uploads
+*.log
+.env
+backend/.env
+frontend/.env

@@ -1,0 +1,64 @@
+@use '../../../shared/styles/variables' as v;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-2;
+  border: none;
+  border-radius: v.$border-radius;
+  font-family: v.$font-family;
+  font-weight: v.$font-weight-medium;
+  cursor: pointer;
+  transition: background v.$transition-fast, opacity v.$transition-fast, transform v.$transition-fast;
+  white-space: nowrap;
+
+  &:active:not(:disabled) { transform: scale(0.98); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &:focus-visible { outline: 2px solid v.$primary; outline-offset: 2px; }
+}
+
+// Sizes
+.sm { padding: v.$space-1 v.$space-3; font-size: v.$font-size-sm; height: 30px; }
+.md { padding: v.$space-2 v.$space-5; font-size: v.$font-size-base; height: 38px; }
+.lg { padding: v.$space-3 v.$space-6; font-size: v.$font-size-md; height: 46px; }
+
+// Variants
+.primary {
+  background: v.$primary;
+  color: v.$text-inverse;
+  &:hover:not(:disabled) { background: v.$primary-dark; }
+}
+
+.secondary {
+  background: v.$gray-100;
+  color: v.$text-primary;
+  border: 1px solid v.$border-color;
+  &:hover:not(:disabled) { background: v.$gray-200; }
+}
+
+.danger {
+  background: v.$danger;
+  color: v.$text-inverse;
+  &:hover:not(:disabled) { background: darken(#FA5252, 10%); }
+}
+
+.ghost {
+  background: transparent;
+  color: v.$text-secondary;
+  &:hover:not(:disabled) { background: v.$gray-100; color: v.$text-primary; }
+}
+
+// Loading spinner
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

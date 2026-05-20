@@ -1,0 +1,190 @@
+@use '../../../../shared/styles/variables' as v;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: v.$z-modal;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer {
+  width: 480px;
+  max-width: 100vw;
+  height: 100%;
+  background: v.$bg-card;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: v.$shadow-elevated;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: v.$space-5 v.$space-6;
+  border-bottom: 1px solid v.$border-color;
+  position: sticky;
+  top: 0;
+  background: v.$bg-card;
+  z-index: 1;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+}
+
+.orderNumber {
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+}
+
+.customerName {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-primary;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$text-secondary;
+  font-size: v.$font-size-xl;
+  padding: v.$space-1;
+  border-radius: v.$border-radius-sm;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-100;
+  }
+}
+
+.body {
+  padding: v.$space-6;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+}
+
+.sectionTitle {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid v.$border-color;
+  padding-bottom: v.$space-2;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: v.$font-size-sm;
+}
+
+.metaLabel {
+  color: v.$text-secondary;
+}
+
+.metaValue {
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.itemRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: v.$space-3 0;
+  border-bottom: 1px solid v.$border-color;
+  font-size: v.$font-size-sm;
+  gap: v.$space-3;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.itemName {
+  font-weight: v.$font-weight-medium;
+  flex: 1;
+}
+
+.itemNotes {
+  color: v.$text-secondary;
+  font-size: v.$font-size-xs;
+  margin-top: 2px;
+}
+
+.itemQty {
+  color: v.$text-secondary;
+  white-space: nowrap;
+}
+
+.itemPrice {
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
+}
+
+.totalsRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: v.$font-size-sm;
+  padding: v.$space-2 0;
+}
+
+.totalsLabel {
+  color: v.$text-secondary;
+}
+
+.totalsValue {
+  font-weight: v.$font-weight-semibold;
+}
+
+.totalProfit {
+  color: #2F9E44;
+}
+
+.fileChip {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  padding: v.$space-2 v.$space-3;
+  background: v.$gray-100;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  color: v.$text-primary;
+  text-decoration: none;
+}
+
+.statusSelect {
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+.skeleton {
+  padding: v.$space-6;
+}

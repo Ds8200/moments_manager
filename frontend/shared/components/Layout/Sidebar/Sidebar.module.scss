@@ -1,0 +1,83 @@
+@use '../../../../shared/styles/variables' as v;
+@use '../../../../shared/styles/mixins' as m;
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: v.$sidebar-width;
+  height: 100vh;
+  background: v.$bg-sidebar;
+  border-left: 1px solid v.$border-color;
+  z-index: v.$z-sidebar;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  @include m.custom-scrollbar;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    display: none;
+  }
+}
+
+.logo {
+  @include m.flex-start;
+  gap: v.$space-2;
+  padding: v.$space-6 v.$space-5;
+  border-bottom: 1px solid v.$border-color;
+  font-weight: v.$font-weight-bold;
+  font-size: v.$font-size-lg;
+}
+
+.logoIcon {
+  color: v.$primary;
+  font-size: v.$font-size-xl;
+}
+
+.logoText {
+  color: v.$text-primary;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding: v.$space-4 v.$space-3;
+  gap: v.$space-1;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  padding: v.$space-3 v.$space-3;
+  border-radius: v.$border-radius;
+  color: v.$text-secondary;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  transition: background v.$transition-fast, color v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-100;
+    color: v.$text-primary;
+  }
+
+  &.active {
+    background: v.$primary-light;
+    color: v.$primary-dark;
+
+    .navIcon {
+      color: v.$primary;
+    }
+  }
+}
+
+.navIcon {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  flex: 1;
+}

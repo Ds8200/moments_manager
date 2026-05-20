@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-frontend:
+    name: Lint Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: cd frontend && npm ci
+      - run: cd frontend && npm run lint
+
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: cd frontend && npm ci
+      - run: cd frontend && npm run test:run
+      - run: cd frontend && npm run test:coverage
+
+  lint-backend:
+    name: Lint Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install uv
+      - run: cd backend && uv sync
+      - run: cd backend && uv run ruff check .
+
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: appuser
+          POSTGRES_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
+          POSTGRES_DB: appdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql+asyncpg://appuser:${{ secrets.CI_DB_PASSWORD }}@localhost:5432/appdb
+      TEST_DATABASE_URL: postgresql+asyncpg://appuser:${{ secrets.CI_DB_PASSWORD }}@localhost:5432/appdb_test
+      SECRET_KEY: ci-secret-key-32-chars-minimum-ok
+      LOG_LEVEL: WARNING
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      UPLOADS_DIR: /tmp/uploads
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install uv
+      - run: cd backend && uv sync
+      - name: Create test DB
+        run: |
+          PGPASSWORD=${{ secrets.CI_DB_PASSWORD }} psql -h localhost -U appuser -d appdb \
+            -c "SELECT 'CREATE DATABASE appdb_test' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'appdb_test')\gexec"
+      - run: cd backend && uv run alembic upgrade head
+      - run: cd backend && uv run pytest --cov=src --cov-fail-under=80 --cov-report=term-missing -x --tb=short -q

@@ -1,0 +1,3 @@
+sh scripts/bootstrap.sh
+cd frontend && npm run test:run
+cd ../backend && uv run pytest -x --tb=short -q

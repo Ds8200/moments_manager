@@ -1,0 +1,113 @@
+@use '../../../../shared/styles/variables' as v;
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: v.$bg-page;
+  padding: v.$space-4;
+}
+
+.card {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-xl;
+  box-shadow: v.$shadow-elevated;
+  padding: v.$space-10;
+  width: 100%;
+  max-width: 380px;
+}
+
+.logo {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$primary;
+  margin-bottom: v.$space-2;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  text-align: center;
+  margin-bottom: v.$space-8;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.input {
+  width: 100%;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+  }
+
+  &.inputError {
+    border-color: v.$danger;
+  }
+}
+
+.errorText {
+  font-size: v.$font-size-xs;
+  color: v.$danger;
+}
+
+.submitError {
+  font-size: v.$font-size-sm;
+  color: v.$danger;
+  background: color-mix(in srgb, v.$danger 10%, transparent);
+  border: 1px solid color-mix(in srgb, v.$danger 25%, transparent);
+  border-radius: v.$border-radius;
+  padding: v.$space-3 v.$space-4;
+  text-align: center;
+}
+
+.button {
+  width: 100%;
+  padding: v.$space-3;
+  background: v.$primary;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  cursor: pointer;
+  transition: background v.$transition-fast;
+  margin-top: v.$space-2;
+
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
