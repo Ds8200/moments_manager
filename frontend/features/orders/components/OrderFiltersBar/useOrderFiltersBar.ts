@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 import { orderFiltersAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { STATUS_ORDER, STATUS_LABELS } from '@/shared/enums/statusEnums'
 import type { OrderStatus } from '@/shared/enums/statusEnums'
+import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import type { OrderFilters } from '../../types'
 
 export interface UseOrderFiltersBarReturn {
@@ -29,7 +30,7 @@ export const useOrderFiltersBar = (): UseOrderFiltersBarReturn => {
   )
 
   const statusOptions = [
-    { value: '' as const, label: 'כל הסטטוסים' },
+    { value: '' as const, label: ORDERS_LABELS.ALL_STATUSES },
     ...STATUS_ORDER.map((s) => ({ value: s, label: STATUS_LABELS[s] })),
   ]
 

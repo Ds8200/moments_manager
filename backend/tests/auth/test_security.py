@@ -1,0 +1,32 @@
+from src.core.security import (
+    create_access_token,
+    decode_access_token,
+    generate_refresh_token,
+    hash_password,
+    hash_refresh_token,
+    verify_password,
+)
+
+
+def test_password_round_trip() -> None:
+    hashed = hash_password("secret123")
+    assert hashed != "secret123"
+    assert verify_password("secret123", hashed)
+    assert not verify_password("wrong", hashed)
+
+
+def test_access_token_round_trip() -> None:
+    token = create_access_token("user-123")
+    payload = decode_access_token(token)
+    assert payload is not None
+    assert payload["sub"] == "user-123"
+
+
+def test_decode_invalid_token_returns_none() -> None:
+    assert decode_access_token("not-a-jwt") is None
+
+
+def test_refresh_token_hashing_is_deterministic() -> None:
+    raw = generate_refresh_token()
+    assert len(raw) > 40
+    assert hash_refresh_token(raw) == hash_refresh_token(raw)

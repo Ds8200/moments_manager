@@ -1,11 +1,11 @@
 'use client'
-import { useAtom, useSetAtom } from 'jotai'
+import { useSetAtom } from 'jotai'
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/useOrders'
 import { orderFiltersAtom, selectedOrderIdAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { formatCurrency, formatShortDate } from '@/shared/utils/formatters'
 import type { OrderSummary, OrderUrgency } from '../../types'
 import type { OrderStatus, PaymentMethod } from '@/shared/enums/statusEnums'
-import { STATUS_LABELS, PAYMENT_LABELS } from '@/shared/enums/statusEnums'
+import { PAYMENT_LABELS } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 
 export interface UseOrdersTableReturn {
@@ -51,7 +51,7 @@ const dueDateTimeFormatter = new Intl.DateTimeFormat('he-IL', {
 
 export const useOrdersTable = (): UseOrdersTableReturn => {
   const { data, isLoading, isError } = useOrders()
-  const [filters, setFilters] = useAtom(orderFiltersAtom)
+  const setFilters = useSetAtom(orderFiltersAtom)
   const setSelectedId = useSetAtom(selectedOrderIdAtom)
   const setFormOpen = useSetAtom(isOrderFormOpenAtom)
   const setEditingId = useSetAtom(editingOrderIdAtom)
@@ -106,7 +106,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     },
 
     getPaymentLabel: (method, isPaid) => {
-      if (!isPaid) return '—'
+      if (!isPaid) return ORDERS_LABELS.URGENCY_NONE
       if (method && PAYMENT_LABELS[method]) return PAYMENT_LABELS[method]
       return ORDERS_LABELS.PAID
     },

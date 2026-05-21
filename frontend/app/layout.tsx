@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Rubik } from 'next/font/google'
+import { META_LABELS } from '@/shared/constants/uiLabels'
 import './globals.scss'
 
 const rubik = Rubik({
@@ -10,8 +11,8 @@ const rubik = Rubik({
 })
 
 export const metadata: Metadata = {
-  title: 'Moments — ניהול עסק',
-  description: 'מערכת ניהול הזמנות, לקוחות ופיננסים',
+  title: META_LABELS.ROOT_TITLE,
+  description: META_LABELS.ROOT_DESCRIPTION,
 }
 
 export default function RootLayout({

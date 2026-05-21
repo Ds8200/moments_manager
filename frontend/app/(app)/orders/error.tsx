@@ -1,10 +1,7 @@
 'use client'
+import { ErrorBoundary } from '@/shared/components/ErrorBoundary/ErrorBoundary'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
 
 export default function OrdersError({ reset }: { error: Error; reset: () => void }) {
-  return (
-    <div style={{ textAlign: 'center', padding: '40px' }}>
-      <p>שגיאה בטעינת ההזמנות</p>
-      <button onClick={reset} style={{ marginTop: '16px', cursor: 'pointer' }}>נסה שנית</button>
-    </div>
-  )
+  return <ErrorBoundary message={UI_LABELS.ERROR_LOADING_ORDERS} onReset={reset} />
 }
