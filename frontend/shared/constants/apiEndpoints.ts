@@ -1,5 +1,9 @@
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
+// DEBUG — remove after confirming env var is set correctly in Vercel
+console.log('[DEBUG] NEXT_PUBLIC_API_URL =', process.env.NEXT_PUBLIC_API_URL)
+console.log('[DEBUG] BASE =', BASE)
+
 export const API_ENDPOINTS = {
   AUTH_LOGIN:   `${BASE}/api/v1/auth/login`,
   AUTH_REFRESH: `${BASE}/api/v1/auth/refresh`,
