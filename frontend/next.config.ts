@@ -3,6 +3,8 @@ import path from 'path'
 
 const isVercel = !!process.env.VERCEL
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moments-manager.onrender.com'
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
@@ -10,6 +12,14 @@ const nextConfig: NextConfig = {
   },
   sassOptions: {
     includePaths: [path.resolve(__dirname)],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: `${BACKEND_URL}/api/v1/:path*`,
+      },
+    ]
   },
   ...(isVercel
     ? {}
