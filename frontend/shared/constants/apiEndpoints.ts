@@ -1,4 +1,5 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://moments-manager.onrender.com'
+// const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://moments-manager.onrender.com'
+const BASE = 'https://moments-manager.onrender.com'
 
 export const API_ENDPOINTS = {
   AUTH_LOGIN:   `${BASE}/api/v1/auth/login`,
