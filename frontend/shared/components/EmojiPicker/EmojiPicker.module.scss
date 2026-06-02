@@ -44,6 +44,7 @@
   width: 30px;
   height: 30px;
   font-size: 18px;
+  font-variant-emoji: emoji; // force emoji (color) presentation over text (monochrome)
   background: none;
   border: none;
   border-radius: $border-radius-sm;

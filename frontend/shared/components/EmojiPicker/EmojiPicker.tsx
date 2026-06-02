@@ -7,6 +7,11 @@ import styles from './EmojiPicker.module.scss'
 
 export { type EmojiPickerProps }
 
+// Strip Variation Selector-16 (U+FE0F) for display — modern browsers render
+// these emojis correctly without it, and leaving it in causes visible □ glyphs
+// in some fonts regardless of what's stored in emojiData.ts.
+const stripVS16 = (s: string): string => s.replace(/️/g, '')
+
 export const EmojiPicker = ({ isOpen, onClose, onSelect }: EmojiPickerProps): JSX.Element => {
   const { containerRef } = useEmojiPicker({ isOpen, onClose })
 
@@ -20,13 +25,13 @@ export const EmojiPicker = ({ isOpen, onClose, onSelect }: EmojiPickerProps): JS
               <div className={styles.grid}>
                 {category.emojis.map((emoji) => (
                   <button
-                    key={emoji}
+                    key={stripVS16(emoji)}
                     type="button"
                     className={styles.emojiBtn}
-                    onClick={() => onSelect(emoji)}
-                    aria-label={emoji}
+                    onClick={() => onSelect(stripVS16(emoji))}
+                    aria-label={stripVS16(emoji)}
                   >
-                    {emoji}
+                    {stripVS16(emoji)}
                   </button>
                 ))}
               </div>

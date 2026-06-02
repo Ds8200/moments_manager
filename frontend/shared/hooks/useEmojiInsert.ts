@@ -28,7 +28,8 @@ export const useEmojiInsert = <T extends FieldValues>(
   const closePicker = useCallback(() => setIsPickerOpen(false), [])
 
   const onEmojiSelect = useCallback(
-    (emoji: string) => {
+    (rawEmoji: string) => {
+      const emoji = rawEmoji.replace(/️/g, '') // strip any residual VS-16
       const el = textareaRef.current
       const current = String(getValues(fieldName) ?? '')
 
