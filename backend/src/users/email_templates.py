@@ -77,9 +77,16 @@ def build_welcome_email(
     .credential-box .label {{
       font-size: 11px;
       color: #9b6fab;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }}
+    .credential-box .value {{
+      font-size: 16px;
+      color: {BRAND_PURPLE};
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
     }}
     .note {{
       font-size: 13px !important;
@@ -129,34 +136,12 @@ def build_welcome_email(
 
       <div class="credential-box">
         <div class="label">אימייל</div>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td style="vertical-align:middle; padding:0;">
-              <input type="text" value="{recipient_email}" readonly onclick="this.select()"
-                     style="font-family:'Courier New',monospace; font-size:15px; color:{BRAND_PURPLE}; font-weight:600; background:transparent; border:none; outline:none; cursor:pointer; width:100%; direction:ltr; display:block;" />
-            </td>
-            <td width="34" style="vertical-align:middle; padding-right:8px; text-align:center;">
-              <span onclick="this.closest('table').querySelector('input').select()"
-                    style="display:inline-block; width:30px; height:30px; background:#ecd9f2; border-radius:6px; text-align:center; line-height:30px; font-size:15px; cursor:pointer; user-select:none;">📋</span>
-            </td>
-          </tr>
-        </table>
+        <div class="value">{recipient_email}</div>
       </div>
 
       <div class="credential-box">
         <div class="label">סיסמה זמנית</div>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td style="vertical-align:middle; padding:0;">
-              <input type="text" value="{temp_password}" readonly onclick="this.select()"
-                     style="font-family:'Courier New',monospace; font-size:15px; color:{BRAND_PURPLE}; font-weight:600; background:transparent; border:none; outline:none; cursor:pointer; width:100%; direction:ltr; display:block;" />
-            </td>
-            <td width="34" style="vertical-align:middle; padding-right:8px; text-align:center;">
-              <span onclick="this.closest('table').querySelector('input').select()"
-                    style="display:inline-block; width:30px; height:30px; background:#ecd9f2; border-radius:6px; text-align:center; line-height:30px; font-size:15px; cursor:pointer; user-select:none;">📋</span>
-            </td>
-          </tr>
-        </table>
+        <div class="value">{temp_password}</div>
       </div>
 
       <p class="note">מומלץ לפנות למנהל המערכת לאחר הכניסה הראשונה לעדכון הסיסמה.</p>
