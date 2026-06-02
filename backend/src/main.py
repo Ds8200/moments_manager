@@ -1,26 +1,27 @@
 import logging
 import os
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import text
-from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from sqlalchemy import text
 
+from src.auth.router import router as auth_router
 from src.config import settings
 from src.core.constants import log_messages
 from src.core.exception_handlers import register_exception_handlers
 from src.core.middleware import register_middleware
 from src.core.rate_limit import limiter
-from src.database import engine
-
-from src.auth.router import router as auth_router
 from src.customers.router import router as customers_router
-from src.products.router import router as products_router
-from src.orders.router import router as orders_router
+from src.database import engine
 from src.expenses.router import router as expenses_router
+from src.orders.router import router as orders_router
+from src.products.router import router as products_router
 from src.reports.router import router as reports_router
+from src.users.router import router as users_router
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,7 @@ register_middleware(app)
 register_exception_handlers(app)
 
 app.include_router(auth_router)
+app.include_router(users_router)
 app.include_router(customers_router)
 app.include_router(products_router)
 app.include_router(orders_router)

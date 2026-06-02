@@ -1,10 +1,12 @@
 import logging
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from src.core.exceptions import (
     ConflictError,
     FileTooLargeError,
+    ForbiddenError,
     InvalidFileTypeError,
     NotFoundError,
     UnauthorizedError,
@@ -29,6 +31,10 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(FileTooLargeError)
     async def file_too_large_handler(request: Request, exc: FileTooLargeError) -> JSONResponse:
         return JSONResponse(status_code=413, content={"detail": str(exc)})
+
+    @app.exception_handler(ForbiddenError)
+    async def forbidden_handler(request: Request, exc: ForbiddenError) -> JSONResponse:
+        return JSONResponse(status_code=403, content={"detail": exc.detail})
 
     @app.exception_handler(InvalidFileTypeError)
     async def invalid_file_type_handler(

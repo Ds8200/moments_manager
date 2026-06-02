@@ -4,12 +4,11 @@ import type { ReactElement } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSidebar } from './useSidebar'
-import { NAV_ITEMS } from '@/shared/constants/routes'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './Sidebar.module.scss'
 
 export const Sidebar = (): ReactElement => {
-  const { pathname } = useSidebar()
+  const { pathname, visibleNavItems } = useSidebar()
 
   return (
     <aside className={styles.sidebar}>
@@ -23,7 +22,7 @@ export const Sidebar = (): ReactElement => {
         />
       </div>
       <nav className={styles.nav}>
-        {NAV_ITEMS.map((item) => (
+        {visibleNavItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}

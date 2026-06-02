@@ -31,3 +31,9 @@ class InvalidFileTypeError(AppError):
     def __init__(self, ext: str) -> None:
         self.ext = ext
         super().__init__(f"File type '{ext}' is not allowed")
+
+
+class ForbiddenError(AppError):
+    def __init__(self, detail: str = "Forbidden") -> None:
+        self.detail = detail
+        super().__init__(detail)

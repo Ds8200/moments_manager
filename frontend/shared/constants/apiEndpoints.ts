@@ -27,4 +27,7 @@ export const API_ENDPOINTS = {
   REPORTS_MONTHLY:   `${BASE}/api/v1/reports/monthly`,
   REPORTS_FINANCIAL: `${BASE}/api/v1/reports/financial`,
   REPORTS_TOP_CUSTOMERS: `${BASE}/api/v1/reports/top-customers`,
+
+  USERS: `${BASE}/api/v1/users`,
+  USER: (id: string) => `${BASE}/api/v1/users/${id}`,
 } as const

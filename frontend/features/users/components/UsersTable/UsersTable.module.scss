@@ -1,0 +1,79 @@
+@use '../../../../shared/styles/variables' as v;
+
+.row {
+  border-bottom: 1px solid v.$border-color;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-50;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cell {
+  padding: v.$space-3 v.$space-4;
+  color: v.$text-primary;
+  vertical-align: middle;
+}
+
+.name {
+  font-weight: v.$font-weight-semibold;
+}
+
+.secondary {
+  color: v.$text-secondary;
+  font-size: v.$font-size-sm;
+}
+
+.roleAdmin {
+  display: inline-block;
+  padding: 2px v.$space-2;
+  border-radius: v.$border-radius-sm;
+  background: rgba(108, 99, 255, 0.12);
+  color: v.$primary;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+}
+
+.roleUser {
+  display: inline-block;
+  padding: 2px v.$space-2;
+  border-radius: v.$border-radius-sm;
+  background: v.$gray-100;
+  color: v.$text-secondary;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+}
+
+.statusActive {
+  color: v.$success;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+}
+
+.statusInactive {
+  color: v.$text-secondary;
+  font-size: v.$font-size-sm;
+}
+
+.actionsCell {
+  width: 40px;
+  text-align: center;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  font-size: v.$font-size-base;
+  opacity: 0.7;
+  transition: opacity v.$transition-fast;
+
+  &:hover {
+    opacity: 1;
+  }
+}

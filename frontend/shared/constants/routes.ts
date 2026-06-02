@@ -5,6 +5,7 @@ export const ROUTES = {
   PRODUCTS: '/products',
   EXPENSES: '/expenses',
   REPORTS: '/reports',
+  USERS: '/users',
   LOGIN: '/login',
 } as const
 
@@ -13,13 +14,15 @@ export interface NavItem {
   label: string
   shortLabel?: string
   icon: string
+  adminOnly?: boolean
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: ROUTES.DASHBOARD,  label: 'דשבורד',    shortLabel: 'בית',      icon: '🏠' },
-  { href: ROUTES.ORDERS,     label: 'הזמנות',    shortLabel: 'הזמנות',   icon: '📋' },
-  { href: ROUTES.CUSTOMERS,  label: 'לקוחות',    shortLabel: 'לקוחות',   icon: '👥' },
-  { href: ROUTES.PRODUCTS,   label: 'מוצרים',    shortLabel: 'מוצרים',   icon: '🎨' },
-  { href: ROUTES.EXPENSES,   label: 'הוצאות',    shortLabel: 'הוצאות',   icon: '💸' },
-  { href: ROUTES.REPORTS,    label: 'דוחות',     shortLabel: 'דוחות',    icon: '📊' },
+  { href: ROUTES.DASHBOARD,  label: 'דשבורד',      shortLabel: 'בית',        icon: '🏠' },
+  { href: ROUTES.ORDERS,     label: 'הזמנות',      shortLabel: 'הזמנות',     icon: '📋' },
+  { href: ROUTES.CUSTOMERS,  label: 'לקוחות',      shortLabel: 'לקוחות',     icon: '👥' },
+  { href: ROUTES.PRODUCTS,   label: 'מוצרים',      shortLabel: 'מוצרים',     icon: '🎨' },
+  { href: ROUTES.EXPENSES,   label: 'הוצאות',      shortLabel: 'הוצאות',     icon: '💸' },
+  { href: ROUTES.REPORTS,    label: 'דוחות',       shortLabel: 'דוחות',      icon: '📊' },
+  { href: ROUTES.USERS,      label: 'משתמשים',     shortLabel: 'משתמשים',    icon: '👤', adminOnly: true },
 ]

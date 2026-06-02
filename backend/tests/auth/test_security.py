@@ -16,10 +16,11 @@ def test_password_round_trip() -> None:
 
 
 def test_access_token_round_trip() -> None:
-    token = create_access_token("user-123")
+    token = create_access_token("user-123", "user")
     payload = decode_access_token(token)
     assert payload is not None
     assert payload["sub"] == "user-123"
+    assert payload["role"] == "user"
 
 
 def test_decode_invalid_token_returns_none() -> None:

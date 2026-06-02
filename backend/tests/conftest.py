@@ -16,6 +16,7 @@ from src.core.dependencies import get_current_user, get_db
 from src.core.security import create_access_token, hash_password
 from src.database import Base
 from src.main import app
+from src.users.enums import UserRole
 from src.users.models import User
 
 
@@ -64,6 +65,23 @@ async def test_user(db_session: AsyncSession) -> User:
         hashed_password=hash_password("testpass123"),
         full_name="Test User",
         is_active=True,
+        role=UserRole.user.value,
+    )
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def admin_user(db_session: AsyncSession) -> User:
+    user = User(
+        id=str(uuid.uuid4()),
+        email=f"admin-{uuid.uuid4()}@example.com",
+        hashed_password=hash_password("adminpass123"),
+        full_name="Admin User",
+        is_active=True,
+        role=UserRole.admin.value,
     )
     db_session.add(user)
     await db_session.commit()
@@ -76,8 +94,28 @@ async def client(db_session: AsyncSession, test_user: User) -> AsyncGenerator[As
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
 
-    async def override_get_current_user() -> dict:
+    async def override_get_current_user() -> User:
         return test_user
+
+    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_current_user] = override_get_current_user
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def admin_client(
+    db_session: AsyncSession, admin_user: User
+) -> AsyncGenerator[AsyncClient, None]:
+    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+        yield db_session
+
+    async def override_get_current_user() -> User:
+        return admin_user
 
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_current_user] = override_get_current_user
@@ -91,5 +129,11 @@ async def client(db_session: AsyncSession, test_user: User) -> AsyncGenerator[As
 
 @pytest.fixture
 def auth_headers(test_user: User) -> dict[str, str]:
-    token = create_access_token(test_user.id)
+    token = create_access_token(test_user.id, test_user.role)
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def admin_headers(admin_user: User) -> dict[str, str]:
+    token = create_access_token(admin_user.id, admin_user.role)
     return {"Authorization": f"Bearer {token}"}

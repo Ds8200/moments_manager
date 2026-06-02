@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useSetAtom } from 'jotai'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { authApi } from '../../api'
 import { setTokensAtom } from '../../store/authAtoms'
 import { ROUTES } from '@/shared/constants/routes'
@@ -26,6 +26,8 @@ export interface UseLoginFormReturn {
 
 export const useLoginForm = (): UseLoginFormReturn => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const prefillEmail = searchParams.get('email') ?? ''
   const setTokens = useSetAtom(setTokensAtom)
 
   const {
@@ -33,7 +35,10 @@ export const useLoginForm = (): UseLoginFormReturn => {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<LoginFormValues>({ resolver: zodResolver(schema) })
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: prefillEmail, password: '' },
+  })
 
   const onSubmit = async (values: LoginFormValues): Promise<void> => {
     try {

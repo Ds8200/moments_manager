@@ -1,18 +1,22 @@
 'use client'
+import { useAtomValue } from 'jotai'
 import { usePathname } from 'next/navigation'
-import { NAV_ITEMS } from '@/shared/constants/routes'
+import { isAdminAtom } from '@/features/auth/store/authAtoms'
+import { NAV_ITEMS, type NavItem } from '@/shared/constants/routes'
 
 const VISIBLE_ITEM_COUNT = 5
 
 export interface UseMobileBottomNavReturn {
-  visibleItems: typeof NAV_ITEMS
+  visibleItems: NavItem[]
   pathname: string
 }
 
 export const useMobileBottomNav = (): UseMobileBottomNavReturn => {
   const pathname = usePathname()
+  const isAdmin = useAtomValue(isAdminAtom)
+  const filteredItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin)
   return {
-    visibleItems: NAV_ITEMS.slice(0, VISIBLE_ITEM_COUNT),
+    visibleItems: filteredItems.slice(0, VISIBLE_ITEM_COUNT),
     pathname,
   }
 }

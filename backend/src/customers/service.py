@@ -1,4 +1,5 @@
 import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.constants.http_messages import RESOURCE_CUSTOMER

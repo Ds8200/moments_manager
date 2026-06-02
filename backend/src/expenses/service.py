@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.constants.http_messages import RESOURCE_EXPENSE

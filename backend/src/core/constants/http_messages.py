@@ -5,6 +5,10 @@ RESOURCE_EXPENSE = "Expense"
 RESOURCE_FILE = "File"
 RESOURCE_USER = "User"
 
+FORBIDDEN = "Access denied"
+USER_EMAIL_EXISTS = "A user with this email already exists"
+CANNOT_DELETE_SELF = "Admins cannot delete their own account"
+
 CUSTOMER_NOT_FOUND = "Customer not found"
 CUSTOMER_CREATED = "Customer created"
 ORDER_NOT_FOUND = "Order not found"

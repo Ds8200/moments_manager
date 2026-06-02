@@ -1,8 +1,9 @@
 import uuid
+
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database import Base, TimestampMixin, SoftDeleteMixin
+from src.database import Base, SoftDeleteMixin, TimestampMixin
 
 
 class Customer(Base, TimestampMixin, SoftDeleteMixin):

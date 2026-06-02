@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timezone
-from sqlalchemy import select, func
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.customers.models import Customer

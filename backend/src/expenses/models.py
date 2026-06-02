@@ -1,10 +1,11 @@
 import uuid
 from datetime import date
 from decimal import Decimal
-from sqlalchemy import String, Text, Date, Numeric
+
+from sqlalchemy import Date, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database import Base, TimestampMixin, SoftDeleteMixin
+from src.database import Base, SoftDeleteMixin, TimestampMixin
 
 
 class Expense(Base, TimestampMixin, SoftDeleteMixin):

@@ -15,6 +15,7 @@ export const UI_LABELS = {
   ERROR_LOADING_PRODUCTS: 'שגיאה בטעינת המוצרים',
   ERROR_LOADING_EXPENSES: 'שגיאה בטעינת ההוצאות',
   ERROR_LOADING_REPORTS:  'שגיאה בטעינת הדוחות',
+  ERROR_LOADING_USERS:    'שגיאה בטעינת המשתמשים',
 } as const
 
 export const META_LABELS = {
@@ -26,6 +27,7 @@ export const META_LABELS = {
   PRODUCTS_TITLE:    'מוצרים | Moments מערכת ניהול',
   EXPENSES_TITLE:    'הוצאות | Moments מערכת ניהול',
   REPORTS_TITLE:     'דוחות | Moments מערכת ניהול',
+  USERS_TITLE:       'משתמשים | Moments מערכת ניהול',
   LOGIN_TITLE:       'התחברות | Moments מערכת ניהול',
 } as const
 

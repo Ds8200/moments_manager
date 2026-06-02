@@ -1,9 +1,12 @@
 import logging
 from datetime import datetime, timedelta, timezone
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.repository import RefreshTokenRepository
 from src.auth.schemas import TokenResponseSchema
+from src.config import settings
+from src.core.constants.http_messages import INVALID_CREDENTIALS, REFRESH_TOKEN_INVALID
 from src.core.exceptions import UnauthorizedError
 from src.core.security import (
     create_access_token,
@@ -11,9 +14,7 @@ from src.core.security import (
     hash_refresh_token,
     verify_password,
 )
-from src.config import settings
 from src.users.repository import UserRepository
-from src.core.constants.http_messages import INVALID_CREDENTIALS, REFRESH_TOKEN_INVALID
 
 logger = logging.getLogger(__name__)
 
@@ -28,24 +29,27 @@ class AuthService:
         user = await self._users.get_by_email(email)
         if not user or not verify_password(password, user.hashed_password):
             raise UnauthorizedError(INVALID_CREDENTIALS)
-        return await self._issue_token_pair(user.id)
+        return await self._issue_token_pair(user.id, user.role)
 
     async def refresh(self, refresh_token_str: str) -> TokenResponseSchema:
         token_hash = hash_refresh_token(refresh_token_str)
         token = await self._tokens.get_valid_by_hash(token_hash)
         if not token:
             raise UnauthorizedError(REFRESH_TOKEN_INVALID)
+        user = await self._users.get_by_id(token.user_id)
+        if not user:
+            raise UnauthorizedError(REFRESH_TOKEN_INVALID)
         await self._tokens.revoke(token_hash)
         await self._db.flush()
-        return await self._issue_token_pair(token.user_id)
+        return await self._issue_token_pair(user.id, user.role)
 
     async def logout(self, refresh_token_str: str) -> None:
         token_hash = hash_refresh_token(refresh_token_str)
         await self._tokens.revoke(token_hash)
         await self._db.commit()
 
-    async def _issue_token_pair(self, user_id: str) -> TokenResponseSchema:
-        access_token = create_access_token(user_id)
+    async def _issue_token_pair(self, user_id: str, role: str) -> TokenResponseSchema:
+        access_token = create_access_token(user_id, role)
         raw_refresh = generate_refresh_token()
         expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
         await self._tokens.create(

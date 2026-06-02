@@ -1,6 +1,7 @@
 import logging
 from datetime import date
 from decimal import Decimal
+
 from sqlalchemy import and_, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
