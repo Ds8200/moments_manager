@@ -2,10 +2,13 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
+from src.users.enums import UserRole
+
 
 class UserCreateSchema(BaseModel):
     email: EmailStr
     full_name: str
+    role: UserRole = UserRole.user
 
 
 class UserResponseSchema(BaseModel):

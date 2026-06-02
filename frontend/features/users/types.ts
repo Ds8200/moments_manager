@@ -19,4 +19,5 @@ export interface UsersResponse {
 export interface UserFormValues {
   email: string
   full_name: string
+  role: 'admin' | 'user'
 }

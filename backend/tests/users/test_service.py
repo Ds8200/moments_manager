@@ -51,7 +51,7 @@ async def test_create_user_success_calls_repo_and_commit() -> None:
 
     with patch("src.users.service.send_html_email"):
         result = await svc.create_user(
-            MagicMock(email="new@example.com", full_name="New"),
+            MagicMock(email="new@example.com", full_name="New", role=UserRole.user.value),
             background_tasks,
         )
 

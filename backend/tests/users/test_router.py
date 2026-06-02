@@ -39,6 +39,23 @@ async def test_create_user_as_admin_returns_201(admin_client: AsyncClient) -> No
     assert "hashed_password" not in body
 
 
+async def test_create_admin_user_via_role_field(admin_client: AsyncClient) -> None:
+    response = await admin_client.post(
+        "/api/v1/users",
+        json={"email": "newadmin@example.com", "full_name": "New Admin", "role": "admin"},
+    )
+    assert response.status_code == 201
+    assert response.json()["role"] == "admin"
+
+
+async def test_create_user_invalid_role_returns_422(admin_client: AsyncClient) -> None:
+    response = await admin_client.post(
+        "/api/v1/users",
+        json={"email": "bad@example.com", "full_name": "Bad Role", "role": "superuser"},
+    )
+    assert response.status_code == 422
+
+
 async def test_create_user_non_admin_returns_403(client: AsyncClient) -> None:
     response = await client.post(
         "/api/v1/users",

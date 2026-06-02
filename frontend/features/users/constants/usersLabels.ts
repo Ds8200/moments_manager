@@ -22,6 +22,7 @@ export const USERS_LABELS = {
   FORM_NEW_TITLE:           'משתמש חדש',
   FORM_EMAIL:               'אימייל',
   FORM_FULL_NAME:           'שם מלא',
+  FORM_ROLE:                'תפקיד',
   FORM_CANCEL:              'ביטול',
   FORM_SAVE:                'צור משתמש',
   FORM_SAVING:              'יוצר...',

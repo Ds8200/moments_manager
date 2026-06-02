@@ -6,17 +6,19 @@ import { z } from 'zod'
 import { useAtom } from 'jotai'
 import { isUserFormOpenAtom } from '../../store/usersAtoms'
 import { useCreateUser } from '../../queries/useUsers'
-import { USERS_LABELS } from '../../constants/usersLabels'
+import { USERS_LABELS, USER_ROLE_VALUES } from '../../constants/usersLabels'
 import type { UserFormValues } from '../../types'
 
 const schema = z.object({
   email: z.string().min(1, USERS_LABELS.FORM_EMAIL_REQUIRED).email(USERS_LABELS.FORM_EMAIL_INVALID),
   full_name: z.string().min(1, USERS_LABELS.FORM_NAME_REQUIRED),
+  role: z.enum([USER_ROLE_VALUES.USER, USER_ROLE_VALUES.ADMIN]),
 })
 
 const DEFAULT_VALUES: UserFormValues = {
   email: '',
   full_name: '',
+  role: USER_ROLE_VALUES.USER,
 }
 
 export interface UseUserFormReturn {

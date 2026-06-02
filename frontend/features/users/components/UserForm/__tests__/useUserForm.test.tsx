@@ -42,13 +42,18 @@ describe('useUserForm', () => {
     const { result } = renderHook(() => useUserForm(), { wrapper: makeWrapper(store, qc) })
 
     await act(async () => {
-      await result.current.onSubmit({ email: 'new@example.com', full_name: 'New User' })
+      await result.current.onSubmit({
+        email: 'new@example.com',
+        full_name: 'New User',
+        role: 'admin',
+      })
     })
 
     await waitFor(() => {
       expect(createMutateAsync).toHaveBeenCalledWith({
         email: 'new@example.com',
         full_name: 'New User',
+        role: 'admin',
       })
     })
   })
@@ -58,7 +63,11 @@ describe('useUserForm', () => {
     const { result } = renderHook(() => useUserForm(), { wrapper: makeWrapper(store, qc) })
 
     await act(async () => {
-      await result.current.onSubmit({ email: 'new@example.com', full_name: 'New User' })
+      await result.current.onSubmit({
+        email: 'new@example.com',
+        full_name: 'New User',
+        role: 'user',
+      })
     })
 
     expect(store.get(isUserFormOpenAtom)).toBe(false)

@@ -48,7 +48,7 @@ class UserService:
             email=data.email,
             hashed_password=hash_password(temp_password),
             full_name=data.full_name,
-            role=UserRole.user.value,
+            role=UserRole(data.role).value,
         )
         await self._db.commit()
         await self._db.refresh(user)

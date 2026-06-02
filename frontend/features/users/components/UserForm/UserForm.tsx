@@ -1,7 +1,7 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useUserForm } from './useUserForm'
-import { USERS_LABELS } from '../../constants/usersLabels'
+import { USERS_LABELS, USER_ROLE_VALUES } from '../../constants/usersLabels'
 import styles from './UserForm.module.scss'
 
 export const UserForm = (): ReactElement | null => {
@@ -36,6 +36,13 @@ export const UserForm = (): ReactElement | null => {
                 {...register('email')}
               />
               {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>{USERS_LABELS.FORM_ROLE}</label>
+              <select className={styles.input} {...register('role')}>
+                <option value={USER_ROLE_VALUES.USER}>{USERS_LABELS.ROLE_USER}</option>
+                <option value={USER_ROLE_VALUES.ADMIN}>{USERS_LABELS.ROLE_ADMIN}</option>
+              </select>
             </div>
             <p className={styles.note}>{USERS_LABELS.WELCOME_EMAIL_NOTE}</p>
           </div>
