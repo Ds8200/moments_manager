@@ -1,21 +1,30 @@
+import html as _html
+
+from src.core.bidi import bidi_paragraphs, detect_dir
 from src.users.email_templates import BRAND_GRADIENT, BRAND_PURPLE, LOGO_URL
 
 
 def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[str, str]:
-    safe_body = body.replace("\n", "<br>")
+    # Detect primary direction from the actual content, not a hardcoded assumption.
+    content_dir = detect_dir(subject + " " + body)
+
+    safe_subject = _html.escape(subject)
+    safe_name = _html.escape(customer_name)
+    greeting = f"<p dir=\"auto\">שלום {safe_name},</p>" if safe_name else ""
+    body_html = bidi_paragraphs(body)
+
     html_body = f"""<!DOCTYPE html>
-<html dir="rtl" lang="he">
+<html dir="{content_dir}" lang="he">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{subject}</title>
+  <title>{safe_subject}</title>
   <style>
     body {{
       font-family: 'Helvetica Neue', Arial, sans-serif;
       background-color: #f5f5f5;
       margin: 0;
       padding: 24px;
-      direction: rtl;
     }}
     .container {{
       max-width: 520px;
@@ -49,12 +58,14 @@ def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[s
       font-size: 20px;
       margin-top: 0;
       margin-bottom: 16px;
+      text-align: start;
     }}
     .body p {{
       color: #555;
       font-size: 15px;
       line-height: 1.7;
       margin: 0 0 16px;
+      text-align: start;
     }}
     .footer {{
       background: #faf5fc;
@@ -76,9 +87,9 @@ def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[s
     </div>
     <div class="accent-bar"></div>
     <div class="body">
-      <h2>{subject}</h2>
-      <p>שלום {customer_name},</p>
-      <p>{safe_body}</p>
+      <h2 dir="auto">{safe_subject}</h2>
+      {greeting}
+      {body_html}
     </div>
     <div class="footer">
       <p>Moments — מערכת ניהול הזמנות ולקוחות</p>

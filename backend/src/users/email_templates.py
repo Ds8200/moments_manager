@@ -1,3 +1,5 @@
+import html as _html
+
 from src.config import settings
 
 LOGO_URL = "https://moments-manager.vercel.app/moments_logo.png"
@@ -13,6 +15,10 @@ def build_welcome_email(
     subject = "ברוכים הבאים ל-Moments"
     login_url = f"{settings.APP_URL}/login"
     quick_login_url = f"{login_url}?token={magic_token}"
+
+    # Email addresses and passwords are always LTR ASCII — escape for safety.
+    safe_email = _html.escape(recipient_email)
+    safe_password = _html.escape(temp_password)
 
     html_body = f"""<!DOCTYPE html>
 <html dir="rtl" lang="he">
@@ -60,12 +66,14 @@ def build_welcome_email(
       font-size: 20px;
       margin-top: 0;
       margin-bottom: 8px;
+      text-align: start;
     }}
     .body p {{
       color: #555;
       font-size: 15px;
       line-height: 1.7;
       margin: 0 0 16px;
+      text-align: start;
     }}
     .credential-box {{
       background: #faf5fc;
@@ -80,6 +88,7 @@ def build_welcome_email(
       margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      text-align: start;
     }}
     .credential-box .value {{
       font-size: 16px;
@@ -87,10 +96,13 @@ def build_welcome_email(
       font-weight: 600;
       font-family: 'Courier New', monospace;
       word-break: break-all;
+      direction: ltr;
+      text-align: start;
     }}
     .note {{
       font-size: 13px !important;
       color: #888 !important;
+      text-align: start;
     }}
     .btn-row {{
       text-align: center;
@@ -131,20 +143,20 @@ def build_welcome_email(
     </div>
     <div class="accent-bar"></div>
     <div class="body">
-      <h2>ברוכים הבאים!</h2>
-      <p>נוצר עבורך חשבון חדש במערכת ניהול Moments.</p>
+      <h2 dir="auto">ברוכים הבאים!</h2>
+      <p dir="auto">נוצר עבורך חשבון חדש במערכת ניהול Moments.</p>
 
       <div class="credential-box">
         <div class="label">אימייל</div>
-        <div class="value">{recipient_email}</div>
+        <div class="value" dir="ltr">{safe_email}</div>
       </div>
 
       <div class="credential-box">
         <div class="label">סיסמה זמנית</div>
-        <div class="value">{temp_password}</div>
+        <div class="value" dir="ltr">{safe_password}</div>
       </div>
 
-      <p class="note">מומלץ לפנות למנהל המערכת לאחר הכניסה הראשונה לעדכון הסיסמה.</p>
+      <p dir="auto" class="note">מומלץ לפנות למנהל המערכת לאחר הכניסה הראשונה לעדכון הסיסמה.</p>
 
       <div class="btn-row">
         <a href="{quick_login_url}" class="btn">כניסה מהירה</a>
