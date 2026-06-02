@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.constants.http_messages import CANNOT_DELETE_SELF, RESOURCE_USER, USER_EMAIL_EXISTS
 from src.core.constants.log_messages import USER_CREATED, USER_DELETED
+from src.auth.repository import RefreshTokenRepository
 from src.core.email import send_html_email
 from src.core.enums.error_codes import ErrorCode
 from src.core.exceptions import ConflictError, ForbiddenError, NotFoundError
@@ -72,6 +73,7 @@ class UserService:
         user = await self._repo.get_by_id(user_id)
         if not user:
             raise NotFoundError(RESOURCE_USER, user_id)
+        await RefreshTokenRepository(self._db).delete_all_for_user(user_id)
         await self._repo.delete(user)
         await self._db.commit()
         logger.info(USER_DELETED, user_id, requesting_admin_id)

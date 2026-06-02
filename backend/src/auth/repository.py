@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import RefreshToken
@@ -44,3 +44,8 @@ class RefreshTokenRepository:
         )
         for token in result.scalars().all():
             token.is_revoked = True
+
+    async def delete_all_for_user(self, user_id: str) -> None:
+        await self._db.execute(
+            delete(RefreshToken).where(RefreshToken.user_id == user_id)
+        )
