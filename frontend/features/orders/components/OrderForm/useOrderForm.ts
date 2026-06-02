@@ -133,7 +133,7 @@ export const useOrderForm = (): UseOrderFormReturn => {
   const onSubmit = async (values: OrderFormValues): Promise<void> => {
     let customerId = values.customer_id || null
     if (!customerId && values.customer_name.trim()) {
-      const newCustomer = await createCustomer.mutateAsync({ name: values.customer_name.trim() })
+      const newCustomer = await createCustomer.mutateAsync({ name: values.customer_name.trim(), phone: '', email: '', notes: '' })
       customerId = newCustomer.id
     }
     const payload: OrderPayload = {

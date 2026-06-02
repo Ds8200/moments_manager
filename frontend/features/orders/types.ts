@@ -96,7 +96,8 @@ export interface OrderFormValues {
   items:         OrderItemFormValues[]
 }
 
-export type OrderPayload = Omit<OrderFormValues, 'due_datetime'> & {
+export type OrderPayload = Omit<OrderFormValues, 'due_datetime' | 'customer_id' | 'customer_name'> & {
+  customer_id:  string | null
   due_datetime: string | null
 }
 
