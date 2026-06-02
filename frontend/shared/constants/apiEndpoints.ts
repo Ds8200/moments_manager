@@ -30,6 +30,7 @@ export const API_ENDPOINTS = {
   REPORTS_TOP_CUSTOMERS: `${BASE}/api/v1/reports/top-customers`,
 
   CUSTOMER_SEND_EMAIL: (id: string) => `${BASE}/api/v1/customers/${id}/send-email`,
+  COMPOSE_EMAIL: `${BASE}/api/v1/customers/compose-email`,
 
   USERS: `${BASE}/api/v1/users`,
   USER: (id: string) => `${BASE}/api/v1/users/${id}`,

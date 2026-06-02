@@ -4,17 +4,23 @@ from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.constants.http_messages import (
+    COMPOSE_EMAIL_SENT,
     CUSTOMER_EMAIL_SENT,
     CUSTOMER_NO_EMAIL,
     RESOURCE_CUSTOMER,
 )
-from src.core.constants.log_messages import CUSTOMER_EMAIL_DISPATCHED
+from src.core.constants.log_messages import (
+    COMPOSE_EMAIL_DISPATCHED,
+    CUSTOMER_EMAIL_DISPATCHED,
+)
 from src.core.email import send_html_email
 from src.core.exceptions import ConflictError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.customers.email_templates import build_customer_email
 from src.customers.repository import CustomerRepository
 from src.customers.schemas import (
+    ComposeEmailResponseSchema,
+    ComposeEmailSchema,
     CustomerCreateSchema,
     CustomerResponseSchema,
     CustomerSendEmailSchema,
@@ -95,3 +101,32 @@ class CustomerService:
         background_tasks.add_task(send_html_email, customer.email, subject, html_body)
         logger.info(CUSTOMER_EMAIL_DISPATCHED, customer.email, customer_id)
         return EmailSentResponseSchema(message=CUSTOMER_EMAIL_SENT)
+
+    async def compose_email(
+        self,
+        data: ComposeEmailSchema,
+        background_tasks: BackgroundTasks,
+    ) -> ComposeEmailResponseSchema:
+        sent_to = 0
+
+        for customer_id in data.customer_ids:
+            customer = await self._repo.get_by_id(customer_id)
+            if not customer:
+                logger.warning("compose_email: customer %s not found, skipping", customer_id)
+                continue
+            if not customer.email:
+                logger.warning("compose_email: customer %s has no email, skipping", customer_id)
+                continue
+            subject, html_body = build_customer_email(customer.name, data.subject, data.body)
+            background_tasks.add_task(send_html_email, customer.email, subject, html_body)
+            sent_to += 1
+
+        for email in data.manual_emails:
+            subject, html_body = build_customer_email("", data.subject, data.body)
+            background_tasks.add_task(send_html_email, email, subject, html_body)
+            sent_to += 1
+
+        logger.info(
+            COMPOSE_EMAIL_DISPATCHED, sent_to, len(data.customer_ids), len(data.manual_emails)
+        )
+        return ComposeEmailResponseSchema(message=COMPOSE_EMAIL_SENT, sent_to=sent_to)

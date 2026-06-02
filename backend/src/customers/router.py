@@ -7,6 +7,8 @@ from src.core.dependencies import get_current_user, get_db
 from src.core.rate_limit import limiter
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.customers.schemas import (
+    ComposeEmailResponseSchema,
+    ComposeEmailSchema,
     CustomerCreateSchema,
     CustomerResponseSchema,
     CustomerSendEmailSchema,
@@ -40,6 +42,19 @@ async def create_customer(
 ):
     svc = CustomerService(db)
     return await svc.create_customer(body)
+
+
+@router.post("/compose-email", response_model=ComposeEmailResponseSchema, status_code=202)
+@limiter.limit("10/minute")
+async def compose_email(
+    request: Request,
+    body: ComposeEmailSchema,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+):
+    svc = CustomerService(db)
+    return await svc.compose_email(body, background_tasks)
 
 
 @router.get("/{customer_id}", response_model=CustomerWithStatsSchema)

@@ -41,3 +41,15 @@ class CustomerSendEmailSchema(BaseModel):
 
 class EmailSentResponseSchema(BaseModel):
     message: str
+
+
+class ComposeEmailSchema(BaseModel):
+    customer_ids: list[str] = []
+    manual_emails: list[str] = []
+    subject: str
+    body: str
+
+
+class ComposeEmailResponseSchema(BaseModel):
+    message: str
+    sent_to: int

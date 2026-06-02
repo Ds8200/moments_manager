@@ -16,6 +16,7 @@ export const UI_LABELS = {
   ERROR_LOADING_EXPENSES: 'שגיאה בטעינת ההוצאות',
   ERROR_LOADING_REPORTS:  'שגיאה בטעינת הדוחות',
   ERROR_LOADING_USERS:    'שגיאה בטעינת המשתמשים',
+  ERROR_LOADING_SEND_EMAIL: 'שגיאה בדף שליחת מייל',
   MORE:                   'עוד',
   LOGOUT:                 'התנתקות',
   MENU_TITLE:             'תפריט',
@@ -31,6 +32,7 @@ export const META_LABELS = {
   EXPENSES_TITLE:    'הוצאות | Moments מערכת ניהול',
   REPORTS_TITLE:     'דוחות | Moments מערכת ניהול',
   USERS_TITLE:       'משתמשים | Moments מערכת ניהול',
+  SEND_EMAIL_TITLE:  'שליחת מייל | Moments מערכת ניהול',
   LOGIN_TITLE:       'התחברות | Moments מערכת ניהול',
 } as const
 

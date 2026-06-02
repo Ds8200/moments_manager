@@ -1,0 +1,84 @@
+@use '@/shared/styles/variables' as *;
+
+.page {
+  padding: $space-6;
+  max-width: 720px;
+}
+
+.title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-block-end: $space-6;
+}
+
+.card {
+  background: $bg-card;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+  padding: $space-8;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  margin-block-end: $space-5;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: $space-2 $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  font-size: $font-size-base;
+  font-family: inherit;
+  color: $text-primary;
+  background: $bg-card;
+  resize: vertical;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
+.error {
+  font-size: $font-size-xs;
+  color: $danger;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-start: $space-6;
+}
+
+.sendButton {
+  padding: $space-3 $space-8;
+  border-radius: $border-radius;
+  border: none;
+  background: $primary;
+  color: $text-inverse;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

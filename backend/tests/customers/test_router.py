@@ -85,6 +85,40 @@ async def test_send_email_no_email_on_customer(client: AsyncClient) -> None:
     assert response.status_code == 409
 
 
+async def test_compose_email_success(client: AsyncClient) -> None:
+    create = await client.post(
+        "/api/v1/customers", json={"name": "Compose Test", "email": "compose@example.com"}
+    )
+    customer_id = create.json()["id"]
+
+    with patch("src.customers.service.send_html_email"):
+        response = await client.post(
+            "/api/v1/customers/compose-email",
+            json={
+                "customer_ids": [customer_id],
+                "manual_emails": ["manual@example.com"],
+                "subject": "נושא",
+                "body": "גוף",
+            },
+        )
+
+    assert response.status_code == 202
+    data = response.json()
+    assert data["sent_to"] == 2
+    assert "message" in data
+
+
+async def test_compose_email_empty_recipients_still_202(client: AsyncClient) -> None:
+    with patch("src.customers.service.send_html_email"):
+        response = await client.post(
+            "/api/v1/customers/compose-email",
+            json={"customer_ids": [], "manual_emails": [], "subject": "נושא", "body": "גוף"},
+        )
+
+    assert response.status_code == 202
+    assert response.json()["sent_to"] == 0
+
+
 async def test_send_email_success(client: AsyncClient) -> None:
     create = await client.post(
         "/api/v1/customers", json={"name": "With Email", "email": "test@example.com"}

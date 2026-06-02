@@ -1,0 +1,18 @@
+export const SEND_EMAIL_LABELS = {
+  PAGE_TITLE:              'שליחת מייל',
+  RECIPIENTS_LABEL:        'נמענים',
+  RECIPIENTS_PLACEHOLDER:  'חיפוש לקוח או הזנת מייל...',
+  SUBJECT_LABEL:           'נושא',
+  SUBJECT_PLACEHOLDER:     'נושא המייל...',
+  BODY_LABEL:              'תוכן המייל',
+  BODY_PLACEHOLDER:        'כתוב כאן את תוכן המייל...',
+  SEND:                    'שלח',
+  SENDING:                 'שולח...',
+  SENT_SUCCESS:            'המיילים נשלחו בהצלחה לנמענים',
+  SEND_ERROR:              'שגיאה בשליחת המיילים',
+  VALIDATION_RECIPIENTS:   'יש להוסיף לפחות נמען אחד',
+  VALIDATION_SUBJECT:      'נדרש נושא',
+  VALIDATION_BODY:         'נדרש תוכן מייל',
+  REMOVE_RECIPIENT:        'הסר נמען',
+  INVALID_EMAIL:           'כתובת מייל לא תקינה',
+} as const
