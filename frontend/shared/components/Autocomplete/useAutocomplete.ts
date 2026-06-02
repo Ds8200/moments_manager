@@ -13,6 +13,7 @@ export interface AutocompleteProps<T = unknown> {
   onChange: (value: string | null, option: AutocompleteOption<T> | null) => void
   options: AutocompleteOption<T>[]
   onSearch: (query: string) => void
+  onFreeText?: (text: string) => void
   defaultLabel?: string
   isLoading?: boolean
   placeholder?: string
@@ -45,7 +46,7 @@ export interface UseAutocompleteReturn<T> {
 export const useAutocomplete = <T = unknown>(
   props: AutocompleteProps<T>
 ): UseAutocompleteReturn<T> => {
-  const { value, onChange, options, onSearch, defaultLabel, id, label, error, placeholder, disabled, isLoading } = props
+  const { value, onChange, options, onSearch, onFreeText, defaultLabel, id, label, error, placeholder, disabled, isLoading } = props
 
   const inputId   = id ?? 'autocomplete'
   const listboxId = `${inputId}-listbox`
@@ -59,6 +60,11 @@ export const useAutocomplete = <T = unknown>(
 
   const containerRef = useRef<HTMLDivElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Synced via useEffect so setTimeout closures always read the latest values
+  const typedValueRef = useRef(typedValue)
+  const isUserTypingRef = useRef(isUserTyping)
+  useEffect(() => { typedValueRef.current = typedValue }, [typedValue])
+  useEffect(() => { isUserTypingRef.current = isUserTyping }, [isUserTyping])
 
   // Derived: the committed label for the current value (no setState in effect needed)
   const selectedLabel = useMemo(() => {
@@ -153,14 +159,20 @@ export const useAutocomplete = <T = unknown>(
     onSearch(isUserTyping ? typedValue : selectedLabel)
   }, [isUserTyping, typedValue, selectedLabel, onSearch])
 
-  // Delay close so mousedown on option fires before blur
+  // Delay close so mousedown on option fires before blur.
+  // Reads refs so the timeout always sees the latest state, not a stale closure.
   const onBlur = useCallback(() => {
     setTimeout(() => {
+      const typed = typedValueRef.current
+      const wasTyping = isUserTypingRef.current
       setIsOpen(false)
       setIsUserTyping(false)
       setTypedValue('')
+      if (wasTyping && typed.trim()) {
+        onFreeText?.(typed.trim())
+      }
     }, 150)
-  }, [])
+  }, [onFreeText])
 
   return {
     inputId,

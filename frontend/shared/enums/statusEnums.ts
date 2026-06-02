@@ -29,6 +29,16 @@ export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   partial:  'חלקי',
 }
 
+export type PaymentState = 'unpaid' | 'transfer' | 'cash'
+
+export const PAYMENT_STATE_LABELS: Record<PaymentState, string> = {
+  unpaid:   'לא שולם',
+  transfer: 'בהעברה',
+  cash:     'במזומן',
+}
+
+export const PAYMENT_STATE_ORDER: PaymentState[] = ['unpaid', 'transfer', 'cash']
+
 export const EXPENSE_CATEGORY_LABELS: Record<string, string> = {
   ink:       'דיו וצבעים',
   materials: 'חומרי גלם',

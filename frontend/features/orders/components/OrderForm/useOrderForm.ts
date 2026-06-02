@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { useAtom } from 'jotai'
 import { isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { useOrder, useCreateOrder, useUpdateOrder } from '../../queries/useOrder'
-import { useCustomers } from '@/features/customers/queries/useCustomers'
+import { useCustomers, useCreateCustomer } from '@/features/customers/queries/useCustomers'
 import type { AutocompleteOption } from '@/shared/components/Autocomplete/useAutocomplete'
 import type { Customer } from '@/features/customers/types'
 import type { OrderFormValues, OrderPayload } from '../../types'
@@ -23,12 +23,16 @@ const itemSchema = z.object({
 })
 
 const schema = z.object({
-  customer_id:  z.string().min(1, ORDERS_LABELS.VALIDATION_CUSTOMER),
-  date:         z.string().min(1, ORDERS_LABELS.VALIDATION_DATE),
-  due_datetime: z.string(),
-  notes:        z.string(),
-  items:        z.array(itemSchema).min(1, ORDERS_LABELS.VALIDATION_ITEMS_MIN),
-})
+  customer_id:   z.string(),
+  customer_name: z.string(),
+  date:          z.string().min(1, ORDERS_LABELS.VALIDATION_DATE),
+  due_datetime:  z.string(),
+  notes:         z.string(),
+  items:         z.array(itemSchema).min(1, ORDERS_LABELS.VALIDATION_ITEMS_MIN),
+}).refine(
+  (d) => d.customer_id.length > 0 || d.customer_name.trim().length > 0,
+  { message: ORDERS_LABELS.VALIDATION_CUSTOMER, path: ['customer_id'] }
+)
 
 const DEFAULT_ITEM: OrderFormValues['items'][number] = {
   product_id:   null,
@@ -40,11 +44,12 @@ const DEFAULT_ITEM: OrderFormValues['items'][number] = {
 }
 
 const DEFAULT_VALUES: OrderFormValues = {
-  customer_id:  '',
-  date:         new Date().toISOString().split('T')[0],
-  due_datetime: '',
-  notes:        '',
-  items:        [DEFAULT_ITEM],
+  customer_id:   '',
+  customer_name: '',
+  date:          new Date().toISOString().split('T')[0],
+  due_datetime:  '',
+  notes:         '',
+  items:         [DEFAULT_ITEM],
 }
 
 export interface UseOrderFormReturn {
@@ -65,6 +70,7 @@ export interface UseOrderFormReturn {
   customersLoading: boolean
   setCustomerSearch: (query: string) => void
   customerDefaultLabel: string
+  onFreeText: (text: string) => void
 }
 
 export const useOrderForm = (): UseOrderFormReturn => {
@@ -75,6 +81,7 @@ export const useOrderForm = (): UseOrderFormReturn => {
   const { data: customersData, isPending: customersLoading } = useCustomers(1, customerSearch, 20)
   const createOrder = useCreateOrder()
   const updateOrder = useUpdateOrder()
+  const createCustomer = useCreateCustomer()
 
   const {
     register,
@@ -94,10 +101,11 @@ export const useOrderForm = (): UseOrderFormReturn => {
   useEffect(() => {
     if (isOpen && existingOrder) {
       reset({
-        customer_id:  existingOrder.customer_id,
-        date:         existingOrder.date,
-        due_datetime: existingOrder.due_datetime ? existingOrder.due_datetime.slice(0, 16) : '',
-        notes:        existingOrder.notes ?? '',
+        customer_id:   existingOrder.customer_id,
+        customer_name: '',
+        date:          existingOrder.date,
+        due_datetime:  existingOrder.due_datetime ? existingOrder.due_datetime.slice(0, 16) : '',
+        notes:         existingOrder.notes ?? '',
         items: existingOrder.items.map((it) => ({
           product_id:   it.product_id,
           product_name: it.product_name,
@@ -117,10 +125,23 @@ export const useOrderForm = (): UseOrderFormReturn => {
     setEditingId(null)
   }
 
+  const onFreeText = (text: string): void => {
+    setValue('customer_id', '')
+    setValue('customer_name', text)
+  }
+
   const onSubmit = async (values: OrderFormValues): Promise<void> => {
+    let customerId = values.customer_id || null
+    if (!customerId && values.customer_name.trim()) {
+      const newCustomer = await createCustomer.mutateAsync({ name: values.customer_name.trim() })
+      customerId = newCustomer.id
+    }
     const payload: OrderPayload = {
-      ...values,
-      due_datetime: values.due_datetime ? values.due_datetime : null,
+      customer_id:  customerId,
+      due_datetime: values.due_datetime || null,
+      date:         values.date,
+      notes:        values.notes,
+      items:        values.items,
     }
     if (editingId) {
       await updateOrder.mutateAsync({ id: editingId, payload })
@@ -152,5 +173,6 @@ export const useOrderForm = (): UseOrderFormReturn => {
     customersLoading,
     setCustomerSearch,
     customerDefaultLabel: existingOrder?.customer_name ?? '',
+    onFreeText,
   }
 }

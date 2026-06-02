@@ -51,6 +51,7 @@ export const useUpdateOrderPayment = (): UseMutationResult<
       ordersApi.updatePayment(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: ['order'] })
     },
   })
 }

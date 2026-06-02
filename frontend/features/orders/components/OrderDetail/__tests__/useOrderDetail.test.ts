@@ -15,6 +15,7 @@ vi.mock('../../../queries/useOrder', () => ({
 
 vi.mock('../../../queries/useOrders', () => ({
   useUpdateOrderStatus: () => ({ mutate: vi.fn() }),
+  useUpdateOrderPayment: () => ({ mutate: vi.fn() }),
 }))
 
 const wrapper = ({ children }: { children: ReactNode }) => {

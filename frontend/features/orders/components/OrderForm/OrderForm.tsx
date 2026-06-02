@@ -11,7 +11,7 @@ export const OrderForm = (): ReactElement | null => {
   const {
     isOpen, isEditing, register, control, setValue, handleSubmit, onSubmit,
     errors, isSubmitting, fields, appendItem, removeItem, onClose,
-    customerOptions, customersLoading, setCustomerSearch, customerDefaultLabel,
+    customerOptions, customersLoading, setCustomerSearch, customerDefaultLabel, onFreeText,
   } = useOrderForm()
 
   return isOpen ? (
@@ -32,9 +32,13 @@ export const OrderForm = (): ReactElement | null => {
                   id="customer"
                   label={ORDERS_LABELS.FORM_CUSTOMER}
                   value={field.value || null}
-                  onChange={(value) => field.onChange(value ?? '')}
+                  onChange={(value) => {
+                    field.onChange(value ?? '')
+                    setValue('customer_name', '')
+                  }}
                   options={customerOptions}
                   onSearch={setCustomerSearch}
+                  onFreeText={onFreeText}
                   defaultLabel={customerDefaultLabel}
                   isLoading={customersLoading}
                   placeholder={ORDERS_LABELS.FORM_CUSTOMER_PLACEHOLDER}

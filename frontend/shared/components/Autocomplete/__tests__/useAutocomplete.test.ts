@@ -134,4 +134,24 @@ describe('useAutocomplete', () => {
     expect(result.current.isOpen).toBe(false)
     expect(result.current.inputValue).toBe('Apple')
   })
+
+  it('onFreeText is called with trimmed text when blurring without selecting an option', () => {
+    const onFreeText = vi.fn()
+    const { result } = buildHook({ value: null, onFreeText })
+    act(() => { result.current.onInputChange(mkChangeEvent('  New Customer  ')) })
+    act(() => { result.current.onBlur() })
+    act(() => { vi.advanceTimersByTime(150) })
+    expect(onFreeText).toHaveBeenCalledWith('New Customer')
+  })
+
+  it('onFreeText is NOT called when an option was selected before blur', () => {
+    const onFreeText = vi.fn()
+    const onChange = vi.fn()
+    const { result } = buildHook({ value: null, onChange, onFreeText })
+    act(() => { result.current.onInputChange(mkChangeEvent('ban')) })
+    act(() => { result.current.onOptionSelect(OPTIONS[1]) }) // selects Banana → isUserTyping=false
+    act(() => { result.current.onBlur() })
+    act(() => { vi.advanceTimersByTime(150) })
+    expect(onFreeText).not.toHaveBeenCalled()
+  })
 })

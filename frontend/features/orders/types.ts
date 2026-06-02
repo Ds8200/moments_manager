@@ -88,11 +88,12 @@ export interface OrderItemFormValues {
 }
 
 export interface OrderFormValues {
-  customer_id: string
-  date: string
-  due_datetime: string
-  notes: string
-  items: OrderItemFormValues[]
+  customer_id:   string
+  customer_name: string
+  date:          string
+  due_datetime:  string
+  notes:         string
+  items:         OrderItemFormValues[]
 }
 
 export type OrderPayload = Omit<OrderFormValues, 'due_datetime'> & {

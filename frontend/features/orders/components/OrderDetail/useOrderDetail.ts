@@ -2,10 +2,10 @@
 import { useAtom, useSetAtom } from 'jotai'
 import { selectedOrderIdAtom, editingOrderIdAtom, isOrderFormOpenAtom } from '../../store/ordersAtoms'
 import { useOrder } from '../../queries/useOrder'
-import { useUpdateOrderStatus } from '../../queries/useOrders'
+import { useUpdateOrderStatus, useUpdateOrderPayment } from '../../queries/useOrders'
 import { formatCurrency, formatDate } from '@/shared/utils/formatters'
-import { STATUS_LABELS, STATUS_ORDER } from '@/shared/enums/statusEnums'
-import type { OrderStatus } from '@/shared/enums/statusEnums'
+import { STATUS_LABELS, STATUS_ORDER, PAYMENT_STATE_LABELS, PAYMENT_STATE_ORDER } from '@/shared/enums/statusEnums'
+import type { OrderStatus, PaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import type { OrderUrgency } from '../../types'
 
@@ -14,9 +14,12 @@ export interface UseOrderDetailReturn {
   order: ReturnType<typeof useOrder>['data']
   isLoading: boolean
   statusOptions: Array<{ value: OrderStatus; label: string }>
+  paymentState: PaymentState
+  paymentOptions: Array<{ value: PaymentState; label: string }>
   onClose: () => void
   onEdit: () => void
   onStatusChange: (status: OrderStatus) => void
+  onPaymentChange: (state: PaymentState) => void
   formatAmount: (v: string) => string
   formatOrderDate: (v: string) => string
   formatDueDateTime: (v: string | null) => string
@@ -38,23 +41,41 @@ const detailDueFormatter = new Intl.DateTimeFormat('he-IL', {
   minute:'2-digit',
 })
 
+const getPaymentState = (isPaid: boolean, method: string | null): PaymentState => {
+  if (!isPaid) return 'unpaid'
+  if (method === 'transfer') return 'transfer'
+  return 'cash'
+}
+
 export const useOrderDetail = (): UseOrderDetailReturn => {
   const [selectedId, setSelectedId] = useAtom(selectedOrderIdAtom)
   const setEditingId = useSetAtom(editingOrderIdAtom)
   const setFormOpen = useSetAtom(isOrderFormOpenAtom)
   const { data: order, isLoading } = useOrder(selectedId)
   const updateStatus = useUpdateOrderStatus()
+  const updatePayment = useUpdateOrderPayment()
 
   const statusOptions = STATUS_ORDER.map((s) => ({
     value: s,
     label: STATUS_LABELS[s],
   }))
 
+  const paymentOptions = PAYMENT_STATE_ORDER.map((s) => ({
+    value: s,
+    label: PAYMENT_STATE_LABELS[s],
+  }))
+
+  const paymentState = order
+    ? getPaymentState(order.is_paid, order.payment_method)
+    : 'unpaid'
+
   return {
     isOpen: selectedId !== null,
     order,
     isLoading,
     statusOptions,
+    paymentState,
+    paymentOptions,
 
     onClose: () => setSelectedId(null),
 
@@ -68,6 +89,15 @@ export const useOrderDetail = (): UseOrderDetailReturn => {
     onStatusChange: (status) => {
       if (!selectedId) return
       updateStatus.mutate({ id: selectedId, payload: { status } })
+    },
+
+    onPaymentChange: (state) => {
+      if (!selectedId) return
+      const payload =
+        state === 'unpaid'
+          ? { is_paid: false, payment_method: null }
+          : { is_paid: true, payment_method: state }
+      updatePayment.mutate({ id: selectedId, payload })
     },
 
     formatAmount: formatCurrency,

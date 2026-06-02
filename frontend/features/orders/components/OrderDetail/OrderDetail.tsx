@@ -1,10 +1,10 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useOrderDetail } from './useOrderDetail'
-import { StatusBadge } from '@/shared/components/StatusBadge/StatusBadge'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrderDetail.module.scss'
+import type { PaymentState } from '@/shared/enums/statusEnums'
 
 export const OrderDetail = (): ReactElement | null => {
   const {
@@ -12,9 +12,12 @@ export const OrderDetail = (): ReactElement | null => {
     order,
     isLoading,
     statusOptions,
+    paymentState,
+    paymentOptions,
     onClose,
     onEdit,
     onStatusChange,
+    onPaymentChange,
     formatAmount,
     formatOrderDate,
     formatDueDateTime,
@@ -68,7 +71,15 @@ export const OrderDetail = (): ReactElement | null => {
               </div>
               <div className={styles.metaRow}>
                 <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_PAYMENT}</span>
-                <StatusBadge status={order.status} />
+                <select
+                  className={styles.statusSelect}
+                  value={paymentState}
+                  onChange={(e) => onPaymentChange(e.target.value as PaymentState)}
+                >
+                  {paymentOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
               </div>
             </div>
 

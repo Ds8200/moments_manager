@@ -45,6 +45,7 @@ export const ORDERS_LABELS = {
   ITEM_SEARCH_PRODUCT:      'חפש מוצר...',
   ITEM_REMOVE:              'הסר פריט',
 
+  CUSTOMER_WILL_BE_CREATED: 'לקוח חדש ייצור אוטומטית',
   VALIDATION_PRODUCT_NAME:  'נדרש שם מוצר',
   VALIDATION_QTY_MIN:       'כמות מינימלית 1',
   VALIDATION_PRICE:         'נדרש מחיר',
