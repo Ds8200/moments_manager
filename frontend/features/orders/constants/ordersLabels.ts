@@ -86,4 +86,7 @@ export const ORDERS_LABELS = {
   URGENCY_URGENT:           'דחוף',
   URGENCY_NORMAL:           'רגיל',
   URGENCY_NONE:             '—',
+  CREATED_SUCCESS:          'ההזמנה נוצרה בהצלחה',
+  UPDATED_SUCCESS:          'ההזמנה עודכנה בהצלחה',
+  DELETED_SUCCESS:          'ההזמנה נמחקה בהצלחה',
 } as const

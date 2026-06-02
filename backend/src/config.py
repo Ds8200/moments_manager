@@ -14,9 +14,9 @@ class Settings(BaseSettings):
     MAGIC_LOGIN_EXPIRE_HOURS: int = 72
     UPLOADS_DIR: str = "./uploads"
     MAX_FILE_SIZE_MB: int = 10
-    RESEND_API_KEY: str = ""
+    BREVO_API_KEY: str = ""
     EMAIL_FROM_NAME: str = "Moments"
-    EMAIL_FROM: str = "onboarding@resend.dev"
+    EMAIL_FROM: str = ""
     APP_URL: str = "http://localhost:3000"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")

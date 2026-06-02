@@ -1,0 +1,104 @@
+@use '@/shared/styles/variables' as *;
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border-radius: $border-radius;
+  background: $bg-card;
+  box-shadow: $shadow-elevated;
+  border-inline-start: 4px solid $gray-400;
+  animation: toastIn $transition-normal;
+}
+
+.icon {
+  flex-shrink: 0;
+  inline-size: 20px;
+  block-size: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-inverse;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+
+  &::before {
+    content: '';
+  }
+}
+
+.message {
+  flex: 1;
+  margin: 0;
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+  color: $text-primary;
+}
+
+.close {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: $text-secondary;
+  font-size: $font-size-xl;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  inline-size: 20px;
+  block-size: 20px;
+
+  &::before {
+    content: '\00d7';
+  }
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.success {
+  border-inline-start-color: $success;
+  .icon {
+    background: $success;
+    &::before { content: '\2713'; }
+  }
+}
+
+.error {
+  border-inline-start-color: $danger;
+  .icon {
+    background: $danger;
+    &::before { content: '\0021'; }
+  }
+}
+
+.warning {
+  border-inline-start-color: $warning;
+  .icon {
+    background: $warning;
+    &::before { content: '\0021'; }
+  }
+}
+
+.info {
+  border-inline-start-color: $info;
+  .icon {
+    background: $info;
+    &::before { content: '\0069'; }
+  }
+}
+
+@keyframes toastIn {
+  from {
+    transform: translateY($space-4);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

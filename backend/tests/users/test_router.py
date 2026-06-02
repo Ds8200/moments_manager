@@ -54,6 +54,7 @@ async def test_create_user_invalid_role_returns_422(admin_client: AsyncClient) -
         json={"email": "bad@example.com", "full_name": "Bad Role", "role": "superuser"},
     )
     assert response.status_code == 422
+    assert response.json()["code"] == "VALIDATION_ERROR"
 
 
 async def test_create_user_non_admin_returns_403(client: AsyncClient) -> None:
@@ -74,6 +75,9 @@ async def test_create_user_duplicate_email_returns_409(admin_client: AsyncClient
         json={"email": "dup@example.com", "full_name": "Second"},
     )
     assert response.status_code == 409
+    body = response.json()
+    assert body["code"] == "USER_EMAIL_EXISTS"
+    assert "detail" in body
 
 
 async def test_create_user_invalid_email_returns_422(admin_client: AsyncClient) -> None:
@@ -96,6 +100,7 @@ async def test_delete_self_as_admin_returns_403(
 ) -> None:
     response = await admin_client.delete(f"/api/v1/users/{admin_user.id}")
     assert response.status_code == 403
+    assert response.json()["code"] == "CANNOT_DELETE_SELF"
 
 
 async def test_delete_nonexistent_user_returns_404(admin_client: AsyncClient) -> None:
@@ -103,6 +108,7 @@ async def test_delete_nonexistent_user_returns_404(admin_client: AsyncClient) ->
         "/api/v1/users/00000000-0000-0000-0000-000000000000"
     )
     assert response.status_code == 404
+    assert response.json()["code"] == "NOT_FOUND"
 
 
 async def test_delete_user_non_admin_returns_403(

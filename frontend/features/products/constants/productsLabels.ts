@@ -42,4 +42,7 @@ export const PRODUCTS_LABELS = {
   VALIDATION_NAME_REQUIRED: 'נדרש שם מוצר',
   VALIDATION_PRICE:         'נדרש מחיר',
   VALIDATION_COST:          'נדרשת עלות',
+  CREATED_SUCCESS:          'המוצר נוצר בהצלחה',
+  UPDATED_SUCCESS:          'המוצר עודכן בהצלחה',
+  DELETED_SUCCESS:          'המוצר נמחק בהצלחה',
 } as const

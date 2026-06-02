@@ -30,4 +30,7 @@ export const CUSTOMERS_LABELS = {
   FORM_SAVING:              'שומר...',
   VALIDATION_NAME_REQUIRED: 'נדרש שם לקוח',
   VALIDATION_EMAIL_INVALID: 'כתובת אימייל לא תקינה',
+  CREATED_SUCCESS:          'הלקוח נוצר בהצלחה',
+  UPDATED_SUCCESS:          'הלקוח עודכן בהצלחה',
+  DELETED_SUCCESS:          'הלקוח נמחק בהצלחה',
 } as const

@@ -29,8 +29,8 @@ export const USERS_LABELS = {
   FORM_EMAIL_REQUIRED:      'נדרשת כתובת אימייל',
   FORM_EMAIL_INVALID:       'כתובת אימייל לא תקינה',
   FORM_NAME_REQUIRED:       'נדרש שם מלא',
-  FORM_ERROR_DUPLICATE:     'משתמש עם אימייל זה כבר קיים',
-  FORM_ERROR_GENERIC:       'אירעה שגיאה ביצירת המשתמש. נסה שנית.',
+  CREATED_SUCCESS:          'המשתמש נוצר בהצלחה',
+  DELETED_SUCCESS:          'המשתמש נמחק בהצלחה',
   WELCOME_EMAIL_NOTE:       'סיסמה זמנית תישלח לכתובת האימייל שצוינה',
 } as const
 

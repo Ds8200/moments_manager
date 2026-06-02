@@ -4,7 +4,8 @@ import { ERROR_MESSAGES } from '@/shared/constants/errorMessages'
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
-    message: string
+    message: string,
+    public readonly code?: string
   ) {
     super(message)
     this.name = 'ApiError'
@@ -111,15 +112,16 @@ export async function apiClient<T>(
   }
 
   if (!response.ok) {
-    if (response.status === 404) {
-      throw new ApiError(404, ERROR_MESSAGES.NOT_FOUND)
-    }
-    let detail = ERROR_MESSAGES.GENERIC
+    const isNotFound = response.status === 404
+    let detail = isNotFound ? ERROR_MESSAGES.NOT_FOUND : ERROR_MESSAGES.GENERIC
+    let code: string | undefined
     try {
       const body = await response.json()
-      detail = body.detail ?? detail
+      // 404 keeps the friendly NOT_FOUND message; other statuses surface the server detail.
+      if (!isNotFound) detail = body.detail ?? detail
+      code = body.code ?? undefined
     } catch {}
-    throw new ApiError(response.status, detail)
+    throw new ApiError(response.status, detail, code)
   }
 
   if (response.status === 204) {
@@ -144,11 +146,13 @@ export async function apiUpload<T>(url: string, formData: FormData): Promise<T> 
 
   if (!response.ok) {
     let detail = ERROR_MESSAGES.GENERIC
+    let code: string | undefined
     try {
       const body = await response.json()
       detail = body.detail ?? detail
+      code = body.code ?? undefined
     } catch {}
-    throw new ApiError(response.status, detail)
+    throw new ApiError(response.status, detail, code)
   }
 
   return response.json() as Promise<T>

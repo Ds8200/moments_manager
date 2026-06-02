@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.constants.http_messages import CANNOT_DELETE_SELF, RESOURCE_USER, USER_EMAIL_EXISTS
 from src.core.constants.log_messages import USER_CREATED, USER_DELETED
 from src.core.email import send_html_email
+from src.core.enums.error_codes import ErrorCode
 from src.core.exceptions import ConflictError, ForbiddenError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.core.security import create_magic_login_token, hash_password
@@ -42,7 +43,7 @@ class UserService:
     ) -> UserResponseSchema:
         existing = await self._repo.get_by_email(data.email)
         if existing:
-            raise ConflictError(USER_EMAIL_EXISTS)
+            raise ConflictError(USER_EMAIL_EXISTS, code=ErrorCode.USER_EMAIL_EXISTS)
 
         temp_password = secrets.token_urlsafe(12)
         try:
@@ -56,7 +57,7 @@ class UserService:
             await self._db.refresh(user)
         except IntegrityError:
             await self._db.rollback()
-            raise ConflictError(USER_EMAIL_EXISTS)
+            raise ConflictError(USER_EMAIL_EXISTS, code=ErrorCode.USER_EMAIL_EXISTS)
         logger.info(USER_CREATED, user.email, user.role)
 
         magic_token = create_magic_login_token(user.id)
@@ -67,7 +68,7 @@ class UserService:
 
     async def delete_user(self, user_id: str, requesting_admin_id: str) -> None:
         if user_id == requesting_admin_id:
-            raise ForbiddenError(CANNOT_DELETE_SELF)
+            raise ForbiddenError(CANNOT_DELETE_SELF, code=ErrorCode.CANNOT_DELETE_SELF)
         user = await self._repo.get_by_id(user_id)
         if not user:
             raise NotFoundError(RESOURCE_USER, user_id)

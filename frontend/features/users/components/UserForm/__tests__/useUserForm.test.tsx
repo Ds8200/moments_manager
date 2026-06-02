@@ -5,7 +5,6 @@ import { createStore, Provider } from 'jotai'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useUserForm } from '../useUserForm'
 import { isUserFormOpenAtom } from '../../../store/usersAtoms'
-import { USERS_LABELS } from '../../../constants/usersLabels'
 import { ApiError } from '@/shared/utils/apiClient'
 
 const createMutateAsync = vi.fn().mockResolvedValue({ id: 'new' })
@@ -86,8 +85,8 @@ describe('useUserForm', () => {
     expect(store.get(isUserFormOpenAtom)).toBe(false)
   })
 
-  it('shows a duplicate-email message and keeps the form open on a 409', async () => {
-    createMutateAsync.mockRejectedValueOnce(new ApiError(409, 'exists'))
+  it('keeps the form open when the mutation fails (error shown globally)', async () => {
+    createMutateAsync.mockRejectedValueOnce(new ApiError(409, 'exists', 'USER_EMAIL_EXISTS'))
     store.set(isUserFormOpenAtom, true)
     const { result } = renderHook(() => useUserForm(), { wrapper: makeWrapper(store, qc) })
 
@@ -99,23 +98,24 @@ describe('useUserForm', () => {
       })
     })
 
-    expect(result.current.submitError).toBe(USERS_LABELS.FORM_ERROR_DUPLICATE)
     expect(store.get(isUserFormOpenAtom)).toBe(true)
   })
 
-  it('shows a generic message on a non-409 error', async () => {
+  it('does not reject from onSubmit on a non-409 error', async () => {
     createMutateAsync.mockRejectedValueOnce(new ApiError(500, 'boom'))
     store.set(isUserFormOpenAtom, true)
     const { result } = renderHook(() => useUserForm(), { wrapper: makeWrapper(store, qc) })
 
-    await act(async () => {
-      await result.current.onSubmit({
-        email: 'x@example.com',
-        full_name: 'X',
-        role: 'user',
+    await expect(
+      act(async () => {
+        await result.current.onSubmit({
+          email: 'x@example.com',
+          full_name: 'X',
+          role: 'user',
+        })
       })
-    })
+    ).resolves.toBeUndefined()
 
-    expect(result.current.submitError).toBe(USERS_LABELS.FORM_ERROR_GENERIC)
+    expect(store.get(isUserFormOpenAtom)).toBe(true)
   })
 })

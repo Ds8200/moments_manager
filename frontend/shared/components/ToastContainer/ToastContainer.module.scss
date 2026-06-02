@@ -1,0 +1,14 @@
+@use '@/shared/styles/variables' as *;
+
+.region {
+  position: fixed;
+  inset-block-end: $space-5;
+  inset-inline-start: $space-5;
+  z-index: $z-toast;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  max-width: 360px;
+  width: calc(100% - #{$space-8});
+  pointer-events: none;
+}

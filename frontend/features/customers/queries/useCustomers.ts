@@ -7,6 +7,8 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query'
 import { customersApi } from '../api'
+import { useNotify } from '@/shared/hooks/useNotify'
+import { CUSTOMERS_LABELS } from '../constants/customersLabels'
 import type {
   Customer,
   CustomerDetail,
@@ -37,9 +39,13 @@ export const useCreateCustomer = (): UseMutationResult<
   CustomerFormValues
 > => {
   const queryClient = useQueryClient()
+  const notify = useNotify()
   return useMutation({
     mutationFn: (payload: CustomerFormValues) => customersApi.create(payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customers'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
+      notify.success(CUSTOMERS_LABELS.CREATED_SUCCESS)
+    },
   })
 }
 
@@ -49,20 +55,26 @@ export const useUpdateCustomer = (): UseMutationResult<
   { id: string; payload: Partial<CustomerFormValues> }
 > => {
   const queryClient = useQueryClient()
+  const notify = useNotify()
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: Partial<CustomerFormValues> }) =>
       customersApi.update(id, payload),
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
       queryClient.invalidateQueries({ queryKey: ['customer', id] })
+      notify.success(CUSTOMERS_LABELS.UPDATED_SUCCESS)
     },
   })
 }
 
 export const useDeleteCustomer = (): UseMutationResult<void, Error, string> => {
   const queryClient = useQueryClient()
+  const notify = useNotify()
   return useMutation({
     mutationFn: (id: string) => customersApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customers'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] })
+      notify.success(CUSTOMERS_LABELS.DELETED_SUCCESS)
+    },
   })
 }

@@ -11,6 +11,7 @@ from src.core.constants.http_messages import (
     MAGIC_LINK_INVALID,
     REFRESH_TOKEN_INVALID,
 )
+from src.core.enums.error_codes import ErrorCode
 from src.core.exceptions import UnauthorizedError
 from src.core.security import (
     MAGIC_LOGIN_PURPOSE,
@@ -34,17 +35,17 @@ class AuthService:
     async def login(self, email: str, password: str) -> TokenResponseSchema:
         user = await self._users.get_by_email(email)
         if not user or not verify_password(password, user.hashed_password):
-            raise UnauthorizedError(INVALID_CREDENTIALS)
+            raise UnauthorizedError(INVALID_CREDENTIALS, code=ErrorCode.INVALID_CREDENTIALS)
         return await self._issue_token_pair(user.id, user.role)
 
     async def refresh(self, refresh_token_str: str) -> TokenResponseSchema:
         token_hash = hash_refresh_token(refresh_token_str)
         token = await self._tokens.get_valid_by_hash(token_hash)
         if not token:
-            raise UnauthorizedError(REFRESH_TOKEN_INVALID)
+            raise UnauthorizedError(REFRESH_TOKEN_INVALID, code=ErrorCode.REFRESH_TOKEN_INVALID)
         user = await self._users.get_by_id(token.user_id)
         if not user:
-            raise UnauthorizedError(REFRESH_TOKEN_INVALID)
+            raise UnauthorizedError(REFRESH_TOKEN_INVALID, code=ErrorCode.REFRESH_TOKEN_INVALID)
         await self._tokens.revoke(token_hash)
         await self._db.flush()
         return await self._issue_token_pair(user.id, user.role)
@@ -52,13 +53,13 @@ class AuthService:
     async def magic_login(self, token: str) -> TokenResponseSchema:
         payload = decode_access_token(token)
         if payload is None or payload.get("purpose") != MAGIC_LOGIN_PURPOSE:
-            raise UnauthorizedError(MAGIC_LINK_INVALID)
+            raise UnauthorizedError(MAGIC_LINK_INVALID, code=ErrorCode.MAGIC_LINK_INVALID)
         user_id = payload.get("sub")
         if not user_id:
-            raise UnauthorizedError(MAGIC_LINK_INVALID)
+            raise UnauthorizedError(MAGIC_LINK_INVALID, code=ErrorCode.MAGIC_LINK_INVALID)
         user = await self._users.get_by_id(user_id)
         if not user:
-            raise UnauthorizedError(MAGIC_LINK_INVALID)
+            raise UnauthorizedError(MAGIC_LINK_INVALID, code=ErrorCode.MAGIC_LINK_INVALID)
         return await self._issue_token_pair(user.id, user.role)
 
     async def logout(self, refresh_token_str: str) -> None:

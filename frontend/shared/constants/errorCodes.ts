@@ -1,0 +1,20 @@
+// Machine-readable error codes mirroring backend `ErrorCode` (src/core/enums/error_codes.py).
+// Values must match the backend exactly — they are the wire contract, not translatable text.
+export const ERROR_CODES = {
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  NOT_FOUND: 'NOT_FOUND',
+  CONFLICT: 'CONFLICT',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+  INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  USER_EMAIL_EXISTS: 'USER_EMAIL_EXISTS',
+  CANNOT_DELETE_SELF: 'CANNOT_DELETE_SELF',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  TOKEN_INVALID: 'TOKEN_INVALID',
+  REFRESH_TOKEN_INVALID: 'REFRESH_TOKEN_INVALID',
+  MAGIC_LINK_INVALID: 'MAGIC_LINK_INVALID',
+} as const
+
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES]

@@ -1,0 +1,21 @@
+from enum import Enum
+
+
+class ErrorCode(str, Enum):
+    # Generic codes mapped from the built-in exception classes.
+    VALIDATION_ERROR = "VALIDATION_ERROR"
+    NOT_FOUND = "NOT_FOUND"
+    CONFLICT = "CONFLICT"
+    UNAUTHORIZED = "UNAUTHORIZED"
+    FORBIDDEN = "FORBIDDEN"
+    FILE_TOO_LARGE = "FILE_TOO_LARGE"
+    INVALID_FILE_TYPE = "INVALID_FILE_TYPE"
+    INTERNAL_ERROR = "INTERNAL_ERROR"
+
+    # Specific codes for cases the frontend renders with a tailored message.
+    USER_EMAIL_EXISTS = "USER_EMAIL_EXISTS"
+    CANNOT_DELETE_SELF = "CANNOT_DELETE_SELF"
+    INVALID_CREDENTIALS = "INVALID_CREDENTIALS"
+    TOKEN_INVALID = "TOKEN_INVALID"
+    REFRESH_TOKEN_INVALID = "REFRESH_TOKEN_INVALID"
+    MAGIC_LINK_INVALID = "MAGIC_LINK_INVALID"

@@ -9,6 +9,9 @@ FORBIDDEN = "Access denied"
 USER_EMAIL_EXISTS = "A user with this email already exists"
 CANNOT_DELETE_SELF = "Admins cannot delete their own account"
 
+VALIDATION_FAILED = "The submitted details are invalid"
+INTERNAL_ERROR = "An unexpected error occurred"
+
 CUSTOMER_NOT_FOUND = "Customer not found"
 CUSTOMER_CREATED = "Customer created"
 ORDER_NOT_FOUND = "Order not found"

@@ -5,7 +5,7 @@ import { USERS_LABELS, USER_ROLE_VALUES } from '../../constants/usersLabels'
 import styles from './UserForm.module.scss'
 
 export const UserForm = (): ReactElement | null => {
-  const { isOpen, register, handleSubmit, onSubmit, errors, isSubmitting, submitError, onClose } =
+  const { isOpen, register, handleSubmit, onSubmit, errors, isSubmitting, onClose } =
     useUserForm()
 
   return isOpen ? (
@@ -46,7 +46,6 @@ export const UserForm = (): ReactElement | null => {
               </select>
             </div>
             <p className={styles.note}>{USERS_LABELS.WELCOME_EMAIL_NOTE}</p>
-            {submitError && <div className={styles.submitError}>{submitError}</div>}
           </div>
           <div className={styles.footer}>
             <button type="button" className={styles.cancelBtn} onClick={onClose}>

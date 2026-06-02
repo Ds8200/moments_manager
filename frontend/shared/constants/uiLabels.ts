@@ -43,3 +43,8 @@ export const CONFIRM_DIALOG_LABELS = {
   CONFIRM: 'אישור',
   CANCEL:  'ביטול',
 } as const
+
+export const TOAST_LABELS = {
+  REGION:      'הודעות מערכת',
+  CLOSE:       'סגור הודעה',
+} as const

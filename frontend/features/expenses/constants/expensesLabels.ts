@@ -24,4 +24,7 @@ export const EXPENSES_LABELS = {
 
   VALIDATION_DATE:          'נדרש תאריך',
   VALIDATION_AMOUNT:        'נדרש סכום',
+  CREATED_SUCCESS:          'ההוצאה נוספה בהצלחה',
+  UPDATED_SUCCESS:          'ההוצאה עודכנה בהצלחה',
+  DELETED_SUCCESS:          'ההוצאה נמחקה בהצלחה',
 } as const
