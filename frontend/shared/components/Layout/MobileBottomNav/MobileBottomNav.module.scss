@@ -28,6 +28,10 @@
   font-size: v.$font-size-xs;
   font-weight: v.$font-weight-medium;
   transition: color v.$transition-fast;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 
   &.active {
     color: v.$primary;

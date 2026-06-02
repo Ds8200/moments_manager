@@ -7,8 +7,10 @@ import { useSidebar } from './useSidebar'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './Sidebar.module.scss'
 
+const LOGOUT_ICON = '🚪'
+
 export const Sidebar = (): ReactElement => {
-  const { pathname, visibleNavItems } = useSidebar()
+  const { pathname, visibleNavItems, logoutLabel, onLogout } = useSidebar()
 
   return (
     <aside className={styles.sidebar}>
@@ -33,6 +35,10 @@ export const Sidebar = (): ReactElement => {
           </Link>
         ))}
       </nav>
+      <button type="button" className={styles.logoutBtn} onClick={onLogout}>
+        <span className={styles.navIcon}>{LOGOUT_ICON}</span>
+        <span className={styles.navLabel}>{logoutLabel}</span>
+      </button>
     </aside>
   )
 }

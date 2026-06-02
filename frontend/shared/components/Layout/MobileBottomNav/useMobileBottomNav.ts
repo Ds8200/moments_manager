@@ -1,22 +1,37 @@
 'use client'
+import { useState } from 'react'
 import { useAtomValue } from 'jotai'
 import { usePathname } from 'next/navigation'
 import { isAdminAtom } from '@/features/auth/store/authAtoms'
 import { NAV_ITEMS, type NavItem } from '@/shared/constants/routes'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
 
-const VISIBLE_ITEM_COUNT = 5
+const PRIMARY_ITEM_COUNT = 4
 
 export interface UseMobileBottomNavReturn {
-  visibleItems: NavItem[]
+  primaryItems: NavItem[]
+  overflowItems: NavItem[]
   pathname: string
+  isMoreOpen: boolean
+  openMore: () => void
+  closeMore: () => void
+  moreLabel: string
 }
 
 export const useMobileBottomNav = (): UseMobileBottomNavReturn => {
   const pathname = usePathname()
   const isAdmin = useAtomValue(isAdminAtom)
+  const [isMoreOpen, setIsMoreOpen] = useState<boolean>(false)
+
   const filteredItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin)
+
   return {
-    visibleItems: filteredItems.slice(0, VISIBLE_ITEM_COUNT),
+    primaryItems: filteredItems.slice(0, PRIMARY_ITEM_COUNT),
+    overflowItems: filteredItems.slice(PRIMARY_ITEM_COUNT),
     pathname,
+    isMoreOpen,
+    openMore: () => setIsMoreOpen(true),
+    closeMore: () => setIsMoreOpen(false),
+    moreLabel: UI_LABELS.MORE,
   }
 }

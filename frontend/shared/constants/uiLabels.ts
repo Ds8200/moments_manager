@@ -16,6 +16,9 @@ export const UI_LABELS = {
   ERROR_LOADING_EXPENSES: 'שגיאה בטעינת ההוצאות',
   ERROR_LOADING_REPORTS:  'שגיאה בטעינת הדוחות',
   ERROR_LOADING_USERS:    'שגיאה בטעינת המשתמשים',
+  MORE:                   'עוד',
+  LOGOUT:                 'התנתקות',
+  MENU_TITLE:             'תפריט',
 } as const
 
 export const META_LABELS = {
