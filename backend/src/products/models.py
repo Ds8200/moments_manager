@@ -1,9 +1,10 @@
 import uuid
 from decimal import Decimal
-from sqlalchemy import String, Numeric, Integer, Boolean
+
+from sqlalchemy import Boolean, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database import Base, TimestampMixin, SoftDeleteMixin
+from src.database import Base, SoftDeleteMixin, TimestampMixin
 
 
 class Product(Base, TimestampMixin, SoftDeleteMixin):

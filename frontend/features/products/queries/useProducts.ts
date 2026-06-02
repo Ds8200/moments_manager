@@ -16,10 +16,14 @@ export const useProduct = (id: string | null): UseQueryResult<Product> =>
     enabled: id !== null,
   })
 
-export const useProducts = (page = 1, search = ''): UseQueryResult<ProductsResponse> =>
+export const useProducts = (
+  page = 1,
+  search = '',
+  isActive: boolean | null = null,
+): UseQueryResult<ProductsResponse> =>
   useQuery({
-    queryKey: ['products', page, search],
-    queryFn: () => productsApi.list(page, search),
+    queryKey: ['products', page, search, isActive],
+    queryFn: () => productsApi.list(page, search, isActive),
   })
 
 export const useCreateProduct = (): UseMutationResult<

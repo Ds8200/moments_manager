@@ -1,4 +1,5 @@
 import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.constants.http_messages import RESOURCE_PRODUCT
@@ -24,8 +25,11 @@ class ProductService:
         params: PaginationParams,
         search: str | None = None,
         category: str | None = None,
+        is_active: bool | None = None,
     ) -> PaginatedResponse[ProductResponseSchema]:
-        products, total = await self._repo.get_all(search, category, params.page_size, params.offset)
+        products, total = await self._repo.get_all(
+            search, category, is_active, params.page_size, params.offset
+        )
         pages = (total + params.page_size - 1) // params.page_size
         return PaginatedResponse(
             items=[ProductResponseSchema.model_validate(p) for p in products],

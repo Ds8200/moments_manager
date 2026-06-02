@@ -6,14 +6,13 @@ import { STATUS_ORDER, STATUS_LABELS, PAYMENT_STATE_ORDER, PAYMENT_STATE_LABELS 
 import type { OrderStatus, PaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import type { OrderFilters } from '../../types'
+import type { FiltersBarSelectConfig } from '@/shared/components/FiltersBar/useFiltersBar'
 
 export interface UseOrderFiltersBarReturn {
   filters: OrderFilters
-  statusOptions: Array<{ value: OrderStatus | ''; label: string }>
-  paymentStateOptions: Array<{ value: '' | PaymentState; label: string }>
+  statusSelect: FiltersBarSelectConfig
+  paymentSelect: FiltersBarSelectConfig
   onSearchChange: (value: string) => void
-  onStatusChange: (value: OrderStatus | '') => void
-  onPaymentStateChange: (value: '' | PaymentState) => void
   onDateFromChange: (value: string) => void
   onDateToChange: (value: string) => void
   onNewOrder: () => void
@@ -25,30 +24,37 @@ export const useOrderFiltersBar = (): UseOrderFiltersBarReturn => {
   const setEditingId = useSetAtom(editingOrderIdAtom)
 
   const patch = useCallback(
-    (patch: Partial<OrderFilters>) =>
-      setFilters((prev) => ({ ...prev, ...patch, page: 1 })),
+    (p: Partial<OrderFilters>) => setFilters((prev) => ({ ...prev, ...p, page: 1 })),
     [setFilters],
   )
 
-  const statusOptions = [
-    { value: '' as const, label: ORDERS_LABELS.ALL_STATUSES },
-    ...STATUS_ORDER.map((s) => ({ value: s, label: STATUS_LABELS[s] })),
-  ]
+  // cast: FiltersBar uses string for generic compatibility
+  const statusSelect: FiltersBarSelectConfig = {
+    value: filters.status,
+    options: [
+      { value: '', label: ORDERS_LABELS.ALL_STATUSES },
+      ...STATUS_ORDER.map((s) => ({ value: s, label: STATUS_LABELS[s] })),
+    ],
+    onChange: (v: string) => patch({ status: v as OrderStatus | '' }),
+  }
 
-  const paymentStateOptions: Array<{ value: '' | PaymentState; label: string }> = [
-    { value: '', label: ORDERS_LABELS.ALL_PAYMENT },
-    ...PAYMENT_STATE_ORDER.map((s) => ({ value: s, label: PAYMENT_STATE_LABELS[s] })),
-  ]
+  // cast: FiltersBar uses string for generic compatibility
+  const paymentSelect: FiltersBarSelectConfig = {
+    value: filters.payment_state,
+    options: [
+      { value: '', label: ORDERS_LABELS.ALL_PAYMENT },
+      ...PAYMENT_STATE_ORDER.map((s) => ({ value: s, label: PAYMENT_STATE_LABELS[s] })),
+    ],
+    onChange: (v: string) => patch({ payment_state: v as '' | PaymentState }),
+  }
 
   return {
     filters,
-    statusOptions,
-    paymentStateOptions,
-    onSearchChange:       (v) => patch({ search: v }),
-    onStatusChange:       (v) => patch({ status: v }),
-    onPaymentStateChange: (v) => patch({ payment_state: v }),
-    onDateFromChange:     (v) => patch({ date_from: v }),
-    onDateToChange:       (v) => patch({ date_to: v }),
+    statusSelect,
+    paymentSelect,
+    onSearchChange:   (v) => patch({ search: v }),
+    onDateFromChange: (v) => patch({ date_from: v }),
+    onDateToChange:   (v) => patch({ date_to: v }),
     onNewOrder: () => {
       setEditingId(null)
       setFormOpen(true)

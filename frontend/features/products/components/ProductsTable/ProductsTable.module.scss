@@ -1,0 +1,75 @@
+@use '../../../../shared/styles/variables' as v;
+
+.row {
+  border-bottom: 1px solid v.$border-color;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-50;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cell {
+  padding: v.$space-3 v.$space-4;
+  color: v.$text-primary;
+  vertical-align: middle;
+}
+
+.name {
+  font-weight: v.$font-weight-semibold;
+}
+
+.secondary {
+  color: v.$text-secondary;
+  font-size: v.$font-size-sm;
+}
+
+.price {
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
+}
+
+.activeBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  background: color-mix(in srgb, #51CF66 15%, transparent);
+  color: #2F9E44;
+}
+
+.inactiveBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  background: v.$gray-100;
+  color: v.$text-secondary;
+}
+
+.actionsCell {
+  width: 40px;
+  text-align: center;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  font-size: v.$font-size-base;
+  opacity: 0.7;
+  transition: opacity v.$transition-fast;
+
+  &:hover {
+    opacity: 1;
+  }
+}

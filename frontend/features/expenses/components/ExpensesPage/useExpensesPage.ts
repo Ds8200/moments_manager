@@ -5,6 +5,7 @@ import { useExpenses, useDeleteExpense } from '../../queries/useExpenses'
 import { isExpenseFormOpenAtom, editingExpenseAtom } from '../../store/expensesAtoms'
 import { EXPENSES_LABELS } from '../../constants/expensesLabels'
 import { formatCurrency, formatDate } from '@/shared/utils/formatters'
+import { useConfirm } from '@/shared/hooks/useConfirm'
 import type { Expense, ExpensesResponse } from '../../types'
 
 export interface UseExpensesPageReturn {
@@ -27,6 +28,7 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
   const deleteExpense = useDeleteExpense()
   const setOpen = useSetAtom(isExpenseFormOpenAtom)
   const setEditingExpense = useSetAtom(editingExpenseAtom)
+  const confirm = useConfirm()
 
   const totalAmount = formatCurrency(
     data?.items.reduce((sum, e) => sum + parseFloat(e.amount), 0) ?? 0
@@ -40,9 +42,11 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
   }
 
   const onDelete = (id: string): void => {
-    if (window.confirm(EXPENSES_LABELS.CONFIRM_DELETE)) {
-      deleteExpense.mutate(id)
-    }
+    confirm({
+      message: EXPENSES_LABELS.CONFIRM_DELETE,
+      isDangerous: true,
+      onConfirm: () => deleteExpense.mutate(id),
+    })
   }
 
   return {

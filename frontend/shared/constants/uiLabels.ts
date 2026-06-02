@@ -32,3 +32,9 @@ export const META_LABELS = {
 export const DASHBOARD_LABELS = {
   COMING_SOON: 'גרפים והזמנות היום יתווספו בהמשך הבנייה',
 } as const
+
+export const CONFIRM_DIALOG_LABELS = {
+  TITLE:   'אישור פעולה',
+  CONFIRM: 'אישור',
+  CANCEL:  'ביטול',
+} as const

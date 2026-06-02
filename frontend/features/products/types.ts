@@ -18,6 +18,13 @@ export interface ProductsResponse {
   pages: number
 }
 
+export interface ProductFilters {
+  search: string
+  is_active: boolean | null
+  page: number
+  page_size: number
+}
+
 export interface ProductFormValues {
   name: string
   category: string

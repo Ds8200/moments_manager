@@ -6,57 +6,16 @@
   gap: v.$space-5;
 }
 
-.toolbar {
+.header {
   display: flex;
   align-items: center;
-  gap: v.$space-3;
+  justify-content: space-between;
 }
 
 .title {
   font-size: v.$font-size-2xl;
   font-weight: v.$font-weight-bold;
   color: v.$text-primary;
-  margin-left: auto;
-}
-
-.searchInput {
-  padding: v.$space-2 v.$space-3;
-  border: 1px solid v.$border-color;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-family: v.$font-family;
-  background: v.$bg-card;
-  color: v.$text-primary;
-  min-width: 220px;
-
-  &:focus {
-    outline: none;
-    border-color: v.$primary;
-  }
-}
-
-.newBtn {
-  padding: v.$space-2 v.$space-4;
-  background: v.$primary;
-  color: v.$text-inverse;
-  border: none;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-weight: v.$font-weight-semibold;
-  font-family: v.$font-family;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background v.$transition-fast;
-
-  &:hover {
-    background: v.$primary-dark;
-  }
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: v.$space-4;
 }
 
 .card {
@@ -64,84 +23,5 @@
   border-radius: v.$border-radius-lg;
   box-shadow: v.$shadow-card;
   border: 1px solid v.$border-color;
-  padding: v.$space-5;
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-3;
-  transition: box-shadow v.$transition-fast;
-
-  &:hover {
-    box-shadow: v.$shadow-elevated;
-  }
-
-  &.inactive {
-    opacity: 0.55;
-  }
-}
-
-.cardHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: v.$space-2;
-}
-
-.productName {
-  font-size: v.$font-size-md;
-  font-weight: v.$font-weight-semibold;
-  color: v.$text-primary;
-}
-
-.categoryBadge {
-  font-size: v.$font-size-xs;
-  color: v.$text-secondary;
-  background: v.$gray-100;
-  padding: 2px 8px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-
-.priceRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: v.$font-size-sm;
-}
-
-.price {
-  font-size: v.$font-size-lg;
-  font-weight: v.$font-weight-bold;
-  color: v.$text-primary;
-}
-
-.cost {
-  color: v.$text-secondary;
-}
-
-.profit {
-  font-size: v.$font-size-xs;
-  color: #2F9E44;
-  font-weight: v.$font-weight-medium;
-}
-
-.cardActions {
-  display: flex;
-  gap: v.$space-2;
-  padding-top: v.$space-2;
-  border-top: 1px solid v.$border-color;
-}
-
-.actionBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: v.$space-1;
-  border-radius: v.$border-radius-sm;
-  font-size: v.$font-size-sm;
-  opacity: 0.6;
-  transition: opacity v.$transition-fast;
-
-  &:hover {
-    opacity: 1;
-  }
+  overflow: hidden;
 }

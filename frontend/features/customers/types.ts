@@ -25,6 +25,12 @@ export interface CustomersResponse {
   pages: number
 }
 
+export interface CustomerFilters {
+  search: string
+  page: number
+  page_size: number
+}
+
 export interface CustomerFormValues {
   name: string
   phone: string

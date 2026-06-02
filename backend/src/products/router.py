@@ -1,4 +1,5 @@
 import logging
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,12 +22,13 @@ async def list_products(
     page_size: int = Query(default=50, ge=1, le=200),
     search: str | None = Query(default=None),
     category: str | None = Query(default=None),
+    is_active: bool | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
     _user=Depends(get_current_user),
 ):
     svc = ProductService(db)
     return await svc.list_products(
-        PaginationParams(page=page, page_size=page_size), search, category
+        PaginationParams(page=page, page_size=page_size), search, category, is_active
     )
 
 

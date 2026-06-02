@@ -4,6 +4,7 @@ import type { ReactElement } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Provider } from 'jotai'
 import { useState } from 'react'
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog/ConfirmDialog'
 
 export const Providers = ({ children }: { children: React.ReactNode }): ReactElement => {
   const [queryClient] = useState(
@@ -17,7 +18,10 @@ export const Providers = ({ children }: { children: React.ReactNode }): ReactEle
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Provider>{children}</Provider>
+      <Provider>
+        {children}
+        <ConfirmDialog />
+      </Provider>
     </QueryClientProvider>
   )
 }

@@ -5,30 +5,30 @@ import { ORDERS_LABELS } from '../../../constants/ordersLabels'
 import { PAYMENT_STATE_LABELS } from '@/shared/enums/statusEnums'
 
 describe('useOrderFiltersBar', () => {
-  it('exposes default filters and statusOptions with all-statuses option first', () => {
+  it('exposes default filters and statusSelect options with all-statuses first', () => {
     const { result } = renderHook(() => useOrderFiltersBar())
 
     expect(result.current.filters.search).toBe('')
     expect(result.current.filters.status).toBe('')
-    expect(result.current.statusOptions[0]).toEqual({
+    expect(result.current.statusSelect.options[0]).toEqual({
       value: '',
       label: ORDERS_LABELS.ALL_STATUSES,
     })
-    expect(result.current.statusOptions.length).toBeGreaterThan(1)
+    expect(result.current.statusSelect.options.length).toBeGreaterThan(1)
   })
 
-  it('exposes paymentStateOptions with all-payment option first, then the 3 payment states', () => {
+  it('exposes paymentSelect options with all-payment first, then the 3 payment states', () => {
     const { result } = renderHook(() => useOrderFiltersBar())
 
-    expect(result.current.paymentStateOptions[0]).toEqual({
+    expect(result.current.paymentSelect.options[0]).toEqual({
       value: '',
       label: ORDERS_LABELS.ALL_PAYMENT,
     })
-    expect(result.current.paymentStateOptions[1]).toEqual({
+    expect(result.current.paymentSelect.options[1]).toEqual({
       value: 'unpaid',
       label: PAYMENT_STATE_LABELS.unpaid,
     })
-    expect(result.current.paymentStateOptions.length).toBe(4)
+    expect(result.current.paymentSelect.options.length).toBe(4)
   })
 
   it('onSearchChange updates filters.search and resets page', () => {
@@ -42,21 +42,21 @@ describe('useOrderFiltersBar', () => {
     expect(result.current.filters.page).toBe(1)
   })
 
-  it('onStatusChange updates filters.status', () => {
+  it('statusSelect.onChange updates filters.status', () => {
     const { result } = renderHook(() => useOrderFiltersBar())
 
     act(() => {
-      result.current.onStatusChange('new')
+      result.current.statusSelect.onChange('new')
     })
 
     expect(result.current.filters.status).toBe('new')
   })
 
-  it('onPaymentStateChange updates filters.payment_state', () => {
+  it('paymentSelect.onChange updates filters.payment_state', () => {
     const { result } = renderHook(() => useOrderFiltersBar())
 
     act(() => {
-      result.current.onPaymentStateChange('transfer')
+      result.current.paymentSelect.onChange('transfer')
     })
 
     expect(result.current.filters.payment_state).toBe('transfer')
@@ -80,8 +80,7 @@ describe('useOrderFiltersBar', () => {
     act(() => {
       result.current.onSearchChange('a')
     })
-    // first establish a non-1 page by simulating multiple filter changes; the patch
-    // function always sets page=1 so we can only assert that
+
     expect(result.current.filters.page).toBe(1)
   })
 })

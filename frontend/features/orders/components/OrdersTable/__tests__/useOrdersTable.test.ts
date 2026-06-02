@@ -6,9 +6,11 @@ import { createElement } from 'react'
 import { useOrdersTable } from '../useOrdersTable'
 import { ORDERS_LABELS } from '../../../constants/ordersLabels'
 import { PAYMENT_STATE_LABELS } from '@/shared/enums/statusEnums'
+import type { ConfirmDialogOptions } from '@/shared/store/globalAtoms'
 
 const deleteMutate = vi.fn()
 const statusMutate = vi.fn()
+const confirmFn = vi.fn()
 
 vi.mock('../../../queries/useOrders', () => ({
   useOrders: () => ({
@@ -20,6 +22,10 @@ vi.mock('../../../queries/useOrders', () => ({
   useUpdateOrderStatus: () => ({ mutate: statusMutate }),
 }))
 
+vi.mock('@/shared/hooks/useConfirm', () => ({
+  useConfirm: () => confirmFn,
+}))
+
 const wrapper = ({ children }: { children: ReactNode }) => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return createElement(QueryClientProvider, { client }, children)
@@ -29,6 +35,7 @@ describe('useOrdersTable', () => {
   beforeEach(() => {
     deleteMutate.mockClear()
     statusMutate.mockClear()
+    confirmFn.mockClear()
   })
 
   it('exposes orders from query data', () => {
@@ -38,21 +45,33 @@ describe('useOrdersTable', () => {
     expect(result.current.currentPage).toBe(1)
   })
 
-  it('onDeleteOrder calls mutate when window.confirm returns true', () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+  it('onDeleteOrder opens confirm dialog with correct message', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
 
     act(() => {
       result.current.onDeleteOrder('order-1')
     })
 
-    expect(confirmSpy).toHaveBeenCalledWith(ORDERS_LABELS.CONFIRM_DELETE)
-    expect(deleteMutate).toHaveBeenCalledWith('order-1')
-    confirmSpy.mockRestore()
+    expect(confirmFn).toHaveBeenCalledWith(
+      expect.objectContaining<Partial<ConfirmDialogOptions>>({
+        message: ORDERS_LABELS.CONFIRM_DELETE,
+        isDangerous: true,
+      })
+    )
   })
 
-  it('onDeleteOrder skips mutate when window.confirm returns false', () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+  it('onDeleteOrder calls mutate when onConfirm callback is invoked', () => {
+    confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
+    const { result } = renderHook(() => useOrdersTable(), { wrapper })
+
+    act(() => {
+      result.current.onDeleteOrder('order-1')
+    })
+
+    expect(deleteMutate).toHaveBeenCalledWith('order-1')
+  })
+
+  it('onDeleteOrder does not call mutate when confirm is dismissed', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
 
     act(() => {
@@ -60,7 +79,6 @@ describe('useOrdersTable', () => {
     })
 
     expect(deleteMutate).not.toHaveBeenCalled()
-    confirmSpy.mockRestore()
   })
 
   it('onStatusChange calls mutate with id and status payload', () => {

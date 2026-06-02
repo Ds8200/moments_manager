@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 
+const EMPTY_PAGE = { items: [], total: 0, page: 1, page_size: 20, pages: 1 }
+
 export const handlers = [
   http.get(API_ENDPOINTS.REPORTS_DASHBOARD, () =>
     HttpResponse.json({
@@ -12,4 +14,6 @@ export const handlers = [
       today_orders: 0,
     })
   ),
+  http.get(API_ENDPOINTS.CUSTOMERS, () => HttpResponse.json(EMPTY_PAGE)),
+  http.get(API_ENDPOINTS.PRODUCTS,  () => HttpResponse.json(EMPTY_PAGE)),
 ]

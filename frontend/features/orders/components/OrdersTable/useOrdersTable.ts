@@ -3,6 +3,7 @@ import { useSetAtom } from 'jotai'
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/useOrders'
 import { orderFiltersAtom, selectedOrderIdAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { formatCurrency, formatShortDate } from '@/shared/utils/formatters'
+import { useConfirm } from '@/shared/hooks/useConfirm'
 import type { OrderSummary, OrderUrgency } from '../../types'
 import type { OrderStatus } from '@/shared/enums/statusEnums'
 import { PAYMENT_STATE_LABELS, getPaymentState } from '@/shared/enums/statusEnums'
@@ -57,6 +58,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
   const setEditingId = useSetAtom(editingOrderIdAtom)
   const updateStatus = useUpdateOrderStatus()
   const deleteOrder = useDeleteOrder()
+  const confirm = useConfirm()
 
   return {
     orders: data?.items ?? [],
@@ -74,9 +76,11 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     },
 
     onDeleteOrder: (id) => {
-      if (window.confirm(ORDERS_LABELS.CONFIRM_DELETE)) {
-        deleteOrder.mutate(id)
-      }
+      confirm({
+        message: ORDERS_LABELS.CONFIRM_DELETE,
+        isDangerous: true,
+        onConfirm: () => deleteOrder.mutate(id),
+      })
     },
 
     onStatusChange: (id, status) => {

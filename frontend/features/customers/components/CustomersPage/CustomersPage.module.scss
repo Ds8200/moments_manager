@@ -6,58 +6,16 @@
   gap: v.$space-5;
 }
 
-.toolbar {
+.header {
   display: flex;
   align-items: center;
-  gap: v.$space-3;
+  justify-content: space-between;
 }
 
 .title {
   font-size: v.$font-size-2xl;
   font-weight: v.$font-weight-bold;
   color: v.$text-primary;
-  margin-left: auto;
-}
-
-.searchInput {
-  padding: v.$space-2 v.$space-3;
-  border: 1px solid v.$border-color;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-family: v.$font-family;
-  background: v.$bg-card;
-  color: v.$text-primary;
-  min-width: 220px;
-
-  &:focus {
-    outline: none;
-    border-color: v.$primary;
-    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
-  }
-}
-
-.newBtn {
-  padding: v.$space-2 v.$space-4;
-  background: v.$primary;
-  color: v.$text-inverse;
-  border: none;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-weight: v.$font-weight-semibold;
-  font-family: v.$font-family;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background v.$transition-fast;
-
-  &:hover {
-    background: v.$primary-dark;
-  }
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: v.$space-4;
 }
 
 .card {
@@ -65,76 +23,5 @@
   border-radius: v.$border-radius-lg;
   box-shadow: v.$shadow-card;
   border: 1px solid v.$border-color;
-  padding: v.$space-5;
-  cursor: pointer;
-  transition: box-shadow v.$transition-fast, border-color v.$transition-fast;
-
-  &:hover {
-    box-shadow: v.$shadow-elevated;
-    border-color: v.$primary-light;
-  }
-}
-
-.cardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: v.$space-3;
-}
-
-.customerName {
-  font-size: v.$font-size-lg;
-  font-weight: v.$font-weight-semibold;
-  color: v.$text-primary;
-}
-
-.customerActions {
-  display: flex;
-  gap: v.$space-1;
-}
-
-.actionBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: v.$space-1;
-  border-radius: v.$border-radius-sm;
-  opacity: 0.6;
-  transition: opacity v.$transition-fast, background v.$transition-fast;
-
-  &:hover {
-    opacity: 1;
-    background: v.$gray-100;
-  }
-}
-
-.customerMeta {
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-1;
-  font-size: v.$font-size-sm;
-  color: v.$text-secondary;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: v.$space-3;
-  padding: v.$space-4;
-  font-size: v.$font-size-sm;
-}
-
-.pageBtn {
-  padding: v.$space-1 v.$space-3;
-  border: 1px solid v.$border-color;
-  border-radius: v.$border-radius-sm;
-  background: v.$bg-card;
-  cursor: pointer;
-  font-size: v.$font-size-sm;
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  overflow: hidden;
 }

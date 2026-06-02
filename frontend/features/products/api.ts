@@ -4,9 +4,10 @@ import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import type { Product, ProductsResponse, ProductFormValues } from './types'
 
 export const productsApi = {
-  list: (page = 1, search = ''): Promise<ProductsResponse> => {
+  list: (page = 1, search = '', isActive: boolean | null = null): Promise<ProductsResponse> => {
     const params = new URLSearchParams({ page: String(page), page_size: '20' })
     if (search) params.set('search', search)
+    if (isActive !== null) params.set('is_active', String(isActive))
     return apiClient<ProductsResponse>(`${API_ENDPOINTS.PRODUCTS}?${params}`)
   },
 

@@ -1,0 +1,102 @@
+@use '@/shared/styles/variables' as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn $transition-fast;
+}
+
+.dialog {
+  background: $bg-card;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-elevated;
+  padding: $space-8;
+  width: 100%;
+  max-width: 420px;
+  margin-inline: $space-4;
+  animation: slideUp $transition-normal;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin-block-end: $space-3;
+}
+
+.message {
+  font-size: $font-size-base;
+  color: $text-secondary;
+  line-height: $line-height-normal;
+  margin-block-end: $space-8;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+}
+
+.cancelButton {
+  padding: $space-2 $space-5;
+  border-radius: $border-radius;
+  border: 1px solid $border-color;
+  background: transparent;
+  color: $text-secondary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background: $gray-100;
+    border-color: $gray-300;
+  }
+}
+
+.confirmButton {
+  padding: $space-2 $space-5;
+  border-radius: $border-radius;
+  border: none;
+  background: $primary;
+  color: $text-inverse;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.dangerButton {
+  padding: $space-2 $space-5;
+  border-radius: $border-radius;
+  border: none;
+  background: $danger;
+  color: $text-inverse;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: darken($danger, 8%);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY($space-4); opacity: 0; }
+  to   { transform: translateY(0);        opacity: 1; }
+}

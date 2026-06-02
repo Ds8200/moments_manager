@@ -1,25 +1,5 @@
 @use '../../../../shared/styles/variables' as v;
 
-.wrapper {
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: v.$font-size-sm;
-}
-
-.thead th {
-  padding: v.$space-3 v.$space-4;
-  text-align: right;
-  font-weight: v.$font-weight-semibold;
-  color: v.$text-secondary;
-  background: v.$gray-50;
-  border-bottom: 1px solid v.$border-color;
-  white-space: nowrap;
-}
-
 .row {
   cursor: pointer;
   border-bottom: 1px solid v.$border-color;
@@ -48,14 +28,6 @@
 
 .customerName {
   font-weight: v.$font-weight-medium;
-}
-
-.products {
-  color: v.$text-secondary;
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .amount {
@@ -130,21 +102,6 @@
   text-align: center;
 }
 
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: v.$space-3 v.$space-4;
-  border-top: 1px solid v.$border-color;
-  font-size: v.$font-size-sm;
-  color: v.$text-secondary;
-}
-
-.pageButtons {
-  display: flex;
-  gap: v.$space-2;
-}
-
 .actionBtn {
   background: none;
   border: none;
@@ -156,31 +113,5 @@
 
   &:hover {
     opacity: 1;
-  }
-}
-
-.pageBtn {
-  padding: v.$space-1 v.$space-3;
-  border: 1px solid v.$border-color;
-  border-radius: v.$border-radius-sm;
-  background: v.$bg-card;
-  cursor: pointer;
-  font-size: v.$font-size-sm;
-  color: v.$text-primary;
-  transition: background v.$transition-fast;
-
-  &:hover:not(:disabled) {
-    background: v.$gray-100;
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  &.active {
-    background: v.$primary;
-    color: v.$text-inverse;
-    border-color: v.$primary;
   }
 }
