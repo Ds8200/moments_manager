@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -7,7 +7,10 @@ import { useAtom } from 'jotai'
 import { isUserFormOpenAtom } from '../../store/usersAtoms'
 import { useCreateUser } from '../../queries/useUsers'
 import { USERS_LABELS, USER_ROLE_VALUES } from '../../constants/usersLabels'
+import { ApiError } from '@/shared/utils/apiClient'
 import type { UserFormValues } from '../../types'
+
+const HTTP_CONFLICT = 409
 
 const schema = z.object({
   email: z.string().min(1, USERS_LABELS.FORM_EMAIL_REQUIRED).email(USERS_LABELS.FORM_EMAIL_INVALID),
@@ -28,11 +31,13 @@ export interface UseUserFormReturn {
   onSubmit: (values: UserFormValues) => Promise<void>
   errors: ReturnType<typeof useForm<UserFormValues>>['formState']['errors']
   isSubmitting: boolean
+  submitError: string | null
   onClose: () => void
 }
 
 export const useUserForm = (): UseUserFormReturn => {
   const [isOpen, setOpen] = useAtom(isUserFormOpenAtom)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const createUser = useCreateUser()
 
   const {
@@ -52,12 +57,22 @@ export const useUserForm = (): UseUserFormReturn => {
   }, [isOpen, reset])
 
   const onClose = (): void => {
+    setSubmitError(null)
     setOpen(false)
   }
 
   const onSubmit = async (values: UserFormValues): Promise<void> => {
-    await createUser.mutateAsync(values)
-    onClose()
+    setSubmitError(null)
+    try {
+      await createUser.mutateAsync(values)
+      onClose()
+    } catch (err) {
+      if (err instanceof ApiError && err.status === HTTP_CONFLICT) {
+        setSubmitError(USERS_LABELS.FORM_ERROR_DUPLICATE)
+      } else {
+        setSubmitError(USERS_LABELS.FORM_ERROR_GENERIC)
+      }
+    }
   }
 
   return {
@@ -67,6 +82,7 @@ export const useUserForm = (): UseUserFormReturn => {
     onSubmit,
     errors,
     isSubmitting,
+    submitError,
     onClose,
   }
 }

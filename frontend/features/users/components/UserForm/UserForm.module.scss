@@ -101,6 +101,15 @@
   margin: 0;
 }
 
+.submitError {
+  background: rgba(250, 82, 82, 0.1);
+  color: v.$danger;
+  font-size: v.$font-size-sm;
+  padding: v.$space-2 v.$space-3;
+  border-radius: v.$border-radius;
+  text-align: center;
+}
+
 .footer {
   display: flex;
   align-items: center;
