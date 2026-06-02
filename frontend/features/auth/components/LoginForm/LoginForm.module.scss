@@ -19,11 +19,9 @@
 }
 
 .logo {
-  font-size: v.$font-size-2xl;
-  font-weight: v.$font-weight-bold;
-  color: v.$primary;
-  margin-bottom: v.$space-2;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: v.$space-4;
 }
 
 .subtitle {

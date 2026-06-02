@@ -1,5 +1,6 @@
 'use client'
 import type { ReactElement } from 'react'
+import Image from 'next/image'
 import { useLoginForm } from './useLoginForm'
 import { AUTH_LABELS } from '../../constants/authLabels'
 import styles from './LoginForm.module.scss'
@@ -10,7 +11,15 @@ export const LoginForm = (): ReactElement => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <div className={styles.logo}>{AUTH_LABELS.TITLE}</div>
+        <div className={styles.logo}>
+          <Image
+            src="/moments_logo.png"
+            alt={AUTH_LABELS.TITLE}
+            width={200}
+            height={75}
+            priority
+          />
+        </div>
         <div className={styles.subtitle}>{AUTH_LABELS.SUBTITLE}</div>
 
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
