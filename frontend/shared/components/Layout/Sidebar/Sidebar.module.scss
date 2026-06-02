@@ -21,21 +21,11 @@
 }
 
 .logo {
-  @include m.flex-start;
-  gap: v.$space-2;
-  padding: v.$space-6 v.$space-5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-4 v.$space-5;
   border-bottom: 1px solid v.$border-color;
-  font-weight: v.$font-weight-bold;
-  font-size: v.$font-size-lg;
-}
-
-.logoIcon {
-  color: v.$primary;
-  font-size: v.$font-size-xl;
-}
-
-.logoText {
-  color: v.$text-primary;
 }
 
 .nav {

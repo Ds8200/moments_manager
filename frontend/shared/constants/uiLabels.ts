@@ -18,15 +18,15 @@ export const UI_LABELS = {
 } as const
 
 export const META_LABELS = {
-  ROOT_TITLE:        'Moments — ניהול עסק',
+  ROOT_TITLE:        'Moments מערכת ניהול',
   ROOT_DESCRIPTION:  'מערכת ניהול הזמנות, לקוחות ופיננסים',
-  DASHBOARD_TITLE:   'דשבורד — Moments',
-  ORDERS_TITLE:      'הזמנות — Moments',
-  CUSTOMERS_TITLE:   'לקוחות — Moments',
-  PRODUCTS_TITLE:    'מוצרים — Moments',
-  EXPENSES_TITLE:    'הוצאות — Moments',
-  REPORTS_TITLE:     'דוחות — Moments',
-  LOGIN_TITLE:       'התחברות — Moments',
+  DASHBOARD_TITLE:   'דשבורד | Moments מערכת ניהול',
+  ORDERS_TITLE:      'הזמנות | Moments מערכת ניהול',
+  CUSTOMERS_TITLE:   'לקוחות | Moments מערכת ניהול',
+  PRODUCTS_TITLE:    'מוצרים | Moments מערכת ניהול',
+  EXPENSES_TITLE:    'הוצאות | Moments מערכת ניהול',
+  REPORTS_TITLE:     'דוחות | Moments מערכת ניהול',
+  LOGIN_TITLE:       'התחברות | Moments מערכת ניהול',
 } as const
 
 export const DASHBOARD_LABELS = {

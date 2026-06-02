@@ -13,6 +13,10 @@ const rubik = Rubik({
 export const metadata: Metadata = {
   title: META_LABELS.ROOT_TITLE,
   description: META_LABELS.ROOT_DESCRIPTION,
+  icons: {
+    icon: '/moments_logo.png',
+    apple: '/moments_logo.png',
+  },
 }
 
 export default function RootLayout({

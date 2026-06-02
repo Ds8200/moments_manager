@@ -1,6 +1,7 @@
 'use client'
 
 import type { ReactElement } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useSidebar } from './useSidebar'
 import { NAV_ITEMS } from '@/shared/constants/routes'
@@ -13,8 +14,13 @@ export const Sidebar = (): ReactElement => {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
-        <span className={styles.logoIcon}>✦</span>
-        <span className={styles.logoText}>{UI_LABELS.APP_NAME}</span>
+        <Image
+          src="/moments_logo.png"
+          alt={UI_LABELS.APP_NAME}
+          width={160}
+          height={60}
+          priority
+        />
       </div>
       <nav className={styles.nav}>
         {NAV_ITEMS.map((item) => (
