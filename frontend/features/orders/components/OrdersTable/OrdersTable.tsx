@@ -89,7 +89,7 @@ export const OrdersTable = (): ReactElement => {
                 </td>
                 <td className={styles.cell}>
                   <span className={`${styles.paidBadge} ${order.is_paid ? styles.paid : styles.unpaid}`}>
-                    {getPaymentLabel(order.payment_method, order.is_paid)}
+                    {getPaymentLabel(order.is_paid, order.payment_method)}
                   </span>
                 </td>
                 <td className={`${styles.cell} ${styles.actionsCell}`} onClick={(e) => e.stopPropagation()}>

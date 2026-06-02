@@ -1,10 +1,11 @@
 import logging
 from datetime import date, datetime, timezone
 from decimal import Decimal
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from src.customers.models import Customer
 from src.orders.models import Order, OrderItem, OrderFile
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,8 @@ class OrderRepository:
         date_to: date | None,
         customer_id: str | None,
         is_paid: bool | None,
+        payment_method: str | None,
+        search: str | None,
         limit: int,
         offset: int,
     ) -> tuple[list[Order], int]:
@@ -47,6 +50,13 @@ class OrderRepository:
             filters.append(Order.customer_id == customer_id)
         if is_paid is not None:
             filters.append(Order.is_paid == is_paid)
+        if payment_method is not None:
+            filters.append(Order.payment_method == payment_method)
+        if search:
+            term = f"%{search}%"
+            customer_ids = select(Customer.id).where(Customer.name.ilike(term))
+            item_order_ids = select(OrderItem.order_id).where(OrderItem.product_name.ilike(term))
+            filters.append(or_(Order.customer_id.in_(customer_ids), Order.id.in_(item_order_ids)))
 
         query = select(Order).where(and_(*filters))
         count_q = select(func.count()).select_from(query.subquery())

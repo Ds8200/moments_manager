@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { createElement } from 'react'
 import { useOrdersTable } from '../useOrdersTable'
 import { ORDERS_LABELS } from '../../../constants/ordersLabels'
+import { PAYMENT_STATE_LABELS } from '@/shared/enums/statusEnums'
 
 const deleteMutate = vi.fn()
 const statusMutate = vi.fn()
@@ -75,14 +76,19 @@ describe('useOrdersTable', () => {
     })
   })
 
-  it('getPaymentLabel returns URGENCY_NONE for unpaid order', () => {
+  it('getPaymentLabel returns "לא שולם" for unpaid order', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
-    expect(result.current.getPaymentLabel(null, false)).toBe(ORDERS_LABELS.URGENCY_NONE)
+    expect(result.current.getPaymentLabel(false, null)).toBe(PAYMENT_STATE_LABELS.unpaid)
   })
 
-  it('getPaymentLabel returns PAID label when paid with no payment method', () => {
+  it('getPaymentLabel returns "במזומן" when paid with cash', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
-    expect(result.current.getPaymentLabel(null, true)).toBe(ORDERS_LABELS.PAID)
+    expect(result.current.getPaymentLabel(true, 'cash')).toBe(PAYMENT_STATE_LABELS.cash)
+  })
+
+  it('getPaymentLabel returns "בהעברה" when paid via transfer', () => {
+    const { result } = renderHook(() => useOrdersTable(), { wrapper })
+    expect(result.current.getPaymentLabel(true, 'transfer')).toBe(PAYMENT_STATE_LABELS.transfer)
   })
 
   it('getUrgencyClass returns empty string when urgency is null', () => {

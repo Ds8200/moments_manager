@@ -28,7 +28,7 @@ export const ORDERS_LABELS = {
   FORM_NEW_TITLE:           'הזמנה חדשה',
   FORM_EDIT_TITLE:          'עריכת הזמנה',
   FORM_CUSTOMER:            'לקוח',
-  FORM_CUSTOMER_PLACEHOLDER:'חפש לקוח...',
+  FORM_CUSTOMER_PLACEHOLDER:'חפש לקוח או לקוח חדש...',
   FORM_DATE:                'תאריך',
   FORM_DUE_DATETIME:        'יעד (תאריך ושעה)',
   FORM_NOTES:               'הערות',

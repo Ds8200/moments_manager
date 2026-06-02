@@ -1,4 +1,4 @@
-import type { OrderStatus, PaymentMethod } from '@/shared/enums/statusEnums'
+import type { OrderStatus, PaymentMethod, PaymentState } from '@/shared/enums/statusEnums'
 
 export type OrderUrgency = 'critical' | 'high' | 'medium' | 'low'
 
@@ -63,7 +63,7 @@ export interface OrderSummary {
 export interface OrderFilters {
   search: string
   status: OrderStatus | ''
-  is_paid: '' | 'true' | 'false'
+  payment_state: '' | PaymentState
   date_from: string
   date_to: string
   page: number

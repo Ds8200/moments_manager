@@ -62,9 +62,11 @@ class OrderService:
         date_to=None,
         customer_id: str | None = None,
         is_paid: bool | None = None,
+        payment_method: str | None = None,
+        search: str | None = None,
     ) -> PaginatedResponse[OrderListResponseSchema]:
         orders, total = await self._repo.get_all(
-            status, date_from, date_to, customer_id, is_paid,
+            status, date_from, date_to, customer_id, is_paid, payment_method, search,
             params.page_size, params.offset
         )
         pages = (total + params.page_size - 1) // params.page_size

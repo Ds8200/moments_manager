@@ -4,7 +4,7 @@ import { selectedOrderIdAtom, editingOrderIdAtom, isOrderFormOpenAtom } from '..
 import { useOrder } from '../../queries/useOrder'
 import { useUpdateOrderStatus, useUpdateOrderPayment } from '../../queries/useOrders'
 import { formatCurrency, formatDate } from '@/shared/utils/formatters'
-import { STATUS_LABELS, STATUS_ORDER, PAYMENT_STATE_LABELS, PAYMENT_STATE_ORDER } from '@/shared/enums/statusEnums'
+import { STATUS_LABELS, STATUS_ORDER, PAYMENT_STATE_LABELS, PAYMENT_STATE_ORDER, getPaymentState } from '@/shared/enums/statusEnums'
 import type { OrderStatus, PaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import type { OrderUrgency } from '../../types'
@@ -40,12 +40,6 @@ const detailDueFormatter = new Intl.DateTimeFormat('he-IL', {
   hour:  '2-digit',
   minute:'2-digit',
 })
-
-const getPaymentState = (isPaid: boolean, method: string | null): PaymentState => {
-  if (!isPaid) return 'unpaid'
-  if (method === 'transfer') return 'transfer'
-  return 'cash'
-}
 
 export const useOrderDetail = (): UseOrderDetailReturn => {
   const [selectedId, setSelectedId] = useAtom(selectedOrderIdAtom)

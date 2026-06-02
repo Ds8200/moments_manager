@@ -2,6 +2,7 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { useOrderFiltersBar } from '../useOrderFiltersBar'
 import { ORDERS_LABELS } from '../../../constants/ordersLabels'
+import { PAYMENT_STATE_LABELS } from '@/shared/enums/statusEnums'
 
 describe('useOrderFiltersBar', () => {
   it('exposes default filters and statusOptions with all-statuses option first', () => {
@@ -14,6 +15,20 @@ describe('useOrderFiltersBar', () => {
       label: ORDERS_LABELS.ALL_STATUSES,
     })
     expect(result.current.statusOptions.length).toBeGreaterThan(1)
+  })
+
+  it('exposes paymentStateOptions with all-payment option first, then the 3 payment states', () => {
+    const { result } = renderHook(() => useOrderFiltersBar())
+
+    expect(result.current.paymentStateOptions[0]).toEqual({
+      value: '',
+      label: ORDERS_LABELS.ALL_PAYMENT,
+    })
+    expect(result.current.paymentStateOptions[1]).toEqual({
+      value: 'unpaid',
+      label: PAYMENT_STATE_LABELS.unpaid,
+    })
+    expect(result.current.paymentStateOptions.length).toBe(4)
   })
 
   it('onSearchChange updates filters.search and resets page', () => {
@@ -37,14 +52,14 @@ describe('useOrderFiltersBar', () => {
     expect(result.current.filters.status).toBe('new')
   })
 
-  it('onPaidChange updates filters.is_paid', () => {
+  it('onPaymentStateChange updates filters.payment_state', () => {
     const { result } = renderHook(() => useOrderFiltersBar())
 
     act(() => {
-      result.current.onPaidChange('true')
+      result.current.onPaymentStateChange('transfer')
     })
 
-    expect(result.current.filters.is_paid).toBe('true')
+    expect(result.current.filters.payment_state).toBe('transfer')
   })
 
   it('onDateFromChange and onDateToChange update date filters', () => {

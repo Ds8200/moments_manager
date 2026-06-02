@@ -13,9 +13,17 @@ import type {
 export const ordersApi = {
   list: (filters: Partial<OrderFilters>): Promise<OrdersResponse> => {
     const params = new URLSearchParams()
-    if (filters.search)   params.set('search', filters.search)
-    if (filters.status)   params.set('status', filters.status)
-    if (filters.is_paid)  params.set('is_paid', filters.is_paid)
+    if (filters.search)    params.set('search', filters.search)
+    if (filters.status)    params.set('status', filters.status)
+    if (filters.payment_state === 'unpaid') {
+      params.set('is_paid', 'false')
+    } else if (filters.payment_state === 'transfer') {
+      params.set('is_paid', 'true')
+      params.set('payment_method', 'transfer')
+    } else if (filters.payment_state === 'cash') {
+      params.set('is_paid', 'true')
+      params.set('payment_method', 'cash')
+    }
     if (filters.date_from) params.set('date_from', filters.date_from)
     if (filters.date_to)   params.set('date_to', filters.date_to)
     params.set('page', String(filters.page ?? 1))

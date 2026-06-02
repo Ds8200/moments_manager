@@ -5,7 +5,7 @@ import type { OrderFilters } from '../types'
 export const DEFAULT_FILTERS: OrderFilters = {
   search: '',
   status: '',
-  is_paid: '',
+  payment_state: '',
   date_from: '',
   date_to: '',
   page: 1,

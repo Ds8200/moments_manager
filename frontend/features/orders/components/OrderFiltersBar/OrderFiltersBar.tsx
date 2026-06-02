@@ -1,16 +1,18 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useOrderFiltersBar } from './useOrderFiltersBar'
-import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrderFiltersBar.module.scss'
+import type { PaymentState } from '@/shared/enums/statusEnums'
+import { ORDERS_LABELS } from '../../constants/ordersLabels'
 
 export const OrderFiltersBar = (): ReactElement => {
   const {
     filters,
     statusOptions,
+    paymentStateOptions,
     onSearchChange,
     onStatusChange,
-    onPaidChange,
+    onPaymentStateChange,
     onDateFromChange,
     onDateToChange,
     onNewOrder,
@@ -41,12 +43,12 @@ export const OrderFiltersBar = (): ReactElement => {
 
       <select
         className={styles.select}
-        value={filters.is_paid}
-        onChange={(e) => onPaidChange(e.target.value as Parameters<typeof onPaidChange>[0])}
+        value={filters.payment_state}
+        onChange={(e) => onPaymentStateChange(e.target.value as '' | PaymentState)}
       >
-        <option value="">{ORDERS_LABELS.ALL_PAYMENT}</option>
-        <option value="true">{ORDERS_LABELS.PAID}</option>
-        <option value="false">{ORDERS_LABELS.UNPAID}</option>
+        {paymentStateOptions.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
       </select>
 
       <input

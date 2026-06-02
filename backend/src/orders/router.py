@@ -24,18 +24,20 @@ router = APIRouter(prefix="/api/v1/orders", tags=["orders"])
 async def list_orders(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
+    search: str | None = Query(default=None),
     status: str | None = Query(default=None),
     date_from: date | None = Query(default=None),
     date_to: date | None = Query(default=None),
     customer_id: str | None = Query(default=None),
     is_paid: bool | None = Query(default=None),
+    payment_method: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
     _user=Depends(get_current_user),
 ):
     svc = OrderService(db)
     return await svc.list_orders(
         PaginationParams(page=page, page_size=page_size),
-        status, date_from, date_to, customer_id, is_paid
+        status, date_from, date_to, customer_id, is_paid, payment_method, search
     )
 
 

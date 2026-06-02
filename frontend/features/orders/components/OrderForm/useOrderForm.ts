@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, useWatch } from 'react-hook-form'
 import type { Resolver, UseFormSetValue } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -70,7 +70,7 @@ export interface UseOrderFormReturn {
   customersLoading: boolean
   setCustomerSearch: (query: string) => void
   customerDefaultLabel: string
-  onFreeText: (text: string) => void
+  onRawInput: (text: string) => void
 }
 
 export const useOrderForm = (): UseOrderFormReturn => {
@@ -95,6 +95,10 @@ export const useOrderForm = (): UseOrderFormReturn => {
     resolver: zodResolver(schema) as Resolver<OrderFormValues>,
     defaultValues: DEFAULT_VALUES,
   })
+
+  // Watch customer_name to use as defaultLabel so the Autocomplete keeps showing
+  // the free-text value after blur (when no customer_id is selected).
+  const watchedCustomerName = useWatch({ control, name: 'customer_name' })
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 
@@ -125,7 +129,9 @@ export const useOrderForm = (): UseOrderFormReturn => {
     setEditingId(null)
   }
 
-  const onFreeText = (text: string): void => {
+  // Called on every keystroke (not debounced) so customer_name is always current
+  // before the form submits — even if the user clicks Save immediately after typing.
+  const onRawInput = (text: string): void => {
     setValue('customer_id', '')
     setValue('customer_name', text)
   }
@@ -172,7 +178,9 @@ export const useOrderForm = (): UseOrderFormReturn => {
     customerOptions,
     customersLoading,
     setCustomerSearch,
-    customerDefaultLabel: existingOrder?.customer_name ?? '',
-    onFreeText,
+    // In edit mode: show the existing customer name as fallback.
+    // In free-text mode: show the typed name so the input stays populated after blur.
+    customerDefaultLabel: existingOrder?.customer_name ?? watchedCustomerName,
+    onRawInput,
   }
 }

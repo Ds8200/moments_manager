@@ -4,8 +4,8 @@ import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/u
 import { orderFiltersAtom, selectedOrderIdAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { formatCurrency, formatShortDate } from '@/shared/utils/formatters'
 import type { OrderSummary, OrderUrgency } from '../../types'
-import type { OrderStatus, PaymentMethod } from '@/shared/enums/statusEnums'
-import { PAYMENT_LABELS } from '@/shared/enums/statusEnums'
+import type { OrderStatus } from '@/shared/enums/statusEnums'
+import { PAYMENT_STATE_LABELS, getPaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 
 export interface UseOrdersTableReturn {
@@ -25,7 +25,7 @@ export interface UseOrdersTableReturn {
   formatDueDateTime: (value: string | null) => string
   getUrgencyLabel: (urgency: OrderUrgency | null) => string
   getUrgencyClass: (urgency: OrderUrgency | null) => string
-  getPaymentLabel: (method: PaymentMethod | null, isPaid: boolean) => string
+  getPaymentLabel: (isPaid: boolean, method: string | null) => string
 }
 
 const URGENCY_LABEL_MAP: Record<OrderUrgency, string> = {
@@ -105,10 +105,6 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
       return URGENCY_CLASS_MAP[urgency]
     },
 
-    getPaymentLabel: (method, isPaid) => {
-      if (!isPaid) return ORDERS_LABELS.URGENCY_NONE
-      if (method && PAYMENT_LABELS[method]) return PAYMENT_LABELS[method]
-      return ORDERS_LABELS.PAID
-    },
+    getPaymentLabel: (isPaid, method) => PAYMENT_STATE_LABELS[getPaymentState(isPaid, method)],
   }
 }

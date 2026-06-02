@@ -135,6 +135,16 @@ describe('useAutocomplete', () => {
     expect(result.current.inputValue).toBe('Apple')
   })
 
+  it('onRawInput is called immediately on every keystroke (not debounced)', () => {
+    const onRawInput = vi.fn()
+    const { result } = buildHook({ value: null, onRawInput })
+    act(() => { result.current.onInputChange(mkChangeEvent('New')) })
+    expect(onRawInput).toHaveBeenCalledWith('New')
+    act(() => { result.current.onInputChange(mkChangeEvent('New Customer')) })
+    expect(onRawInput).toHaveBeenCalledWith('New Customer')
+    expect(onRawInput).toHaveBeenCalledTimes(2)
+  })
+
   it('onFreeText is called with trimmed text when blurring without selecting an option', () => {
     const onFreeText = vi.fn()
     const { result } = buildHook({ value: null, onFreeText })
@@ -153,5 +163,10 @@ describe('useAutocomplete', () => {
     act(() => { result.current.onBlur() })
     act(() => { vi.advanceTimersByTime(150) })
     expect(onFreeText).not.toHaveBeenCalled()
+  })
+
+  it('shows defaultLabel as inputValue when no value is selected (free-text mode)', () => {
+    const { result } = buildHook({ value: null, defaultLabel: 'דניאל' })
+    expect(result.current.inputValue).toBe('דניאל')
   })
 })

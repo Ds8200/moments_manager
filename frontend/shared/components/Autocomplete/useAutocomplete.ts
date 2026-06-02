@@ -13,6 +13,7 @@ export interface AutocompleteProps<T = unknown> {
   onChange: (value: string | null, option: AutocompleteOption<T> | null) => void
   options: AutocompleteOption<T>[]
   onSearch: (query: string) => void
+  onRawInput?: (text: string) => void
   onFreeText?: (text: string) => void
   defaultLabel?: string
   isLoading?: boolean
@@ -46,7 +47,7 @@ export interface UseAutocompleteReturn<T> {
 export const useAutocomplete = <T = unknown>(
   props: AutocompleteProps<T>
 ): UseAutocompleteReturn<T> => {
-  const { value, onChange, options, onSearch, onFreeText, defaultLabel, id, label, error, placeholder, disabled, isLoading } = props
+  const { value, onChange, options, onSearch, onRawInput, onFreeText, defaultLabel, id, label, error, placeholder, disabled, isLoading } = props
 
   const inputId   = id ?? 'autocomplete'
   const listboxId = `${inputId}-listbox`
@@ -66,9 +67,10 @@ export const useAutocomplete = <T = unknown>(
   useEffect(() => { typedValueRef.current = typedValue }, [typedValue])
   useEffect(() => { isUserTypingRef.current = isUserTyping }, [isUserTyping])
 
-  // Derived: the committed label for the current value (no setState in effect needed)
+  // Derived: the committed label for the current value.
+  // When value is null but defaultLabel is set, show defaultLabel (e.g. free-text mode).
   const selectedLabel = useMemo(() => {
-    if (!value) return ''
+    if (!value) return defaultLabel ?? ''
     const match = options.find((o) => o.value === value)
     return match?.label ?? defaultLabel ?? ''
   }, [value, options, defaultLabel])
@@ -101,10 +103,11 @@ export const useAutocomplete = <T = unknown>(
       setIsUserTyping(true)
       setIsOpen(true)
       setHighlightedIndex(-1)
+      onRawInput?.(query)
       if (debounceRef.current) clearTimeout(debounceRef.current)
       debounceRef.current = setTimeout(() => onSearch(query), 300)
     },
-    [onSearch]
+    [onSearch, onRawInput]
   )
 
   const onOptionSelect = useCallback(

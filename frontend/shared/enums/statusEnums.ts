@@ -39,6 +39,12 @@ export const PAYMENT_STATE_LABELS: Record<PaymentState, string> = {
 
 export const PAYMENT_STATE_ORDER: PaymentState[] = ['unpaid', 'transfer', 'cash']
 
+export const getPaymentState = (isPaid: boolean, method: string | null): PaymentState => {
+  if (!isPaid) return 'unpaid'
+  if (method === 'transfer') return 'transfer'
+  return 'cash'
+}
+
 export const EXPENSE_CATEGORY_LABELS: Record<string, string> = {
   ink:       'דיו וצבעים',
   materials: 'חומרי גלם',
