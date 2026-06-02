@@ -81,41 +81,6 @@ def build_welcome_email(
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }}
-    .credential-box .copy-row {{
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }}
-    .credential-box .copy-input {{
-      flex: 1;
-      font-size: 15px;
-      color: {BRAND_PURPLE};
-      font-weight: 600;
-      font-family: 'Courier New', monospace;
-      background: transparent;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      padding: 0;
-      direction: ltr;
-      text-align: right;
-    }}
-    .credential-box .copy-btn {{
-      flex-shrink: 0;
-      width: 32px;
-      height: 32px;
-      background: #ecd9f2;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-inline-start: 8px;
-      text-decoration: none;
-      line-height: 1;
-    }}
     .note {{
       font-size: 13px !important;
       color: #888 !important;
@@ -164,22 +129,34 @@ def build_welcome_email(
 
       <div class="credential-box">
         <div class="label">אימייל</div>
-        <div class="copy-row">
-          <input class="copy-input" type="text" value="{recipient_email}"
-                 readonly onclick="this.select()" title="לחץ להעתקה" />
-          <button class="copy-btn" onclick="document.querySelectorAll('.copy-input')[0].select()"
-                  type="button" title="העתק אימייל">📋</button>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="vertical-align:middle; padding:0;">
+              <input type="text" value="{recipient_email}" readonly onclick="this.select()"
+                     style="font-family:'Courier New',monospace; font-size:15px; color:{BRAND_PURPLE}; font-weight:600; background:transparent; border:none; outline:none; cursor:pointer; width:100%; direction:ltr; display:block;" />
+            </td>
+            <td width="34" style="vertical-align:middle; padding-right:8px; text-align:center;">
+              <span onclick="this.closest('table').querySelector('input').select()"
+                    style="display:inline-block; width:30px; height:30px; background:#ecd9f2; border-radius:6px; text-align:center; line-height:30px; font-size:15px; cursor:pointer; user-select:none;">📋</span>
+            </td>
+          </tr>
+        </table>
       </div>
 
       <div class="credential-box">
         <div class="label">סיסמה זמנית</div>
-        <div class="copy-row">
-          <input class="copy-input" type="text" value="{temp_password}"
-                 readonly onclick="this.select()" title="לחץ להעתקה" />
-          <button class="copy-btn" onclick="document.querySelectorAll('.copy-input')[1].select()"
-                  type="button" title="העתק סיסמה">📋</button>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="vertical-align:middle; padding:0;">
+              <input type="text" value="{temp_password}" readonly onclick="this.select()"
+                     style="font-family:'Courier New',monospace; font-size:15px; color:{BRAND_PURPLE}; font-weight:600; background:transparent; border:none; outline:none; cursor:pointer; width:100%; direction:ltr; display:block;" />
+            </td>
+            <td width="34" style="vertical-align:middle; padding-right:8px; text-align:center;">
+              <span onclick="this.closest('table').querySelector('input').select()"
+                    style="display:inline-block; width:30px; height:30px; background:#ecd9f2; border-radius:6px; text-align:center; line-height:30px; font-size:15px; cursor:pointer; user-select:none;">📋</span>
+            </td>
+          </tr>
+        </table>
       </div>
 
       <p class="note">מומלץ לפנות למנהל המערכת לאחר הכניסה הראשונה לעדכון הסיסמה.</p>
