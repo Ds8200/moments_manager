@@ -1,0 +1,127 @@
+@use '@/shared/styles/variables' as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn $transition-fast;
+}
+
+.dialog {
+  background: $bg-card;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-elevated;
+  padding: $space-8;
+  width: 100%;
+  max-width: 520px;
+  margin-inline: $space-4;
+  animation: slideUp $transition-normal;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin-block-end: $space-6;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  margin-block-end: $space-5;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: $space-2 $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  font-size: $font-size-base;
+  font-family: inherit;
+  color: $text-primary;
+  background: $bg-card;
+  resize: vertical;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
+.error {
+  font-size: $font-size-xs;
+  color: $danger;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+  margin-block-start: $space-6;
+}
+
+.cancelButton {
+  padding: $space-2 $space-5;
+  border-radius: $border-radius;
+  border: 1px solid $border-color;
+  background: transparent;
+  color: $text-secondary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast, border-color $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $gray-100;
+    border-color: $gray-300;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.sendButton {
+  padding: $space-2 $space-5;
+  border-radius: $border-radius;
+  border: none;
+  background: $primary;
+  color: $text-inverse;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY($space-4); opacity: 0; }
+  to   { transform: translateY(0);        opacity: 1; }
+}

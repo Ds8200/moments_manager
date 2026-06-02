@@ -23,6 +23,7 @@ export const CustomersTable = (): ReactElement => {
     isError,
     onEdit,
     onDelete,
+    onEmail,
     onPageChange,
   } = useCustomersTable()
 
@@ -38,6 +39,7 @@ export const CustomersTable = (): ReactElement => {
         <span className={styles.secondary}>{customer.email ?? '—'}</span>
       </td>
       <td className={`${styles.cell} ${styles.actionsCell}`} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.actionBtn} onClick={() => onEmail(customer.id)} title={CUSTOMERS_LABELS.TABLE_EMAIL_TITLE}>✉️</button>
         <button className={styles.actionBtn} onClick={() => onEdit(customer.id)} title={CUSTOMERS_LABELS.TABLE_EDIT_TITLE}>✏️</button>
         <button className={styles.actionBtn} onClick={() => onDelete(customer.id, customer.name)} title={CUSTOMERS_LABELS.TABLE_DELETE_TITLE}>🗑️</button>
       </td>

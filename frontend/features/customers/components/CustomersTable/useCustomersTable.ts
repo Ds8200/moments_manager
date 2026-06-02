@@ -1,7 +1,7 @@
 'use client'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useCustomers, useDeleteCustomer } from '../../queries/useCustomers'
-import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../store/customersAtoms'
+import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom, emailingCustomerIdAtom } from '../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
 import { useConfirm } from '@/shared/hooks/useConfirm'
 import type { Customer } from '../../types'
@@ -15,6 +15,7 @@ export interface UseCustomersTableReturn {
   isError: boolean
   onEdit: (id: string) => void
   onDelete: (id: string, name: string) => void
+  onEmail: (id: string) => void
   onPageChange: (page: number) => void
 }
 
@@ -23,6 +24,7 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
   const setFilters = useSetAtom(customerFiltersAtom)
   const setFormOpen = useSetAtom(isCustomerFormOpenAtom)
   const setEditingId = useSetAtom(editingCustomerIdAtom)
+  const setEmailingId = useSetAtom(emailingCustomerIdAtom)
   const deleteCustomer = useDeleteCustomer()
 
   const { data, isLoading, isError } = useCustomers(filters.page, filters.search, filters.page_size)
@@ -48,6 +50,8 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
         onConfirm: () => deleteCustomer.mutate(id),
       })
     },
+
+    onEmail: (id) => setEmailingId(id),
 
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
   }

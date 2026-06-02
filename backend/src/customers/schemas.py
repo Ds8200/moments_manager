@@ -32,3 +32,12 @@ class CustomerResponseSchema(BaseModel):
 class CustomerWithStatsSchema(CustomerResponseSchema):
     total_orders: int = 0
     total_spent: float = 0.0
+
+
+class CustomerSendEmailSchema(BaseModel):
+    subject: str
+    body: str
+
+
+class EmailSentResponseSchema(BaseModel):
+    message: str

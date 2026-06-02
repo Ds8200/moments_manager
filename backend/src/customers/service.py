@@ -1,16 +1,26 @@
 import logging
 
+from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.constants.http_messages import RESOURCE_CUSTOMER
-from src.core.exceptions import NotFoundError
+from src.core.constants.http_messages import (
+    CUSTOMER_EMAIL_SENT,
+    CUSTOMER_NO_EMAIL,
+    RESOURCE_CUSTOMER,
+)
+from src.core.constants.log_messages import CUSTOMER_EMAIL_DISPATCHED
+from src.core.email import send_html_email
+from src.core.exceptions import ConflictError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
+from src.customers.email_templates import build_customer_email
 from src.customers.repository import CustomerRepository
 from src.customers.schemas import (
     CustomerCreateSchema,
     CustomerResponseSchema,
+    CustomerSendEmailSchema,
     CustomerUpdateSchema,
     CustomerWithStatsSchema,
+    EmailSentResponseSchema,
 )
 
 logger = logging.getLogger(__name__)
@@ -69,3 +79,19 @@ class CustomerService:
             raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
         await self._repo.soft_delete(customer)
         await self._db.commit()
+
+    async def send_email_to_customer(
+        self,
+        customer_id: str,
+        data: CustomerSendEmailSchema,
+        background_tasks: BackgroundTasks,
+    ) -> EmailSentResponseSchema:
+        customer = await self._repo.get_by_id(customer_id)
+        if not customer:
+            raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
+        if not customer.email:
+            raise ConflictError(CUSTOMER_NO_EMAIL)
+        subject, html_body = build_customer_email(customer.name, data.subject, data.body)
+        background_tasks.add_task(send_html_email, customer.email, subject, html_body)
+        logger.info(CUSTOMER_EMAIL_DISPATCHED, customer.email, customer_id)
+        return EmailSentResponseSchema(message=CUSTOMER_EMAIL_SENT)

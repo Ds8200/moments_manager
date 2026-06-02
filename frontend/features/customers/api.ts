@@ -1,7 +1,7 @@
 'use client'
 import { apiClient } from '@/shared/utils/apiClient'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
-import type { Customer, CustomerDetail, CustomersResponse, CustomerFormValues } from './types'
+import type { Customer, CustomerDetail, CustomersResponse, CustomerFormValues, CustomerSendEmailPayload, EmailSentResponse } from './types'
 
 export const customersApi = {
   list: (page = 1, search = '', page_size = 20): Promise<CustomersResponse> => {
@@ -27,4 +27,10 @@ export const customersApi = {
 
   delete: (id: string): Promise<void> =>
     apiClient<void>(API_ENDPOINTS.CUSTOMER(id), { method: 'DELETE' }),
+
+  sendEmail: (id: string, payload: CustomerSendEmailPayload): Promise<EmailSentResponse> =>
+    apiClient<EmailSentResponse>(API_ENDPOINTS.CUSTOMER_SEND_EMAIL(id), {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 }

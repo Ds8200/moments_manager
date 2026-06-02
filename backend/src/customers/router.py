@@ -1,15 +1,18 @@
 import logging
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.dependencies import get_current_user, get_db
+from src.core.rate_limit import limiter
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.customers.schemas import (
     CustomerCreateSchema,
     CustomerResponseSchema,
+    CustomerSendEmailSchema,
     CustomerUpdateSchema,
     CustomerWithStatsSchema,
+    EmailSentResponseSchema,
 )
 from src.customers.service import CustomerService
 
@@ -68,3 +71,17 @@ async def delete_customer(
 ):
     svc = CustomerService(db)
     await svc.delete_customer(customer_id)
+
+
+@router.post("/{customer_id}/send-email", response_model=EmailSentResponseSchema, status_code=202)
+@limiter.limit("10/minute")
+async def send_email_to_customer(
+    request: Request,
+    customer_id: str,
+    body: CustomerSendEmailSchema,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+):
+    svc = CustomerService(db)
+    return await svc.send_email_to_customer(customer_id, body, background_tasks)

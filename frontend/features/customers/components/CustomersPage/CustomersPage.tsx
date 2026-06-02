@@ -3,6 +3,7 @@ import type { ReactElement } from 'react'
 import { CustomersFiltersBar } from '../CustomersFiltersBar/CustomersFiltersBar'
 import { CustomersTable } from '../CustomersTable/CustomersTable'
 import { CustomerForm } from '../CustomerForm/CustomerForm'
+import { EmailDialog } from '../EmailDialog/EmailDialog'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
 import styles from './CustomersPage.module.scss'
 
@@ -20,6 +21,7 @@ export const CustomersPage = (): ReactElement => {
       </div>
 
       <CustomerForm />
+      <EmailDialog />
     </div>
   )
 }

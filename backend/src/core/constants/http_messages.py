@@ -27,3 +27,6 @@ REFRESH_TOKEN_INVALID = "Invalid or expired refresh token"
 MAGIC_LINK_INVALID = "Invalid or expired login link"
 TOKEN_REVOKED = "Token has been revoked"
 LOGGED_OUT = "Logged out successfully"
+
+CUSTOMER_EMAIL_SENT = "Email queued for delivery"
+CUSTOMER_NO_EMAIL = "Customer has no email address on file"

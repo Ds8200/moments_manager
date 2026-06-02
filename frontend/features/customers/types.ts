@@ -37,3 +37,12 @@ export interface CustomerFormValues {
   email: string
   notes: string
 }
+
+export interface CustomerSendEmailPayload {
+  subject: string
+  body: string
+}
+
+export interface EmailSentResponse {
+  message: string
+}

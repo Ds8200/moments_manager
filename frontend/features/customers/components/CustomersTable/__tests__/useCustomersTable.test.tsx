@@ -7,7 +7,7 @@ import { server } from '@/shared/mocks/server'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { useCustomersTable } from '../useCustomersTable'
-import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../../store/customersAtoms'
+import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom, emailingCustomerIdAtom } from '../../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../../constants/customersLabels'
 import type { ConfirmDialogOptions } from '@/shared/store/globalAtoms'
 
@@ -108,6 +108,16 @@ describe('useCustomersTable', () => {
     })
 
     expect(confirmFn).toHaveBeenCalled()
+  })
+
+  it('onEmail sets emailingCustomerIdAtom', () => {
+    const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
+
+    act(() => {
+      result.current.onEmail('c1')
+    })
+
+    expect(store.get(emailingCustomerIdAtom)).toBe('c1')
   })
 
   it('onPageChange updates customerFiltersAtom.page', () => {

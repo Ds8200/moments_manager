@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from httpx import AsyncClient
 
@@ -62,3 +64,38 @@ async def test_list_customers_pagination(client: AsyncClient) -> None:
     assert len(data["items"]) == 2
     assert data["total"] == 3
     assert data["pages"] == 2
+
+
+async def test_send_email_customer_not_found(client: AsyncClient) -> None:
+    response = await client.post(
+        "/api/v1/customers/00000000-0000-0000-0000-000000000000/send-email",
+        json={"subject": "נושא", "body": "גוף"},
+    )
+    assert response.status_code == 404
+
+
+async def test_send_email_no_email_on_customer(client: AsyncClient) -> None:
+    create = await client.post("/api/v1/customers", json={"name": "No Email"})
+    customer_id = create.json()["id"]
+
+    response = await client.post(
+        f"/api/v1/customers/{customer_id}/send-email",
+        json={"subject": "נושא", "body": "גוף"},
+    )
+    assert response.status_code == 409
+
+
+async def test_send_email_success(client: AsyncClient) -> None:
+    create = await client.post(
+        "/api/v1/customers", json={"name": "With Email", "email": "test@example.com"}
+    )
+    customer_id = create.json()["id"]
+
+    with patch("src.customers.service.send_html_email"):
+        response = await client.post(
+            f"/api/v1/customers/{customer_id}/send-email",
+            json={"subject": "שלום", "body": "תוכן המייל"},
+        )
+
+    assert response.status_code == 202
+    assert "message" in response.json()

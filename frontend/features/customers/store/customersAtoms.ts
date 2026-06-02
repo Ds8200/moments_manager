@@ -12,3 +12,4 @@ export const DEFAULT_CUSTOMER_FILTERS: CustomerFilters = {
 }
 
 export const customerFiltersAtom = atom<CustomerFilters>({ ...DEFAULT_CUSTOMER_FILTERS })
+export const emailingCustomerIdAtom = atom<string | null>(null)
