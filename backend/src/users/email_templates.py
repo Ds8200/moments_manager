@@ -81,10 +81,10 @@ def build_welcome_email(
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }}
-    .credential-box .row {{
+    .credential-box .copy-row {{
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0;
     }}
     .credential-box .copy-input {{
       flex: 1;
@@ -97,15 +97,24 @@ def build_welcome_email(
       outline: none;
       cursor: pointer;
       padding: 0;
-      width: 100%;
       direction: ltr;
       text-align: right;
     }}
-    .credential-box .copy-hint {{
-      font-size: 11px;
-      color: #b18fbd;
-      white-space: nowrap;
+    .credential-box .copy-btn {{
       flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: #ecd9f2;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-inline-start: 8px;
+      text-decoration: none;
+      line-height: 1;
     }}
     .note {{
       font-size: 13px !important;
@@ -155,19 +164,21 @@ def build_welcome_email(
 
       <div class="credential-box">
         <div class="label">אימייל</div>
-        <div class="row">
+        <div class="copy-row">
           <input class="copy-input" type="text" value="{recipient_email}"
-                 readonly onclick="this.select()" title="לחץ כדי לסמן ולהעתיק" />
-          <span class="copy-hint">לחץ להעתקה</span>
+                 readonly onclick="this.select()" title="לחץ להעתקה" />
+          <button class="copy-btn" onclick="document.querySelectorAll('.copy-input')[0].select()"
+                  type="button" title="העתק אימייל">📋</button>
         </div>
       </div>
 
       <div class="credential-box">
         <div class="label">סיסמה זמנית</div>
-        <div class="row">
+        <div class="copy-row">
           <input class="copy-input" type="text" value="{temp_password}"
-                 readonly onclick="this.select()" title="לחץ כדי לסמן ולהעתיק" />
-          <span class="copy-hint">לחץ להעתקה</span>
+                 readonly onclick="this.select()" title="לחץ להעתקה" />
+          <button class="copy-btn" onclick="document.querySelectorAll('.copy-input')[1].select()"
+                  type="button" title="העתק סיסמה">📋</button>
         </div>
       </div>
 
