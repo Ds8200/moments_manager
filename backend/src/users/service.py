@@ -2,6 +2,7 @@ import logging
 import secrets
 
 from fastapi import BackgroundTasks
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.constants.http_messages import CANNOT_DELETE_SELF, RESOURCE_USER, USER_EMAIL_EXISTS
@@ -44,19 +45,25 @@ class UserService:
             raise ConflictError(USER_EMAIL_EXISTS)
 
         temp_password = secrets.token_urlsafe(12)
-        user = await self._repo.create(
-            email=data.email,
-            hashed_password=hash_password(temp_password),
-            full_name=data.full_name,
-            role=UserRole(data.role).value,
-        )
-        await self._db.commit()
-        await self._db.refresh(user)
+        try:
+            user = await self._repo.create(
+                email=data.email,
+                hashed_password=hash_password(temp_password),
+                full_name=data.full_name,
+                role=UserRole(data.role).value,
+            )
+            await self._db.commit()
+            await self._db.refresh(user)
+        except IntegrityError:
+            await self._db.rollback()
+            raise ConflictError(USER_EMAIL_EXISTS)
         logger.info(USER_CREATED, user.email, user.role)
 
         magic_token = create_magic_login_token(user.id)
-        subject, html_body = build_welcome_email(data.email, temp_password, magic_token)
-        background_tasks.add_task(send_html_email, data.email, subject, html_body)
+        subject, html_body, inline_images = build_welcome_email(
+            data.email, temp_password, magic_token
+        )
+        background_tasks.add_task(send_html_email, data.email, subject, html_body, inline_images)
 
         return UserResponseSchema.model_validate(user)
 
@@ -66,6 +73,6 @@ class UserService:
         user = await self._repo.get_by_id(user_id)
         if not user:
             raise NotFoundError(RESOURCE_USER, user_id)
-        await self._repo.soft_delete(user)
+        await self._repo.delete(user)
         await self._db.commit()
         logger.info(USER_DELETED, user_id, requesting_admin_id)

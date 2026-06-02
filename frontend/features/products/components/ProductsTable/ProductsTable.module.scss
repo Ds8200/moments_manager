@@ -40,8 +40,8 @@
   border-radius: 20px;
   font-size: v.$font-size-xs;
   font-weight: v.$font-weight-medium;
-  background: color-mix(in srgb, #51CF66 15%, transparent);
-  color: #2F9E44;
+  background: color-mix(in srgb, v.$success 15%, transparent);
+  color: v.$success-dark;
 }
 
 .inactiveBadge {

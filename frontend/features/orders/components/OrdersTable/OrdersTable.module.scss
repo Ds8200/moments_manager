@@ -52,18 +52,18 @@
 }
 
 .urgencyVeryUrgent {
-  background: color-mix(in srgb, #FA5252 18%, transparent);
-  color: #C92A2A;
+  background: color-mix(in srgb, v.$danger 18%, transparent);
+  color: v.$danger-dark;
 }
 
 .urgencyUrgent {
-  background: color-mix(in srgb, #FF922B 18%, transparent);
-  color: #D9480F;
+  background: color-mix(in srgb, v.$warning 18%, transparent);
+  color: v.$warning-dark;
 }
 
 .urgencyNormal {
-  background: color-mix(in srgb, #51CF66 18%, transparent);
-  color: #2F9E44;
+  background: color-mix(in srgb, v.$success 18%, transparent);
+  color: v.$success-dark;
 }
 
 .paidBadge {
@@ -75,8 +75,8 @@
   font-weight: v.$font-weight-medium;
 
   &.paid {
-    background: color-mix(in srgb, #51CF66 15%, transparent);
-    color: #2F9E44;
+    background: color-mix(in srgb, v.$success 15%, transparent);
+    color: v.$success-dark;
   }
 
   &.unpaid {

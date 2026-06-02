@@ -1,9 +1,19 @@
+from pathlib import Path
+
 from src.config import settings
+
+LOGO_CID = "moments-logo"
+LOGO_PATH = Path(__file__).resolve().parent.parent / "core" / "assets" / "moments_logo.png"
+
+# Brand colors — מותאם ללוגו Moments (סגול → מג'נטה)
+BRAND_PURPLE = "#9C27B0"
+BRAND_MAGENTA = "#D81B60"
+BRAND_GRADIENT = "linear-gradient(135deg, #9C27B0 0%, #D81B60 100%)"
 
 
 def build_welcome_email(
     recipient_email: str, temp_password: str, magic_token: str
-) -> tuple[str, str]:
+) -> tuple[str, str, dict[str, bytes]]:
     subject = "ברוכים הבאים ל-Moments"
     login_url = f"{settings.APP_URL}/login"
     quick_login_url = f"{login_url}?token={magic_token}"
@@ -31,22 +41,26 @@ def build_welcome_email(
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }}
     .header {{
-      background-color: #2d2d2d;
-      padding: 32px 40px;
+      background-color: #ffffff;
+      padding: 32px 40px 20px;
       text-align: center;
     }}
-    .header h1 {{
-      color: #ffffff;
-      margin: 0;
-      font-size: 26px;
-      letter-spacing: 2px;
-      font-weight: 300;
+    .header img {{
+      display: block;
+      margin: 0 auto;
+      width: 200px;
+      max-width: 70%;
+      height: auto;
+    }}
+    .accent-bar {{
+      height: 6px;
+      background: {BRAND_GRADIENT};
     }}
     .body {{
       padding: 36px 40px;
     }}
     .body h2 {{
-      color: #2d2d2d;
+      color: {BRAND_PURPLE};
       font-size: 20px;
       margin-top: 0;
       margin-bottom: 8px;
@@ -58,22 +72,22 @@ def build_welcome_email(
       margin: 0 0 16px;
     }}
     .credential-box {{
-      background: #f8f8f8;
-      border: 1px solid #e0e0e0;
+      background: #faf5fc;
+      border: 1px solid #ecd9f2;
       border-radius: 8px;
       padding: 14px 20px;
       margin: 12px 0;
     }}
     .credential-box .label {{
       font-size: 11px;
-      color: #888;
+      color: #9b6fab;
       margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }}
     .credential-box .value {{
       font-size: 16px;
-      color: #2d2d2d;
+      color: {BRAND_PURPLE};
       font-weight: 600;
       font-family: 'Courier New', monospace;
       word-break: break-all;
@@ -88,7 +102,7 @@ def build_welcome_email(
     }}
     .btn {{
       display: inline-block;
-      background-color: #2d2d2d;
+      background: {BRAND_GRADIENT};
       color: #ffffff;
       text-decoration: none;
       padding: 12px 28px;
@@ -98,17 +112,17 @@ def build_welcome_email(
       margin: 0 4px;
     }}
     .btn-secondary {{
-      background-color: #f0f0f0;
-      color: #2d2d2d;
+      background: #f3e5f5;
+      color: {BRAND_PURPLE};
     }}
     .footer {{
-      background: #f8f8f8;
+      background: #faf5fc;
       padding: 20px 40px;
       text-align: center;
-      border-top: 1px solid #ebebeb;
+      border-top: 1px solid #ecd9f2;
     }}
     .footer p {{
-      color: #aaa;
+      color: #b18fbd;
       font-size: 12px;
       margin: 0;
     }}
@@ -117,8 +131,9 @@ def build_welcome_email(
 <body>
   <div class="container">
     <div class="header">
-      <h1>Moments</h1>
+      <img src="cid:{LOGO_CID}" alt="Moments" width="200" />
     </div>
+    <div class="accent-bar"></div>
     <div class="body">
       <h2>ברוכים הבאים!</h2>
       <p>נוצר עבורך חשבון חדש במערכת ניהול Moments.</p>
@@ -147,4 +162,5 @@ def build_welcome_email(
 </body>
 </html>"""
 
-    return subject, html_body
+    inline_images = {LOGO_CID: LOGO_PATH.read_bytes()}
+    return subject, html_body, inline_images

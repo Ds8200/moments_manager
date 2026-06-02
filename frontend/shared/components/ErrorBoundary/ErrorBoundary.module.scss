@@ -1,3 +1,5 @@
+@use '../../../shared/styles/variables' as v;
+
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -16,7 +18,7 @@
 }
 
 .message {
-  color: var(--text-muted, #6b7280);
+  color: v.$text-secondary;
   margin: 0;
 }
 
@@ -26,12 +28,12 @@
   padding-inline: 20px;
   cursor: pointer;
   border-radius: 6px;
-  border: 1px solid var(--border, #d1d5db);
-  background: var(--surface, #ffffff);
+  border: 1px solid v.$border-color;
+  background: v.$bg-card;
   font-weight: 500;
   transition: background 0.15s ease;
 
   &:hover {
-    background: var(--surface-hover, #f3f4f6);
+    background: v.$gray-100;
   }
 }

@@ -67,7 +67,7 @@
   color: v.$text-primary;
 }
 
-.kpiPositive { color: #2F9E44; }
+.kpiPositive { color: v.$success-dark; }
 .kpiNegative { color: v.$danger; }
 
 .tableCard {
@@ -119,7 +119,7 @@
 }
 
 .profit {
-  color: #2F9E44;
+  color: v.$success-dark;
   font-weight: v.$font-weight-semibold;
 }
 

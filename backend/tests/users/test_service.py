@@ -85,7 +85,7 @@ async def test_delete_user_success_calls_soft_delete_and_commit() -> None:
     admin_id = str(uuid.uuid4())
     await svc.delete_user(target.id, admin_id)
 
-    svc._repo.soft_delete.assert_called_once_with(target)
+    svc._repo.delete.assert_called_once_with(target)
     db.commit.assert_called_once()
 
 

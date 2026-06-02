@@ -57,19 +57,19 @@
 }
 
 .success {
-  border-color: color.adjust(#51CF66, $lightness: 32%);
-  .icon { background: color.adjust(#51CF66, $lightness: 40%); }
-  .value { color: color.adjust(#51CF66, $lightness: -15%); }
+  border-color: color.adjust(v.$success, $lightness: 32%);
+  .icon { background: color.adjust(v.$success, $lightness: 40%); }
+  .value { color: color.adjust(v.$success, $lightness: -15%); }
 }
 
 .warning {
-  border-color: color.adjust(#F59F00, $lightness: 38%);
-  .icon { background: color.adjust(#F59F00, $lightness: 42%); }
-  .value { color: color.adjust(#F59F00, $lightness: -10%); }
+  border-color: color.adjust(v.$warning, $lightness: 38%);
+  .icon { background: color.adjust(v.$warning, $lightness: 42%); }
+  .value { color: color.adjust(v.$warning, $lightness: -10%); }
 }
 
 .danger {
-  border-color: color.adjust(#FA5252, $lightness: 30%);
-  .icon { background: color.adjust(#FA5252, $lightness: 38%); }
-  .value { color: color.adjust(#FA5252, $lightness: -10%); }
+  border-color: color.adjust(v.$danger, $lightness: 30%);
+  .icon { background: color.adjust(v.$danger, $lightness: 38%); }
+  .value { color: color.adjust(v.$danger, $lightness: -10%); }
 }

@@ -2,11 +2,15 @@
 // Design Tokens — Moments
 // ============================================================
 
-// Primary palette
-$primary:       #6C63FF;
-$primary-light: #EDE9FE;
-$primary-dark:  #4D45CC;
-$accent:        #FF6B6B;
+// Primary palette — מותאם ללוגו Moments (סגול → מג'נטה + כתום-זהב)
+$primary:       #9C27B0;
+$primary-light: #F3E5F5;
+$primary-dark:  #6A1B7A;
+$accent:        #D81B60;
+$accent-gold:   #FF9F1C;
+
+// גרדיאנט המותג — לכותרות/מותג/מייל
+$gradient-brand: linear-gradient(135deg, #9C27B0 0%, #D81B60 100%);
 
 // Order status colors
 $status-new:              #339AF0;
@@ -19,9 +23,14 @@ $status-cancelled:        #FA5252;
 
 // Semantic colors
 $success: #51CF66;
-$warning: #FFD43B;
+$warning: #F59F00;
 $danger:  #FA5252;
 $info:    #339AF0;
+
+// Semantic dark shades — לטקסט על רקע בהיר (ניגודיות)
+$success-dark: #2F9E44;
+$warning-dark: #D9480F;
+$danger-dark:  #C92A2A;
 
 // Gray scale
 $gray-50:  #F8F9FA;

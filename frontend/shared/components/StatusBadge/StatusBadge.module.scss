@@ -12,28 +12,28 @@
 }
 
 .new {
-  background: color.adjust(#339AF0, $lightness: 35%);
-  color: color.adjust(#339AF0, $lightness: -10%);
+  background: color.adjust(v.$status-new, $lightness: 35%);
+  color: color.adjust(v.$status-new, $lightness: -10%);
 }
 
 .waiting_approval {
-  background: color.adjust(#F59F00, $lightness: 38%);
-  color: color.adjust(#F59F00, $lightness: -15%);
+  background: color.adjust(v.$status-waiting-approval, $lightness: 38%);
+  color: color.adjust(v.$status-waiting-approval, $lightness: -15%);
 }
 
 .approved {
-  background: color.adjust(#20C997, $lightness: 42%);
-  color: color.adjust(#20C997, $lightness: -10%);
+  background: color.adjust(v.$status-approved, $lightness: 42%);
+  color: color.adjust(v.$status-approved, $lightness: -10%);
 }
 
 .printing {
-  background: color.adjust(#7950F2, $lightness: 38%);
-  color: color.adjust(#7950F2, $lightness: -5%);
+  background: color.adjust(v.$status-printing, $lightness: 38%);
+  color: color.adjust(v.$status-printing, $lightness: -5%);
 }
 
 .ready {
-  background: color.adjust(#51CF66, $lightness: 38%);
-  color: color.adjust(#51CF66, $lightness: -15%);
+  background: color.adjust(v.$status-ready, $lightness: 38%);
+  color: color.adjust(v.$status-ready, $lightness: -15%);
 }
 
 .completed {
@@ -42,6 +42,6 @@
 }
 
 .cancelled {
-  background: color.adjust(#FA5252, $lightness: 32%);
-  color: color.adjust(#FA5252, $lightness: -10%);
+  background: color.adjust(v.$status-cancelled, $lightness: 32%);
+  color: color.adjust(v.$status-cancelled, $lightness: -10%);
 }
