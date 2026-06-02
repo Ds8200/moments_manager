@@ -4,6 +4,7 @@ import { useProducts, useDeleteProduct } from '../../queries/useProducts'
 import { productFiltersAtom, isProductFormOpenAtom, editingProductIdAtom } from '../../store/productsAtoms'
 import { formatCurrency } from '@/shared/utils/formatters'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
+import { useConfirm } from '@/shared/hooks/useConfirm'
 import type { Product } from '../../types'
 
 export interface UseProductsTableReturn {
@@ -27,6 +28,7 @@ export const useProductsTable = (): UseProductsTableReturn => {
   const deleteProduct = useDeleteProduct()
 
   const { data, isLoading, isError } = useProducts(filters.page, filters.search, filters.is_active)
+  const confirm = useConfirm()
 
   return {
     products: data?.items ?? [],
@@ -42,9 +44,11 @@ export const useProductsTable = (): UseProductsTableReturn => {
     },
 
     onDelete: (id, name) => {
-      if (window.confirm(`${PRODUCTS_LABELS.CONFIRM_DELETE} ${name}?`)) {
-        deleteProduct.mutate(id)
-      }
+      confirm({
+        message: `${PRODUCTS_LABELS.CONFIRM_DELETE} ${name}?`,
+        isDangerous: true,
+        onConfirm: () => deleteProduct.mutate(id),
+      })
     },
 
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),

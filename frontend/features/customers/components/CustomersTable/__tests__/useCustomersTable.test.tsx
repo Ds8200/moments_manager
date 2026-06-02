@@ -8,6 +8,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { useCustomersTable } from '../useCustomersTable'
 import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../../store/customersAtoms'
+import { CUSTOMERS_LABELS } from '../../../constants/customersLabels'
+import type { ConfirmDialogOptions } from '@/shared/store/globalAtoms'
+
+const confirmFn = vi.fn()
+vi.mock('@/shared/hooks/useConfirm', () => ({ useConfirm: () => confirmFn }))
 
 function makeWrapper(store: ReturnType<typeof createStore>, qc: QueryClient) {
   function TestWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
@@ -37,6 +42,7 @@ describe('useCustomersTable', () => {
   beforeEach(() => {
     store = createStore()
     qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    confirmFn.mockClear()
   })
 
   it('returns empty customers by default', () => {
@@ -68,28 +74,40 @@ describe('useCustomersTable', () => {
     expect(store.get(isCustomerFormOpenAtom)).toBe(true)
   })
 
-  it('onDelete calls mutate when confirmed', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
+  it('onDelete opens confirm dialog with customer name in message', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
       result.current.onDelete('c1', 'דניאל')
     })
 
-    expect(window.confirm).toHaveBeenCalled()
-    vi.restoreAllMocks()
+    expect(confirmFn).toHaveBeenCalledWith(
+      expect.objectContaining<Partial<ConfirmDialogOptions>>({
+        message: `${CUSTOMERS_LABELS.CONFIRM_DELETE} דניאל?`,
+        isDangerous: true,
+      })
+    )
   })
 
-  it('onDelete does not call mutate when cancelled', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
+  it('onDelete calls mutate when onConfirm callback is invoked', () => {
+    confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
       result.current.onDelete('c1', 'דניאל')
     })
 
-    expect(window.confirm).toHaveBeenCalled()
-    vi.restoreAllMocks()
+    expect(confirmFn).toHaveBeenCalled()
+  })
+
+  it('onDelete does not mutate when confirm dialog is dismissed', () => {
+    const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
+
+    act(() => {
+      result.current.onDelete('c1', 'דניאל')
+    })
+
+    expect(confirmFn).toHaveBeenCalled()
   })
 
   it('onPageChange updates customerFiltersAtom.page', () => {

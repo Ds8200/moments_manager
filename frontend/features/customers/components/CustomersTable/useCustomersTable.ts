@@ -3,6 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { useCustomers, useDeleteCustomer } from '../../queries/useCustomers'
 import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
+import { useConfirm } from '@/shared/hooks/useConfirm'
 import type { Customer } from '../../types'
 
 export interface UseCustomersTableReturn {
@@ -25,6 +26,7 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
   const deleteCustomer = useDeleteCustomer()
 
   const { data, isLoading, isError } = useCustomers(filters.page, filters.search, filters.page_size)
+  const confirm = useConfirm()
 
   return {
     customers: data?.items ?? [],
@@ -40,9 +42,11 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
     },
 
     onDelete: (id, name) => {
-      if (window.confirm(`${CUSTOMERS_LABELS.CONFIRM_DELETE} ${name}?`)) {
-        deleteCustomer.mutate(id)
-      }
+      confirm({
+        message: `${CUSTOMERS_LABELS.CONFIRM_DELETE} ${name}?`,
+        isDangerous: true,
+        onConfirm: () => deleteCustomer.mutate(id),
+      })
     },
 
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
