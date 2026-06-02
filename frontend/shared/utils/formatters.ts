@@ -24,3 +24,14 @@ export function formatShortDate(dateStr: string | Date): string {
     month: 'numeric',
   }).format(date)
 }
+
+export function formatDateTime(dateStr: string | Date): string {
+  const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr
+  return new Intl.DateTimeFormat('he-IL', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}

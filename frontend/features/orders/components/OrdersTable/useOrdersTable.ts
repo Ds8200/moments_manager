@@ -2,7 +2,7 @@
 import { useSetAtom } from 'jotai'
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/useOrders'
 import { orderFiltersAtom, selectedOrderIdAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
-import { formatCurrency, formatShortDate } from '@/shared/utils/formatters'
+import { formatCurrency, formatDateTime } from '@/shared/utils/formatters'
 import { useConfirm } from '@/shared/hooks/useConfirm'
 import type { OrderSummary, UrgencyLevel } from '../../types'
 import type { OrderStatus } from '@/shared/enums/statusEnums'
@@ -88,7 +88,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
 
     formatAmount: formatCurrency,
-    formatDate: formatShortDate,
+    formatDate: formatDateTime,
 
     formatDueDateTime: (value) => {
       if (!value) return ORDERS_LABELS.URGENCY_NONE

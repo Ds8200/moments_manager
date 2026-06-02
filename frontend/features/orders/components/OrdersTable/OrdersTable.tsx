@@ -47,7 +47,7 @@ export const OrdersTable = (): ReactElement => {
       <td className={styles.cell}>
         <span className={styles.customerName}>{order.customer_name}</span>
       </td>
-      <td className={styles.cell}>{formatDate(order.date)}</td>
+      <td className={styles.cell}>{formatDate(order.created_at)}</td>
       <td className={styles.cell}>
         <span className={styles.target}>{formatDueDateTime(order.due_datetime)}</span>
       </td>
