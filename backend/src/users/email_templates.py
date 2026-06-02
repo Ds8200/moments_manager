@@ -77,16 +77,35 @@ def build_welcome_email(
     .credential-box .label {{
       font-size: 11px;
       color: #9b6fab;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }}
-    .credential-box .value {{
-      font-size: 16px;
+    .credential-box .row {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+    .credential-box .copy-input {{
+      flex: 1;
+      font-size: 15px;
       color: {BRAND_PURPLE};
       font-weight: 600;
       font-family: 'Courier New', monospace;
-      word-break: break-all;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 0;
+      width: 100%;
+      direction: ltr;
+      text-align: right;
+    }}
+    .credential-box .copy-hint {{
+      font-size: 11px;
+      color: #b18fbd;
+      white-space: nowrap;
+      flex-shrink: 0;
     }}
     .note {{
       font-size: 13px !important;
@@ -136,12 +155,20 @@ def build_welcome_email(
 
       <div class="credential-box">
         <div class="label">אימייל</div>
-        <div class="value">{recipient_email}</div>
+        <div class="row">
+          <input class="copy-input" type="text" value="{recipient_email}"
+                 readonly onclick="this.select()" title="לחץ כדי לסמן ולהעתיק" />
+          <span class="copy-hint">לחץ להעתקה</span>
+        </div>
       </div>
 
       <div class="credential-box">
         <div class="label">סיסמה זמנית</div>
-        <div class="value">{temp_password}</div>
+        <div class="row">
+          <input class="copy-input" type="text" value="{temp_password}"
+                 readonly onclick="this.select()" title="לחץ כדי לסמן ולהעתיק" />
+          <span class="copy-hint">לחץ להעתקה</span>
+        </div>
       </div>
 
       <p class="note">מומלץ לפנות למנהל המערכת לאחר הכניסה הראשונה לעדכון הסיסמה.</p>
