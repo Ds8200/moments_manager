@@ -1,6 +1,13 @@
 from enum import Enum
 
 
+class OrderSortField(str, Enum):
+    created_at = "created_at"
+    customer_name = "customer_name"
+    due_datetime = "due_datetime"
+    urgency = "urgency"
+
+
 class OrderStatus(str, Enum):
     new = "new"
     waiting_approval = "waiting_approval"
@@ -17,8 +24,7 @@ class PaymentMethod(str, Enum):
     partial = "partial"
 
 
-class OrderUrgency(str, Enum):
-    critical = "critical"  # ≤ 24 שעות
-    high = "high"          # 1–3 ימים
-    medium = "medium"      # 3–7 ימים
-    low = "low"            # > 7 ימים
+class UrgencyLevel(str, Enum):
+    normal      = "normal"
+    urgent      = "urgent"
+    very_urgent = "very_urgent"

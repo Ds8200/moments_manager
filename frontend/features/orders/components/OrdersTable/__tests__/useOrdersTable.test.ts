@@ -109,9 +109,14 @@ describe('useOrdersTable', () => {
     expect(result.current.getPaymentLabel(true, 'transfer')).toBe(PAYMENT_STATE_LABELS.transfer)
   })
 
-  it('getUrgencyClass returns empty string when urgency is null', () => {
+  it('getUrgencyClass returns urgencyNormal for normal urgency', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
-    expect(result.current.getUrgencyClass(null)).toBe('')
+    expect(result.current.getUrgencyClass('normal')).toBe('urgencyNormal')
+  })
+
+  it('getUrgencyClass returns urgencyVeryUrgent for very_urgent urgency', () => {
+    const { result } = renderHook(() => useOrdersTable(), { wrapper })
+    expect(result.current.getUrgencyClass('very_urgent')).toBe('urgencyVeryUrgent')
   })
 
   it('formatDueDateTime returns URGENCY_NONE for null', () => {

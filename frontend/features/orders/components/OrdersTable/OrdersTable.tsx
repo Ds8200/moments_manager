@@ -12,6 +12,7 @@ const HEADERS = [
   ORDERS_LABELS.COL_CUSTOMER,
   ORDERS_LABELS.COL_DATE,
   ORDERS_LABELS.COL_TARGET,
+  ORDERS_LABELS.COL_URGENCY,
   ORDERS_LABELS.COL_AMOUNT,
   ORDERS_LABELS.COL_STATUS,
   ORDERS_LABELS.COL_PAYMENT,
@@ -48,14 +49,12 @@ export const OrdersTable = (): ReactElement => {
       </td>
       <td className={styles.cell}>{formatDate(order.date)}</td>
       <td className={styles.cell}>
-        <div className={styles.targetCell}>
-          <span className={styles.target}>{formatDueDateTime(order.due_datetime)}</span>
-          {order.urgency && (
-            <span className={`${styles.urgencyBadge} ${styles[getUrgencyClass(order.urgency)]}`}>
-              {getUrgencyLabel(order.urgency)}
-            </span>
-          )}
-        </div>
+        <span className={styles.target}>{formatDueDateTime(order.due_datetime)}</span>
+      </td>
+      <td className={styles.cell}>
+        <span className={`${styles.urgencyBadge} ${styles[getUrgencyClass(order.urgency)]}`}>
+          {getUrgencyLabel(order.urgency)}
+        </span>
       </td>
       <td className={styles.cell}>
         <span className={styles.amount}>{formatAmount(order.total_amount)}</span>

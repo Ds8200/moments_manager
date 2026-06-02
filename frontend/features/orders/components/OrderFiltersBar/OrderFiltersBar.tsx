@@ -9,6 +9,7 @@ export const OrderFiltersBar = (): ReactElement => {
     filters,
     statusSelect,
     paymentSelect,
+    sortSelect,
     onSearchChange,
     onDateFromChange,
     onDateToChange,
@@ -20,7 +21,7 @@ export const OrderFiltersBar = (): ReactElement => {
       searchValue={filters.search}
       searchPlaceholder={ORDERS_LABELS.SEARCH_PLACEHOLDER}
       onSearchChange={onSearchChange}
-      selects={[statusSelect, paymentSelect]}
+      selects={[statusSelect, paymentSelect, sortSelect]}
       dateFrom={filters.date_from}
       dateTo={filters.date_to}
       onDateFromChange={onDateFromChange}

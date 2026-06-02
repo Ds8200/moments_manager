@@ -5,7 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from src.orders.enums import OrderStatus, OrderUrgency, PaymentMethod
+from src.orders.enums import OrderStatus, PaymentMethod, UrgencyLevel
 
 
 class OrderItemCreateSchema(BaseModel):
@@ -46,6 +46,7 @@ class OrderCreateSchema(BaseModel):
     customer_id: Optional[str] = None
     date: Date
     due_datetime: Optional[datetime] = None
+    urgency: UrgencyLevel = UrgencyLevel.normal
     notes: Optional[str] = None
     items: list[OrderItemCreateSchema] = []
 
@@ -54,6 +55,7 @@ class OrderUpdateSchema(BaseModel):
     customer_id: Optional[str] = None
     date: Optional[Date] = None
     due_datetime: Optional[datetime] = None
+    urgency: Optional[UrgencyLevel] = None
     notes: Optional[str] = None
     items: Optional[list[OrderItemCreateSchema]] = None
 
@@ -67,6 +69,10 @@ class OrderPaymentUpdateSchema(BaseModel):
     payment_method: Optional[PaymentMethod] = None
 
 
+class OrderUrgencyUpdateSchema(BaseModel):
+    urgency: UrgencyLevel
+
+
 class OrderResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -76,7 +82,7 @@ class OrderResponseSchema(BaseModel):
     customer_name: Optional[str] = None
     date: Date
     due_datetime: Optional[datetime]
-    urgency: Optional[OrderUrgency] = None
+    urgency: UrgencyLevel
     status: str
     is_paid: bool
     payment_method: Optional[str]
@@ -99,7 +105,7 @@ class OrderListResponseSchema(BaseModel):
     customer_name: Optional[str] = None
     date: Date
     due_datetime: Optional[datetime]
-    urgency: Optional[OrderUrgency] = None
+    urgency: UrgencyLevel
     status: str
     is_paid: bool
     payment_method: Optional[str]

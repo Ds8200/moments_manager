@@ -83,4 +83,38 @@ describe('useOrderFiltersBar', () => {
 
     expect(result.current.filters.page).toBe(1)
   })
+
+  it('exposes sortSelect with 4 options and default value created_at', () => {
+    const { result } = renderHook(() => useOrderFiltersBar())
+
+    expect(result.current.sortSelect.options).toHaveLength(4)
+    expect(result.current.sortSelect.value).toBe('created_at')
+    expect(result.current.sortSelect.options.map((o) => o.value)).toEqual([
+      'created_at',
+      'customer_name',
+      'due_datetime',
+      'urgency',
+    ])
+  })
+
+  it('sortSelect.onChange updates filters.sort_by and resets page to 1', () => {
+    const { result } = renderHook(() => useOrderFiltersBar())
+
+    act(() => {
+      result.current.sortSelect.onChange('urgency')
+    })
+
+    expect(result.current.filters.sort_by).toBe('urgency')
+    expect(result.current.filters.page).toBe(1)
+  })
+
+  it('sortSelect.onChange to customer_name reflects in sortSelect.value', () => {
+    const { result } = renderHook(() => useOrderFiltersBar())
+
+    act(() => {
+      result.current.sortSelect.onChange('customer_name')
+    })
+
+    expect(result.current.sortSelect.value).toBe('customer_name')
+  })
 })

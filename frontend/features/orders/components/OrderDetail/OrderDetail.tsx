@@ -2,9 +2,12 @@
 import type { ReactElement } from 'react'
 import { useOrderDetail } from './useOrderDetail'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
+import { InlineSelectField } from '@/shared/components/InlineSelectField/InlineSelectField'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrderDetail.module.scss'
+import type { OrderStatus } from '@/shared/enums/statusEnums'
 import type { PaymentState } from '@/shared/enums/statusEnums'
+import type { UrgencyLevel } from '../../types'
 
 export const OrderDetail = (): ReactElement | null => {
   const {
@@ -14,14 +17,15 @@ export const OrderDetail = (): ReactElement | null => {
     statusOptions,
     paymentState,
     paymentOptions,
+    urgencyOptions,
     onClose,
     onEdit,
     onStatusChange,
     onPaymentChange,
+    onUrgencyChange,
     formatAmount,
     formatOrderDate,
     formatDueDateTime,
-    getUrgencyLabel,
   } = useOrderDetail()
 
   return isOpen ? (
@@ -50,37 +54,26 @@ export const OrderDetail = (): ReactElement | null => {
               </div>
               <div className={styles.metaRow}>
                 <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_TARGET}</span>
-                <span className={styles.metaValue}>
-                  {formatDueDateTime(order.due_datetime)}
-                  {order.urgency && ` · ${getUrgencyLabel(order.urgency)}`}
-                </span>
+                <span className={styles.metaValue}>{formatDueDateTime(order.due_datetime)}</span>
               </div>
-              <div className={styles.metaRow}>
-                <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_STATUS}</span>
-                <div>
-                  <select
-                    className={styles.statusSelect}
-                    value={order.status}
-                    onChange={(e) => onStatusChange(e.target.value as Parameters<typeof onStatusChange>[0])}
-                  >
-                    {statusOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className={styles.metaRow}>
-                <span className={styles.metaLabel}>{ORDERS_LABELS.DETAIL_LABEL_PAYMENT}</span>
-                <select
-                  className={styles.statusSelect}
-                  value={paymentState}
-                  onChange={(e) => onPaymentChange(e.target.value as PaymentState)}
-                >
-                  {paymentOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
+              <InlineSelectField
+                label={ORDERS_LABELS.DETAIL_LABEL_URGENCY}
+                value={order.urgency}
+                options={urgencyOptions}
+                onChange={(v) => onUrgencyChange(v as UrgencyLevel)}
+              />
+              <InlineSelectField
+                label={ORDERS_LABELS.DETAIL_LABEL_STATUS}
+                value={order.status}
+                options={statusOptions}
+                onChange={(v) => onStatusChange(v as OrderStatus)}
+              />
+              <InlineSelectField
+                label={ORDERS_LABELS.DETAIL_LABEL_PAYMENT}
+                value={paymentState}
+                options={paymentOptions}
+                onChange={(v) => onPaymentChange(v as PaymentState)}
+              />
             </div>
 
             <div className={styles.section}>

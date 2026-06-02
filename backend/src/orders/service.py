@@ -1,13 +1,15 @@
 import logging
 import os
-from datetime import datetime
 from decimal import Decimal
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.config import settings
+from src.core.constants import log_messages
 from src.core.constants.http_messages import RESOURCE_FILE, RESOURCE_ORDER
 from src.core.exceptions import FileTooLargeError, InvalidFileTypeError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
-from src.orders.enums import OrderStatus, OrderUrgency
+from src.orders.enums import OrderSortField
 from src.orders.models import Order
 from src.orders.repository import OrderRepository
 from src.orders.schemas import (
@@ -17,9 +19,8 @@ from src.orders.schemas import (
     OrderResponseSchema,
     OrderStatusUpdateSchema,
     OrderUpdateSchema,
+    OrderUrgencyUpdateSchema,
 )
-from src.core.constants import log_messages
-from src.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -33,20 +34,6 @@ def _compute_item_fields(item_data: dict) -> dict:
     total_price = Decimal(str(qty)) * price
     profit = total_price - Decimal(str(qty)) * cost
     return {**item_data, "total_price": total_price, "profit": profit}
-
-
-def _compute_urgency(due_datetime: datetime | None) -> OrderUrgency | None:
-    if due_datetime is None:
-        return None
-    now = datetime.now(due_datetime.tzinfo) if due_datetime.tzinfo else datetime.now()
-    hours = (due_datetime - now).total_seconds() / 3600
-    if hours <= 24:
-        return OrderUrgency.critical
-    if hours <= 72:
-        return OrderUrgency.high
-    if hours <= 168:
-        return OrderUrgency.medium
-    return OrderUrgency.low
 
 
 class OrderService:
@@ -64,19 +51,17 @@ class OrderService:
         is_paid: bool | None = None,
         payment_method: str | None = None,
         search: str | None = None,
+        sort_by: str = OrderSortField.created_at.value,
     ) -> PaginatedResponse[OrderListResponseSchema]:
         orders, total = await self._repo.get_all(
             status, date_from, date_to, customer_id, is_paid, payment_method, search,
-            params.page_size, params.offset
+            params.page_size, params.offset, sort_by
         )
         pages = (total + params.page_size - 1) // params.page_size
         items = []
         for o in orders:
             schema = OrderListResponseSchema.model_validate(o)
-            schema = schema.model_copy(update={
-                "item_count": len(o.items),
-                "urgency": _compute_urgency(o.due_datetime),
-            })
+            schema = schema.model_copy(update={"item_count": len(o.items)})
             items.append(schema)
         return PaginatedResponse(
             items=items, total=total, page=params.page,
@@ -94,10 +79,7 @@ class OrderService:
         result = []
         for o in orders:
             schema = OrderListResponseSchema.model_validate(o)
-            schema = schema.model_copy(update={
-                "item_count": len(o.items),
-                "urgency": _compute_urgency(o.due_datetime),
-            })
+            schema = schema.model_copy(update={"item_count": len(o.items)})
             result.append(schema)
         return result
 
@@ -124,7 +106,9 @@ class OrderService:
         refreshed = await self._repo.get_by_id(order_id)
         return self._to_response(refreshed)
 
-    async def update_status(self, order_id: str, data: OrderStatusUpdateSchema) -> OrderResponseSchema:
+    async def update_status(
+        self, order_id: str, data: OrderStatusUpdateSchema
+    ) -> OrderResponseSchema:
         order = await self._repo.get_by_id(order_id)
         if not order:
             raise NotFoundError(RESOURCE_ORDER, order_id)
@@ -148,10 +132,21 @@ class OrderService:
         refreshed = await self._repo.get_by_id(order_id)
         return self._to_response(refreshed)
 
+    async def update_urgency(
+        self, order_id: str, data: OrderUrgencyUpdateSchema
+    ) -> OrderResponseSchema:
+        order = await self._repo.get_by_id(order_id)
+        if not order:
+            raise NotFoundError(RESOURCE_ORDER, order_id)
+        order.urgency = data.urgency.value
+        await self._db.commit()
+        logger.info(log_messages.ORDER_URGENCY_CHANGED, order_id, data.urgency.value)
+        refreshed = await self._repo.get_by_id(order_id)
+        return self._to_response(refreshed)
+
     @staticmethod
     def _to_response(order: Order) -> OrderResponseSchema:
-        schema = OrderResponseSchema.model_validate(order)
-        return schema.model_copy(update={"urgency": _compute_urgency(order.due_datetime)})
+        return OrderResponseSchema.model_validate(order)
 
     async def delete_order(self, order_id: str) -> None:
         order = await self._repo.get_by_id(order_id)
@@ -176,7 +171,12 @@ class OrderService:
         if ext not in ALLOWED_EXTENSIONS:
             raise InvalidFileTypeError(ext)
 
-        file_type = "image" if ext in {".jpg", ".jpeg", ".png", ".gif", ".svg"} else "pdf" if ext == ".pdf" else "other"
+        if ext in {".jpg", ".jpeg", ".png", ".gif", ".svg"}:
+            file_type = "image"
+        elif ext == ".pdf":
+            file_type = "pdf"
+        else:
+            file_type = "other"
         stored_name = f"{uuid.uuid4()}{ext}"
         dir_path = os.path.join(settings.UPLOADS_DIR, order_id)
         os.makedirs(dir_path, exist_ok=True)

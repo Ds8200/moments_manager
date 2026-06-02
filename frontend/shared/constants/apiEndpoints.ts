@@ -14,8 +14,9 @@ export const API_ENDPOINTS = {
 
   ORDERS:       `${BASE}/api/v1/orders`,
   ORDER:        (id: string) => `${BASE}/api/v1/orders/${id}`,
-  ORDER_STATUS: (id: string) => `${BASE}/api/v1/orders/${id}/status`,
-  ORDER_PAYMENT:(id: string) => `${BASE}/api/v1/orders/${id}/payment`,
+  ORDER_STATUS:  (id: string) => `${BASE}/api/v1/orders/${id}/status`,
+  ORDER_PAYMENT: (id: string) => `${BASE}/api/v1/orders/${id}/payment`,
+  ORDER_URGENCY: (id: string) => `${BASE}/api/v1/orders/${id}/urgency`,
   ORDER_FILES:  (id: string) => `${BASE}/api/v1/orders/${id}/files`,
   ORDER_FILE:   (orderId: string, fileId: string) => `${BASE}/api/v1/orders/${orderId}/files/${fileId}`,
 

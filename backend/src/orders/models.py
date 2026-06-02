@@ -1,12 +1,13 @@
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
-from sqlalchemy import String, Text, Boolean, Numeric, Integer, Date, DateTime, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING, Optional
 
-from src.database import Base, TimestampMixin, SoftDeleteMixin
-from src.orders.enums import OrderStatus, PaymentMethod
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.database import Base, SoftDeleteMixin, TimestampMixin
+from src.orders.enums import OrderStatus, UrgencyLevel
 
 if TYPE_CHECKING:
     from src.customers.models import Customer
@@ -24,6 +25,9 @@ class Order(Base, TimestampMixin, SoftDeleteMixin):
     due_datetime: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     status: Mapped[str] = mapped_column(
         String(50), default=OrderStatus.new, nullable=False
+    )
+    urgency: Mapped[str] = mapped_column(
+        String(50), nullable=False, default=UrgencyLevel.normal.value
     )
     is_paid: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     payment_method: Mapped[str | None] = mapped_column(String(20), nullable=True)

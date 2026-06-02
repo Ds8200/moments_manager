@@ -16,6 +16,7 @@ vi.mock('../../../queries/useOrder', () => ({
 vi.mock('../../../queries/useOrders', () => ({
   useUpdateOrderStatus: () => ({ mutate: vi.fn() }),
   useUpdateOrderPayment: () => ({ mutate: vi.fn() }),
+  useUpdateOrderUrgency: () => ({ mutate: vi.fn() }),
 }))
 
 const wrapper = ({ children }: { children: ReactNode }) => {
@@ -39,15 +40,23 @@ describe('useOrderDetail', () => {
     })
   })
 
-  it('getUrgencyLabel returns mapped label for known urgency', () => {
+  it('exposes 3 urgencyOptions matching the 3 urgency levels', () => {
     const { result } = renderHook(() => useOrderDetail(), { wrapper })
-    expect(result.current.getUrgencyLabel('critical')).toBe(ORDERS_LABELS.URGENCY_CRITICAL)
-    expect(result.current.getUrgencyLabel('low')).toBe(ORDERS_LABELS.URGENCY_LOW)
+    expect(result.current.urgencyOptions).toHaveLength(3)
+    const values = result.current.urgencyOptions.map((o) => o.value)
+    expect(values).toContain('normal')
+    expect(values).toContain('urgent')
+    expect(values).toContain('very_urgent')
   })
 
-  it('getUrgencyLabel returns URGENCY_NONE when urgency is null', () => {
+  it('urgencyOptions labels match ORDERS_LABELS', () => {
     const { result } = renderHook(() => useOrderDetail(), { wrapper })
-    expect(result.current.getUrgencyLabel(null)).toBe(ORDERS_LABELS.URGENCY_NONE)
+    const normal = result.current.urgencyOptions.find((o) => o.value === 'normal')
+    const urgent = result.current.urgencyOptions.find((o) => o.value === 'urgent')
+    const veryUrgent = result.current.urgencyOptions.find((o) => o.value === 'very_urgent')
+    expect(normal?.label).toBe(ORDERS_LABELS.URGENCY_NORMAL)
+    expect(urgent?.label).toBe(ORDERS_LABELS.URGENCY_URGENT)
+    expect(veryUrgent?.label).toBe(ORDERS_LABELS.URGENCY_VERY_URGENT)
   })
 
   it('formatDueDateTime returns URGENCY_NONE for null value', () => {

@@ -14,6 +14,7 @@ import type {
   OrdersResponse,
   UpdatePaymentPayload,
   UpdateStatusPayload,
+  UpdateUrgencyPayload,
 } from '../types'
 
 export const useOrders = (): UseQueryResult<OrdersResponse> => {
@@ -49,6 +50,22 @@ export const useUpdateOrderPayment = (): UseMutationResult<
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdatePaymentPayload }) =>
       ordersApi.updatePayment(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: ['order'] })
+    },
+  })
+}
+
+export const useUpdateOrderUrgency = (): UseMutationResult<
+  Order,
+  Error,
+  { id: string; payload: UpdateUrgencyPayload }
+> => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateUrgencyPayload }) =>
+      ordersApi.updateUrgency(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
       queryClient.invalidateQueries({ queryKey: ['order'] })

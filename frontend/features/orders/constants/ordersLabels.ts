@@ -15,6 +15,7 @@ export const ORDERS_LABELS = {
   COL_PRODUCTS:         'מוצרים',
   COL_DATE:             'תאריך',
   COL_TARGET:           'יעד',
+  COL_URGENCY:          'דחיפות',
   COL_AMOUNT:           'סכום',
   COL_STATUS:           'סטטוס',
   COL_PAYMENT:          'תשלום',
@@ -53,6 +54,11 @@ export const ORDERS_LABELS = {
   VALIDATION_DATE:          'נדרש תאריך',
   VALIDATION_ITEMS_MIN:     'נדרש לפחות פריט אחד',
 
+  SORT_CREATED_AT:          'תאריך יצירה',
+  SORT_CUSTOMER_NAME:       'שם לקוח (א-ב)',
+  SORT_DUE_DATETIME:        'יעד',
+  SORT_URGENCY:             'דחיפות',
+
   TABLE_TOTAL:              'סה"כ',
   TABLE_ORDERS_SUFFIX:      'הזמנות',
   TABLE_EDIT_TITLE:         'עריכה',
@@ -65,6 +71,7 @@ export const ORDERS_LABELS = {
   DETAIL_LABEL_TARGET:      'יעד',
   DETAIL_LABEL_STATUS:      'סטטוס',
   DETAIL_LABEL_PAYMENT:     'תשלום',
+  DETAIL_LABEL_URGENCY:     'דחיפות',
   DETAIL_SECTION_ITEMS:     'פריטים',
   DETAIL_SECTION_SUMMARY:   'סיכום',
   DETAIL_LABEL_TOTAL:       'סה"כ',
@@ -75,9 +82,8 @@ export const ORDERS_LABELS = {
   DETAIL_EDIT_TITLE:        'ערוך',
   DETAIL_CLOSE_TITLE:       'סגור',
 
-  URGENCY_CRITICAL:         'דחוף מאוד',
-  URGENCY_HIGH:             'דחוף',
-  URGENCY_MEDIUM:           'בינוני',
-  URGENCY_LOW:              'רגיל',
+  URGENCY_VERY_URGENT:      'דחוף מאוד',
+  URGENCY_URGENT:           'דחוף',
+  URGENCY_NORMAL:           'רגיל',
   URGENCY_NONE:             '—',
 } as const

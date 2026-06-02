@@ -1,0 +1,28 @@
+@use '../../styles/variables' as v;
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: v.$font-size-sm;
+}
+
+.label {
+  color: v.$text-secondary;
+}
+
+.select {
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}

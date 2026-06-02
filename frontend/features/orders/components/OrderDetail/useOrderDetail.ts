@@ -2,44 +2,46 @@
 import { useAtom, useSetAtom } from 'jotai'
 import { selectedOrderIdAtom, editingOrderIdAtom, isOrderFormOpenAtom } from '../../store/ordersAtoms'
 import { useOrder } from '../../queries/useOrder'
-import { useUpdateOrderStatus, useUpdateOrderPayment } from '../../queries/useOrders'
+import { useUpdateOrderStatus, useUpdateOrderPayment, useUpdateOrderUrgency } from '../../queries/useOrders'
 import { formatCurrency, formatDate } from '@/shared/utils/formatters'
 import { STATUS_LABELS, STATUS_ORDER, PAYMENT_STATE_LABELS, PAYMENT_STATE_ORDER, getPaymentState } from '@/shared/enums/statusEnums'
 import type { OrderStatus, PaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
-import type { OrderUrgency } from '../../types'
+import type { UrgencyLevel } from '../../types'
+
+const URGENCY_ORDER: UrgencyLevel[] = ['normal', 'urgent', 'very_urgent']
+
+const URGENCY_LABEL_MAP: Record<UrgencyLevel, string> = {
+  normal:      ORDERS_LABELS.URGENCY_NORMAL,
+  urgent:      ORDERS_LABELS.URGENCY_URGENT,
+  very_urgent: ORDERS_LABELS.URGENCY_VERY_URGENT,
+}
+
+const detailDueFormatter = new Intl.DateTimeFormat('he-IL', {
+  day:    '2-digit',
+  month:  '2-digit',
+  year:   'numeric',
+  hour:   '2-digit',
+  minute: '2-digit',
+})
 
 export interface UseOrderDetailReturn {
   isOpen: boolean
   order: ReturnType<typeof useOrder>['data']
   isLoading: boolean
-  statusOptions: Array<{ value: OrderStatus; label: string }>
+  statusOptions: Array<{ value: string; label: string }>
   paymentState: PaymentState
-  paymentOptions: Array<{ value: PaymentState; label: string }>
+  paymentOptions: Array<{ value: string; label: string }>
+  urgencyOptions: Array<{ value: string; label: string }>
   onClose: () => void
   onEdit: () => void
   onStatusChange: (status: OrderStatus) => void
   onPaymentChange: (state: PaymentState) => void
+  onUrgencyChange: (level: UrgencyLevel) => void
   formatAmount: (v: string) => string
   formatOrderDate: (v: string) => string
   formatDueDateTime: (v: string | null) => string
-  getUrgencyLabel: (urgency: OrderUrgency | null) => string
 }
-
-const URGENCY_LABEL_MAP: Record<OrderUrgency, string> = {
-  critical: ORDERS_LABELS.URGENCY_CRITICAL,
-  high:     ORDERS_LABELS.URGENCY_HIGH,
-  medium:   ORDERS_LABELS.URGENCY_MEDIUM,
-  low:      ORDERS_LABELS.URGENCY_LOW,
-}
-
-const detailDueFormatter = new Intl.DateTimeFormat('he-IL', {
-  day:   '2-digit',
-  month: '2-digit',
-  year:  'numeric',
-  hour:  '2-digit',
-  minute:'2-digit',
-})
 
 export const useOrderDetail = (): UseOrderDetailReturn => {
   const [selectedId, setSelectedId] = useAtom(selectedOrderIdAtom)
@@ -48,6 +50,7 @@ export const useOrderDetail = (): UseOrderDetailReturn => {
   const { data: order, isLoading } = useOrder(selectedId)
   const updateStatus = useUpdateOrderStatus()
   const updatePayment = useUpdateOrderPayment()
+  const updateUrgency = useUpdateOrderUrgency()
 
   const statusOptions = STATUS_ORDER.map((s) => ({
     value: s,
@@ -57,6 +60,11 @@ export const useOrderDetail = (): UseOrderDetailReturn => {
   const paymentOptions = PAYMENT_STATE_ORDER.map((s) => ({
     value: s,
     label: PAYMENT_STATE_LABELS[s],
+  }))
+
+  const urgencyOptions = URGENCY_ORDER.map((u) => ({
+    value: u,
+    label: URGENCY_LABEL_MAP[u],
   }))
 
   const paymentState = order
@@ -70,6 +78,7 @@ export const useOrderDetail = (): UseOrderDetailReturn => {
     statusOptions,
     paymentState,
     paymentOptions,
+    urgencyOptions,
 
     onClose: () => setSelectedId(null),
 
@@ -94,6 +103,11 @@ export const useOrderDetail = (): UseOrderDetailReturn => {
       updatePayment.mutate({ id: selectedId, payload })
     },
 
+    onUrgencyChange: (level) => {
+      if (!selectedId) return
+      updateUrgency.mutate({ id: selectedId, payload: { urgency: level } })
+    },
+
     formatAmount: formatCurrency,
     formatOrderDate: formatDate,
 
@@ -102,11 +116,6 @@ export const useOrderDetail = (): UseOrderDetailReturn => {
       const parsed = new Date(value)
       if (Number.isNaN(parsed.getTime())) return ORDERS_LABELS.URGENCY_NONE
       return detailDueFormatter.format(parsed)
-    },
-
-    getUrgencyLabel: (urgency) => {
-      if (!urgency) return ORDERS_LABELS.URGENCY_NONE
-      return URGENCY_LABEL_MAP[urgency]
     },
   }
 }

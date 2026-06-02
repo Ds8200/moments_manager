@@ -5,13 +5,14 @@ import { orderFiltersAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../..
 import { STATUS_ORDER, STATUS_LABELS, PAYMENT_STATE_ORDER, PAYMENT_STATE_LABELS } from '@/shared/enums/statusEnums'
 import type { OrderStatus, PaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
-import type { OrderFilters } from '../../types'
+import type { OrderFilters, OrderSortField } from '../../types'
 import type { FiltersBarSelectConfig } from '@/shared/components/FiltersBar/useFiltersBar'
 
 export interface UseOrderFiltersBarReturn {
   filters: OrderFilters
   statusSelect: FiltersBarSelectConfig
   paymentSelect: FiltersBarSelectConfig
+  sortSelect: FiltersBarSelectConfig
   onSearchChange: (value: string) => void
   onDateFromChange: (value: string) => void
   onDateToChange: (value: string) => void
@@ -48,10 +49,22 @@ export const useOrderFiltersBar = (): UseOrderFiltersBarReturn => {
     onChange: (v: string) => patch({ payment_state: v as '' | PaymentState }),
   }
 
+  const sortSelect: FiltersBarSelectConfig = {
+    value: filters.sort_by,
+    options: [
+      { value: 'created_at',    label: ORDERS_LABELS.SORT_CREATED_AT },
+      { value: 'customer_name', label: ORDERS_LABELS.SORT_CUSTOMER_NAME },
+      { value: 'due_datetime',  label: ORDERS_LABELS.SORT_DUE_DATETIME },
+      { value: 'urgency',       label: ORDERS_LABELS.SORT_URGENCY },
+    ],
+    onChange: (v: string) => patch({ sort_by: v as OrderSortField }),
+  }
+
   return {
     filters,
     statusSelect,
     paymentSelect,
+    sortSelect,
     onSearchChange:   (v) => patch({ search: v }),
     onDateFromChange: (v) => patch({ date_from: v }),
     onDateToChange:   (v) => patch({ date_to: v }),

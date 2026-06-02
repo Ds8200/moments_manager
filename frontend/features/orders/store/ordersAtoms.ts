@@ -10,6 +10,7 @@ export const DEFAULT_FILTERS: OrderFilters = {
   date_to: '',
   page: 1,
   page_size: 20,
+  sort_by: 'created_at',
 }
 
 export const orderFiltersAtom = atom<OrderFilters>({ ...DEFAULT_FILTERS })

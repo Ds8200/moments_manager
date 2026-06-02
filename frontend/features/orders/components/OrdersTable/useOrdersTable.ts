@@ -4,7 +4,7 @@ import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/u
 import { orderFiltersAtom, selectedOrderIdAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { formatCurrency, formatShortDate } from '@/shared/utils/formatters'
 import { useConfirm } from '@/shared/hooks/useConfirm'
-import type { OrderSummary, OrderUrgency } from '../../types'
+import type { OrderSummary, UrgencyLevel } from '../../types'
 import type { OrderStatus } from '@/shared/enums/statusEnums'
 import { PAYMENT_STATE_LABELS, getPaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
@@ -24,23 +24,21 @@ export interface UseOrdersTableReturn {
   formatAmount: (amount: string) => string
   formatDate: (date: string) => string
   formatDueDateTime: (value: string | null) => string
-  getUrgencyLabel: (urgency: OrderUrgency | null) => string
-  getUrgencyClass: (urgency: OrderUrgency | null) => string
+  getUrgencyLabel: (urgency: UrgencyLevel) => string
+  getUrgencyClass: (urgency: UrgencyLevel) => string
   getPaymentLabel: (isPaid: boolean, method: string | null) => string
 }
 
-const URGENCY_LABEL_MAP: Record<OrderUrgency, string> = {
-  critical: ORDERS_LABELS.URGENCY_CRITICAL,
-  high:     ORDERS_LABELS.URGENCY_HIGH,
-  medium:   ORDERS_LABELS.URGENCY_MEDIUM,
-  low:      ORDERS_LABELS.URGENCY_LOW,
+const URGENCY_LABEL_MAP: Record<UrgencyLevel, string> = {
+  normal:      ORDERS_LABELS.URGENCY_NORMAL,
+  urgent:      ORDERS_LABELS.URGENCY_URGENT,
+  very_urgent: ORDERS_LABELS.URGENCY_VERY_URGENT,
 }
 
-const URGENCY_CLASS_MAP: Record<OrderUrgency, string> = {
-  critical: 'urgencyCritical',
-  high:     'urgencyHigh',
-  medium:   'urgencyMedium',
-  low:      'urgencyLow',
+const URGENCY_CLASS_MAP: Record<UrgencyLevel, string> = {
+  normal:      'urgencyNormal',
+  urgent:      'urgencyUrgent',
+  very_urgent: 'urgencyVeryUrgent',
 }
 
 const dueDateTimeFormatter = new Intl.DateTimeFormat('he-IL', {
@@ -99,15 +97,9 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
       return dueDateTimeFormatter.format(parsed)
     },
 
-    getUrgencyLabel: (urgency) => {
-      if (!urgency) return ORDERS_LABELS.URGENCY_NONE
-      return URGENCY_LABEL_MAP[urgency]
-    },
+    getUrgencyLabel: (urgency) => URGENCY_LABEL_MAP[urgency],
 
-    getUrgencyClass: (urgency) => {
-      if (!urgency) return ''
-      return URGENCY_CLASS_MAP[urgency]
-    },
+    getUrgencyClass: (urgency) => URGENCY_CLASS_MAP[urgency],
 
     getPaymentLabel: (isPaid, method) => PAYMENT_STATE_LABELS[getPaymentState(isPaid, method)],
   }

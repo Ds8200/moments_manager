@@ -41,13 +41,6 @@
   white-space: nowrap;
 }
 
-.targetCell {
-  display: flex;
-  align-items: center;
-  gap: v.$space-2;
-  flex-wrap: nowrap;
-}
-
 .urgencyBadge {
   display: inline-flex;
   align-items: center;
@@ -58,22 +51,17 @@
   white-space: nowrap;
 }
 
-.urgencyCritical {
+.urgencyVeryUrgent {
   background: color-mix(in srgb, #FA5252 18%, transparent);
   color: #C92A2A;
 }
 
-.urgencyHigh {
+.urgencyUrgent {
   background: color-mix(in srgb, #FF922B 18%, transparent);
   color: #D9480F;
 }
 
-.urgencyMedium {
-  background: color-mix(in srgb, #FAB005 18%, transparent);
-  color: #E67700;
-}
-
-.urgencyLow {
+.urgencyNormal {
   background: color-mix(in srgb, #51CF66 18%, transparent);
   color: #2F9E44;
 }

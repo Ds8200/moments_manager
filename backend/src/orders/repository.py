@@ -1,14 +1,31 @@
 import logging
 from datetime import date, datetime, timezone
-from decimal import Decimal
-from sqlalchemy import select, func, and_, or_
+
+from sqlalchemy import and_, case, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.customers.models import Customer
-from src.orders.models import Order, OrderItem, OrderFile
+from src.orders.enums import OrderSortField
+from src.orders.models import Order, OrderFile, OrderItem
 
 logger = logging.getLogger(__name__)
+
+
+def _build_order_clause(sort_by: str) -> list:
+    if sort_by == OrderSortField.customer_name.value:
+        return [Customer.name.asc().nullslast()]
+    if sort_by == OrderSortField.due_datetime.value:
+        return [Order.due_datetime.asc().nullslast(), Order.created_at.desc()]
+    if sort_by == OrderSortField.urgency.value:
+        urgency_rank = case(
+            (Order.urgency == "very_urgent", 1),
+            (Order.urgency == "urgent", 2),
+            (Order.urgency == "normal", 3),
+            else_=4,
+        )
+        return [urgency_rank.asc()]
+    return [Order.created_at.desc()]
 
 
 class OrderRepository:
@@ -38,8 +55,9 @@ class OrderRepository:
         search: str | None,
         limit: int,
         offset: int,
+        sort_by: str = OrderSortField.created_at.value,
     ) -> tuple[list[Order], int]:
-        filters = [Order.is_deleted == False]
+        filters = [Order.is_deleted.is_(False)]
         if status:
             filters.append(Order.status == status)
         if date_from:
@@ -59,12 +77,15 @@ class OrderRepository:
             filters.append(or_(Order.customer_id.in_(customer_ids), Order.id.in_(item_order_ids)))
 
         query = select(Order).where(and_(*filters))
+        if sort_by == OrderSortField.customer_name.value:
+            query = query.outerjoin(Customer, Order.customer_id == Customer.id)
+
         count_q = select(func.count()).select_from(query.subquery())
         total = (await self._db.execute(count_q)).scalar_one()
 
         query = (
             query.options(selectinload(Order.items), selectinload(Order.customer))
-            .order_by(Order.due_datetime.asc().nullslast(), Order.date.desc())
+            .order_by(*_build_order_clause(sort_by))
             .limit(limit)
             .offset(offset)
         )
@@ -74,8 +95,12 @@ class OrderRepository:
     async def get_by_id(self, order_id: str) -> Order | None:
         result = await self._db.execute(
             select(Order)
-            .options(selectinload(Order.items), selectinload(Order.files), selectinload(Order.customer))
-            .where(Order.id == order_id, Order.is_deleted == False)
+            .options(
+                selectinload(Order.items),
+                selectinload(Order.files),
+                selectinload(Order.customer),
+            )
+            .where(Order.id == order_id, Order.is_deleted.is_(False))
         )
         return result.scalar_one_or_none()
 
@@ -83,7 +108,7 @@ class OrderRepository:
         result = await self._db.execute(
             select(Order)
             .options(selectinload(Order.items), selectinload(Order.customer))
-            .where(Order.customer_id == customer_id, Order.is_deleted == False)
+            .where(Order.customer_id == customer_id, Order.is_deleted.is_(False))
             .order_by(Order.due_datetime.asc().nullslast(), Order.date.desc())
         )
         return result.scalars().all()
@@ -154,7 +179,7 @@ class OrderRepository:
             select(
                 func.count(Order.id),
                 func.coalesce(func.sum(Order.total_amount), 0),
-            ).where(Order.customer_id == customer_id, Order.is_deleted == False)
+            ).where(Order.customer_id == customer_id, Order.is_deleted.is_(False))
         )
         row = result.one()
         return {"total_orders": row[0], "total_spent": float(row[1])}

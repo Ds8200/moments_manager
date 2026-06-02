@@ -1,10 +1,12 @@
 import logging
 from datetime import date
-from fastapi import APIRouter, Depends, Query, UploadFile, File
+
+from fastapi import APIRouter, Depends, File, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.dependencies import get_current_user, get_db
 from src.core.schemas import PaginatedResponse, PaginationParams
+from src.orders.enums import OrderSortField
 from src.orders.schemas import (
     OrderCreateSchema,
     OrderFileResponseSchema,
@@ -13,6 +15,7 @@ from src.orders.schemas import (
     OrderResponseSchema,
     OrderStatusUpdateSchema,
     OrderUpdateSchema,
+    OrderUrgencyUpdateSchema,
 )
 from src.orders.service import OrderService
 
@@ -31,13 +34,15 @@ async def list_orders(
     customer_id: str | None = Query(default=None),
     is_paid: bool | None = Query(default=None),
     payment_method: str | None = Query(default=None),
+    sort_by: OrderSortField = Query(default=OrderSortField.created_at),
     db: AsyncSession = Depends(get_db),
     _user=Depends(get_current_user),
 ):
     svc = OrderService(db)
     return await svc.list_orders(
         PaginationParams(page=page, page_size=page_size),
-        status, date_from, date_to, customer_id, is_paid, payment_method, search
+        status, date_from, date_to, customer_id, is_paid, payment_method, search,
+        sort_by.value,
     )
 
 
@@ -92,6 +97,17 @@ async def update_payment(
 ):
     svc = OrderService(db)
     return await svc.update_payment(order_id, body)
+
+
+@router.patch("/{order_id}/urgency", response_model=OrderResponseSchema)
+async def update_urgency(
+    order_id: str,
+    body: OrderUrgencyUpdateSchema,
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+):
+    svc = OrderService(db)
+    return await svc.update_urgency(order_id, body)
 
 
 @router.delete("/{order_id}", status_code=204, response_model=None)

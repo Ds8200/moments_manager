@@ -8,6 +8,7 @@ import type {
   OrderFilters,
   UpdateStatusPayload,
   UpdatePaymentPayload,
+  UpdateUrgencyPayload,
 } from './types'
 
 export const ordersApi = {
@@ -26,6 +27,7 @@ export const ordersApi = {
     }
     if (filters.date_from) params.set('date_from', filters.date_from)
     if (filters.date_to)   params.set('date_to', filters.date_to)
+    if (filters.sort_by)   params.set('sort_by', filters.sort_by)
     params.set('page', String(filters.page ?? 1))
     params.set('page_size', String(filters.page_size ?? 20))
     const query = params.toString()
@@ -58,6 +60,12 @@ export const ordersApi = {
 
   updatePayment: (id: string, payload: UpdatePaymentPayload): Promise<Order> =>
     apiClient<Order>(API_ENDPOINTS.ORDER_PAYMENT(id), {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  updateUrgency: (id: string, payload: UpdateUrgencyPayload): Promise<Order> =>
+    apiClient<Order>(API_ENDPOINTS.ORDER_URGENCY(id), {
       method: 'PATCH',
       body: JSON.stringify(payload),
     }),
