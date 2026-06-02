@@ -37,6 +37,13 @@
   gap: v.$space-4;
 }
 
+.magicMessage {
+  text-align: center;
+  font-size: v.$font-size-base;
+  color: v.$text-secondary;
+  padding-block: v.$space-6;
+}
+
 .field {
   display: flex;
   flex-direction: column;

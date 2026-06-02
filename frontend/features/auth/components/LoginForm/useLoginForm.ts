@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -22,13 +23,18 @@ export interface UseLoginFormReturn {
   errors: ReturnType<typeof useForm<LoginFormValues>>['formState']['errors']
   submitError: string | null
   isSubmitting: boolean
+  isMagicLoggingIn: boolean
 }
 
 export const useLoginForm = (): UseLoginFormReturn => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const magicToken = searchParams.get('token')
   const prefillEmail = searchParams.get('email') ?? ''
   const setTokens = useSetAtom(setTokensAtom)
+
+  const [isMagicLoggingIn, setIsMagicLoggingIn] = useState<boolean>(magicToken !== null)
+  const hasAttemptedMagic = useRef<boolean>(false)
 
   const {
     register,
@@ -39,6 +45,24 @@ export const useLoginForm = (): UseLoginFormReturn => {
     resolver: zodResolver(schema),
     defaultValues: { email: prefillEmail, password: '' },
   })
+
+  useEffect(() => {
+    if (!magicToken || hasAttemptedMagic.current) return
+    hasAttemptedMagic.current = true
+
+    const runMagicLogin = async (): Promise<void> => {
+      try {
+        const tokens = await authApi.magicLogin(magicToken)
+        setTokens({ access: tokens.access_token, refresh: tokens.refresh_token })
+        router.push(ROUTES.DASHBOARD)
+      } catch {
+        setError('root', { message: AUTH_LABELS.MAGIC_LOGIN_FAILED })
+        setIsMagicLoggingIn(false)
+      }
+    }
+
+    void runMagicLogin()
+  }, [magicToken, setTokens, router, setError])
 
   const onSubmit = async (values: LoginFormValues): Promise<void> => {
     try {
@@ -57,5 +81,6 @@ export const useLoginForm = (): UseLoginFormReturn => {
     errors,
     submitError: errors.root?.message ?? null,
     isSubmitting,
+    isMagicLoggingIn,
   }
 }

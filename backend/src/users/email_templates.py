@@ -1,10 +1,12 @@
 from src.config import settings
 
 
-def build_welcome_email(recipient_email: str, temp_password: str) -> tuple[str, str]:
+def build_welcome_email(
+    recipient_email: str, temp_password: str, magic_token: str
+) -> tuple[str, str]:
     subject = "ברוכים הבאים ל-Moments"
     login_url = f"{settings.APP_URL}/login"
-    quick_login_url = f"{login_url}?email={recipient_email}"
+    quick_login_url = f"{login_url}?token={magic_token}"
 
     html_body = f"""<!DOCTYPE html>
 <html dir="rtl" lang="he">

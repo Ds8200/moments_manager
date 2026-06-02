@@ -3,7 +3,12 @@ import logging
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.schemas import LoginSchema, RefreshSchema, TokenResponseSchema
+from src.auth.schemas import (
+    LoginSchema,
+    MagicLoginSchema,
+    RefreshSchema,
+    TokenResponseSchema,
+)
 from src.auth.service import AuthService
 from src.core.dependencies import get_db
 from src.core.rate_limit import limiter
@@ -23,6 +28,13 @@ async def login(request: Request, body: LoginSchema, db: AsyncSession = Depends(
 async def refresh(body: RefreshSchema, db: AsyncSession = Depends(get_db)):
     svc = AuthService(db)
     return await svc.refresh(body.refresh_token)
+
+
+@router.post("/magic-login", response_model=TokenResponseSchema)
+@limiter.limit("10/minute")
+async def magic_login(request: Request, body: MagicLoginSchema, db: AsyncSession = Depends(get_db)):
+    svc = AuthService(db)
+    return await svc.magic_login(body.token)
 
 
 @router.post("/logout", status_code=204, response_model=None)

@@ -10,6 +10,10 @@ class RefreshSchema(BaseModel):
     refresh_token: str
 
 
+class MagicLoginSchema(BaseModel):
+    token: str
+
+
 class TokenResponseSchema(BaseModel):
     access_token: str
     refresh_token: str

@@ -12,7 +12,7 @@ from src.core.constants.http_messages import (
     USER_NOT_FOUND,
 )
 from src.core.exceptions import ForbiddenError
-from src.core.security import decode_access_token
+from src.core.security import MAGIC_LOGIN_PURPOSE, decode_access_token
 from src.database import AsyncSessionLocal
 
 logger = logging.getLogger(__name__)
@@ -32,6 +32,11 @@ async def get_current_user(
 
     payload = decode_access_token(credentials.credentials)
     if payload is None:
+        raise HTTPException(status_code=401, detail=TOKEN_INVALID)
+
+    # Magic-login tokens are single-purpose: they may only be exchanged at the
+    # magic-login endpoint, never used directly as an API bearer token.
+    if payload.get("purpose") == MAGIC_LOGIN_PURPOSE:
         raise HTTPException(status_code=401, detail=TOKEN_INVALID)
 
     user_id = payload.get("sub")

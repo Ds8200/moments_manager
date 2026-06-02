@@ -4,7 +4,11 @@ import pytest
 
 from src.auth.service import AuthService
 from src.core.exceptions import UnauthorizedError
-from src.core.security import hash_password
+from src.core.security import (
+    create_access_token,
+    create_magic_login_token,
+    hash_password,
+)
 
 pytestmark = pytest.mark.asyncio
 
@@ -39,3 +43,50 @@ async def test_refresh_with_invalid_token_raises() -> None:
 
     with pytest.raises(UnauthorizedError):
         await service.refresh("invalid-token")
+
+
+async def test_magic_login_with_garbage_token_raises() -> None:
+    db = AsyncMock()
+    service = AuthService(db)
+
+    with pytest.raises(UnauthorizedError):
+        await service.magic_login("not-a-jwt")
+
+
+async def test_magic_login_rejects_a_regular_access_token() -> None:
+    db = AsyncMock()
+    service = AuthService(db)
+    # A normal access token has no magic_login purpose claim.
+    access = create_access_token("user-1", "user")
+
+    with pytest.raises(UnauthorizedError):
+        await service.magic_login(access)
+
+
+async def test_magic_login_with_valid_token_issues_token_pair() -> None:
+    db = AsyncMock()
+    service = AuthService(db)
+    user = MagicMock()
+    user.id = "user-1"
+    user.role = "admin"
+    service._users = AsyncMock()
+    service._users.get_by_id.return_value = user
+    service._tokens = AsyncMock()
+
+    token = create_magic_login_token("user-1")
+    result = await service.magic_login(token)
+
+    assert result.access_token
+    assert result.refresh_token
+    service._users.get_by_id.assert_called_once_with("user-1")
+
+
+async def test_magic_login_unknown_user_raises() -> None:
+    db = AsyncMock()
+    service = AuthService(db)
+    service._users = AsyncMock()
+    service._users.get_by_id.return_value = None
+
+    token = create_magic_login_token("ghost")
+    with pytest.raises(UnauthorizedError):
+        await service.magic_login(token)

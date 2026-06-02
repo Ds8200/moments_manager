@@ -8,6 +8,7 @@ from jose import JWTError, jwt
 from src.config import settings
 
 ALGORITHM = "HS256"
+MAGIC_LOGIN_PURPOSE = "magic_login"
 
 
 def hash_password(password: str) -> str:
@@ -22,6 +23,15 @@ def create_access_token(user_id: str, role: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return jwt.encode(
         {"sub": user_id, "role": role, "exp": expire},
+        settings.SECRET_KEY,
+        algorithm=ALGORITHM,
+    )
+
+
+def create_magic_login_token(user_id: str) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(hours=settings.MAGIC_LOGIN_EXPIRE_HOURS)
+    return jwt.encode(
+        {"sub": user_id, "purpose": MAGIC_LOGIN_PURPOSE, "exp": expire},
         settings.SECRET_KEY,
         algorithm=ALGORITHM,
     )

@@ -6,10 +6,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.repository import RefreshTokenRepository
 from src.auth.schemas import TokenResponseSchema
 from src.config import settings
-from src.core.constants.http_messages import INVALID_CREDENTIALS, REFRESH_TOKEN_INVALID
+from src.core.constants.http_messages import (
+    INVALID_CREDENTIALS,
+    MAGIC_LINK_INVALID,
+    REFRESH_TOKEN_INVALID,
+)
 from src.core.exceptions import UnauthorizedError
 from src.core.security import (
+    MAGIC_LOGIN_PURPOSE,
     create_access_token,
+    decode_access_token,
     generate_refresh_token,
     hash_refresh_token,
     verify_password,
@@ -41,6 +47,18 @@ class AuthService:
             raise UnauthorizedError(REFRESH_TOKEN_INVALID)
         await self._tokens.revoke(token_hash)
         await self._db.flush()
+        return await self._issue_token_pair(user.id, user.role)
+
+    async def magic_login(self, token: str) -> TokenResponseSchema:
+        payload = decode_access_token(token)
+        if payload is None or payload.get("purpose") != MAGIC_LOGIN_PURPOSE:
+            raise UnauthorizedError(MAGIC_LINK_INVALID)
+        user_id = payload.get("sub")
+        if not user_id:
+            raise UnauthorizedError(MAGIC_LINK_INVALID)
+        user = await self._users.get_by_id(user_id)
+        if not user:
+            raise UnauthorizedError(MAGIC_LINK_INVALID)
         return await self._issue_token_pair(user.id, user.role)
 
     async def logout(self, refresh_token_str: str) -> None:

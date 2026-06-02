@@ -1,5 +1,7 @@
 from src.core.security import (
+    MAGIC_LOGIN_PURPOSE,
     create_access_token,
+    create_magic_login_token,
     decode_access_token,
     generate_refresh_token,
     hash_password,
@@ -25,6 +27,14 @@ def test_access_token_round_trip() -> None:
 
 def test_decode_invalid_token_returns_none() -> None:
     assert decode_access_token("not-a-jwt") is None
+
+
+def test_magic_login_token_carries_purpose_and_sub() -> None:
+    token = create_magic_login_token("user-99")
+    payload = decode_access_token(token)
+    assert payload is not None
+    assert payload["sub"] == "user-99"
+    assert payload["purpose"] == MAGIC_LOGIN_PURPOSE
 
 
 def test_refresh_token_hashing_is_deterministic() -> None:

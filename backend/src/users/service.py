@@ -9,7 +9,7 @@ from src.core.constants.log_messages import USER_CREATED, USER_DELETED
 from src.core.email import send_html_email
 from src.core.exceptions import ConflictError, ForbiddenError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
-from src.core.security import hash_password
+from src.core.security import create_magic_login_token, hash_password
 from src.users.email_templates import build_welcome_email
 from src.users.enums import UserRole
 from src.users.repository import UserRepository
@@ -54,7 +54,8 @@ class UserService:
         await self._db.refresh(user)
         logger.info(USER_CREATED, user.email, user.role)
 
-        subject, html_body = build_welcome_email(data.email, temp_password)
+        magic_token = create_magic_login_token(user.id)
+        subject, html_body = build_welcome_email(data.email, temp_password, magic_token)
         background_tasks.add_task(send_html_email, data.email, subject, html_body)
 
         return UserResponseSchema.model_validate(user)

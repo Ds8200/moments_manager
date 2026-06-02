@@ -6,7 +6,8 @@ import { AUTH_LABELS } from '../../constants/authLabels'
 import styles from './LoginForm.module.scss'
 
 export const LoginForm = (): ReactElement => {
-  const { register, handleSubmit, onSubmit, errors, submitError, isSubmitting } = useLoginForm()
+  const { register, handleSubmit, onSubmit, errors, submitError, isSubmitting, isMagicLoggingIn } =
+    useLoginForm()
 
   return (
     <div className={styles.wrapper}>
@@ -22,6 +23,9 @@ export const LoginForm = (): ReactElement => {
         </div>
         <div className={styles.subtitle}>{AUTH_LABELS.SUBTITLE}</div>
 
+        {isMagicLoggingIn ? (
+          <div className={styles.magicMessage}>{AUTH_LABELS.MAGIC_LOGGING_IN}</div>
+        ) : (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="email">
@@ -59,6 +63,7 @@ export const LoginForm = (): ReactElement => {
             {isSubmitting ? AUTH_LABELS.SUBMITTING : AUTH_LABELS.SUBMIT}
           </button>
         </form>
+        )}
       </div>
     </div>
   )

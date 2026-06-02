@@ -11,4 +11,6 @@ export const AUTH_LABELS = {
   SUBMIT:           'התחברות',
   SUBMITTING:       'מתחבר...',
   LOGIN_FAILED:     'שם משתמש או סיסמה שגויים',
+  MAGIC_LOGGING_IN: 'מתחבר אוטומטית...',
+  MAGIC_LOGIN_FAILED: 'קישור הכניסה אינו תקף או שפג תוקפו. התחבר עם המייל והסיסמה.',
 } as const

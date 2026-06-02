@@ -4,6 +4,7 @@ export const API_ENDPOINTS = {
   AUTH_LOGIN:   `${BASE}/api/v1/auth/login`,
   AUTH_REFRESH: `${BASE}/api/v1/auth/refresh`,
   AUTH_LOGOUT:  `${BASE}/api/v1/auth/logout`,
+  AUTH_MAGIC_LOGIN: `${BASE}/api/v1/auth/magic-login`,
 
   CUSTOMERS:    `${BASE}/api/v1/customers`,
   CUSTOMER:     (id: string) => `${BASE}/api/v1/customers/${id}`,
