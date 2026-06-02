@@ -17,6 +17,7 @@ export const UI_LABELS = {
   ERROR_LOADING_REPORTS:  'שגיאה בטעינת הדוחות',
   ERROR_LOADING_USERS:    'שגיאה בטעינת המשתמשים',
   ERROR_LOADING_SEND_EMAIL: 'שגיאה בדף שליחת מייל',
+  EMOJI_PICKER_BTN: "הוסף אמוג'י",
   MORE:                   'עוד',
   LOGOUT:                 'התנתקות',
   MENU_TITLE:             'תפריט',

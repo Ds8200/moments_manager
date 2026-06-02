@@ -1,0 +1,66 @@
+@use '@/shared/styles/variables' as *;
+
+.panel {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + $space-1);
+  z-index: $z-dropdown;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-elevated;
+  padding: $space-3;
+  min-width: 260px;
+  animation: fadeIn $transition-fast;
+}
+
+.category {
+  margin-block-end: $space-3;
+
+  &:last-child {
+    margin-block-end: 0;
+  }
+}
+
+.categoryLabel {
+  display: block;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  margin-block-end: $space-1;
+  padding-inline-start: $space-1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+}
+
+.emojiBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  background: none;
+  border: none;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  transition: background $transition-fast;
+  line-height: 1;
+
+  &:hover {
+    background: $gray-100;
+  }
+
+  &:active {
+    background: $primary-light;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

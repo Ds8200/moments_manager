@@ -4,8 +4,10 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useComposeEmail } from '../../queries/useSendEmail'
+import { useEmojiInsert } from '@/shared/hooks/useEmojiInsert'
 import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
 import type { Recipient } from '../../types'
+import type { UseEmojiInsertReturn } from '@/shared/hooks/useEmojiInsert'
 
 const composeSchema = z.object({
   subject: z.string().min(1, SEND_EMAIL_LABELS.VALIDATION_SUBJECT),
@@ -14,7 +16,7 @@ const composeSchema = z.object({
 
 type ComposeFormValues = z.infer<typeof composeSchema>
 
-export interface UseSendEmailPageReturn {
+export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   recipients: Recipient[]
   onAddRecipient: (r: Recipient) => void
   onRemoveRecipient: (key: string) => void
@@ -37,7 +39,11 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     handleSubmit,
     formState: { errors },
     reset,
+    getValues,
+    setValue,
   } = useForm<ComposeFormValues>({ resolver: zodResolver(composeSchema) })
+
+  const emojiInsert = useEmojiInsert('body', getValues, setValue)
 
   const onAddRecipient = useCallback((r: Recipient) => {
     setRecipients((prev) => [...prev, r])
@@ -67,6 +73,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
           reset()
           setRecipients([])
           setRecipientsError(undefined)
+          emojiInsert.closePicker()
         },
       },
     )
@@ -82,5 +89,6 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     recipientsError,
     onSubmit,
     isPending: compose.isPending,
+    ...emojiInsert,
   }
 }

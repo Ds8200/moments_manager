@@ -51,6 +51,31 @@
   }
 }
 
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.emojiToggle {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 $space-1;
+  border-radius: $border-radius-sm;
+  transition: background $transition-fast;
+  line-height: 1;
+
+  &:hover {
+    background: $gray-100;
+  }
+}
+
+.bodyWrapper {
+  position: relative;
+}
+
 .error {
   font-size: $font-size-xs;
   color: $danger;

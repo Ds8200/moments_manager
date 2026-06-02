@@ -7,8 +7,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { emailingCustomerIdAtom } from '../../store/customersAtoms'
 import { useCustomer } from '../../queries/useCustomers'
 import { useSendCustomerEmail } from '../../queries/useCustomers'
+import { useEmojiInsert } from '@/shared/hooks/useEmojiInsert'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
 import type { CustomerSendEmailPayload } from '../../types'
+import type { UseEmojiInsertReturn } from '@/shared/hooks/useEmojiInsert'
 
 const emailSchema = z.object({
   subject: z.string().min(1, CUSTOMERS_LABELS.VALIDATION_SUBJECT_REQUIRED),
@@ -17,7 +19,7 @@ const emailSchema = z.object({
 
 type EmailFormValues = z.infer<typeof emailSchema>
 
-export interface UseEmailDialogReturn {
+export interface UseEmailDialogReturn extends UseEmojiInsertReturn {
   isOpen: boolean
   customerName: string | null
   register: ReturnType<typeof useForm<EmailFormValues>>['register']
@@ -40,11 +42,18 @@ export const useEmailDialog = (): UseEmailDialogReturn => {
     handleSubmit,
     formState: { errors },
     reset,
+    getValues,
+    setValue,
   } = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) })
 
+  const emojiInsert = useEmojiInsert('body', getValues, setValue)
+
   useEffect(() => {
-    if (!isOpen) reset()
-  }, [isOpen, reset])
+    if (!isOpen) {
+      reset()
+      emojiInsert.closePicker()
+    }
+  }, [isOpen, reset, emojiInsert.closePicker])
 
   const onClose = (): void => {
     setEmailingCustomerId(null)
@@ -68,5 +77,6 @@ export const useEmailDialog = (): UseEmailDialogReturn => {
     onSubmit,
     onClose,
     isPending: sendEmail.isPending,
+    ...emojiInsert,
   }
 }
