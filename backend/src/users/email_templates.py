@@ -1,19 +1,15 @@
-from pathlib import Path
-
 from src.config import settings
 
-LOGO_CID = "moments-logo"
-LOGO_PATH = Path(__file__).resolve().parent.parent / "core" / "assets" / "moments_logo.png"
+LOGO_URL = "https://moments-manager.vercel.app/moments_logo.png"
 
 # Brand colors — מותאם ללוגו Moments (סגול → מג'נטה)
 BRAND_PURPLE = "#9C27B0"
-BRAND_MAGENTA = "#D81B60"
 BRAND_GRADIENT = "linear-gradient(135deg, #9C27B0 0%, #D81B60 100%)"
 
 
 def build_welcome_email(
     recipient_email: str, temp_password: str, magic_token: str
-) -> tuple[str, str, dict[str, bytes]]:
+) -> tuple[str, str]:
     subject = "ברוכים הבאים ל-Moments"
     login_url = f"{settings.APP_URL}/login"
     quick_login_url = f"{login_url}?token={magic_token}"
@@ -131,7 +127,7 @@ def build_welcome_email(
 <body>
   <div class="container">
     <div class="header">
-      <img src="cid:{LOGO_CID}" alt="Moments" width="200" />
+      <img src="{LOGO_URL}" alt="Moments" width="200" />
     </div>
     <div class="accent-bar"></div>
     <div class="body">
@@ -162,5 +158,4 @@ def build_welcome_email(
 </body>
 </html>"""
 
-    inline_images = {LOGO_CID: LOGO_PATH.read_bytes()}
-    return subject, html_body, inline_images
+    return subject, html_body

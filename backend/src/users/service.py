@@ -60,10 +60,8 @@ class UserService:
         logger.info(USER_CREATED, user.email, user.role)
 
         magic_token = create_magic_login_token(user.id)
-        subject, html_body, inline_images = build_welcome_email(
-            data.email, temp_password, magic_token
-        )
-        background_tasks.add_task(send_html_email, data.email, subject, html_body, inline_images)
+        subject, html_body = build_welcome_email(data.email, temp_password, magic_token)
+        background_tasks.add_task(send_html_email, data.email, subject, html_body)
 
         return UserResponseSchema.model_validate(user)
 
