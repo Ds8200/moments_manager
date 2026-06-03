@@ -68,8 +68,7 @@ export const useReportsPage = (): UseReportsPageReturn => {
       icon: '📊',
       onClick: () => {
         exportToExcel({
-          filename: `${REPORTS_LABELS.PAGE_TITLE}-${year}`,
-          sheetName: String(year),
+          filename: `reports-${year}`,
           headers: EXCEL_HEADERS,
           rows: buildRows(),
         })

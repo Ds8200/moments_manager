@@ -1,8 +1,5 @@
-import * as XLSX from 'xlsx'
-
 export interface ExcelExportConfig {
   filename: string
-  sheetName?: string
   headers: string[]
   rows: (string | number)[][]
 }
@@ -13,32 +10,34 @@ export interface PrintExportConfig {
   rows: (string | number)[][]
 }
 
-export const exportToExcel = (config: ExcelExportConfig): void => {
-  const wsData = [config.headers, ...config.rows]
-  const ws = XLSX.utils.aoa_to_sheet(wsData)
-  const wb = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(wb, ws, config.sheetName ?? 'Data')
+// UTF-8 BOM ensures Excel displays Hebrew characters correctly
+const UTF8_BOM = '﻿'
 
-  // binary string → ArrayBuffer is the most reliable cross-browser pattern for SheetJS
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' }) as string
-  const buf = new ArrayBuffer(wbout.length)
-  const view = new Uint8Array(buf)
-  for (let i = 0; i < wbout.length; i++) {
-    view[i] = wbout.charCodeAt(i) & 0xff
+const escapeCell = (value: string | number): string => {
+  const str = String(value)
+  // Wrap in quotes and escape any existing quotes if the cell contains comma, quote, or newline
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`
   }
+  return `"${str}"`
+}
 
-  const blob = new Blob([buf], { type: 'application/octet-stream' })
+export const exportToExcel = (config: ExcelExportConfig): void => {
+  const allRows = [config.headers, ...config.rows]
+  const csv = UTF8_BOM + allRows.map((row) => row.map(escapeCell).join(',')).join('\n')
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
-  anchor.download = `${config.filename}.xlsx`
+  anchor.download = `${config.filename}.csv`
   document.body.appendChild(anchor)
   anchor.click()
   document.body.removeChild(anchor)
   URL.revokeObjectURL(url)
 }
 
-// @page must be at top level (not inside @media print) for browsers to recognise landscape
+// @page must be at top level (not inside @media print) for browsers to honour the size rule
 const PRINT_STYLES = `
   @page { size: A4 landscape; margin: 10mm; }
   * { box-sizing: border-box; }
@@ -51,11 +50,7 @@ const PRINT_STYLES = `
     color: #212529;
   }
   h2 { margin: 0 0 8px; font-size: 14px; font-weight: 700; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: auto;
-  }
+  table { width: 100%; border-collapse: collapse; }
   th {
     background: #e9ecef;
     font-weight: 700;
