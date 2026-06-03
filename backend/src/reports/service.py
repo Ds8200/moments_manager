@@ -64,6 +64,9 @@ class ReportService:
             paid_count=paid_count,
             unpaid_count=unpaid_count,
             total_count=paid_count + unpaid_count,
+            collection_rate=round(paid_count / (paid_count + unpaid_count) * 100, 1)
+            if (paid_count + unpaid_count) > 0
+            else 0.0,
             cash_revenue=cash_revenue,
             transfer_revenue=transfer_revenue,
             unpaid_amount=unpaid_amount,
@@ -80,6 +83,8 @@ class ReportService:
         net_profit = sum((m.net_profit for m in monthly_data), Decimal("0"))
         annual_profit = sum((m.total_profit for m in monthly_data), Decimal("0"))
 
+        annual_unpaid = sum((m.unpaid_amount for m in monthly_data), Decimal("0"))
+
         return FinancialYearSchema(
             year=year,
             months=monthly_data,
@@ -87,6 +92,7 @@ class ReportService:
             annual_profit=annual_profit,
             annual_expenses=total_expenses,
             annual_net=net_profit,
+            annual_unpaid=annual_unpaid,
         )
 
     async def get_top_customers(self, limit: int = 10) -> list[TopCustomerSchema]:

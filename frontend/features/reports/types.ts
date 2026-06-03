@@ -9,6 +9,7 @@ export interface MonthlyReport {
   paid_count: number
   unpaid_count: number
   total_count: number
+  collection_rate: number
   cash_revenue: string
   transfer_revenue: string
   unpaid_amount: string
@@ -22,6 +23,7 @@ export interface FinancialReport {
   annual_profit: string
   annual_expenses: string
   annual_net: string
+  annual_unpaid: string
 }
 
 export interface TopCustomer {

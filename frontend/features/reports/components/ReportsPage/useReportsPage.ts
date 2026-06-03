@@ -13,6 +13,7 @@ export interface UseReportsPageReturn {
   topCustomers: TopCustomer[] | undefined
   isLoading: boolean
   formatAmount: (v: string | number) => string
+  formatRate: (v: number) => string
   getMonthName: (monthIndex: number) => string
 }
 
@@ -32,6 +33,7 @@ export const useReportsPage = (): UseReportsPageReturn => {
     topCustomers,
     isLoading,
     formatAmount: formatCurrency,
+    formatRate: (v: number): string => `${v.toFixed(1)}%`,
     getMonthName: (monthIndex: number) => HEBREW_MONTHS[monthIndex - 1] ?? '',
   }
 }

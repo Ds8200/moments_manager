@@ -7,7 +7,7 @@ import styles from './ReportsPage.module.scss'
 
 export const ReportsPage = (): ReactElement => {
   const {
-    year, setYear, yearOptions, financial, topCustomers, isLoading, formatAmount, getMonthName,
+    year, setYear, yearOptions, financial, topCustomers, isLoading, formatAmount, formatRate, getMonthName,
   } = useReportsPage()
 
   return (
@@ -48,6 +48,10 @@ export const ReportsPage = (): ReactElement => {
                 {formatAmount(financial.annual_net)}
               </span>
             </div>
+            <div className={styles.kpiCard}>
+              <span className={styles.kpiLabel}>{REPORTS_LABELS.ANNUAL_UNPAID}</span>
+              <span className={`${styles.kpiValue} ${styles.kpiNegative}`}>{formatAmount(financial.annual_unpaid)}</span>
+            </div>
           </div>
 
           <div className={styles.tableCard}>
@@ -59,6 +63,7 @@ export const ReportsPage = (): ReactElement => {
                   <th>{REPORTS_LABELS.COL_PAID_ORDERS}</th>
                   <th>{REPORTS_LABELS.COL_UNPAID_ORDERS}</th>
                   <th>{REPORTS_LABELS.COL_TOTAL_ORDERS}</th>
+                  <th>{REPORTS_LABELS.COL_COLLECTION_RATE}</th>
                   <th>{REPORTS_LABELS.COL_CASH}</th>
                   <th>{REPORTS_LABELS.COL_TRANSFER}</th>
                   <th>{REPORTS_LABELS.COL_UNPAID_AMOUNT}</th>
@@ -74,6 +79,7 @@ export const ReportsPage = (): ReactElement => {
                     <td className={styles.cell}>{m.paid_count}</td>
                     <td className={styles.cell}>{m.unpaid_count}</td>
                     <td className={styles.cell}>{m.total_count}</td>
+                    <td className={styles.cell}>{formatRate(m.collection_rate)}</td>
                     <td className={styles.cell}>{formatAmount(m.cash_revenue)}</td>
                     <td className={styles.cell}>{formatAmount(m.transfer_revenue)}</td>
                     <td className={`${styles.cell} ${styles.kpiNegative}`}>{formatAmount(m.unpaid_amount)}</td>

@@ -23,6 +23,7 @@ class MonthlyReportSchema(BaseModel):
     paid_count: int
     unpaid_count: int
     total_count: int
+    collection_rate: float
     cash_revenue: Decimal
     transfer_revenue: Decimal
     unpaid_amount: Decimal
@@ -36,6 +37,7 @@ class FinancialYearSchema(BaseModel):
     annual_profit: Decimal
     annual_expenses: Decimal
     annual_net: Decimal
+    annual_unpaid: Decimal
 
 
 class TopCustomerSchema(BaseModel):
