@@ -5,16 +5,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useSidebar } from './useSidebar'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { ROUTES } from '@/shared/constants/routes'
 import styles from './Sidebar.module.scss'
 
-const LOGOUT_ICON = '🚪'
-
 export const Sidebar = (): ReactElement => {
-  const { pathname, visibleNavItems, logoutLabel, onLogout, isOpen } = useSidebar()
+  const { pathname, visibleNavItems, isOpen } = useSidebar()
 
   return (
     <aside className={`${styles.sidebar} ${!isOpen ? styles.collapsed : ''}`}>
-      <div className={styles.logo}>
+      <Link href={ROUTES.DASHBOARD} className={styles.logo}>
         <Image
           src="/moments_logo.png"
           alt={UI_LABELS.APP_NAME}
@@ -22,7 +21,7 @@ export const Sidebar = (): ReactElement => {
           height={60}
           priority
         />
-      </div>
+      </Link>
       <nav className={styles.nav}>
         {visibleNavItems.map((item) => (
           <Link
@@ -35,10 +34,6 @@ export const Sidebar = (): ReactElement => {
           </Link>
         ))}
       </nav>
-      <button type="button" className={styles.logoutBtn} onClick={onLogout}>
-        <span className={styles.navIcon}>{LOGOUT_ICON}</span>
-        <span className={styles.navLabel}>{logoutLabel}</span>
-      </button>
     </aside>
   )
 }
