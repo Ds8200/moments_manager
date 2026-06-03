@@ -2,7 +2,7 @@
 import { useState, type MouseEvent } from 'react'
 import { useFinancialReport, useTopCustomers } from '../../queries/useReports'
 import { formatCurrency } from '@/shared/utils/formatters'
-import { exportToExcel, exportToPrint } from '@/shared/utils/exportUtils'
+import { exportToExcel, exportToPrint, type ColumnGroup } from '@/shared/utils/exportUtils'
 import { useDropdownMenu, type DropdownMenuItem, type DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 import { HEBREW_MONTHS, REPORTS_LABELS } from '../../constants/reportsLabels'
 import type { FinancialReport, TopCustomer } from '../../types'
@@ -22,17 +22,25 @@ export interface UseReportsPageReturn {
   handleExportClick: (e: MouseEvent<HTMLButtonElement>) => void
 }
 
-const EXCEL_HEADERS = [
+// headers[0] = primary column (rowspan=2 in PDF), headers[1..] = sub-headers within groups
+const EXPORT_HEADERS = [
   REPORTS_LABELS.COL_MONTH,
   REPORTS_LABELS.COL_PAID_ORDERS,
   REPORTS_LABELS.COL_UNPAID_ORDERS,
   REPORTS_LABELS.COL_TOTAL_ORDERS,
+  REPORTS_LABELS.COL_COLLECTION_RATE,
   REPORTS_LABELS.COL_CASH,
   REPORTS_LABELS.COL_TRANSFER,
   REPORTS_LABELS.COL_UNPAID_AMOUNT,
   REPORTS_LABELS.COL_PAID_REVENUE,
   REPORTS_LABELS.COL_EXPENSES,
   REPORTS_LABELS.COL_PROFIT,
+]
+
+const COLUMN_GROUPS: ColumnGroup[] = [
+  { label: REPORTS_LABELS.GROUP_ORDERS, colSpan: 4 },
+  { label: REPORTS_LABELS.GROUP_PAYMENTS, colSpan: 4 },
+  { label: REPORTS_LABELS.GROUP_PROFIT, colSpan: 2 },
 ]
 
 export const useReportsPage = (): UseReportsPageReturn => {
@@ -53,6 +61,7 @@ export const useReportsPage = (): UseReportsPageReturn => {
       m.paid_count,
       m.unpaid_count,
       m.total_count,
+      `${m.collection_rate.toFixed(1)}%`,
       formatCurrency(m.cash_revenue),
       formatCurrency(m.transfer_revenue),
       formatCurrency(m.unpaid_amount),
@@ -69,8 +78,9 @@ export const useReportsPage = (): UseReportsPageReturn => {
       onClick: () => {
         exportToExcel({
           filename: `reports-${year}`,
-          headers: EXCEL_HEADERS,
+          headers: EXPORT_HEADERS,
           rows: buildRows(),
+          columnGroups: COLUMN_GROUPS,
         })
       },
     },
@@ -80,8 +90,9 @@ export const useReportsPage = (): UseReportsPageReturn => {
       onClick: () => {
         exportToPrint({
           title: `${REPORTS_LABELS.MONTHLY_TITLE} ${year}`,
-          headers: EXCEL_HEADERS,
+          headers: EXPORT_HEADERS,
           rows: buildRows(),
+          columnGroups: COLUMN_GROUPS,
         })
       },
     },
