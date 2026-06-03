@@ -48,6 +48,7 @@ class ReportService:
         transfer_revenue = await self._repo.month_revenue_by_payment_method(
             year, month, PaymentMethod.transfer
         )
+        paid_revenue = await self._repo.sum_month_paid_revenue(year, month)
         total_expenses = await self._repo.sum_month_expenses(year, month)
 
         return MonthlyReportSchema(
@@ -60,6 +61,7 @@ class ReportService:
             net_profit=total_profit - total_expenses,
             cash_revenue=cash_revenue,
             transfer_revenue=transfer_revenue,
+            paid_revenue=paid_revenue,
             order_count=order_count,
         )
 

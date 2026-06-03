@@ -60,6 +60,9 @@ export const ReportsPage = (): ReactElement => {
                   <th>{REPORTS_LABELS.COL_EXPENSES}</th>
                   <th>{REPORTS_LABELS.COL_PROFIT}</th>
                   <th>{REPORTS_LABELS.COL_ORDERS}</th>
+                  <th>{REPORTS_LABELS.COL_CASH}</th>
+                  <th>{REPORTS_LABELS.COL_TRANSFER}</th>
+                  <th>{REPORTS_LABELS.COL_PAID_REVENUE}</th>
                 </tr>
               </thead>
               <tbody>
@@ -70,6 +73,9 @@ export const ReportsPage = (): ReactElement => {
                     <td className={styles.cell}>{formatAmount(m.total_expenses)}</td>
                     <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.total_profit)}</td>
                     <td className={styles.cell}>{m.order_count}</td>
+                    <td className={styles.cell}>{formatAmount(m.cash_revenue)}</td>
+                    <td className={styles.cell}>{formatAmount(m.transfer_revenue)}</td>
+                    <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.paid_revenue)}</td>
                   </tr>
                 ))}
               </tbody>

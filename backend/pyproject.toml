@@ -36,6 +36,8 @@ testpaths = ["tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+# E712: SQLAlchemy intentionally uses == True/False to generate SQL boolean comparisons
+ignore = ["E712"]
 
 [dependency-groups]
 dev = [

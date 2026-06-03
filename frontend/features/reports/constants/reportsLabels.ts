@@ -10,6 +10,9 @@ export const REPORTS_LABELS = {
   COL_EXPENSES:    'הוצאות',
   COL_PROFIT:      'רווח',
   COL_ORDERS:      'הזמנות',
+  COL_CASH:        'מזומן',
+  COL_TRANSFER:    'העברה',
+  COL_PAID_REVENUE: 'סהכ הכנסות',
   TOP_CUSTOMERS:   'לקוחות מובילים',
   COL_CUSTOMER:    'לקוח',
 } as const
