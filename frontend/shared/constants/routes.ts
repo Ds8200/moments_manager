@@ -7,6 +7,7 @@ export const ROUTES = {
   REPORTS: '/reports',
   SEND_EMAIL: '/send-email',
   USERS: '/users',
+  PROFILE: '/profile',
   LOGIN: '/login',
 } as const
 

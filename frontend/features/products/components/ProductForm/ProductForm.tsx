@@ -1,12 +1,14 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useProductForm } from './useProductForm'
+import { CategoryManagerModal } from '../CategoryManagerModal/CategoryManagerModal'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 import styles from './ProductForm.module.scss'
 
 export const ProductForm = (): ReactElement | null => {
   const {
     isOpen, isEditing, register, handleSubmit, onSubmit, errors, isSubmitting, onClose,
+    categories, isCategoryManagerOpen, openCategoryManager, closeCategoryManager,
   } = useProductForm()
 
   return isOpen ? (
@@ -25,7 +27,17 @@ export const ProductForm = (): ReactElement | null => {
             </div>
             <div className={styles.field}>
               <label className={styles.label}>{PRODUCTS_LABELS.FORM_CATEGORY}</label>
-              <input className={styles.input} {...register('category')} />
+              <div className={styles.categoryRow}>
+                <select className={styles.input} {...register('category_id')}>
+                  <option value="">{PRODUCTS_LABELS.FORM_CATEGORY_PLACEHOLDER}</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <button type="button" className={styles.manageBtn} onClick={openCategoryManager}>
+                  {PRODUCTS_LABELS.FORM_MANAGE_CATEGORIES}
+                </button>
+              </div>
             </div>
             <div className={styles.field}>
               <label className={styles.label}>{PRODUCTS_LABELS.FORM_PRICE}</label>
@@ -55,6 +67,7 @@ export const ProductForm = (): ReactElement | null => {
             </button>
           </div>
         </form>
+        {isCategoryManagerOpen && <CategoryManagerModal onClose={closeCategoryManager} />}
       </div>
     </div>
   ) : null

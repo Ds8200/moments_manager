@@ -16,6 +16,7 @@ from src.config import settings
 import src.users.models  # noqa: F401
 import src.auth.models  # noqa: F401
 import src.customers.models  # noqa: F401
+import src.product_categories.models  # noqa: F401
 import src.products.models  # noqa: F401
 import src.orders.models  # noqa: F401
 import src.expenses.models  # noqa: F401

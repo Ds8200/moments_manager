@@ -96,6 +96,36 @@
   color: v.$danger;
 }
 
+.categoryRow {
+  display: flex;
+  gap: v.$space-2;
+  align-items: center;
+
+  select {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.manageBtn {
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  background: v.$bg-card;
+  cursor: pointer;
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+  font-family: v.$font-family;
+  white-space: nowrap;
+  transition: background v.$transition-fast, color v.$transition-fast;
+  flex-shrink: 0;
+
+  &:hover {
+    background: v.$gray-100;
+    color: v.$text-primary;
+  }
+}
+
 .checkboxField {
   justify-content: flex-end;
 }

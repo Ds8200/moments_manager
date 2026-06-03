@@ -1,0 +1,161 @@
+@use '../../../../shared/styles/variables' as v;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: calc(#{v.$z-modal} + 10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-4;
+}
+
+.modal {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-xl;
+  box-shadow: v.$shadow-elevated;
+  width: 100%;
+  max-width: 400px;
+  padding: v.$space-5;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-semibold;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$text-secondary;
+  font-size: v.$font-size-lg;
+  padding: v.$space-1;
+  border-radius: v.$border-radius-sm;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-100;
+  }
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+  min-height: 60px;
+}
+
+.empty {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  text-align: center;
+  padding: v.$space-4 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: v.$space-2 v.$space-3;
+  border-radius: v.$border-radius;
+  background: v.$bg-page;
+  gap: v.$space-2;
+}
+
+.rowName {
+  font-size: v.$font-size-sm;
+  flex: 1;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: v.$space-2;
+  flex-shrink: 0;
+}
+
+.rowError {
+  font-size: v.$font-size-xs;
+  color: v.$danger;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$text-secondary;
+  font-size: v.$font-size-sm;
+  padding: v.$space-1;
+  border-radius: v.$border-radius-sm;
+  transition: color v.$transition-fast;
+
+  &:hover {
+    color: v.$danger;
+  }
+}
+
+.addForm {
+  display: flex;
+  gap: v.$space-2;
+  flex-shrink: 0;
+  padding-top: v.$space-3;
+  border-top: 1px solid v.$border-color;
+}
+
+.addInput {
+  flex: 1;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  transition: border-color v.$transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+.addBtn {
+  padding: v.$space-2 v.$space-4;
+  background: v.$primary;
+  border: none;
+  border-radius: v.$border-radius;
+  color: v.$text-inverse;
+  cursor: pointer;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  white-space: nowrap;
+  transition: background v.$transition-fast;
+
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

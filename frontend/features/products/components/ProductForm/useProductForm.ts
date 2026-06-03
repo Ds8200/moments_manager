@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,12 +7,13 @@ import { z } from 'zod'
 import { useAtom } from 'jotai'
 import { isProductFormOpenAtom, editingProductIdAtom } from '../../store/productsAtoms'
 import { useProduct, useCreateProduct, useUpdateProduct } from '../../queries/useProducts'
-import type { ProductFormValues } from '../../types'
+import { useProductCategories } from '@/features/productCategories'
+import type { ProductCategory, ProductFormValues } from '../../types'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 
 const schema = z.object({
   name:     z.string().min(1, PRODUCTS_LABELS.VALIDATION_NAME_REQUIRED),
-  category: z.string(),
+  category_id: z.string(),
   base_price: z.string().min(1, PRODUCTS_LABELS.VALIDATION_PRICE),
   base_cost:  z.string().min(1, PRODUCTS_LABELS.VALIDATION_COST),
   avg_production_days: z.preprocess(
@@ -27,7 +28,7 @@ const schema = z.object({
 
 const DEFAULT_VALUES: ProductFormValues = {
   name:                '',
-  category:            '',
+  category_id:         '',
   base_price:          '',
   base_cost:           '',
   avg_production_days: null,
@@ -43,6 +44,10 @@ export interface UseProductFormReturn {
   errors: ReturnType<typeof useForm<ProductFormValues>>['formState']['errors']
   isSubmitting: boolean
   onClose: () => void
+  categories: ProductCategory[]
+  isCategoryManagerOpen: boolean
+  openCategoryManager: () => void
+  closeCategoryManager: () => void
 }
 
 export const useProductForm = (): UseProductFormReturn => {
@@ -51,6 +56,8 @@ export const useProductForm = (): UseProductFormReturn => {
   const { data: existingProduct }   = useProduct(editingId)
   const createProduct               = useCreateProduct()
   const updateProduct               = useUpdateProduct()
+  const { data: categories = [] }   = useProductCategories()
+  const [isCategoryManagerOpen, setCategoryManagerOpen] = useState(false)
 
   const {
     register,
@@ -67,7 +74,7 @@ export const useProductForm = (): UseProductFormReturn => {
     if (isOpen && existingProduct) {
       reset({
         name:                existingProduct.name,
-        category:            existingProduct.category ?? '',
+        category_id:         existingProduct.category_id ?? '',
         base_price:          existingProduct.base_price,
         base_cost:           existingProduct.base_cost,
         avg_production_days: existingProduct.avg_production_days,
@@ -81,13 +88,15 @@ export const useProductForm = (): UseProductFormReturn => {
   const onClose = (): void => {
     setOpen(false)
     setEditingId(null)
+    setCategoryManagerOpen(false)
   }
 
   const onSubmit = async (values: ProductFormValues): Promise<void> => {
+    const payload = { ...values, category_id: values.category_id || null }
     if (editingId) {
-      await updateProduct.mutateAsync({ id: editingId, payload: values })
+      await updateProduct.mutateAsync({ id: editingId, payload })
     } else {
-      await createProduct.mutateAsync(values)
+      await createProduct.mutateAsync(payload as ProductFormValues)
     }
     onClose()
   }
@@ -101,5 +110,9 @@ export const useProductForm = (): UseProductFormReturn => {
     errors,
     isSubmitting,
     onClose,
+    categories,
+    isCategoryManagerOpen,
+    openCategoryManager: () => setCategoryManagerOpen(true),
+    closeCategoryManager: () => setCategoryManagerOpen(false),
   }
 }

@@ -28,13 +28,19 @@ function makeWrapper(store: ReturnType<typeof createStore>, qc: QueryClient) {
 const PRODUCT_ROW = {
   id: 'p1',
   name: 'חולצה',
-  category: 'הדפסה',
+  category: null,
+  category_id: null,
   base_price: '100.00',
   base_cost: '40.00',
   avg_production_days: 2,
   is_active: true,
   created_at: '2025-01-01T00:00:00Z',
   updated_at: '2025-01-01T00:00:00Z',
+}
+
+function makeMockEvent() {
+  const el = document.createElement('tr')
+  return { currentTarget: el } as unknown as React.MouseEvent<Element>
 }
 
 describe('useProductsTable', () => {
@@ -65,23 +71,41 @@ describe('useProductsTable', () => {
     expect(result.current.products[0].name).toBe('חולצה')
   })
 
-  it('onEdit sets editing atom and opens form', () => {
+  it('onRowClick opens menu with product name as title', () => {
+    const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
+    expect(result.current.menuState.isOpen).toBe(false)
+
+    act(() => {
+      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
+    })
+
+    expect(result.current.menuState.isOpen).toBe(true)
+    expect(result.current.menuState.title).toBe('חולצה')
+  })
+
+  it('edit menu item sets editing atom and opens form', () => {
     const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onEdit('p1')
+      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
     })
+
+    const editItem = result.current.menuState.items.find((i) => i.label === PRODUCTS_LABELS.TABLE_EDIT_TITLE)
+    act(() => { editItem!.onClick() })
 
     expect(store.get(editingProductIdAtom)).toBe('p1')
     expect(store.get(isProductFormOpenAtom)).toBe(true)
   })
 
-  it('onDelete opens confirm dialog with product name in message', () => {
+  it('delete menu item opens confirm dialog with product name', () => {
     const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onDelete('p1', 'חולצה')
+      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
     })
+
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
     expect(confirmFn).toHaveBeenCalledWith(
       expect.objectContaining<Partial<ConfirmDialogOptions>>({
@@ -91,26 +115,28 @@ describe('useProductsTable', () => {
     )
   })
 
-  it('onDelete calls mutate when onConfirm callback is invoked', () => {
+  it('delete menu item calls onConfirm when confirmed', () => {
     confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
     const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onDelete('p1', 'חולצה')
+      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
     })
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
-    // mutate is called — no error thrown means success (mutation is fire-and-forget in test)
     expect(confirmFn).toHaveBeenCalled()
   })
 
-  it('onDelete does not mutate when confirm dialog is dismissed', () => {
+  it('delete does not mutate when confirm dialog is dismissed', () => {
     const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onDelete('p1', 'חולצה')
+      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
     })
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
-    // confirmFn is called but onConfirm is never invoked — mutation never fires
     expect(confirmFn).toHaveBeenCalled()
   })
 

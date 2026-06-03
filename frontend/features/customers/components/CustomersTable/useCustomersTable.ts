@@ -1,10 +1,14 @@
 'use client'
+import { type MouseEvent } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useCustomers, useDeleteCustomer } from '../../queries/useCustomers'
 import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom, emailingCustomerIdAtom } from '../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
 import { useConfirm } from '@/shared/hooks/useConfirm'
+import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
 import type { Customer } from '../../types'
+import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
 export interface UseCustomersTableReturn {
   customers: Customer[]
@@ -13,9 +17,9 @@ export interface UseCustomersTableReturn {
   totalPages: number
   isLoading: boolean
   isError: boolean
-  onEdit: (id: string) => void
-  onDelete: (id: string, name: string) => void
-  onEmail: (id: string) => void
+  menuState: DropdownMenuState
+  onRowClick: (customer: Customer, e: MouseEvent<Element>) => void
+  closeMenu: () => void
   onPageChange: (page: number) => void
 }
 
@@ -26,9 +30,33 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
   const setEditingId = useSetAtom(editingCustomerIdAtom)
   const setEmailingId = useSetAtom(emailingCustomerIdAtom)
   const deleteCustomer = useDeleteCustomer()
+  const confirm = useConfirm()
+  const { menuState, openMenu, closeMenu } = useDropdownMenu()
 
   const { data, isLoading, isError } = useCustomers(filters.page, filters.search, filters.page_size)
-  const confirm = useConfirm()
+
+  const onEdit = (id: string): void => {
+    setEditingId(id)
+    setFormOpen(true)
+  }
+
+  const onDelete = (id: string, name: string): void => {
+    confirm({
+      message: `${CUSTOMERS_LABELS.CONFIRM_DELETE} ${name}?`,
+      isDangerous: true,
+      onConfirm: () => deleteCustomer.mutate(id),
+    })
+  }
+
+  const onEmail = (id: string): void => setEmailingId(id)
+
+  const onRowClick = (customer: Customer, e: MouseEvent<Element>): void => {
+    openMenu(customer.name, [
+      { label: UI_LABELS.EMAIL_ACTION, icon: '✉️', onClick: () => onEmail(customer.id) },
+      { label: CUSTOMERS_LABELS.TABLE_EDIT_TITLE, icon: '✏️', onClick: () => onEdit(customer.id) },
+      { label: CUSTOMERS_LABELS.TABLE_DELETE_TITLE, icon: '🗑️', onClick: () => onDelete(customer.id, customer.name), variant: 'danger' },
+    ], e)
+  }
 
   return {
     customers: data?.items ?? [],
@@ -37,22 +65,9 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
     totalPages: data?.pages ?? 1,
     isLoading,
     isError,
-
-    onEdit: (id) => {
-      setEditingId(id)
-      setFormOpen(true)
-    },
-
-    onDelete: (id, name) => {
-      confirm({
-        message: `${CUSTOMERS_LABELS.CONFIRM_DELETE} ${name}?`,
-        isDangerous: true,
-        onConfirm: () => deleteCustomer.mutate(id),
-      })
-    },
-
-    onEmail: (id) => setEmailingId(id),
-
+    menuState,
+    onRowClick,
+    closeMenu,
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
   }
 }

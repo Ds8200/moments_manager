@@ -3,10 +3,12 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
+from src.product_categories.schemas import ProductCategoryResponseSchema
+
 
 class ProductCreateSchema(BaseModel):
     name: str
-    category: str | None = None
+    category_id: str | None = None
     base_price: Decimal = Decimal("0")
     base_cost: Decimal = Decimal("0")
     avg_production_days: int = 0
@@ -14,7 +16,7 @@ class ProductCreateSchema(BaseModel):
 
 class ProductUpdateSchema(BaseModel):
     name: str | None = None
-    category: str | None = None
+    category_id: str | None = None
     base_price: Decimal | None = None
     base_cost: Decimal | None = None
     avg_production_days: int | None = None
@@ -26,7 +28,8 @@ class ProductResponseSchema(BaseModel):
 
     id: str
     name: str
-    category: str | None
+    category_id: str | None
+    category: ProductCategoryResponseSchema | None
     base_price: Decimal
     base_cost: Decimal
     avg_production_days: int

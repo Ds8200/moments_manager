@@ -1,13 +1,16 @@
 'use client'
+import { type MouseEvent } from 'react'
 import { useSetAtom } from 'jotai'
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/useOrders'
 import { orderFiltersAtom, selectedOrderIdAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { formatCurrency, formatDateTime } from '@/shared/utils/formatters'
 import { useConfirm } from '@/shared/hooks/useConfirm'
+import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
 import type { OrderSummary, UrgencyLevel } from '../../types'
 import type { OrderStatus } from '@/shared/enums/statusEnums'
 import { PAYMENT_STATE_LABELS, getPaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
+import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
 export interface UseOrdersTableReturn {
   orders: OrderSummary[]
@@ -16,9 +19,9 @@ export interface UseOrdersTableReturn {
   totalPages: number
   isLoading: boolean
   isError: boolean
-  onRowClick: (id: string) => void
-  onEditOrder: (id: string) => void
-  onDeleteOrder: (id: string) => void
+  menuState: DropdownMenuState
+  onRowMenuClick: (order: OrderSummary, e: MouseEvent<Element>) => void
+  closeMenu: () => void
   onStatusChange: (id: string, status: OrderStatus) => void
   onPageChange: (page: number) => void
   formatAmount: (amount: string) => string
@@ -57,6 +60,30 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
   const updateStatus = useUpdateOrderStatus()
   const deleteOrder = useDeleteOrder()
   const confirm = useConfirm()
+  const { menuState, openMenu, closeMenu } = useDropdownMenu()
+
+  const onViewOrder = (id: string): void => setSelectedId(id)
+
+  const onEditOrder = (id: string): void => {
+    setEditingId(id)
+    setFormOpen(true)
+  }
+
+  const onDeleteOrder = (id: string): void => {
+    confirm({
+      message: ORDERS_LABELS.CONFIRM_DELETE,
+      isDangerous: true,
+      onConfirm: () => deleteOrder.mutate(id),
+    })
+  }
+
+  const onRowMenuClick = (order: OrderSummary, e: MouseEvent<Element>): void => {
+    openMenu(`#${order.order_number}`, [
+      { label: ORDERS_LABELS.DETAIL_EDIT_TITLE, icon: '📋', onClick: () => onViewOrder(order.id) },
+      { label: ORDERS_LABELS.TABLE_EDIT_TITLE, icon: '✏️', onClick: () => onEditOrder(order.id) },
+      { label: ORDERS_LABELS.TABLE_DELETE_TITLE, icon: '🗑️', onClick: () => onDeleteOrder(order.id), variant: 'danger' },
+    ], e)
+  }
 
   return {
     orders: data?.items ?? [],
@@ -65,21 +92,9 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     totalPages: data?.pages ?? 1,
     isLoading,
     isError,
-
-    onRowClick: (id) => setSelectedId(id),
-
-    onEditOrder: (id) => {
-      setEditingId(id)
-      setFormOpen(true)
-    },
-
-    onDeleteOrder: (id) => {
-      confirm({
-        message: ORDERS_LABELS.CONFIRM_DELETE,
-        isDangerous: true,
-        onConfirm: () => deleteOrder.mutate(id),
-      })
-    },
+    menuState,
+    onRowMenuClick,
+    closeMenu,
 
     onStatusChange: (id, status) => {
       updateStatus.mutate({ id, payload: { status } })
@@ -98,9 +113,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     },
 
     getUrgencyLabel: (urgency) => URGENCY_LABEL_MAP[urgency],
-
     getUrgencyClass: (urgency) => URGENCY_CLASS_MAP[urgency],
-
     getPaymentLabel: (isPaid, method) => PAYMENT_STATE_LABELS[getPaymentState(isPaid, method)],
   }
 }

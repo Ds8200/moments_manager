@@ -20,10 +20,12 @@ class MonthlyReportSchema(BaseModel):
     total_profit: Decimal
     total_expenses: Decimal
     net_profit: Decimal
+    paid_count: int
+    unpaid_count: int
     cash_revenue: Decimal
     transfer_revenue: Decimal
+    unpaid_amount: Decimal
     paid_revenue: Decimal
-    order_count: int
 
 
 class FinancialYearSchema(BaseModel):

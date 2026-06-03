@@ -24,11 +24,11 @@ class ProductService:
         self,
         params: PaginationParams,
         search: str | None = None,
-        category: str | None = None,
+        category_id: str | None = None,
         is_active: bool | None = None,
     ) -> PaginatedResponse[ProductResponseSchema]:
         products, total = await self._repo.get_all(
-            search, category, is_active, params.page_size, params.offset
+            search, category_id, is_active, params.page_size, params.offset
         )
         pages = (total + params.page_size - 1) // params.page_size
         return PaginatedResponse(
@@ -57,7 +57,11 @@ class ProductService:
         product = await self._repo.get_by_id(product_id)
         if not product:
             raise NotFoundError(RESOURCE_PRODUCT, product_id)
-        await self._repo.update(product, data.model_dump(exclude_none=True))
+        update_data = data.model_dump(exclude_none=True)
+        # Allow explicitly clearing category_id when it was set in the request body
+        if "category_id" in data.model_fields_set and data.category_id is None:
+            update_data["category_id"] = None
+        await self._repo.update(product, update_data)
         await self._db.commit()
         refreshed = await self._repo.get_by_id(product_id)
         return ProductResponseSchema.model_validate(refreshed)

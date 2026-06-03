@@ -31,3 +31,11 @@ LOGGED_OUT = "Logged out successfully"
 CUSTOMER_EMAIL_SENT = "Email queued for delivery"
 CUSTOMER_NO_EMAIL = "Customer has no email address on file"
 COMPOSE_EMAIL_SENT = "Emails queued for delivery"
+
+PROFILE_UPDATED = "Profile updated successfully"
+WRONG_CURRENT_PASSWORD = "Current password is incorrect"
+
+RESOURCE_PRODUCT_CATEGORY = "ProductCategory"
+PRODUCT_CATEGORY_NOT_FOUND = "Product category not found"
+PRODUCT_CATEGORY_NAME_EXISTS = "A category with this name already exists"
+PRODUCT_CATEGORY_IN_USE = "Category is in use by one or more products and cannot be deleted"

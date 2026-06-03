@@ -56,26 +56,28 @@ export const ReportsPage = (): ReactElement => {
               <thead className={styles.thead}>
                 <tr>
                   <th>{REPORTS_LABELS.COL_MONTH}</th>
-                  <th>{REPORTS_LABELS.COL_REVENUE}</th>
-                  <th>{REPORTS_LABELS.COL_EXPENSES}</th>
-                  <th>{REPORTS_LABELS.COL_PROFIT}</th>
-                  <th>{REPORTS_LABELS.COL_ORDERS}</th>
+                  <th>{REPORTS_LABELS.COL_PAID_ORDERS}</th>
+                  <th>{REPORTS_LABELS.COL_UNPAID_ORDERS}</th>
                   <th>{REPORTS_LABELS.COL_CASH}</th>
                   <th>{REPORTS_LABELS.COL_TRANSFER}</th>
+                  <th>{REPORTS_LABELS.COL_UNPAID_AMOUNT}</th>
                   <th>{REPORTS_LABELS.COL_PAID_REVENUE}</th>
+                  <th>{REPORTS_LABELS.COL_EXPENSES}</th>
+                  <th>{REPORTS_LABELS.COL_PROFIT}</th>
                 </tr>
               </thead>
               <tbody>
                 {financial.months.map((m) => (
                   <tr key={m.month} className={styles.row}>
                     <td className={`${styles.cell} ${styles.monthName}`}>{getMonthName(m.month)}</td>
-                    <td className={styles.cell}>{formatAmount(m.total_revenue)}</td>
-                    <td className={styles.cell}>{formatAmount(m.total_expenses)}</td>
-                    <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.total_profit)}</td>
-                    <td className={styles.cell}>{m.order_count}</td>
+                    <td className={styles.cell}>{m.paid_count}</td>
+                    <td className={styles.cell}>{m.unpaid_count}</td>
                     <td className={styles.cell}>{formatAmount(m.cash_revenue)}</td>
                     <td className={styles.cell}>{formatAmount(m.transfer_revenue)}</td>
+                    <td className={`${styles.cell} ${styles.kpiNegative}`}>{formatAmount(m.unpaid_amount)}</td>
                     <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.paid_revenue)}</td>
+                    <td className={styles.cell}>{formatAmount(m.total_expenses)}</td>
+                    <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.total_profit)}</td>
                   </tr>
                 ))}
               </tbody>

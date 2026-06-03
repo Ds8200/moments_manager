@@ -21,6 +21,29 @@ export const UI_LABELS = {
   MORE:                   'עוד',
   LOGOUT:                 'התנתקות',
   MENU_TITLE:             'תפריט',
+  // Header greetings
+  GOOD_MORNING:           'בוקר טוב',
+  GOOD_AFTERNOON:         'צהריים טובים',
+  GOOD_EVENING:           'ערב טוב',
+  GOOD_NIGHT:             'לילה טוב',
+  GREETING_FALLBACK:      'שלום',
+  // Profile
+  EDIT_PROFILE:           'עריכת פרופיל',
+  PROFILE_TITLE:          'הפרופיל שלי',
+  PROFILE_NAME_SECTION:   'שינוי שם',
+  PROFILE_PASSWORD_SECTION: 'שינוי סיסמה',
+  FULL_NAME_LABEL:        'שם מלא',
+  CURRENT_PASSWORD_LABEL: 'סיסמה נוכחית',
+  NEW_PASSWORD_LABEL:     'סיסמה חדשה',
+  SAVE_CHANGES:           'שמור שינויים',
+  PROFILE_UPDATED_SUCCESS: 'הפרופיל עודכן בהצלחה',
+  PROFILE_WRONG_PASSWORD:  'הסיסמה הנוכחית שגויה',
+  // Navigation
+  OPEN_NAV:               'פתח תפריט ניווט',
+  CLOSE_NAV:              'סגור תפריט ניווט',
+  OPEN_PROFILE_MENU:      'פתח תפריט פרופיל',
+  // DropdownMenu
+  EMAIL_ACTION:           'שליחת מייל',
 } as const
 
 export const META_LABELS = {
@@ -35,6 +58,7 @@ export const META_LABELS = {
   USERS_TITLE:       'משתמשים | Moments מערכת ניהול',
   SEND_EMAIL_TITLE:  'שליחת מייל | Moments מערכת ניהול',
   LOGIN_TITLE:       'התחברות | Moments מערכת ניהול',
+  PROFILE_TITLE_META: 'פרופיל | Moments מערכת ניהול',
 } as const
 
 export const DASHBOARD_LABELS = {

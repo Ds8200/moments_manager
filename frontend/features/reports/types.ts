@@ -6,10 +6,12 @@ export interface MonthlyReport {
   total_profit: string
   total_expenses: string
   net_profit: string
+  paid_count: number
+  unpaid_count: number
   cash_revenue: string
   transfer_revenue: string
+  unpaid_amount: string
   paid_revenue: string
-  order_count: number
 }
 
 export interface FinancialReport {

@@ -19,6 +19,7 @@ from src.customers.router import router as customers_router
 from src.database import engine
 from src.expenses.router import router as expenses_router
 from src.orders.router import router as orders_router
+from src.product_categories.router import router as product_categories_router
 from src.products.router import router as products_router
 from src.reports.router import router as reports_router
 from src.users.router import router as users_router
@@ -63,6 +64,7 @@ register_exception_handlers(app)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(customers_router)
+app.include_router(product_categories_router)
 app.include_router(products_router)
 app.include_router(orders_router)
 app.include_router(expenses_router)

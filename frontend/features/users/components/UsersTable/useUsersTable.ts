@@ -1,11 +1,14 @@
 'use client'
+import { type MouseEvent } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
 import { useUsers, useDeleteUser } from '../../queries/useUsers'
 import { usersPageAtom } from '../../store/usersAtoms'
 import { USERS_LABELS } from '../../constants/usersLabels'
 import { useConfirm } from '@/shared/hooks/useConfirm'
+import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
 import { currentUserIdAtom } from '@/features/auth/store/authAtoms'
 import type { User } from '../../types'
+import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
 export interface UseUsersTableReturn {
   users: User[]
@@ -14,8 +17,9 @@ export interface UseUsersTableReturn {
   totalPages: number
   isLoading: boolean
   isError: boolean
-  currentUserId: string | null
-  onDelete: (id: string, name: string) => void
+  menuState: DropdownMenuState
+  onRowClick: (user: User, e: MouseEvent<Element>) => void
+  closeMenu: () => void
   onPageChange: (page: number) => void
 }
 
@@ -24,8 +28,24 @@ export const useUsersTable = (): UseUsersTableReturn => {
   const currentUserId = useAtomValue(currentUserIdAtom)
   const deleteUser = useDeleteUser()
   const confirm = useConfirm()
+  const { menuState, openMenu, closeMenu } = useDropdownMenu()
 
   const { data, isLoading, isError } = useUsers(page)
+
+  const onDelete = (id: string, name: string): void => {
+    confirm({
+      message: `${USERS_LABELS.CONFIRM_DELETE} ${name}?`,
+      isDangerous: true,
+      onConfirm: () => deleteUser.mutate(id),
+    })
+  }
+
+  const onRowClick = (user: User, e: MouseEvent<Element>): void => {
+    if (user.id === currentUserId) return
+    openMenu(user.full_name, [
+      { label: USERS_LABELS.TABLE_DELETE_TITLE, icon: '🗑️', onClick: () => onDelete(user.id, user.full_name), variant: 'danger' },
+    ], e)
+  }
 
   return {
     users: data?.items ?? [],
@@ -34,16 +54,9 @@ export const useUsersTable = (): UseUsersTableReturn => {
     totalPages: data?.pages ?? 1,
     isLoading,
     isError,
-    currentUserId,
-
-    onDelete: (id, name) => {
-      confirm({
-        message: `${USERS_LABELS.CONFIRM_DELETE} ${name}?`,
-        isDangerous: true,
-        onConfirm: () => deleteUser.mutate(id),
-      })
-    },
-
+    menuState,
+    onRowClick,
+    closeMenu,
     onPageChange: (next) => setPage(next),
   }
 }

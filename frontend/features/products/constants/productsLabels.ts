@@ -39,6 +39,18 @@ export const PRODUCTS_LABELS = {
   FORM_SAVE:                'שמור',
   FORM_SAVING:              'שומר...',
 
+  FORM_CATEGORY_PLACEHOLDER: '-- בחר קטגוריה --',
+  FORM_MANAGE_CATEGORIES:   'נהל קטגוריות',
+
+  CATEGORY_MANAGER_TITLE:   'ניהול קטגוריות',
+  CATEGORY_ADD_PLACEHOLDER: 'שם קטגוריה חדשה',
+  CATEGORY_ADD_BTN:         'הוסף',
+  CATEGORY_EMPTY:           'אין קטגוריות עדיין',
+  CATEGORY_IN_USE_ERROR:    'הקטגוריה בשימוש ולא ניתן למחוק אותה',
+  CATEGORY_DELETE_TITLE:    'מחק קטגוריה',
+  CATEGORY_CREATED:         'הקטגוריה נוצרה',
+  CATEGORY_DELETED:         'הקטגוריה נמחקה',
+
   VALIDATION_NAME_REQUIRED: 'נדרש שם מוצר',
   VALIDATION_PRICE:         'נדרש מחיר',
   VALIDATION_COST:          'נדרשת עלות',

@@ -1,19 +1,78 @@
 @use '../../../../shared/styles/variables' as v;
+@use '../../../../shared/styles/mixins' as m;
 
 .header {
+  @include m.flex-between;
   height: v.$header-height;
   background: v.$bg-card;
   border-bottom: 1px solid v.$border-color;
-  display: flex;
-  align-items: center;
-  padding: 0 v.$space-6;
+  padding: 0 v.$space-4;
   position: sticky;
   top: 0;
   z-index: v.$z-header;
+  gap: v.$space-3;
 }
 
-.title {
-  font-size: v.$font-size-xl;
-  font-weight: v.$font-weight-semibold;
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: v.$border-radius-sm;
+  padding: v.$space-2;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-100;
+  }
+}
+
+.bar {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: v.$text-primary;
+  border-radius: 2px;
+  transition: background v.$transition-fast;
+}
+
+.greeting {
+  flex: 1;
+  text-align: center;
+  font-size: v.$font-size-md;
+  font-weight: v.$font-weight-medium;
   color: v.$text-primary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: 380px) {
+    font-size: v.$font-size-sm;
+  }
+}
+
+.profileBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid v.$border-color;
+  background: v.$gray-100;
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 18px;
+  transition: background v.$transition-fast, border-color v.$transition-fast;
+
+  &:hover {
+    background: v.$primary-light;
+    border-color: v.$primary;
+  }
 }

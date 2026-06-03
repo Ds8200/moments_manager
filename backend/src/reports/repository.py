@@ -55,6 +55,7 @@ class ReportRepository:
         result = await self._db.execute(
             select(func.coalesce(func.sum(Order.total_profit), 0)).where(
                 Order.is_deleted == False,
+                Order.is_paid == True,
                 extract("year", Order.date) == year,
                 extract("month", Order.date) == month,
             )
@@ -85,6 +86,7 @@ class ReportRepository:
     ) -> tuple[Decimal, Decimal, Decimal, int]:
         base_filter = and_(
             Order.is_deleted == False,
+            Order.is_paid == True,
             extract("year", Order.date) == year,
             extract("month", Order.date) == month,
         )
@@ -125,6 +127,30 @@ class ReportRepository:
             select(func.coalesce(func.sum(Order.total_amount), 0)).where(
                 Order.is_deleted == False,
                 Order.is_paid == True,
+                extract("year", Order.date) == year,
+                extract("month", Order.date) == month,
+            )
+        )
+        return Decimal(str(result.scalar_one()))
+
+    async def count_month_unpaid_orders(self, year: int, month: int) -> int:
+        result = await self._db.execute(
+            select(func.count(Order.id)).where(
+                Order.is_deleted == False,
+                Order.is_paid == False,
+                Order.status != OrderStatus.cancelled.value,
+                extract("year", Order.date) == year,
+                extract("month", Order.date) == month,
+            )
+        )
+        return result.scalar_one()
+
+    async def sum_month_unpaid_amount(self, year: int, month: int) -> Decimal:
+        result = await self._db.execute(
+            select(func.coalesce(func.sum(Order.total_amount), 0)).where(
+                Order.is_deleted == False,
+                Order.is_paid == False,
+                Order.status != OrderStatus.cancelled.value,
                 extract("year", Order.date) == year,
                 extract("month", Order.date) == month,
             )

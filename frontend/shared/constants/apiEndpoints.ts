@@ -10,6 +10,9 @@ export const API_ENDPOINTS = {
   CUSTOMER:     (id: string) => `${BASE}/api/v1/customers/${id}`,
   CUSTOMER_ORDERS: (id: string) => `${BASE}/api/v1/customers/${id}/orders`,
 
+  PRODUCT_CATEGORIES:  `${BASE}/api/v1/product-categories`,
+  PRODUCT_CATEGORY:    (id: string) => `${BASE}/api/v1/product-categories/${id}`,
+
   PRODUCTS:     `${BASE}/api/v1/products`,
   PRODUCT:      (id: string) => `${BASE}/api/v1/products/${id}`,
 
@@ -34,4 +37,5 @@ export const API_ENDPOINTS = {
 
   USERS: `${BASE}/api/v1/users`,
   USER: (id: string) => `${BASE}/api/v1/users/${id}`,
+  ME: `${BASE}/api/v1/users/me`,
 } as const

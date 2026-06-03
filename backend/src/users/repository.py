@@ -48,6 +48,19 @@ class UserRepository:
         await self._db.flush()
         return user
 
+    async def update_me(
+        self,
+        user: User,
+        full_name: str | None = None,
+        hashed_password: str | None = None,
+    ) -> User:
+        if full_name is not None:
+            user.full_name = full_name
+        if hashed_password is not None:
+            user.hashed_password = hashed_password
+        await self._db.flush()
+        return user
+
     async def delete(self, user: User) -> None:
         await self._db.delete(user)
         await self._db.flush()

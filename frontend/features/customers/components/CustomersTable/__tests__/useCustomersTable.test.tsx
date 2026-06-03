@@ -35,6 +35,11 @@ const CUSTOMER_ROW = {
   updated_at: '2025-01-01T00:00:00Z',
 }
 
+function makeMockEvent() {
+  const el = document.createElement('tr')
+  return { currentTarget: el } as unknown as React.MouseEvent<Element>
+}
+
 describe('useCustomersTable', () => {
   let store: ReturnType<typeof createStore>
   let qc: QueryClient
@@ -63,23 +68,41 @@ describe('useCustomersTable', () => {
     expect(result.current.customers[0].name).toBe('דניאל')
   })
 
-  it('onEdit sets editing atom and opens form', () => {
+  it('onRowClick opens menu with customer name as title', () => {
+    const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
+    expect(result.current.menuState.isOpen).toBe(false)
+
+    act(() => {
+      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
+    })
+
+    expect(result.current.menuState.isOpen).toBe(true)
+    expect(result.current.menuState.title).toBe('דניאל')
+  })
+
+  it('edit menu item sets editing atom and opens form', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onEdit('c1')
+      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
     })
+
+    const editItem = result.current.menuState.items.find((i) => i.label === CUSTOMERS_LABELS.TABLE_EDIT_TITLE)
+    act(() => { editItem!.onClick() })
 
     expect(store.get(editingCustomerIdAtom)).toBe('c1')
     expect(store.get(isCustomerFormOpenAtom)).toBe(true)
   })
 
-  it('onDelete opens confirm dialog with customer name in message', () => {
+  it('delete menu item opens confirm dialog with customer name', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onDelete('c1', 'דניאל')
+      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
     })
+
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
     expect(confirmFn).toHaveBeenCalledWith(
       expect.objectContaining<Partial<ConfirmDialogOptions>>({
@@ -89,35 +112,42 @@ describe('useCustomersTable', () => {
     )
   })
 
-  it('onDelete calls mutate when onConfirm callback is invoked', () => {
+  it('delete menu item calls mutate when onConfirm callback is invoked', () => {
     confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onDelete('c1', 'דניאל')
+      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
     })
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
     expect(confirmFn).toHaveBeenCalled()
   })
 
-  it('onDelete does not mutate when confirm dialog is dismissed', () => {
+  it('email menu item sets emailingCustomerIdAtom', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onDelete('c1', 'דניאל')
+      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
     })
 
-    expect(confirmFn).toHaveBeenCalled()
-  })
-
-  it('onEmail sets emailingCustomerIdAtom', () => {
-    const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onEmail('c1')
-    })
+    const emailItem = result.current.menuState.items[0]
+    act(() => { emailItem.onClick() })
 
     expect(store.get(emailingCustomerIdAtom)).toBe('c1')
+  })
+
+  it('closeMenu closes the menu', () => {
+    const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
+
+    act(() => {
+      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
+    })
+    expect(result.current.menuState.isOpen).toBe(true)
+
+    act(() => { result.current.closeMenu() })
+    expect(result.current.menuState.isOpen).toBe(false)
   })
 
   it('onPageChange updates customerFiltersAtom.page', () => {

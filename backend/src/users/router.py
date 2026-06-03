@@ -3,13 +3,32 @@ import logging
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.dependencies import get_db, require_admin
+from src.core.dependencies import get_current_user, get_db, require_admin
 from src.core.schemas import PaginatedResponse, PaginationParams
-from src.users.schemas import UserCreateSchema, UserResponseSchema
+from src.users.schemas import UserCreateSchema, UserResponseSchema, UserUpdateMeSchema
 from src.users.service import UserService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
+
+
+@router.get("/me", response_model=UserResponseSchema)
+async def get_me(
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    svc = UserService(db)
+    return await svc.get_me(current_user)
+
+
+@router.patch("/me", response_model=UserResponseSchema)
+async def update_me(
+    body: UserUpdateMeSchema,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    svc = UserService(db)
+    return await svc.update_me(current_user, body)
 
 
 @router.get("", response_model=PaginatedResponse[UserResponseSchema])

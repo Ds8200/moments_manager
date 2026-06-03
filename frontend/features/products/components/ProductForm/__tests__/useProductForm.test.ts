@@ -14,6 +14,10 @@ vi.mock('../../../queries/useProducts', () => ({
   useUpdateProduct: () => ({ mutateAsync: updateMutateAsync }),
 }))
 
+vi.mock('@/features/productCategories', () => ({
+  useProductCategories: () => ({ data: [] }),
+}))
+
 const wrapper = ({ children }: { children: ReactNode }) => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return createElement(QueryClientProvider, { client }, children)
@@ -31,13 +35,24 @@ describe('useProductForm', () => {
     expect(result.current.isEditing).toBe(false)
   })
 
+  it('isCategoryManagerOpen is false initially', () => {
+    const { result } = renderHook(() => useProductForm(), { wrapper })
+    expect(result.current.isCategoryManagerOpen).toBe(false)
+  })
+
+  it('openCategoryManager sets isCategoryManagerOpen to true', async () => {
+    const { result } = renderHook(() => useProductForm(), { wrapper })
+    act(() => result.current.openCategoryManager())
+    expect(result.current.isCategoryManagerOpen).toBe(true)
+  })
+
   it('onSubmit calls createProduct when not editing', async () => {
     const { result } = renderHook(() => useProductForm(), { wrapper })
 
     await act(async () => {
       await result.current.onSubmit({
         name: 'New Item',
-        category: 'print',
+        category_id: 'cat-1',
         base_price: '10',
         base_cost: '5',
         avg_production_days: 2,
@@ -49,5 +64,26 @@ describe('useProductForm', () => {
       expect(createMutateAsync).toHaveBeenCalledOnce()
     })
     expect(updateMutateAsync).not.toHaveBeenCalled()
+  })
+
+  it('onSubmit converts empty category_id to null', async () => {
+    const { result } = renderHook(() => useProductForm(), { wrapper })
+
+    await act(async () => {
+      await result.current.onSubmit({
+        name: 'Item',
+        category_id: '',
+        base_price: '10',
+        base_cost: '5',
+        avg_production_days: null,
+        is_active: true,
+      })
+    })
+
+    await waitFor(() => {
+      expect(createMutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({ category_id: null }),
+      )
+    })
   })
 })

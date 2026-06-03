@@ -31,6 +31,24 @@ const wrapper = ({ children }: { children: ReactNode }) => {
   return createElement(QueryClientProvider, { client }, children)
 }
 
+const MOCK_ORDER = {
+  id: 'order-1',
+  order_number: 42,
+  customer_name: 'דניאל',
+  created_at: '2025-01-01T00:00:00Z',
+  due_datetime: null,
+  urgency: 'normal' as const,
+  total_amount: '100.00',
+  status: 'new' as const,
+  is_paid: false,
+  payment_method: null,
+}
+
+function makeMockEvent() {
+  const el = document.createElement('tr')
+  return { currentTarget: el } as unknown as React.MouseEvent<Element>
+}
+
 describe('useOrdersTable', () => {
   beforeEach(() => {
     deleteMutate.mockClear()
@@ -45,12 +63,27 @@ describe('useOrdersTable', () => {
     expect(result.current.currentPage).toBe(1)
   })
 
-  it('onDeleteOrder opens confirm dialog with correct message', () => {
+  it('onRowMenuClick opens menu with order number as title', () => {
+    const { result } = renderHook(() => useOrdersTable(), { wrapper })
+    expect(result.current.menuState.isOpen).toBe(false)
+
+    act(() => {
+      result.current.onRowMenuClick(MOCK_ORDER, makeMockEvent())
+    })
+
+    expect(result.current.menuState.isOpen).toBe(true)
+    expect(result.current.menuState.title).toBe('#42')
+  })
+
+  it('delete menu item opens confirm dialog with correct message', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
 
     act(() => {
-      result.current.onDeleteOrder('order-1')
+      result.current.onRowMenuClick(MOCK_ORDER, makeMockEvent())
     })
+
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
     expect(confirmFn).toHaveBeenCalledWith(
       expect.objectContaining<Partial<ConfirmDialogOptions>>({
@@ -60,23 +93,27 @@ describe('useOrdersTable', () => {
     )
   })
 
-  it('onDeleteOrder calls mutate when onConfirm callback is invoked', () => {
+  it('delete menu item calls mutate when onConfirm callback is invoked', () => {
     confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
 
     act(() => {
-      result.current.onDeleteOrder('order-1')
+      result.current.onRowMenuClick(MOCK_ORDER, makeMockEvent())
     })
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
     expect(deleteMutate).toHaveBeenCalledWith('order-1')
   })
 
-  it('onDeleteOrder does not call mutate when confirm is dismissed', () => {
+  it('delete menu item does not call mutate when confirm is dismissed', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
 
     act(() => {
-      result.current.onDeleteOrder('order-2')
+      result.current.onRowMenuClick(MOCK_ORDER, makeMockEvent())
     })
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
     expect(deleteMutate).not.toHaveBeenCalled()
   })

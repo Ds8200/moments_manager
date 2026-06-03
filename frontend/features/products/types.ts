@@ -1,7 +1,12 @@
+import type { ProductCategory } from '@/features/productCategories/types'
+
+export type { ProductCategory }
+
 export interface Product {
   id: string
   name: string
-  category: string | null
+  category_id: string | null
+  category: ProductCategory | null
   base_price: string
   base_cost: string
   avg_production_days: number | null
@@ -27,7 +32,7 @@ export interface ProductFilters {
 
 export interface ProductFormValues {
   name: string
-  category: string
+  category_id: string
   base_price: string
   base_cost: string
   avg_production_days: number | null

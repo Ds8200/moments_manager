@@ -25,6 +25,15 @@ const ORDER_STUB = {
 }
 
 export const handlers = [
+  http.get(API_ENDPOINTS.PRODUCT_CATEGORIES, () => HttpResponse.json([])),
+  http.post(API_ENDPOINTS.PRODUCT_CATEGORIES, async ({ request }) => {
+    const body = await request.json() as { name: string }
+    return HttpResponse.json(
+      { id: 'cat-1', name: body.name, created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-01T00:00:00Z' },
+      { status: 201 },
+    )
+  }),
+  http.delete(API_ENDPOINTS.PRODUCT_CATEGORY(':id'), () => new HttpResponse(null, { status: 204 })),
   http.get(API_ENDPOINTS.REPORTS_DASHBOARD, () =>
     HttpResponse.json({
       open_orders: 0,

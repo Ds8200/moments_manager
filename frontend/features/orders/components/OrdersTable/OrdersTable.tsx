@@ -1,7 +1,8 @@
 'use client'
-import type { ReactElement } from 'react'
+import type { ReactElement, MouseEvent } from 'react'
 import { useOrdersTable } from './useOrdersTable'
 import { DataTable } from '@/shared/components/DataTable/DataTable'
+import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
 import { StatusBadge } from '@/shared/components/StatusBadge/StatusBadge'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import styles from './OrdersTable.module.scss'
@@ -16,7 +17,6 @@ const HEADERS = [
   ORDERS_LABELS.COL_AMOUNT,
   ORDERS_LABELS.COL_STATUS,
   ORDERS_LABELS.COL_PAYMENT,
-  ORDERS_LABELS.COL_ACTIONS,
 ]
 
 export const OrdersTable = (): ReactElement => {
@@ -27,9 +27,9 @@ export const OrdersTable = (): ReactElement => {
     totalPages,
     isLoading,
     isError,
-    onRowClick,
-    onEditOrder,
-    onDeleteOrder,
+    menuState,
+    onRowMenuClick,
+    closeMenu,
     onPageChange,
     formatAmount,
     formatDate,
@@ -40,7 +40,10 @@ export const OrdersTable = (): ReactElement => {
   } = useOrdersTable()
 
   const renderRow = (order: OrderSummary): ReactElement => (
-    <tr className={styles.row} onClick={() => onRowClick(order.id)}>
+    <tr
+      className={styles.row}
+      onClick={(e: MouseEvent<HTMLTableRowElement>) => onRowMenuClick(order, e)}
+    >
       <td className={styles.cell}>
         <span className={styles.orderNumber}>{order.order_number}</span>
       </td>
@@ -67,35 +70,34 @@ export const OrdersTable = (): ReactElement => {
           {getPaymentLabel(order.is_paid, order.payment_method)}
         </span>
       </td>
-      <td className={`${styles.cell} ${styles.actionsCell}`} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.actionBtn} onClick={() => onEditOrder(order.id)} title={ORDERS_LABELS.TABLE_EDIT_TITLE}>✏️</button>
-        <button className={styles.actionBtn} onClick={() => onDeleteOrder(order.id)} title={ORDERS_LABELS.TABLE_DELETE_TITLE}>🗑️</button>
-      </td>
     </tr>
   )
 
   return (
-    <DataTable
-      headers={HEADERS}
-      rows={orders}
-      keyExtractor={(order) => order.id}
-      renderRow={renderRow}
-      isLoading={isLoading}
-      isError={isError}
-      emptyTitle={ORDERS_LABELS.EMPTY_TITLE}
-      emptyDescription={ORDERS_LABELS.EMPTY_DESC}
-      emptyIcon="📋"
-      errorTitle={ORDERS_LABELS.ERROR}
-      currentPage={currentPage}
-      totalPages={totalPages}
-      total={total}
-      onPageChange={onPageChange}
-      paginationLabels={{
-        totalPrefix: ORDERS_LABELS.TABLE_TOTAL,
-        totalSuffix: ORDERS_LABELS.TABLE_ORDERS_SUFFIX,
-        prev: ORDERS_LABELS.TABLE_PREV,
-        next: ORDERS_LABELS.TABLE_NEXT,
-      }}
-    />
+    <>
+      <DataTable
+        headers={HEADERS}
+        rows={orders}
+        keyExtractor={(order) => order.id}
+        renderRow={renderRow}
+        isLoading={isLoading}
+        isError={isError}
+        emptyTitle={ORDERS_LABELS.EMPTY_TITLE}
+        emptyDescription={ORDERS_LABELS.EMPTY_DESC}
+        emptyIcon="📋"
+        errorTitle={ORDERS_LABELS.ERROR}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        total={total}
+        onPageChange={onPageChange}
+        paginationLabels={{
+          totalPrefix: ORDERS_LABELS.TABLE_TOTAL,
+          totalSuffix: ORDERS_LABELS.TABLE_ORDERS_SUFFIX,
+          prev: ORDERS_LABELS.TABLE_PREV,
+          next: ORDERS_LABELS.TABLE_NEXT,
+        }}
+      />
+      <DropdownMenu state={menuState} onClose={closeMenu} />
+    </>
   )
 }

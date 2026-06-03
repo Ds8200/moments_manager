@@ -10,10 +10,10 @@ import styles from './Sidebar.module.scss'
 const LOGOUT_ICON = '🚪'
 
 export const Sidebar = (): ReactElement => {
-  const { pathname, visibleNavItems, logoutLabel, onLogout } = useSidebar()
+  const { pathname, visibleNavItems, logoutLabel, onLogout, isOpen } = useSidebar()
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${!isOpen ? styles.collapsed : ''}`}>
       <div className={styles.logo}>
         <Image
           src="/moments_logo.png"

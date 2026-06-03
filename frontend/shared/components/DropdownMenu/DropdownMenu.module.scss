@@ -1,0 +1,90 @@
+@use '../../../shared/styles/variables' as v;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(#{v.$z-modal} - 1);
+  background: transparent;
+}
+
+.menu {
+  position: fixed;
+  top: var(--dm-top);
+  left: var(--dm-left);
+  width: 220px;
+  background: v.$bg-card;
+  border-radius: v.$border-radius;
+  box-shadow: v.$shadow-elevated;
+  border: 1px solid v.$border-color;
+  z-index: v.$z-modal;
+  overflow: hidden;
+  animation: dropIn v.$transition-fast forwards;
+}
+
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.menuTitle {
+  padding: v.$space-3 v.$space-4;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-secondary;
+  border-bottom: 1px solid v.$border-color;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: v.$gray-50;
+}
+
+.menuList {
+  list-style: none;
+  padding: v.$space-1 0;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  width: 100%;
+  min-height: 44px;
+  padding: v.$space-2 v.$space-4;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  color: v.$text-primary;
+  text-align: start;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-100;
+  }
+
+  &:active {
+    background: v.$gray-200;
+  }
+}
+
+.menuItemDanger {
+  color: v.$danger;
+
+  &:hover {
+    background: rgba(v.$danger, 0.08);
+  }
+}
+
+.menuItemIcon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}

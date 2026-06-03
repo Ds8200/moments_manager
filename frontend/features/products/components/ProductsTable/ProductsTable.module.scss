@@ -1,6 +1,7 @@
 @use '../../../../shared/styles/variables' as v;
 
 .row {
+  cursor: pointer;
   border-bottom: 1px solid v.$border-color;
   transition: background v.$transition-fast;
 

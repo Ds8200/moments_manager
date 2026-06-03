@@ -36,6 +36,11 @@ const USER_ROW = {
   updated_at: '2025-01-01T00:00:00Z',
 }
 
+function makeMockEvent() {
+  const el = document.createElement('tr')
+  return { currentTarget: el } as unknown as React.MouseEvent<Element>
+}
+
 describe('useUsersTable', () => {
   let store: ReturnType<typeof createStore>
   let qc: QueryClient
@@ -64,12 +69,27 @@ describe('useUsersTable', () => {
     expect(result.current.users[0].full_name).toBe('דניאל')
   })
 
-  it('onDelete opens confirm dialog with user name in message', () => {
+  it('onRowClick opens menu with user name as title', () => {
+    const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
+    expect(result.current.menuState.isOpen).toBe(false)
+
+    act(() => {
+      result.current.onRowClick(USER_ROW, makeMockEvent())
+    })
+
+    expect(result.current.menuState.isOpen).toBe(true)
+    expect(result.current.menuState.title).toBe('דניאל')
+  })
+
+  it('delete menu item opens confirm dialog with user name', () => {
     const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onDelete('u1', 'דניאל')
+      result.current.onRowClick(USER_ROW, makeMockEvent())
     })
+
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
     expect(confirmFn).toHaveBeenCalledWith(
       expect.objectContaining<Partial<ConfirmDialogOptions>>({
@@ -79,15 +99,30 @@ describe('useUsersTable', () => {
     )
   })
 
-  it('onDelete calls mutate when onConfirm callback is invoked', () => {
+  it('delete menu item calls mutate when onConfirm is invoked', () => {
     confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
     const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
-      result.current.onDelete('u1', 'דניאל')
+      result.current.onRowClick(USER_ROW, makeMockEvent())
     })
+    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
+    act(() => { deleteItem!.onClick() })
 
     expect(confirmFn).toHaveBeenCalled()
+  })
+
+  it('onRowClick does nothing when user is the current user', () => {
+    const token = 'x.' + btoa(JSON.stringify({ sub: 'u1', role: 'admin' })) + '.y'
+    store.set(accessTokenAtom, token)
+
+    const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
+
+    act(() => {
+      result.current.onRowClick(USER_ROW, makeMockEvent())
+    })
+
+    expect(result.current.menuState.isOpen).toBe(false)
   })
 
   it('onPageChange updates usersPageAtom', () => {
@@ -98,15 +133,5 @@ describe('useUsersTable', () => {
     })
 
     expect(store.get(usersPageAtom)).toBe(3)
-  })
-
-  it('exposes currentUserId decoded from the access token', () => {
-    // token payload: { sub: "me-123", role: "admin" }
-    const token =
-      'x.' + btoa(JSON.stringify({ sub: 'me-123', role: 'admin' })) + '.y'
-    store.set(accessTokenAtom, token)
-
-    const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
-    expect(result.current.currentUserId).toBe('me-123')
   })
 })

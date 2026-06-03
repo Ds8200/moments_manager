@@ -39,15 +39,17 @@ class ReportService:
         )
 
     async def get_monthly_report(self, year: int, month: int) -> MonthlyReportSchema:
-        total_revenue, total_cost, total_profit, order_count = (
+        total_revenue, total_cost, total_profit, paid_count = (
             await self._repo.month_orders_summary(year, month)
         )
+        unpaid_count = await self._repo.count_month_unpaid_orders(year, month)
         cash_revenue = await self._repo.month_revenue_by_payment_method(
             year, month, PaymentMethod.cash
         )
         transfer_revenue = await self._repo.month_revenue_by_payment_method(
             year, month, PaymentMethod.transfer
         )
+        unpaid_amount = await self._repo.sum_month_unpaid_amount(year, month)
         paid_revenue = await self._repo.sum_month_paid_revenue(year, month)
         total_expenses = await self._repo.sum_month_expenses(year, month)
 
@@ -59,10 +61,12 @@ class ReportService:
             total_profit=total_profit,
             total_expenses=total_expenses,
             net_profit=total_profit - total_expenses,
+            paid_count=paid_count,
+            unpaid_count=unpaid_count,
             cash_revenue=cash_revenue,
             transfer_revenue=transfer_revenue,
+            unpaid_amount=unpaid_amount,
             paid_revenue=paid_revenue,
-            order_count=order_count,
         )
 
     async def get_financial_year(self, year: int) -> FinancialYearSchema:

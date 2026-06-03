@@ -13,6 +13,7 @@ class ErrorCode(str, Enum):
     INTERNAL_ERROR = "INTERNAL_ERROR"
 
     # Specific codes for cases the frontend renders with a tailored message.
+    CATEGORY_IN_USE = "CATEGORY_IN_USE"
     USER_EMAIL_EXISTS = "USER_EMAIL_EXISTS"
     CANNOT_DELETE_SELF = "CANNOT_DELETE_SELF"
     INVALID_CREDENTIALS = "INVALID_CREDENTIALS"
