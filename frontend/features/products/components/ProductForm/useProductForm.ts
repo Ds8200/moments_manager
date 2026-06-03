@@ -92,7 +92,7 @@ export const useProductForm = (): UseProductFormReturn => {
   }
 
   const onSubmit = async (values: ProductFormValues): Promise<void> => {
-    const payload = { ...values, category_id: values.category_id || null }
+    const payload = { ...values, category_id: values.category_id || undefined }
     if (editingId) {
       await updateProduct.mutateAsync({ id: editingId, payload })
     } else {

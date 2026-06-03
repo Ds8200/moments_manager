@@ -17,6 +17,7 @@ export const REPORTS_LABELS = {
   COL_PAID_REVENUE:  'סה"כ הכנסות',
   TOP_CUSTOMERS:   'לקוחות מובילים',
   COL_CUSTOMER:    'לקוח',
+  COL_ORDERS:      'הזמנות',
 } as const
 
 export const HEBREW_MONTHS: readonly string[] = [
