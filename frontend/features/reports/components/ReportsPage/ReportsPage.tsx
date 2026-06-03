@@ -2,27 +2,36 @@
 import type { ReactElement } from 'react'
 import { useReportsPage } from './useReportsPage'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
+import { Button } from '@/shared/components/Button/Button'
+import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
 import { REPORTS_LABELS } from '../../constants/reportsLabels'
 import styles from './ReportsPage.module.scss'
 
 export const ReportsPage = (): ReactElement => {
   const {
-    year, setYear, yearOptions, financial, topCustomers, isLoading, formatAmount, formatRate, getMonthName,
+    year, setYear, yearOptions, financial, topCustomers, isLoading,
+    formatAmount, formatRate, getMonthName,
+    menuState, closeMenu, handleExportClick,
   } = useReportsPage()
 
   return (
     <div className={styles.page}>
       <div className={styles.toolbar}>
         <h1 className={styles.title}>{REPORTS_LABELS.PAGE_TITLE}</h1>
-        <select
-          className={styles.yearSelect}
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-        >
-          {yearOptions.map((y) => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
+        <div className={styles.toolbarActions}>
+          <select
+            className={styles.yearSelect}
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+          >
+            {yearOptions.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+          <Button variant="secondary" size="sm" onClick={handleExportClick}>
+            {REPORTS_LABELS.EXPORT_BUTTON}
+          </Button>
+        </div>
       </div>
 
       {isLoading && <PageSkeleton rows={4} />}
@@ -117,6 +126,8 @@ export const ReportsPage = (): ReactElement => {
           </table>
         </div>
       )}
+
+      <DropdownMenu state={menuState} onClose={closeMenu} />
     </div>
   )
 }

@@ -10,7 +10,7 @@ export const ORDERS_LABELS = {
   DATE_TO:              'עד תאריך',
   EMPTY_TITLE:          'אין הזמנות',
   EMPTY_DESC:           'לחץ על "+ הזמנה חדשה" כדי להתחיל',
-  COL_NUMBER:           '#',
+  COL_NUMBER:           'מספר הזמנה',
   COL_CUSTOMER:         'לקוח',
   COL_PRODUCTS:         'מוצרים',
   COL_DATE:             'תאריך',

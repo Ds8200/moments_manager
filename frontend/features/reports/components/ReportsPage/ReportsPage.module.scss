@@ -9,13 +9,19 @@
 .toolbar {
   display: flex;
   align-items: center;
-  gap: v.$space-3;
+  justify-content: space-between;
 }
 
 .title {
   font-size: v.$font-size-2xl;
   font-weight: v.$font-weight-bold;
   color: v.$text-primary;
+}
+
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
 }
 
 .yearSelect {
@@ -26,7 +32,6 @@
   font-family: v.$font-family;
   background: v.$bg-card;
   color: v.$text-primary;
-  margin-right: auto;
 
   &:focus {
     outline: none;

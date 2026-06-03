@@ -21,6 +21,10 @@ export const REPORTS_LABELS = {
   TOP_CUSTOMERS:   'לקוחות מובילים',
   COL_CUSTOMER:    'לקוח',
   COL_ORDERS:      'הזמנות',
+  EXPORT_BUTTON:         'יצוא',
+  EXPORT_DROPDOWN_TITLE: 'בחר פורמט',
+  EXPORT_EXCEL:          'ייצוא ל-Excel',
+  EXPORT_PDF:            'ייצוא ל-PDF',
 } as const
 
 export const HEBREW_MONTHS: readonly string[] = [
