@@ -19,7 +19,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: ROUTES.DASHBOARD,  label: 'דשבורד',      shortLabel: 'בית',        icon: '🏠' },
+  { href: ROUTES.DASHBOARD,  label: 'בית',          shortLabel: 'בית',        icon: '🏠' },
   { href: ROUTES.ORDERS,     label: 'הזמנות',      shortLabel: 'הזמנות',     icon: '📋' },
   { href: ROUTES.CUSTOMERS,  label: 'לקוחות',      shortLabel: 'לקוחות',     icon: '👥' },
   { href: ROUTES.PRODUCTS,   label: 'מוצרים',      shortLabel: 'מוצרים',     icon: '🎨' },
