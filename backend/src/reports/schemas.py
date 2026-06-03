@@ -22,6 +22,7 @@ class MonthlyReportSchema(BaseModel):
     net_profit: Decimal
     paid_count: int
     unpaid_count: int
+    total_count: int
     cash_revenue: Decimal
     transfer_revenue: Decimal
     unpaid_amount: Decimal

@@ -58,6 +58,7 @@ export const ReportsPage = (): ReactElement => {
                   <th>{REPORTS_LABELS.COL_MONTH}</th>
                   <th>{REPORTS_LABELS.COL_PAID_ORDERS}</th>
                   <th>{REPORTS_LABELS.COL_UNPAID_ORDERS}</th>
+                  <th>{REPORTS_LABELS.COL_TOTAL_ORDERS}</th>
                   <th>{REPORTS_LABELS.COL_CASH}</th>
                   <th>{REPORTS_LABELS.COL_TRANSFER}</th>
                   <th>{REPORTS_LABELS.COL_UNPAID_AMOUNT}</th>
@@ -72,6 +73,7 @@ export const ReportsPage = (): ReactElement => {
                     <td className={`${styles.cell} ${styles.monthName}`}>{getMonthName(m.month)}</td>
                     <td className={styles.cell}>{m.paid_count}</td>
                     <td className={styles.cell}>{m.unpaid_count}</td>
+                    <td className={styles.cell}>{m.total_count}</td>
                     <td className={styles.cell}>{formatAmount(m.cash_revenue)}</td>
                     <td className={styles.cell}>{formatAmount(m.transfer_revenue)}</td>
                     <td className={`${styles.cell} ${styles.kpiNegative}`}>{formatAmount(m.unpaid_amount)}</td>

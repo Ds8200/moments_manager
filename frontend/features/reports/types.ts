@@ -8,6 +8,7 @@ export interface MonthlyReport {
   net_profit: string
   paid_count: number
   unpaid_count: number
+  total_count: number
   cash_revenue: string
   transfer_revenue: string
   unpaid_amount: string

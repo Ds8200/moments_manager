@@ -63,6 +63,7 @@ class ReportService:
             net_profit=total_profit - total_expenses,
             paid_count=paid_count,
             unpaid_count=unpaid_count,
+            total_count=paid_count + unpaid_count,
             cash_revenue=cash_revenue,
             transfer_revenue=transfer_revenue,
             unpaid_amount=unpaid_amount,
