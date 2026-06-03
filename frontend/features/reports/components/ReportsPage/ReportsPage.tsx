@@ -68,7 +68,12 @@ export const ReportsPage = (): ReactElement => {
             <table className={styles.table}>
               <thead className={styles.thead}>
                 <tr>
-                  <th>{REPORTS_LABELS.COL_MONTH}</th>
+                  <th rowSpan={2} className={styles.thFirstCol}>{REPORTS_LABELS.COL_MONTH}</th>
+                  <th colSpan={4} className={styles.thGroup}>{REPORTS_LABELS.GROUP_ORDERS}</th>
+                  <th colSpan={4} className={styles.thGroup}>{REPORTS_LABELS.GROUP_PAYMENTS}</th>
+                  <th colSpan={2} className={styles.thGroup}>{REPORTS_LABELS.GROUP_PROFIT}</th>
+                </tr>
+                <tr>
                   <th>{REPORTS_LABELS.COL_PAID_ORDERS}</th>
                   <th>{REPORTS_LABELS.COL_UNPAID_ORDERS}</th>
                   <th>{REPORTS_LABELS.COL_TOTAL_ORDERS}</th>

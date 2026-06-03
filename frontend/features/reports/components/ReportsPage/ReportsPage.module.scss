@@ -41,8 +41,12 @@
 
 .kpiRow {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: v.$space-4;
+
+  @media (max-width: #{v.$breakpoint-lg - 1}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 
   @media (max-width: #{v.$breakpoint-md - 1}) {
     grid-template-columns: repeat(2, 1fr);
@@ -104,6 +108,22 @@
   background: v.$gray-50;
   border-bottom: 1px solid v.$border-color;
   white-space: nowrap;
+}
+
+.thGroup {
+  text-align: center;
+  background: v.$primary-light;
+  color: v.$primary-dark;
+  font-weight: v.$font-weight-bold;
+  font-size: v.$font-size-xs;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-inline: 1px solid v.$gray-200;
+}
+
+.thFirstCol {
+  vertical-align: middle;
+  border-inline-end: 1px solid v.$gray-200;
 }
 
 .row {
