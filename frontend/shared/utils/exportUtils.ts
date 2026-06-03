@@ -19,56 +19,62 @@ export const exportToExcel = (config: ExcelExportConfig): void => {
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, config.sheetName ?? 'Data')
 
-  // Use Blob + anchor for reliable cross-browser download in Next.js
-  const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer
-  const blob = new Blob([buf], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  })
+  // binary string → ArrayBuffer is the most reliable cross-browser pattern for SheetJS
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' }) as string
+  const buf = new ArrayBuffer(wbout.length)
+  const view = new Uint8Array(buf)
+  for (let i = 0; i < wbout.length; i++) {
+    view[i] = wbout.charCodeAt(i) & 0xff
+  }
+
+  const blob = new Blob([buf], { type: 'application/octet-stream' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
   anchor.download = `${config.filename}.xlsx`
+  document.body.appendChild(anchor)
   anchor.click()
+  document.body.removeChild(anchor)
   URL.revokeObjectURL(url)
 }
 
+// @page must be at top level (not inside @media print) for browsers to recognise landscape
 const PRINT_STYLES = `
+  @page { size: A4 landscape; margin: 10mm; }
   * { box-sizing: border-box; }
   body {
     font-family: Arial, 'Arial Hebrew', sans-serif;
     direction: rtl;
-    margin: 16px;
-    font-size: 12px;
+    margin: 0;
+    padding: 8px;
+    font-size: 11px;
+    color: #212529;
   }
-  h2 { margin: 0 0 12px; font-size: 16px; }
+  h2 { margin: 0 0 8px; font-size: 14px; font-weight: 700; }
   table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
+    table-layout: auto;
   }
   th {
     background: #e9ecef;
     font-weight: 700;
-    padding: 6px 8px;
+    padding: 4px 6px;
     border: 1px solid #ced4da;
     text-align: right;
     white-space: nowrap;
-    font-size: 11px;
+    font-size: 10px;
   }
   td {
-    padding: 5px 8px;
+    padding: 3px 6px;
     border: 1px solid #dee2e6;
     text-align: right;
-    word-break: break-word;
-    font-size: 11px;
+    font-size: 10px;
+    white-space: nowrap;
   }
   tr:nth-child(even) td { background: #f8f9fa; }
   thead { display: table-header-group; }
   tr { page-break-inside: avoid; }
-  @media print {
-    body { margin: 8px; }
-    @page { margin: 10mm; size: A4 landscape; }
-  }
 `
 
 export const exportToPrint = (config: PrintExportConfig): void => {
@@ -90,11 +96,7 @@ export const exportToPrint = (config: PrintExportConfig): void => {
       <thead><tr>${headerCells}</tr></thead>
       <tbody>${bodyRows}</tbody>
     </table>
-    <script>
-      window.onload = function() {
-        window.print();
-      };
-    </script>
+    <script>window.onload = function() { window.print(); };<\/script>
   </body>
 </html>`
 
