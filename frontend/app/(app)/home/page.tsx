@@ -1,16 +1,16 @@
 import type { Metadata } from 'next'
-import { DashboardKpiGrid } from '@/features/dashboard/components/DashboardKpiGrid/DashboardKpiGrid'
-import { DASHBOARD_LABELS, META_LABELS } from '@/shared/constants/uiLabels'
-import styles from './DashboardPage.module.scss'
+import { HomeKpiGrid } from '@/features/home/components/HomeKpiGrid/HomeKpiGrid'
+import { HOME_LABELS, META_LABELS } from '@/shared/constants/uiLabels'
+import styles from './HomePage.module.scss'
 
-export const metadata: Metadata = { title: META_LABELS.DASHBOARD_TITLE }
+export const metadata: Metadata = { title: META_LABELS.HOME_TITLE }
 
-export default function DashboardPage() {
+export default function HomePage() {
   return (
     <div className={styles.page}>
-      <DashboardKpiGrid />
+      <HomeKpiGrid />
       <div className={styles.placeholderNote}>
-        <p>{DASHBOARD_LABELS.COMING_SOON}</p>
+        <p>{HOME_LABELS.COMING_SOON}</p>
       </div>
     </div>
   )

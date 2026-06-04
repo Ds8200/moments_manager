@@ -9,7 +9,7 @@ export const UI_LABELS = {
   APP_NAME:               'Moments',
   TRY_AGAIN:              'נסה שנית',
   ERROR_TITLE:            'משהו השתבש',
-  ERROR_LOADING_DASHBOARD: 'שגיאה בטעינת הדשבורד',
+  ERROR_LOADING_HOME: 'שגיאה בטעינת הבית',
   ERROR_LOADING_ORDERS:   'שגיאה בטעינת ההזמנות',
   ERROR_LOADING_CUSTOMERS: 'שגיאה בטעינת הלקוחות',
   ERROR_LOADING_PRODUCTS: 'שגיאה בטעינת המוצרים',
@@ -49,7 +49,7 @@ export const UI_LABELS = {
 export const META_LABELS = {
   ROOT_TITLE:        'Moments מערכת ניהול',
   ROOT_DESCRIPTION:  'מערכת ניהול הזמנות, לקוחות ופיננסים',
-  DASHBOARD_TITLE:   'דשבורד | Moments מערכת ניהול',
+  HOME_TITLE:        'בית | Moments מערכת ניהול',
   ORDERS_TITLE:      'הזמנות | Moments מערכת ניהול',
   CUSTOMERS_TITLE:   'לקוחות | Moments מערכת ניהול',
   PRODUCTS_TITLE:    'מוצרים | Moments מערכת ניהול',
@@ -61,7 +61,7 @@ export const META_LABELS = {
   PROFILE_TITLE_META: 'פרופיל | Moments מערכת ניהול',
 } as const
 
-export const DASHBOARD_LABELS = {
+export const HOME_LABELS = {
   COMING_SOON: 'גרפים והזמנות היום יתווספו בהמשך הבנייה',
 } as const
 

@@ -34,7 +34,7 @@ export const handlers = [
     )
   }),
   http.delete(API_ENDPOINTS.PRODUCT_CATEGORY(':id'), () => new HttpResponse(null, { status: 204 })),
-  http.get(API_ENDPOINTS.REPORTS_DASHBOARD, () =>
+  http.get(API_ENDPOINTS.REPORTS_HOME, () =>
     HttpResponse.json({
       open_orders: 0,
       ready_orders: 0,

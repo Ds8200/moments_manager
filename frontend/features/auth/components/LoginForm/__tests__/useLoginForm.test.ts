@@ -22,7 +22,7 @@ describe('useLoginForm', () => {
     mockSearchParams = new URLSearchParams()
   })
 
-  it('stores tokens and navigates to dashboard on successful login', async () => {
+  it('stores tokens and navigates to home on successful login', async () => {
     server.use(
       http.post(API_ENDPOINTS.AUTH_LOGIN, () =>
         HttpResponse.json({ access_token: 'a-token', refresh_token: 'r-token' }),
@@ -36,7 +36,7 @@ describe('useLoginForm', () => {
     })
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith(ROUTES.DASHBOARD)
+      expect(pushMock).toHaveBeenCalledWith(ROUTES.HOME)
     })
     expect(localStorage.getItem('access_token')).toBe('a-token')
   })
@@ -60,7 +60,7 @@ describe('useLoginForm', () => {
     expect(pushMock).not.toHaveBeenCalled()
   })
 
-  it('auto-logs-in with a magic token in the URL and navigates to dashboard', async () => {
+  it('auto-logs-in with a magic token in the URL and navigates to home', async () => {
     mockSearchParams = new URLSearchParams({ token: 'magic-123' })
     server.use(
       http.post(API_ENDPOINTS.AUTH_MAGIC_LOGIN, () =>
@@ -73,7 +73,7 @@ describe('useLoginForm', () => {
     expect(result.current.isMagicLoggingIn).toBe(true)
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith(ROUTES.DASHBOARD)
+      expect(pushMock).toHaveBeenCalledWith(ROUTES.HOME)
     })
     expect(localStorage.getItem('access_token')).toBe('m-access')
   })

@@ -4,7 +4,7 @@ import { useAuthGuard } from '../useAuthGuard'
 import { ROUTES } from '@/shared/constants/routes'
 
 const replaceMock = vi.fn()
-let currentPathname = '/dashboard'
+let currentPathname = '/home'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: replaceMock }),
@@ -15,7 +15,7 @@ describe('useAuthGuard', () => {
   beforeEach(() => {
     localStorage.clear()
     replaceMock.mockClear()
-    currentPathname = '/dashboard'
+    currentPathname = '/home'
   })
 
   afterEach(() => {
@@ -42,7 +42,7 @@ describe('useAuthGuard', () => {
   })
 
   it('redirects to login when checked and no token and not on login page', async () => {
-    currentPathname = '/dashboard'
+    currentPathname = '/home'
     renderHook(() => useAuthGuard())
 
     await waitFor(() => {

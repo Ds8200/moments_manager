@@ -27,7 +27,7 @@ export const API_ENDPOINTS = {
   EXPENSES:     `${BASE}/api/v1/expenses`,
   EXPENSE:      (id: string) => `${BASE}/api/v1/expenses/${id}`,
 
-  REPORTS_DASHBOARD:     `${BASE}/api/v1/reports/dashboard`,
+  REPORTS_HOME:          `${BASE}/api/v1/reports/dashboard`,
   REPORTS_MONTHLY:       `${BASE}/api/v1/reports/monthly`,
   REPORTS_FINANCIAL:     `${BASE}/api/v1/reports/financial`,
   REPORTS_TOP_CUSTOMERS: `${BASE}/api/v1/reports/top-customers`,

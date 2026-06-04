@@ -1,5 +1,5 @@
 export const ROUTES = {
-  DASHBOARD: '/dashboard',
+  HOME: '/home',
   ORDERS: '/orders',
   CUSTOMERS: '/customers',
   PRODUCTS: '/products',
@@ -20,7 +20,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: ROUTES.DASHBOARD,  label: 'בית',          shortLabel: 'בית',        icon: '🏠' },
+  { href: ROUTES.HOME,  label: 'בית',          shortLabel: 'בית',        icon: '🏠' },
   { href: ROUTES.ORDERS,     label: 'הזמנות',      shortLabel: 'הזמנות',     icon: '📋' },
   { href: ROUTES.CUSTOMERS,  label: 'לקוחות',      shortLabel: 'לקוחות',     icon: '👥' },
   { href: ROUTES.PRODUCTS,   label: 'מוצרים',      shortLabel: 'מוצרים',     icon: '🎨' },

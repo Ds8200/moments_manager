@@ -53,5 +53,6 @@ const CLOSED_STATE: ConfirmDialogState = {
 
 export const confirmDialogAtom = atom<ConfirmDialogState>(CLOSED_STATE)
 
-// Controls sidebar visibility on desktop (collapse/expand) and drawer on mobile
-export const isSidebarOpenAtom = atom<boolean>(true)
+// Controls sidebar visibility on desktop (collapse/expand) and drawer on mobile.
+// Defaults to false; AppContentWrapper sets true on desktop after mount.
+export const isSidebarOpenAtom = atom<boolean>(false)

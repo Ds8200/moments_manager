@@ -1,4 +1,4 @@
-export interface DashboardKpi {
+export interface HomeKpi {
   open_orders: number
   ready_orders: number
   monthly_revenue: string

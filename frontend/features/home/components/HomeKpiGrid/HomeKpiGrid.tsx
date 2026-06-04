@@ -1,11 +1,11 @@
 'use client'
 import type { ReactElement } from 'react'
-import { useDashboardKpiGrid } from './useDashboardKpiGrid'
+import { useHomeKpiGrid } from './useHomeKpiGrid'
 import { KpiCard } from '../KpiCard/KpiCard'
-import styles from './DashboardKpiGrid.module.scss'
+import styles from './HomeKpiGrid.module.scss'
 
-export const DashboardKpiGrid = (): ReactElement => {
-  const { kpiCards, isPending } = useDashboardKpiGrid()
+export const HomeKpiGrid = (): ReactElement => {
+  const { kpiCards, isPending } = useHomeKpiGrid()
 
   return (
     <div className={styles.grid}>

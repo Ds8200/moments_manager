@@ -54,7 +54,7 @@ export const useLoginForm = (): UseLoginFormReturn => {
       try {
         const tokens = await authApi.magicLogin(magicToken)
         setTokens({ access: tokens.access_token, refresh: tokens.refresh_token })
-        router.push(ROUTES.DASHBOARD)
+        router.push(ROUTES.HOME)
       } catch {
         setError('root', { message: AUTH_LABELS.MAGIC_LOGIN_FAILED })
         setIsMagicLoggingIn(false)
@@ -68,7 +68,7 @@ export const useLoginForm = (): UseLoginFormReturn => {
     try {
       const tokens = await authApi.login(values.email, values.password)
       setTokens({ access: tokens.access_token, refresh: tokens.refresh_token })
-      router.push(ROUTES.DASHBOARD)
+      router.push(ROUTES.HOME)
     } catch {
       setError('root', { message: AUTH_LABELS.LOGIN_FAILED })
     }

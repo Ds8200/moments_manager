@@ -1,4 +1,4 @@
-export const DASHBOARD_LABELS = {
+export const HOME_KPI_LABELS = {
   OPEN_ORDERS:     'הזמנות פתוחות',
   READY_ORDERS:    'מוכנות לאיסוף',
   MONTHLY_REVENUE: 'הכנסות החודש',

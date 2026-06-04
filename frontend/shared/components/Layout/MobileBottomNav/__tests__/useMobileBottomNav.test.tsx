@@ -7,7 +7,7 @@ import { userRoleAtom } from '@/features/auth/store/authAtoms'
 import { ROUTES } from '@/shared/constants/routes'
 
 vi.mock('next/navigation', () => ({
-  usePathname: () => ROUTES.DASHBOARD,
+  usePathname: () => ROUTES.HOME,
 }))
 
 function makeWrapper(store: ReturnType<typeof createStore>) {

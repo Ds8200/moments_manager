@@ -12,7 +12,7 @@ export const useAdminGuard = (): void => {
 
   useEffect(() => {
     if (accessToken !== null && !isAdmin) {
-      router.replace(ROUTES.DASHBOARD)
+      router.replace(ROUTES.HOME)
     }
   }, [isAdmin, accessToken, router])
 }

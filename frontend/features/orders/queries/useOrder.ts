@@ -25,7 +25,7 @@ export const useCreateOrder = (): UseMutationResult<Order, Error, OrderPayload> 
     mutationFn: (payload: OrderPayload) => ordersApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['home'] })
       notify.success(ORDERS_LABELS.CREATED_SUCCESS)
     },
   })

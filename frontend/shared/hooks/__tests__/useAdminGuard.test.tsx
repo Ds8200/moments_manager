@@ -36,13 +36,13 @@ describe('useAdminGuard', () => {
     expect(replaceMock).not.toHaveBeenCalled()
   })
 
-  it('redirects to dashboard when a logged-in user is not an admin', () => {
+  it('redirects to home when a logged-in user is not an admin', () => {
     store.set(accessTokenAtom, 'token')
     store.set(userRoleAtom, 'user')
 
     renderHook(() => useAdminGuard(), { wrapper: makeWrapper(store) })
 
-    expect(replaceMock).toHaveBeenCalledWith(ROUTES.DASHBOARD)
+    expect(replaceMock).toHaveBeenCalledWith(ROUTES.HOME)
   })
 
   it('does not redirect before the token is initialised', () => {
