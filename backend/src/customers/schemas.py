@@ -34,9 +34,15 @@ class CustomerWithStatsSchema(CustomerResponseSchema):
     total_spent: float = 0.0
 
 
+class EmailAttachmentSchema(BaseModel):
+    name: str
+    content: str  # base64-encoded file content
+
+
 class CustomerSendEmailSchema(BaseModel):
     subject: str
     body: str
+    attachments: list[EmailAttachmentSchema] = []
 
 
 class EmailSentResponseSchema(BaseModel):
@@ -48,6 +54,7 @@ class ComposeEmailSchema(BaseModel):
     manual_emails: list[str] = []
     subject: str
     body: str
+    attachments: list[EmailAttachmentSchema] = []
 
 
 class ComposeEmailResponseSchema(BaseModel):

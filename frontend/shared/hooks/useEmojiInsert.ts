@@ -63,9 +63,7 @@ export const useEmojiInsert = <T extends FieldValues>(
 
   const onEmojiSelect = useCallback(
     (rawEmoji: string) => {
-      // Strip Variation Selector-16 using explicit unicode escape — literal
-      // U+FE0F in source gets mangled by some tools; the escape is reliable.
-      const emoji = rawEmoji.replace(/️/g, '')
+      const emoji = rawEmoji
 
       if (activeField === 'subject') {
         const el = subjectRef.current

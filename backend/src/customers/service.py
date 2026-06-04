@@ -101,7 +101,8 @@ class CustomerService:
         if not customer.email:
             raise ConflictError(CUSTOMER_NO_EMAIL, code=ErrorCode.CUSTOMER_NO_EMAIL)
         subject, html_body = build_customer_email(customer.name, data.subject, data.body)
-        background_tasks.add_task(send_html_email, customer.email, subject, html_body)
+        attachments = [a.model_dump() for a in data.attachments] if data.attachments else None
+        background_tasks.add_task(send_html_email, customer.email, subject, html_body, attachments)
         logger.info(CUSTOMER_EMAIL_DISPATCHED, customer.email, customer_id)
         return EmailSentResponseSchema(message=CUSTOMER_EMAIL_SENT)
 
@@ -112,6 +113,8 @@ class CustomerService:
     ) -> ComposeEmailResponseSchema:
         sent_to = 0
 
+        attachments = [a.model_dump() for a in data.attachments] if data.attachments else None
+
         for customer_id in data.customer_ids:
             customer = await self._repo.get_by_id(customer_id)
             if not customer:
@@ -121,12 +124,14 @@ class CustomerService:
                 logger.warning(COMPOSE_EMAIL_CUSTOMER_NO_EMAIL, customer_id)
                 continue
             subject, html_body = build_customer_email(customer.name, data.subject, data.body)
-            background_tasks.add_task(send_html_email, customer.email, subject, html_body)
+            background_tasks.add_task(
+                send_html_email, customer.email, subject, html_body, attachments
+            )
             sent_to += 1
 
         for email in data.manual_emails:
             subject, html_body = build_customer_email("", data.subject, data.body)
-            background_tasks.add_task(send_html_email, email, subject, html_body)
+            background_tasks.add_task(send_html_email, email, subject, html_body, attachments)
             sent_to += 1
 
         logger.info(

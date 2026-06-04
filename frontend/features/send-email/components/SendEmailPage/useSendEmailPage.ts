@@ -7,7 +7,7 @@ import type { ChangeEvent, DragEvent, RefCallback } from 'react'
 import { useComposeEmail } from '../../queries/useSendEmail'
 import { useEmojiInsert } from '@/shared/hooks/useEmojiInsert'
 import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
-import type { Recipient } from '../../types'
+import type { EmailAttachment, Recipient } from '../../types'
 import type { UseEmojiInsertReturn } from '@/shared/hooks/useEmojiInsert'
 
 const composeSchema = z.object({
@@ -17,6 +17,16 @@ const composeSchema = z.object({
 
 type ComposeFormValues = z.infer<typeof composeSchema>
 
+const fileToBase64 = async (file: File): Promise<string> => {
+  const buffer = await file.arrayBuffer()
+  const bytes = new Uint8Array(buffer)
+  let binary = ''
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary)
+}
+
 export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   recipients: Recipient[]
   onAddRecipient: (r: Recipient) => void
@@ -25,7 +35,7 @@ export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   errors: ReturnType<typeof useForm<ComposeFormValues>>['formState']['errors']
   handleSubmit: ReturnType<typeof useForm<ComposeFormValues>>['handleSubmit']
   recipientsError: string | undefined
-  onSubmit: (values: ComposeFormValues) => void
+  onSubmit: (values: ComposeFormValues) => Promise<void>
   isPending: boolean
   mergedSubjectRef: RefCallback<HTMLInputElement>
   subjectRest: Omit<ReturnType<ReturnType<typeof useForm<ComposeFormValues>>['register']>, 'ref'>
@@ -134,7 +144,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     [addFiles],
   )
 
-  const onSubmit = (values: ComposeFormValues): void => {
+  const onSubmit = async (values: ComposeFormValues): Promise<void> => {
     if (recipients.length === 0) {
       setRecipientsError(SEND_EMAIL_LABELS.VALIDATION_RECIPIENTS)
       return
@@ -146,8 +156,15 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
       .filter((r) => r.customer_id === undefined)
       .map((r) => r.email)
 
+    const attachments: EmailAttachment[] = await Promise.all(
+      files.map(async (file) => ({
+        name: file.name,
+        content: await fileToBase64(file),
+      })),
+    )
+
     compose.mutate(
-      { customer_ids, manual_emails, subject: values.subject, body: values.body },
+      { customer_ids, manual_emails, subject: values.subject, body: values.body, attachments },
       {
         onSuccess: () => {
           reset()
