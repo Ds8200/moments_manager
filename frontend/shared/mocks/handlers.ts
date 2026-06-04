@@ -58,6 +58,33 @@ export const handlers = [
   http.get(API_ENDPOINTS.PRODUCTS,  () => HttpResponse.json(EMPTY_PAGE)),
   http.get(API_ENDPOINTS.USERS,     () => HttpResponse.json(EMPTY_PAGE)),
   http.post(API_ENDPOINTS.AUTH_LOGOUT, () => new HttpResponse(null, { status: 204 })),
+  http.get(API_ENDPOINTS.REPORTS_FINANCIAL, () =>
+    HttpResponse.json({
+      year: new Date().getFullYear(),
+      annual_revenue: '60000',
+      annual_profit: '24000',
+      annual_expenses: '12000',
+      annual_net: '24000',
+      annual_unpaid: '3000',
+      months: Array.from({ length: 12 }, (_, i) => ({
+        year: new Date().getFullYear(),
+        month: i + 1,
+        total_revenue: '5000',
+        total_cost: '2000',
+        total_profit: '3000',
+        total_expenses: '1000',
+        net_profit: '2000',
+        paid_count: 5,
+        unpaid_count: 1,
+        total_count: 6,
+        collection_rate: 83.3,
+        cash_revenue: '2500',
+        transfer_revenue: '2500',
+        unpaid_amount: '500',
+        paid_revenue: '4500',
+      })),
+    })
+  ),
   http.patch(API_ENDPOINTS.ORDER_URGENCY(':id'), async ({ request, params }) => {
     const body = await request.json() as { urgency: string }
     return HttpResponse.json({ ...ORDER_STUB, id: params['id'] as string, urgency: body.urgency })

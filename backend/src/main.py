@@ -9,6 +9,8 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy import text
 
+from src.ai.router import router as ai_router
+from src.ai.tools import *  # noqa: F401,F403 — registers all tools with tool_registry on import
 from src.auth.router import router as auth_router
 from src.config import settings
 from src.core.constants import log_messages
@@ -71,6 +73,7 @@ app.include_router(orders_router)
 app.include_router(expense_categories_router)
 app.include_router(expenses_router)
 app.include_router(reports_router)
+app.include_router(ai_router)
 
 app.mount("/uploads", StaticFiles(directory=settings.UPLOADS_DIR), name="uploads")
 

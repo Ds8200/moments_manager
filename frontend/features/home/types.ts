@@ -7,3 +7,9 @@ export interface HomeKpi {
   unpaid_amount: string
   today_orders: number
 }
+
+export interface RevenueChartDataPoint {
+  month: string
+  revenue: number
+  expenses: number
+}

@@ -1,0 +1,37 @@
+.wrapper {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 16px 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  margin: 0 0 16px;
+}
+
+.skeleton {
+  height: 302px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f3e5f5 25%, #ede0f0 50%, #f3e5f5 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.empty {
+  height: 302px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  border-radius: 12px;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}

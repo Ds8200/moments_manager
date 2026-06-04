@@ -18,6 +18,7 @@ export const UI_LABELS = {
   ERROR_LOADING_USERS:    'שגיאה בטעינת המשתמשים',
   ERROR_LOADING_SEND_EMAIL: 'שגיאה בדף שליחת מייל',
   ERROR_LOADING_ORDER_DETAIL: 'שגיאה בטעינת פרטי ההזמנה',
+  ERROR_LOADING_AI: 'שגיאה בטעינת Moments AI',
   EMOJI_PICKER_BTN:  "הוסף אמוג'י",
   ATTACH_FILE:       'צרף קובץ',
   ATTACH_BTN_ARIA:   'בחר קובץ לצירוף',
@@ -67,6 +68,7 @@ export const META_LABELS = {
   SEND_EMAIL_TITLE:  'שליחת מייל | Moments מערכת ניהול',
   LOGIN_TITLE:       'התחברות | Moments מערכת ניהול',
   PROFILE_TITLE_META: 'פרופיל | Moments מערכת ניהול',
+  AI_TITLE:          'Moments AI | Moments מערכת ניהול',
 } as const
 
 export const HOME_LABELS = {

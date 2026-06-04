@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     EMAIL_FROM_NAME: str = "Moments"
     EMAIL_FROM: str = ""
     APP_URL: str = "http://localhost:3000"
+    GEMINI_API_KEY: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

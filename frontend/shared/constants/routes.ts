@@ -6,6 +6,7 @@ export const ROUTES = {
   EXPENSES: '/expenses',
   REPORTS: '/reports',
   SEND_EMAIL: '/send-email',
+  AI: '/ai',
   USERS: '/users',
   PROFILE: '/profile',
   LOGIN: '/login',
@@ -21,6 +22,7 @@ export const ROUTE_ICONS = {
   EXPENSES:  '💸',
   REPORTS:   '📊',
   EMAIL:     '✉️',
+  AI:        '🤖',
   USERS:     '👤',
 } as const
 
@@ -40,5 +42,6 @@ export const NAV_ITEMS: NavItem[] = [
   { href: ROUTES.EXPENSES,   label: 'הוצאות',      shortLabel: 'הוצאות',   icon: ROUTE_ICONS.EXPENSES },
   { href: ROUTES.REPORTS,    label: 'דוחות',       shortLabel: 'דוחות',    icon: ROUTE_ICONS.REPORTS },
   { href: ROUTES.SEND_EMAIL, label: 'שליחת מייל',  shortLabel: 'מייל',     icon: ROUTE_ICONS.EMAIL },
+  { href: ROUTES.AI,         label: 'Moments AI',  shortLabel: 'AI',       icon: ROUTE_ICONS.AI },
   { href: ROUTES.USERS,      label: 'משתמשים',     shortLabel: 'משתמשים',  icon: ROUTE_ICONS.USERS, adminOnly: true },
 ]
