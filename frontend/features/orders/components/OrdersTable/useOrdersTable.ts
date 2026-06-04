@@ -10,6 +10,8 @@ import type { OrderSummary, UrgencyLevel } from '../../types'
 import type { OrderStatus } from '@/shared/enums/statusEnums'
 import { PAYMENT_STATE_LABELS, getPaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
+import { ROUTE_ICONS } from '@/shared/constants/routes'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
 export interface UseOrdersTableReturn {
@@ -30,6 +32,7 @@ export interface UseOrdersTableReturn {
   getUrgencyLabel: (urgency: UrgencyLevel) => string
   getUrgencyClass: (urgency: UrgencyLevel) => string
   getPaymentLabel: (isPaid: boolean, method: string | null) => string
+  emptyIcon: string
 }
 
 const URGENCY_LABEL_MAP: Record<UrgencyLevel, string> = {
@@ -79,9 +82,9 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
 
   const onRowMenuClick = (order: OrderSummary, e: MouseEvent<Element>): void => {
     openMenu(`#${order.order_number}`, [
-      { label: ORDERS_LABELS.DETAIL_EDIT_TITLE, icon: '📋', onClick: () => onViewOrder(order.id) },
-      { label: ORDERS_LABELS.TABLE_EDIT_TITLE, icon: '✏️', onClick: () => onEditOrder(order.id) },
-      { label: ORDERS_LABELS.TABLE_DELETE_TITLE, icon: '🗑️', onClick: () => onDeleteOrder(order.id), variant: 'danger' },
+      { label: ORDERS_LABELS.DETAIL_EDIT_TITLE, icon: ROUTE_ICONS.ORDERS, onClick: () => onViewOrder(order.id) },
+      { label: ORDERS_LABELS.TABLE_EDIT_TITLE, icon: UI_SYMBOLS.EDIT, onClick: () => onEditOrder(order.id) },
+      { label: ORDERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDeleteOrder(order.id), variant: 'danger' },
     ], e)
   }
 
@@ -115,5 +118,6 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     getUrgencyLabel: (urgency) => URGENCY_LABEL_MAP[urgency],
     getUrgencyClass: (urgency) => URGENCY_CLASS_MAP[urgency],
     getPaymentLabel: (isPaid, method) => PAYMENT_STATE_LABELS[getPaymentState(isPaid, method)],
+    emptyIcon: ROUTE_ICONS.ORDERS,
   }
 }

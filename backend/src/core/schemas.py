@@ -13,6 +13,9 @@ class PaginationParams(BaseModel):
     def offset(self) -> int:
         return (self.page - 1) * self.page_size
 
+    def compute_pages(self, total: int) -> int:
+        return max(1, (total + self.page_size - 1) // self.page_size)
+
 
 class PaginatedResponse(BaseModel, Generic[T]):
     items: list[T]

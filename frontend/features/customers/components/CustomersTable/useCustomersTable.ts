@@ -7,6 +7,8 @@ import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
 import { useConfirm } from '@/shared/hooks/useConfirm'
 import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
+import { ROUTE_ICONS } from '@/shared/constants/routes'
 import type { Customer } from '../../types'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
@@ -21,6 +23,8 @@ export interface UseCustomersTableReturn {
   onRowClick: (customer: Customer, e: MouseEvent<Element>) => void
   closeMenu: () => void
   onPageChange: (page: number) => void
+  emptyIcon: string
+  emptyValue: string
 }
 
 export const useCustomersTable = (): UseCustomersTableReturn => {
@@ -52,9 +56,9 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
 
   const onRowClick = (customer: Customer, e: MouseEvent<Element>): void => {
     openMenu(customer.name, [
-      { label: UI_LABELS.EMAIL_ACTION, icon: '✉️', onClick: () => onEmail(customer.id) },
-      { label: CUSTOMERS_LABELS.TABLE_EDIT_TITLE, icon: '✏️', onClick: () => onEdit(customer.id) },
-      { label: CUSTOMERS_LABELS.TABLE_DELETE_TITLE, icon: '🗑️', onClick: () => onDelete(customer.id, customer.name), variant: 'danger' },
+      { label: UI_LABELS.EMAIL_ACTION, icon: ROUTE_ICONS.EMAIL, onClick: () => onEmail(customer.id) },
+      { label: CUSTOMERS_LABELS.TABLE_EDIT_TITLE, icon: UI_SYMBOLS.EDIT, onClick: () => onEdit(customer.id) },
+      { label: CUSTOMERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(customer.id, customer.name), variant: 'danger' },
     ], e)
   }
 
@@ -69,5 +73,7 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
     onRowClick,
     closeMenu,
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
+    emptyIcon: ROUTE_ICONS.CUSTOMERS,
+    emptyValue: UI_SYMBOLS.EM_DASH,
   }
 }

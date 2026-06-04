@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.customers.models import Customer
-from src.orders.enums import OrderSortField
+from src.orders.constants import ORDER_NUMBER_PREFIX
+from src.orders.enums import OrderSortField, UrgencyLevel
 from src.orders.models import Order, OrderFile, OrderItem
 
 logger = logging.getLogger(__name__)
@@ -19,9 +20,9 @@ def _build_order_clause(sort_by: str) -> list:
         return [Order.due_datetime.asc().nullslast(), Order.created_at.desc()]
     if sort_by == OrderSortField.urgency.value:
         urgency_rank = case(
-            (Order.urgency == "very_urgent", 1),
-            (Order.urgency == "urgent", 2),
-            (Order.urgency == "normal", 3),
+            (Order.urgency == UrgencyLevel.very_urgent.value, 1),
+            (Order.urgency == UrgencyLevel.urgent.value, 2),
+            (Order.urgency == UrgencyLevel.normal.value, 3),
             else_=4,
         )
         return [urgency_rank.asc()]
@@ -34,7 +35,7 @@ class OrderRepository:
 
     async def get_next_order_number(self) -> str:
         year = datetime.now().year
-        prefix = f"ORD-{year}-"
+        prefix = f"{ORDER_NUMBER_PREFIX}-{year}-"
         result = await self._db.execute(
             select(func.max(Order.order_number)).where(
                 Order.order_number.like(f"{prefix}%")

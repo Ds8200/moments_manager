@@ -34,7 +34,7 @@ class UserService:
 
     async def list_users(self, params: PaginationParams) -> PaginatedResponse[UserResponseSchema]:
         users, total = await self._repo.list_all(params.page_size, params.offset)
-        pages = max(1, (total + params.page_size - 1) // params.page_size)
+        pages = params.compute_pages(total)
         return PaginatedResponse(
             items=[UserResponseSchema.model_validate(u) for u in users],
             total=total,
@@ -105,6 +105,6 @@ class UserService:
         if not user:
             raise NotFoundError(RESOURCE_USER, user_id)
         await RefreshTokenRepository(self._db).delete_all_for_user(user_id)
-        await self._repo.delete(user)
+        await self._repo.soft_delete(user)
         await self._db.commit()
         logger.info(USER_DELETED, user_id, requesting_admin_id)

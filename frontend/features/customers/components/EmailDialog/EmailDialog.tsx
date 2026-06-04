@@ -1,29 +1,30 @@
 'use client'
-import type { JSX, MutableRefObject } from 'react'
+import type { ReactElement } from 'react'
 import { useEmailDialog } from './useEmailDialog'
 import { EmojiPicker } from '@/shared/components/EmojiPicker/EmojiPicker'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './EmailDialog.module.scss'
 
-export const EmailDialog = (): JSX.Element => {
+export const EmailDialog = (): ReactElement => {
   const {
     isOpen,
-    customerName,
+    customerNameSuffix,
+    emojiPickerSymbol,
     register,
     errors,
     handleSubmit,
     onSubmit,
     onClose,
     isPending,
-    textareaRef,
+    buttonRef,
     isPickerOpen,
     togglePicker,
     closePicker,
     onEmojiSelect,
+    mergedBodyRef,
+    bodyInputProps,
   } = useEmailDialog()
-
-  const { ref: bodyRef, ...bodyRest } = register('body')
 
   return (
     <>
@@ -36,8 +37,7 @@ export const EmailDialog = (): JSX.Element => {
             aria-modal="true"
           >
             <h2 className={styles.title}>
-              {CUSTOMERS_LABELS.EMAIL_DIALOG_TITLE}
-              {customerName ? ` — ${customerName}` : ''}
+              {CUSTOMERS_LABELS.EMAIL_DIALOG_TITLE}{customerNameSuffix}
             </h2>
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <div className={styles.field}>
@@ -61,12 +61,13 @@ export const EmailDialog = (): JSX.Element => {
                   </label>
                   <button
                     type="button"
+                    ref={buttonRef}
                     className={styles.emojiToggle}
                     onClick={togglePicker}
                     title={UI_LABELS.EMOJI_PICKER_BTN}
                     aria-label={UI_LABELS.EMOJI_PICKER_BTN}
                   >
-                    😊
+                    {emojiPickerSymbol}
                   </button>
                 </div>
                 <div className={styles.bodyWrapper}>
@@ -75,20 +76,14 @@ export const EmailDialog = (): JSX.Element => {
                     className={styles.textarea}
                     placeholder={CUSTOMERS_LABELS.EMAIL_BODY_PLACEHOLDER}
                     rows={6}
-                    ref={(el) => {
-                      textareaRef.current = el
-                      if (typeof bodyRef === 'function') {
-                        bodyRef(el)
-                      } else if (bodyRef) {
-                        (bodyRef as MutableRefObject<HTMLTextAreaElement | null>).current = el
-                      }
-                    }}
-                    {...bodyRest}
+                    ref={mergedBodyRef}
+                    {...bodyInputProps}
                   />
                   <EmojiPicker
                     isOpen={isPickerOpen}
                     onClose={closePicker}
                     onSelect={onEmojiSelect}
+                    buttonRef={buttonRef}
                   />
                 </div>
                 {errors.body && <span className={styles.error}>{errors.body.message}</span>}

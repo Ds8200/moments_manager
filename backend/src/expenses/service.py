@@ -31,7 +31,7 @@ class ExpenseService:
         expenses, total = await self._repo.get_all(
             date_from, date_to, category, params.page_size, params.offset
         )
-        pages = (total + params.page_size - 1) // params.page_size
+        pages = params.compute_pages(total)
         return PaginatedResponse(
             items=[ExpenseResponseSchema.model_validate(e) for e in expenses],
             total=total, page=params.page, page_size=params.page_size, pages=pages,

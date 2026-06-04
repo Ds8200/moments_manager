@@ -13,6 +13,7 @@ export const ExpensesPage = (): ReactElement => {
   const {
     data, isLoading, isError, totalAmount,
     onNew, onEdit, onDelete, formatAmount, formatExpenseDate,
+    emptyErrorIcon, emptyStateIcon, editSymbol, deleteSymbol, emptyValue,
   } = useExpensesPage()
 
   return (
@@ -23,10 +24,10 @@ export const ExpensesPage = (): ReactElement => {
       </div>
 
       {isLoading && <PageSkeleton rows={6} />}
-      {isError && <EmptyState title={EXPENSES_LABELS.ERROR_LOAD} description="" icon="⚠️" />}
+      {isError && <EmptyState title={EXPENSES_LABELS.ERROR_LOAD} description="" icon={emptyErrorIcon} />}
 
       {data && data.items.length === 0 && (
-        <EmptyState title={EXPENSES_LABELS.EMPTY_TITLE} description={EXPENSES_LABELS.EMPTY_DESC} icon="💸" />
+        <EmptyState title={EXPENSES_LABELS.EMPTY_TITLE} description={EXPENSES_LABELS.EMPTY_DESC} icon={emptyStateIcon} />
       )}
 
       {data && data.items.length > 0 && (
@@ -53,10 +54,10 @@ export const ExpensesPage = (): ReactElement => {
                   <td className={styles.cell}>
                     <span className={styles.amount}>{formatAmount(expense.amount)}</span>
                   </td>
-                  <td className={styles.cell}>{expense.notes ?? '—'}</td>
+                  <td className={styles.cell}>{expense.notes ?? emptyValue}</td>
                   <td className={styles.cell}>
-                    <button className={styles.actionBtn} title={UI_LABELS.EDIT} onClick={() => onEdit(expense)}>✏️</button>
-                    <button className={styles.actionBtn} title={UI_LABELS.DELETE} onClick={() => onDelete(expense.id)}>🗑️</button>
+                    <button className={styles.actionBtn} title={UI_LABELS.EDIT} onClick={() => onEdit(expense)}>{editSymbol}</button>
+                    <button className={styles.actionBtn} title={UI_LABELS.DELETE} onClick={() => onDelete(expense.id)}>{deleteSymbol}</button>
                   </td>
                 </tr>
               ))}

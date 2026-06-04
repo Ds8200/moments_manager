@@ -28,6 +28,8 @@ export const ProductsTable = (): ReactElement => {
     closeMenu,
     onPageChange,
     formatAmount,
+    emptyIcon,
+    emptyValue,
   } = useProductsTable()
 
   const renderRow = (product: Product): ReactElement => (
@@ -39,7 +41,7 @@ export const ProductsTable = (): ReactElement => {
         <span className={styles.name}>{product.name}</span>
       </td>
       <td className={styles.cell}>
-        <span className={styles.secondary}>{product.category?.name ?? '—'}</span>
+        <span className={styles.secondary}>{product.category?.name ?? emptyValue}</span>
       </td>
       <td className={styles.cell}>
         <span className={styles.price}>{formatAmount(product.base_price)}</span>
@@ -66,7 +68,7 @@ export const ProductsTable = (): ReactElement => {
         isError={isError}
         emptyTitle={PRODUCTS_LABELS.EMPTY_TITLE}
         emptyDescription={PRODUCTS_LABELS.EMPTY_DESC}
-        emptyIcon="🎨"
+        emptyIcon={emptyIcon}
         errorTitle={PRODUCTS_LABELS.ERROR_LOAD}
         currentPage={currentPage}
         totalPages={totalPages}

@@ -13,12 +13,12 @@ export const DataTable = <T,>(props: DataTableProps<T>): ReactElement => {
     isPrevDisabled, isNextDisabled,
     currentPage, totalPages, total,
     onPageChange, paginationLabels,
-    emptyTitle, emptyDescription, emptyIcon, errorTitle,
+    emptyTitle, emptyDescription, emptyIcon, errorTitle, errorIcon,
   } = useDataTable(props)
 
   if (showLoading) return <PageSkeleton rows={8} />
 
-  if (showError) return <EmptyState title={errorTitle} description="" icon="⚠️" />
+  if (showError) return <EmptyState title={errorTitle} description="" icon={errorIcon} />
 
   if (showEmpty) return <EmptyState title={emptyTitle} description={emptyDescription} icon={emptyIcon} />
 

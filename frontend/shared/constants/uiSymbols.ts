@@ -1,0 +1,12 @@
+export const UI_SYMBOLS = {
+  CLOSE:         '✕',
+  EM_DASH:       '—',
+  CURRENCY:      '₪',
+  WARNING:       '⚠️',
+  PROFILE:       '👤',
+  EMPTY_MAILBOX: '📭',
+  ATTACHMENT:    '📎',
+  EDIT:          '✏️',
+  DELETE:        '🗑️',
+  EMOJI_PICKER:  '😊',
+} as const

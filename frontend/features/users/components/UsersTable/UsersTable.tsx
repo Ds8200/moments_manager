@@ -26,6 +26,7 @@ export const UsersTable = (): ReactElement => {
     onRowClick,
     closeMenu,
     onPageChange,
+    emptyIcon,
   } = useUsersTable()
 
   const renderRow = (user: User): ReactElement => (
@@ -63,7 +64,7 @@ export const UsersTable = (): ReactElement => {
         isError={isError}
         emptyTitle={USERS_LABELS.EMPTY_TITLE}
         emptyDescription={USERS_LABELS.EMPTY_DESC}
-        emptyIcon="👤"
+        emptyIcon={emptyIcon}
         errorTitle={USERS_LABELS.ERROR_LOAD}
         currentPage={currentPage}
         totalPages={totalPages}

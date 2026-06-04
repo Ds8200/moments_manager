@@ -10,6 +10,7 @@ import { useProduct, useCreateProduct, useUpdateProduct } from '../../queries/us
 import { useProductCategories } from '@/features/productCategories'
 import type { ProductCategory, ProductFormValues } from '../../types'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
 const schema = z.object({
   name:     z.string().min(1, PRODUCTS_LABELS.VALIDATION_NAME_REQUIRED),
@@ -48,6 +49,8 @@ export interface UseProductFormReturn {
   isCategoryManagerOpen: boolean
   openCategoryManager: () => void
   closeCategoryManager: () => void
+  closeSymbol: string
+  currencySymbol: string
 }
 
 export const useProductForm = (): UseProductFormReturn => {
@@ -114,5 +117,7 @@ export const useProductForm = (): UseProductFormReturn => {
     isCategoryManagerOpen,
     openCategoryManager: () => setCategoryManagerOpen(true),
     closeCategoryManager: () => setCategoryManagerOpen(false),
+    closeSymbol: UI_SYMBOLS.CLOSE,
+    currencySymbol: UI_SYMBOLS.CURRENCY,
   }
 }

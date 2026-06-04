@@ -14,6 +14,8 @@ class ErrorCode(str, Enum):
 
     # Specific codes for cases the frontend renders with a tailored message.
     CATEGORY_IN_USE = "CATEGORY_IN_USE"
+    CATEGORY_NAME_EXISTS = "CATEGORY_NAME_EXISTS"
+    CUSTOMER_NO_EMAIL = "CUSTOMER_NO_EMAIL"
     USER_EMAIL_EXISTS = "USER_EMAIL_EXISTS"
     CANNOT_DELETE_SELF = "CANNOT_DELETE_SELF"
     INVALID_CREDENTIALS = "INVALID_CREDENTIALS"

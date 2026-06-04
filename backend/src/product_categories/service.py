@@ -33,7 +33,7 @@ class ProductCategoryService:
     ) -> ProductCategoryResponseSchema:
         existing = await self._repo.get_by_name(data.name)
         if existing:
-            raise ConflictError(PRODUCT_CATEGORY_NAME_EXISTS)
+            raise ConflictError(PRODUCT_CATEGORY_NAME_EXISTS, code=ErrorCode.CATEGORY_NAME_EXISTS)
         category = await self._repo.create(data.model_dump())
         await self._db.commit()
         return ProductCategoryResponseSchema.model_validate(category)
@@ -46,7 +46,7 @@ class ProductCategoryService:
             raise NotFoundError(RESOURCE_PRODUCT_CATEGORY, category_id)
         existing = await self._repo.get_by_name(data.name)
         if existing and existing.id != category_id:
-            raise ConflictError(PRODUCT_CATEGORY_NAME_EXISTS)
+            raise ConflictError(PRODUCT_CATEGORY_NAME_EXISTS, code=ErrorCode.CATEGORY_NAME_EXISTS)
         await self._repo.update(category, data.model_dump())
         await self._db.commit()
         refreshed = await self._repo.get_by_id(category_id)

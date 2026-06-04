@@ -13,7 +13,7 @@ export const Sidebar = (): ReactElement => {
 
   return (
     <aside className={`${styles.sidebar} ${!isOpen ? styles.collapsed : ''}`}>
-      <Link href={ROUTES.DASHBOARD} className={styles.logo}>
+      <Link href={ROUTES.HOME} className={styles.logo}>
         <Image
           src="/moments_logo.png"
           alt={UI_LABELS.APP_NAME}

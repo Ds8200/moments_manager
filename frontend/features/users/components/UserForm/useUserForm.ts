@@ -7,6 +7,7 @@ import { useAtom } from 'jotai'
 import { isUserFormOpenAtom } from '../../store/usersAtoms'
 import { useCreateUser } from '../../queries/useUsers'
 import { USERS_LABELS, USER_ROLE_VALUES } from '../../constants/usersLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import type { UserFormValues } from '../../types'
 
 const schema = z.object({
@@ -29,6 +30,7 @@ export interface UseUserFormReturn {
   errors: ReturnType<typeof useForm<UserFormValues>>['formState']['errors']
   isSubmitting: boolean
   onClose: () => void
+  closeSymbol: string
 }
 
 export const useUserForm = (): UseUserFormReturn => {
@@ -73,5 +75,6 @@ export const useUserForm = (): UseUserFormReturn => {
     errors,
     isSubmitting,
     onClose,
+    closeSymbol: UI_SYMBOLS.CLOSE,
   }
 }

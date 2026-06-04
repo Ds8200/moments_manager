@@ -26,6 +26,9 @@ export const OrderDetail = (): ReactElement | null => {
     formatAmount,
     formatOrderDate,
     formatDueDateTime,
+    editSymbol,
+    closeSymbol,
+    attachmentSymbol,
   } = useOrderDetail()
 
   return isOpen ? (
@@ -37,8 +40,8 @@ export const OrderDetail = (): ReactElement | null => {
             <span className={styles.customerName}>{order?.customer_name}</span>
           </div>
           <div>
-            <button className={styles.closeBtn} onClick={onEdit} title={ORDERS_LABELS.DETAIL_EDIT_TITLE}>✏️</button>
-            <button className={styles.closeBtn} onClick={onClose} title={ORDERS_LABELS.DETAIL_CLOSE_TITLE}>✕</button>
+            <button className={styles.closeBtn} onClick={onEdit} title={ORDERS_LABELS.DETAIL_EDIT_TITLE}>{editSymbol}</button>
+            <button className={styles.closeBtn} onClick={onClose} title={ORDERS_LABELS.DETAIL_CLOSE_TITLE}>{closeSymbol}</button>
           </div>
         </div>
 
@@ -127,7 +130,7 @@ export const OrderDetail = (): ReactElement | null => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      📎 {f.original_name}
+                      {attachmentSymbol} {f.original_name}
                     </a>
                   ))}
                 </div>

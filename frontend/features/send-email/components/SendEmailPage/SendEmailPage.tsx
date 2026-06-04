@@ -19,6 +19,7 @@ export const SendEmailPage = (): ReactElement => {
     onSubmit,
     isPending,
     textareaRef,
+    buttonRef,
     isPickerOpen,
     togglePicker,
     closePicker,
@@ -64,6 +65,7 @@ export const SendEmailPage = (): ReactElement => {
               </label>
               <button
                 type="button"
+                ref={buttonRef}
                 className={styles.emojiToggle}
                 onClick={togglePicker}
                 title={UI_LABELS.EMOJI_PICKER_BTN}
@@ -92,6 +94,7 @@ export const SendEmailPage = (): ReactElement => {
                 isOpen={isPickerOpen}
                 onClose={closePicker}
                 onSelect={onEmojiSelect}
+                buttonRef={buttonRef}
               />
             </div>
             {errors.body && <span className={styles.error}>{errors.body.message}</span>}

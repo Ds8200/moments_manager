@@ -30,7 +30,7 @@ class ProductService:
         products, total = await self._repo.get_all(
             search, category_id, is_active, params.page_size, params.offset
         )
-        pages = (total + params.page_size - 1) // params.page_size
+        pages = params.compute_pages(total)
         return PaginatedResponse(
             items=[ProductResponseSchema.model_validate(p) for p in products],
             total=total,

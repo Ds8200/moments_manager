@@ -13,7 +13,9 @@ class CustomerRepository:
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
 
-    async def get_all(self, search: str | None, limit: int, offset: int) -> tuple[list[Customer], int]:
+    async def get_all(
+        self, search: str | None, limit: int, offset: int
+    ) -> tuple[list[Customer], int]:
         query = select(Customer).where(Customer.is_deleted == False)
         if search:
             query = query.where(Customer.name.ilike(f"%{search}%"))

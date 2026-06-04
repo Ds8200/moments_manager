@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -61,6 +62,7 @@ class UserRepository:
         await self._db.flush()
         return user
 
-    async def delete(self, user: User) -> None:
-        await self._db.delete(user)
+    async def soft_delete(self, user: User) -> None:
+        user.is_deleted = True
+        user.deleted_at = datetime.now(timezone.utc)
         await self._db.flush()

@@ -9,6 +9,7 @@ export const ProductForm = (): ReactElement | null => {
   const {
     isOpen, isEditing, register, handleSubmit, onSubmit, errors, isSubmitting, onClose,
     categories, isCategoryManagerOpen, openCategoryManager, closeCategoryManager,
+    closeSymbol, currencySymbol,
   } = useProductForm()
 
   return isOpen ? (
@@ -16,7 +17,7 @@ export const ProductForm = (): ReactElement | null => {
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{isEditing ? PRODUCTS_LABELS.FORM_EDIT_TITLE : PRODUCTS_LABELS.FORM_NEW_TITLE}</h2>
-          <button className={styles.closeBtn} onClick={onClose}>✕</button>
+          <button className={styles.closeBtn} onClick={onClose}>{closeSymbol}</button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.grid2}>
@@ -41,12 +42,12 @@ export const ProductForm = (): ReactElement | null => {
             </div>
             <div className={styles.field}>
               <label className={styles.label}>{PRODUCTS_LABELS.FORM_PRICE}</label>
-              <input className={`${styles.input}${errors.base_price ? ` ${styles.error}` : ''}`} placeholder="₪" {...register('base_price')} />
+              <input className={`${styles.input}${errors.base_price ? ` ${styles.error}` : ''}`} placeholder={currencySymbol} {...register('base_price')} />
               {errors.base_price && <span className={styles.errorText}>{errors.base_price.message}</span>}
             </div>
             <div className={styles.field}>
               <label className={styles.label}>{PRODUCTS_LABELS.FORM_COST}</label>
-              <input className={`${styles.input}${errors.base_cost ? ` ${styles.error}` : ''}`} placeholder="₪" {...register('base_cost')} />
+              <input className={`${styles.input}${errors.base_cost ? ` ${styles.error}` : ''}`} placeholder={currencySymbol} {...register('base_cost')} />
               {errors.base_cost && <span className={styles.errorText}>{errors.base_cost.message}</span>}
             </div>
             <div className={styles.field}>

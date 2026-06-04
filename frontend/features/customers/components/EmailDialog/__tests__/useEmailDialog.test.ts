@@ -77,7 +77,7 @@ describe('useEmailDialog', () => {
     const { result } = renderHook(() => useEmailDialog(), { wrapper: makeWrapper(store, qc) })
 
     await vi.waitFor(() => {
-      expect(result.current.customerName).toBe('דניאל')
+      expect(result.current.customerNameSuffix).toBe('— דניאל')
     })
   })
 

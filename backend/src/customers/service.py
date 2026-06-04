@@ -10,10 +10,13 @@ from src.core.constants.http_messages import (
     RESOURCE_CUSTOMER,
 )
 from src.core.constants.log_messages import (
+    COMPOSE_EMAIL_CUSTOMER_NO_EMAIL,
+    COMPOSE_EMAIL_CUSTOMER_NOT_FOUND,
     COMPOSE_EMAIL_DISPATCHED,
     CUSTOMER_EMAIL_DISPATCHED,
 )
 from src.core.email import send_html_email
+from src.core.enums.error_codes import ErrorCode
 from src.core.exceptions import ConflictError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.customers.email_templates import build_customer_email
@@ -41,7 +44,7 @@ class CustomerService:
         self, params: PaginationParams, search: str | None = None
     ) -> PaginatedResponse[CustomerResponseSchema]:
         customers, total = await self._repo.get_all(search, params.page_size, params.offset)
-        pages = (total + params.page_size - 1) // params.page_size
+        pages = params.compute_pages(total)
         return PaginatedResponse(
             items=[CustomerResponseSchema.model_validate(c) for c in customers],
             total=total,
@@ -96,7 +99,7 @@ class CustomerService:
         if not customer:
             raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
         if not customer.email:
-            raise ConflictError(CUSTOMER_NO_EMAIL)
+            raise ConflictError(CUSTOMER_NO_EMAIL, code=ErrorCode.CUSTOMER_NO_EMAIL)
         subject, html_body = build_customer_email(customer.name, data.subject, data.body)
         background_tasks.add_task(send_html_email, customer.email, subject, html_body)
         logger.info(CUSTOMER_EMAIL_DISPATCHED, customer.email, customer_id)
@@ -112,10 +115,10 @@ class CustomerService:
         for customer_id in data.customer_ids:
             customer = await self._repo.get_by_id(customer_id)
             if not customer:
-                logger.warning("compose_email: customer %s not found, skipping", customer_id)
+                logger.warning(COMPOSE_EMAIL_CUSTOMER_NOT_FOUND, customer_id)
                 continue
             if not customer.email:
-                logger.warning("compose_email: customer %s has no email, skipping", customer_id)
+                logger.warning(COMPOSE_EMAIL_CUSTOMER_NO_EMAIL, customer_id)
                 continue
             subject, html_body = build_customer_email(customer.name, data.subject, data.body)
             background_tasks.add_task(send_html_email, customer.email, subject, html_body)

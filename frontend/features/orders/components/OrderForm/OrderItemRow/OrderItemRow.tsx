@@ -15,6 +15,8 @@ export const OrderItemRow = (props: OrderItemRowProps): ReactElement => {
     currentProductName,
     onProductSearch,
     onProductSelect,
+    closeSymbol,
+    currencySymbol,
   } = useOrderItemRow(props)
 
   const itemErrors = errors.items?.[index]
@@ -50,7 +52,7 @@ export const OrderItemRow = (props: OrderItemRowProps): ReactElement => {
           type="number"
           step="0.01"
           className={`${styles.input}${itemErrors?.unit_price ? ` ${styles.inputError}` : ''}`}
-          placeholder="₪"
+          placeholder={currencySymbol}
           {...register(`items.${index}.unit_price`)}
         />
       </div>
@@ -60,7 +62,7 @@ export const OrderItemRow = (props: OrderItemRowProps): ReactElement => {
           type="number"
           step="0.01"
           className={styles.input}
-          placeholder="₪"
+          placeholder={currencySymbol}
           {...register(`items.${index}.unit_cost`)}
         />
       </div>
@@ -71,7 +73,7 @@ export const OrderItemRow = (props: OrderItemRowProps): ReactElement => {
         disabled={isOnly}
         aria-label={ORDERS_LABELS.ITEM_REMOVE}
       >
-        ✕
+        {closeSymbol}
       </button>
     </div>
   )

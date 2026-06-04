@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { useProductCategories, useCreateProductCategory, useDeleteProductCategory } from '@/features/productCategories'
 import { ApiError } from '@/shared/utils/apiClient'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import type { ProductCategory } from '../../types'
 
 const addSchema = z.object({ name: z.string().min(1) })
@@ -25,6 +26,7 @@ export interface UseCategoryManagerModalReturn {
   onDelete: (id: string) => Promise<void>
   deleteErrors: Record<string, string>
   onClose: () => void
+  closeSymbol: string
 }
 
 export const useCategoryManagerModal = (
@@ -68,5 +70,6 @@ export const useCategoryManagerModal = (
     onDelete,
     deleteErrors,
     onClose,
+    closeSymbol: UI_SYMBOLS.CLOSE,
   }
 }

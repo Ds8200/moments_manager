@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import styles from './EmptyState.module.scss'
 
 interface EmptyStateProps {
@@ -8,7 +9,7 @@ interface EmptyStateProps {
   action?: React.ReactNode
 }
 
-export const EmptyState = ({ icon = '📭', title, description, action }: EmptyStateProps): ReactElement => {
+export const EmptyState = ({ icon = UI_SYMBOLS.EMPTY_MAILBOX, title, description, action }: EmptyStateProps): ReactElement => {
   return (
     <div className={styles.wrapper}>
       <span className={styles.icon}>{icon}</span>

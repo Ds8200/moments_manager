@@ -28,7 +28,8 @@ class ExpenseRepository:
             query = query.where(Expense.date <= date_to)
         if category:
             query = query.where(Expense.category == category)
-        total = (await self._db.execute(select(func.count()).select_from(query.subquery()))).scalar_one()
+        count_q = select(func.count()).select_from(query.subquery())
+        total = (await self._db.execute(count_q)).scalar_one()
         query = query.order_by(Expense.date.desc()).limit(limit).offset(offset)
         result = await self._db.execute(query)
         return result.scalars().all(), total

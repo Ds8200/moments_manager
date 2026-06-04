@@ -27,6 +27,8 @@ from openpyxl.styles import (
 )
 from openpyxl.utils import get_column_letter
 
+from src.core.constants.log_messages import WEASYPRINT_UNAVAILABLE
+
 logger = logging.getLogger(__name__)
 
 # ── Design tokens (matching frontend _variables.scss) ──────────────────────
@@ -245,7 +247,7 @@ def build_pdf_bytes(config: TableExportConfig) -> bytes:
     try:
         from weasyprint import HTML  # type: ignore[import-untyped]
     except (ImportError, OSError) as exc:
-        logger.error("weasyprint unavailable — missing system libs: %s", exc)
+        logger.error(WEASYPRINT_UNAVAILABLE, exc)
         raise RuntimeError(
             "PDF export requires weasyprint system dependencies (libpango, libcairo). "
             "See docker/backend/Dockerfile for installation instructions."

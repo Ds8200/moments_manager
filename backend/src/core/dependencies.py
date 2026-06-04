@@ -1,7 +1,7 @@
 import logging
 from typing import AsyncGenerator
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,7 +11,8 @@ from src.core.constants.http_messages import (
     TOKEN_PAYLOAD_INVALID,
     USER_NOT_FOUND,
 )
-from src.core.exceptions import ForbiddenError
+from src.core.enums.error_codes import ErrorCode
+from src.core.exceptions import ForbiddenError, UnauthorizedError
 from src.core.security import MAGIC_LOGIN_PURPOSE, decode_access_token
 from src.database import AsyncSessionLocal
 
@@ -32,21 +33,21 @@ async def get_current_user(
 
     payload = decode_access_token(credentials.credentials)
     if payload is None:
-        raise HTTPException(status_code=401, detail=TOKEN_INVALID)
+        raise UnauthorizedError(TOKEN_INVALID, code=ErrorCode.TOKEN_INVALID)
 
     # Magic-login tokens are single-purpose: they may only be exchanged at the
     # magic-login endpoint, never used directly as an API bearer token.
     if payload.get("purpose") == MAGIC_LOGIN_PURPOSE:
-        raise HTTPException(status_code=401, detail=TOKEN_INVALID)
+        raise UnauthorizedError(TOKEN_INVALID, code=ErrorCode.TOKEN_INVALID)
 
     user_id = payload.get("sub")
     if not user_id:
-        raise HTTPException(status_code=401, detail=TOKEN_PAYLOAD_INVALID)
+        raise UnauthorizedError(TOKEN_PAYLOAD_INVALID, code=ErrorCode.TOKEN_INVALID)
 
     repo = UserRepository(db)
     user = await repo.get_by_id(user_id)
     if user is None or user.is_deleted:
-        raise HTTPException(status_code=401, detail=USER_NOT_FOUND)
+        raise UnauthorizedError(USER_NOT_FOUND, code=ErrorCode.UNAUTHORIZED)
 
     return user
 

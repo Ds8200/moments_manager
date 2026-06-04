@@ -4,6 +4,7 @@ import type { ReactElement } from 'react'
 import { useHeader } from './useHeader'
 import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import styles from './Header.module.scss'
 
 export const Header = (): ReactElement => {
@@ -32,7 +33,7 @@ export const Header = (): ReactElement => {
         onClick={onProfileClick}
         aria-label={UI_LABELS.OPEN_PROFILE_MENU}
       >
-        👤
+        {UI_SYMBOLS.PROFILE}
       </button>
 
       <DropdownMenu state={profileMenu.menuState} onClose={profileMenu.closeMenu} />

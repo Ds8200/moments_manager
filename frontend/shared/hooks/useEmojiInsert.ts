@@ -10,6 +10,7 @@ import type {
 
 export interface UseEmojiInsertReturn {
   textareaRef: RefObject<HTMLTextAreaElement | null>
+  buttonRef: RefObject<HTMLButtonElement | null>
   isPickerOpen: boolean
   togglePicker: () => void
   closePicker: () => void
@@ -22,6 +23,7 @@ export const useEmojiInsert = <T extends FieldValues>(
   setValue: UseFormSetValue<T>,
 ): UseEmojiInsertReturn => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
 
   const togglePicker = useCallback(() => setIsPickerOpen((v) => !v), [])
@@ -29,7 +31,10 @@ export const useEmojiInsert = <T extends FieldValues>(
 
   const onEmojiSelect = useCallback(
     (rawEmoji: string) => {
-      const emoji = rawEmoji.replace(/️/g, '') // strip any residual VS-16
+      // Strip Variation Selector-16 using explicit unicode escape — literal
+      // U+FE0F in source gets mangled by some tools; the escape is reliable.
+      const emoji = rawEmoji.replace(/️/g, '')
+
       const el = textareaRef.current
       const current = String(getValues(fieldName) ?? '')
 
@@ -38,7 +43,6 @@ export const useEmojiInsert = <T extends FieldValues>(
 
       const next = current.slice(0, start) + emoji + current.slice(end)
 
-      // shouldDirty + shouldValidate keeps RHF in sync
       setValue(fieldName, next as T[Path<T>], {
         shouldValidate: true,
         shouldDirty: true,
@@ -46,18 +50,20 @@ export const useEmojiInsert = <T extends FieldValues>(
 
       setIsPickerOpen(false)
 
-      // Restore focus and cursor after React re-renders the controlled value.
-      // [...emoji].length counts Unicode code points, not UTF-16 code units,
-      // so surrogate-pair emojis don't mis-advance the cursor.
+      // Use emoji.length (UTF-16 code units) — NOT [...emoji].length (code points).
+      // setSelectionRange counts UTF-16 code units, just like selectionStart.
+      // Supplementary-plane emojis (😊, 👍, …) are 2 code units / 1 code point,
+      // so using code-point length would place the cursor inside a surrogate pair,
+      // causing the next keystroke to insert a replacement character (U+FFFD "?").
       requestAnimationFrame(() => {
         if (!el) return
         el.focus()
-        const pos = start + [...emoji].length
+        const pos = start + emoji.length
         el.setSelectionRange(pos, pos)
       })
     },
     [fieldName, getValues, setValue],
   )
 
-  return { textareaRef, isPickerOpen, togglePicker, closePicker, onEmojiSelect }
+  return { textareaRef, buttonRef, isPickerOpen, togglePicker, closePicker, onEmojiSelect }
 }

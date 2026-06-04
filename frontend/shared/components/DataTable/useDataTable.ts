@@ -1,5 +1,6 @@
 'use client'
 import type { ReactElement } from 'react'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
 export interface PaginationLabels {
   totalPrefix: string
@@ -19,6 +20,7 @@ export interface DataTableProps<T> {
   emptyDescription: string
   emptyIcon: string
   errorTitle: string
+  errorIcon?: string
   currentPage: number
   totalPages: number
   total: number
@@ -47,6 +49,7 @@ export interface UseDataTableReturn<T> {
   emptyDescription: string
   emptyIcon: string
   errorTitle: string
+  errorIcon: string
 }
 
 export const useDataTable = <T>(props: DataTableProps<T>): UseDataTableReturn<T> => {
@@ -84,5 +87,6 @@ export const useDataTable = <T>(props: DataTableProps<T>): UseDataTableReturn<T>
     emptyDescription,
     emptyIcon,
     errorTitle,
+    errorIcon: props.errorIcon ?? UI_SYMBOLS.WARNING,
   }
 }

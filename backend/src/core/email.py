@@ -3,7 +3,11 @@ import logging
 import httpx
 
 from src.config import settings
-from src.core.constants.log_messages import WELCOME_EMAIL_FAILED, WELCOME_EMAIL_SENT
+from src.core.constants.log_messages import (
+    BREVO_API_KEY_NOT_CONFIGURED,
+    WELCOME_EMAIL_FAILED,
+    WELCOME_EMAIL_SENT,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +16,7 @@ BREVO_SEND_URL = "https://api.brevo.com/v3/smtp/email"
 
 async def send_html_email(to_email: str, subject: str, html_body: str) -> None:
     if not settings.BREVO_API_KEY:
-        logger.warning("BREVO_API_KEY not configured — email to %s skipped", to_email)
+        logger.warning(BREVO_API_KEY_NOT_CONFIGURED, to_email)
         return
 
     try:

@@ -22,7 +22,7 @@ export const MobileDrawer = (): ReactElement => {
         className={`${styles.drawer} ${isOpen ? styles.drawerOpen : ''}`}
         aria-hidden={!isOpen}
       >
-        <Link href={ROUTES.DASHBOARD} className={styles.logo} onClick={onClose}>
+        <Link href={ROUTES.HOME} className={styles.logo} onClick={onClose}>
           <Image
             src="/moments_logo.png"
             alt={UI_LABELS.APP_NAME}

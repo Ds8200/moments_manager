@@ -5,7 +5,7 @@ import { USERS_LABELS, USER_ROLE_VALUES } from '../../constants/usersLabels'
 import styles from './UserForm.module.scss'
 
 export const UserForm = (): ReactElement | null => {
-  const { isOpen, register, handleSubmit, onSubmit, errors, isSubmitting, onClose } =
+  const { isOpen, register, handleSubmit, onSubmit, errors, isSubmitting, onClose, closeSymbol } =
     useUserForm()
 
   return isOpen ? (
@@ -14,7 +14,7 @@ export const UserForm = (): ReactElement | null => {
         <div className={styles.header}>
           <h2 className={styles.title}>{USERS_LABELS.FORM_NEW_TITLE}</h2>
           <button className={styles.closeBtn} onClick={onClose}>
-            ✕
+            {closeSymbol}
           </button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>

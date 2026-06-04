@@ -6,6 +6,8 @@ import { isExpenseFormOpenAtom, editingExpenseAtom } from '../../store/expensesA
 import { EXPENSES_LABELS } from '../../constants/expensesLabels'
 import { formatCurrency, formatDate } from '@/shared/utils/formatters'
 import { useConfirm } from '@/shared/hooks/useConfirm'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
+import { ROUTE_ICONS } from '@/shared/constants/routes'
 import type { Expense, ExpensesResponse } from '../../types'
 
 export interface UseExpensesPageReturn {
@@ -20,6 +22,11 @@ export interface UseExpensesPageReturn {
   onDelete: (id: string) => void
   formatAmount: (value: string | number) => string
   formatExpenseDate: (date: string) => string
+  emptyErrorIcon: string
+  emptyStateIcon: string
+  editSymbol: string
+  deleteSymbol: string
+  emptyValue: string
 }
 
 export const useExpensesPage = (): UseExpensesPageReturn => {
@@ -61,5 +68,10 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
     onDelete,
     formatAmount: formatCurrency,
     formatExpenseDate: formatDate,
+    emptyErrorIcon: UI_SYMBOLS.WARNING,
+    emptyStateIcon: ROUTE_ICONS.EXPENSES,
+    editSymbol: UI_SYMBOLS.EDIT,
+    deleteSymbol: UI_SYMBOLS.DELETE,
+    emptyValue: UI_SYMBOLS.EM_DASH,
   }
 }

@@ -8,7 +8,7 @@ import styles from './CategoryManagerModal.module.scss'
 export const CategoryManagerModal = (props: CategoryManagerModalProps): ReactElement => {
   const {
     categories, isLoading, addRegister, addHandleSubmit, onAdd,
-    isAdding, onDelete, deleteErrors, onClose,
+    isAdding, onDelete, deleteErrors, onClose, closeSymbol,
   } = useCategoryManagerModal(props)
 
   return (
@@ -16,7 +16,7 @@ export const CategoryManagerModal = (props: CategoryManagerModalProps): ReactEle
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h3 className={styles.title}>{PRODUCTS_LABELS.CATEGORY_MANAGER_TITLE}</h3>
-          <button className={styles.closeBtn} onClick={onClose}>✕</button>
+          <button className={styles.closeBtn} onClick={onClose}>{closeSymbol}</button>
         </div>
 
         <div className={styles.list}>
@@ -35,7 +35,7 @@ export const CategoryManagerModal = (props: CategoryManagerModalProps): ReactEle
                   onClick={() => onDelete(cat.id)}
                   title={PRODUCTS_LABELS.CATEGORY_DELETE_TITLE}
                 >
-                  ✕
+                  {closeSymbol}
                 </button>
               </div>
             </div>

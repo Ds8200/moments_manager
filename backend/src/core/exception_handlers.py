@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from src.core.constants.http_messages import INTERNAL_ERROR, VALIDATION_FAILED
+from src.core.constants.log_messages import UNHANDLED_EXCEPTION
 from src.core.enums.error_codes import ErrorCode
 from src.core.exceptions import (
     ConflictError,
@@ -64,5 +65,5 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-        logger.error("Unhandled exception on %s %s: %s", request.method, request.url.path, exc)
+        logger.error(UNHANDLED_EXCEPTION, request.method, request.url.path, exc)
         return _error_response(500, INTERNAL_ERROR, ErrorCode.INTERNAL_ERROR)

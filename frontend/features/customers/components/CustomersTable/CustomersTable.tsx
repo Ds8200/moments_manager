@@ -25,6 +25,8 @@ export const CustomersTable = (): ReactElement => {
     onRowClick,
     closeMenu,
     onPageChange,
+    emptyIcon,
+    emptyValue,
   } = useCustomersTable()
 
   const renderRow = (customer: Customer): ReactElement => (
@@ -36,10 +38,10 @@ export const CustomersTable = (): ReactElement => {
         <span className={styles.name}>{customer.name}</span>
       </td>
       <td className={styles.cell}>
-        <span className={styles.secondary}>{customer.phone ?? '—'}</span>
+        <span className={styles.secondary}>{customer.phone ?? emptyValue}</span>
       </td>
       <td className={styles.cell}>
-        <span className={styles.secondary}>{customer.email ?? '—'}</span>
+        <span className={styles.secondary}>{customer.email ?? emptyValue}</span>
       </td>
     </tr>
   )
@@ -55,7 +57,7 @@ export const CustomersTable = (): ReactElement => {
         isError={isError}
         emptyTitle={CUSTOMERS_LABELS.EMPTY_TITLE}
         emptyDescription={CUSTOMERS_LABELS.EMPTY_DESC}
-        emptyIcon="👥"
+        emptyIcon={emptyIcon}
         errorTitle={CUSTOMERS_LABELS.ERROR_LOAD}
         currentPage={currentPage}
         totalPages={totalPages}

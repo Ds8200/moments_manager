@@ -7,6 +7,7 @@ import styles from './CustomerForm.module.scss'
 export const CustomerForm = (): ReactElement | null => {
   const {
     isOpen, isEditing, register, handleSubmit, onSubmit, errors, isSubmitting, onClose,
+    closeSymbol,
   } = useCustomerForm()
 
   return isOpen ? (
@@ -14,7 +15,7 @@ export const CustomerForm = (): ReactElement | null => {
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{isEditing ? CUSTOMERS_LABELS.FORM_EDIT_TITLE : CUSTOMERS_LABELS.FORM_NEW_TITLE}</h2>
-          <button className={styles.closeBtn} onClick={onClose}>✕</button>
+          <button className={styles.closeBtn} onClick={onClose}>{closeSymbol}</button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.grid2}>

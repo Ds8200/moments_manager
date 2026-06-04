@@ -11,7 +11,15 @@
   box-shadow: $shadow-elevated;
   padding: $space-3;
   min-width: 260px;
+  max-height: 280px;
+  overflow-y: auto;
   animation: fadeIn $transition-fast;
+
+  // Flip upward when there isn't enough space below the textarea
+  &[data-flip="true"] {
+    top: auto;
+    bottom: calc(100% + $space-1);
+  }
 }
 
 .category {
@@ -44,7 +52,7 @@
   width: 30px;
   height: 30px;
   font-size: 18px;
-  font-variant-emoji: emoji; // force emoji (color) presentation over text (monochrome)
+  font-variant-emoji: emoji;
   background: none;
   border: none;
   border-radius: $border-radius-sm;

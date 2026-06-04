@@ -9,6 +9,7 @@ import { useCustomer, useCreateCustomer, useUpdateCustomer } from '../../queries
 import type { CustomerFormValues } from '../../types'
 
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
 const schema = z.object({
   name:  z.string().min(1, CUSTOMERS_LABELS.VALIDATION_NAME_REQUIRED),
@@ -33,6 +34,7 @@ export interface UseCustomerFormReturn {
   errors: ReturnType<typeof useForm<CustomerFormValues>>['formState']['errors']
   isSubmitting: boolean
   onClose: () => void
+  closeSymbol: string
 }
 
 export const useCustomerForm = (): UseCustomerFormReturn => {
@@ -88,5 +90,6 @@ export const useCustomerForm = (): UseCustomerFormReturn => {
     errors,
     isSubmitting,
     onClose,
+    closeSymbol: UI_SYMBOLS.CLOSE,
   }
 }

@@ -8,7 +8,7 @@ import styles from './ExpenseForm.module.scss'
 export const ExpenseForm = (): ReactElement | null => {
   const {
     isOpen, isEditing, register, handleSubmit, onSubmit,
-    errors, isSubmitting, onClose, categories,
+    errors, isSubmitting, onClose, categories, closeSymbol, currencySymbol,
   } = useExpenseForm()
 
   return isOpen ? (
@@ -16,7 +16,7 @@ export const ExpenseForm = (): ReactElement | null => {
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{isEditing ? EXPENSES_LABELS.FORM_EDIT_TITLE : EXPENSES_LABELS.FORM_NEW_TITLE}</h2>
-          <button className={styles.closeBtn} onClick={onClose}>✕</button>
+          <button className={styles.closeBtn} onClick={onClose}>{closeSymbol}</button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.grid2}>
@@ -35,7 +35,7 @@ export const ExpenseForm = (): ReactElement | null => {
             </div>
             <div className={`${styles.field} ${styles.fieldFull}`}>
               <label className={styles.label}>{EXPENSES_LABELS.FORM_AMOUNT}</label>
-              <input className={`${styles.input}${errors.amount ? ` ${styles.error}` : ''}`} placeholder="₪" {...register('amount')} />
+              <input className={`${styles.input}${errors.amount ? ` ${styles.error}` : ''}`} placeholder={currencySymbol} {...register('amount')} />
               {errors.amount && <span className={styles.errorText}>{errors.amount.message}</span>}
             </div>
             <div className={`${styles.field} ${styles.fieldFull}`}>

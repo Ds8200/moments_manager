@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -23,8 +24,8 @@ def _make_customer(customer_id: str = "c-1", name: str = "Test") -> MagicMock:
     customer.phone = None
     customer.email = None
     customer.notes = None
-    customer.created_at = None
-    customer.updated_at = None
+    customer.created_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    customer.updated_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
     return customer
 
 

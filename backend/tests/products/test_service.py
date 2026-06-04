@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
@@ -16,12 +17,13 @@ def _make_product(name: str = "P1") -> MagicMock:
     product.id = "p-1"
     product.name = name
     product.category = None
+    product.category_id = None
     product.base_price = Decimal("10")
     product.base_cost = Decimal("3")
     product.avg_production_days = 1
     product.is_active = True
-    product.created_at = None
-    product.updated_at = None
+    product.created_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    product.updated_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
     return product
 
 

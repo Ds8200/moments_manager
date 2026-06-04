@@ -6,6 +6,7 @@ import { useProducts } from '@/features/products/queries/useProducts'
 import type { Product } from '@/features/products/types'
 import type { AutocompleteOption } from '@/shared/components/Autocomplete/useAutocomplete'
 import type { OrderFormValues } from '../../../types'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
 export interface OrderItemRowProps {
   index: number
@@ -24,6 +25,8 @@ export interface UseOrderItemRowReturn {
   currentProductName: string
   onProductSearch: (query: string) => void
   onProductSelect: (value: string | null, option: AutocompleteOption<Product> | null) => void
+  closeSymbol: string
+  currencySymbol: string
 }
 
 export const useOrderItemRow = (props: OrderItemRowProps): UseOrderItemRowReturn => {
@@ -74,5 +77,7 @@ export const useOrderItemRow = (props: OrderItemRowProps): UseOrderItemRowReturn
     currentProductName,
     onProductSearch,
     onProductSelect,
+    closeSymbol: UI_SYMBOLS.CLOSE,
+    currencySymbol: UI_SYMBOLS.CURRENCY,
   }
 }

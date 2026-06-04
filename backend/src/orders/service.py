@@ -9,6 +9,7 @@ from src.core.constants import log_messages
 from src.core.constants.http_messages import RESOURCE_FILE, RESOURCE_ORDER
 from src.core.exceptions import FileTooLargeError, InvalidFileTypeError, NotFoundError
 from src.core.schemas import PaginatedResponse, PaginationParams
+from src.orders.constants import ALLOWED_FILE_EXTENSIONS
 from src.orders.enums import OrderSortField
 from src.orders.models import Order
 from src.orders.repository import OrderRepository
@@ -24,7 +25,7 @@ from src.orders.schemas import (
 
 logger = logging.getLogger(__name__)
 
-ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".pdf", ".svg", ".ai", ".psd"}
+
 
 
 def _compute_item_fields(item_data: dict) -> dict:
@@ -57,7 +58,7 @@ class OrderService:
             status, date_from, date_to, customer_id, is_paid, payment_method, search,
             params.page_size, params.offset, sort_by
         )
-        pages = (total + params.page_size - 1) // params.page_size
+        pages = params.compute_pages(total)
         items = []
         for o in orders:
             schema = OrderListResponseSchema.model_validate(o)
@@ -168,7 +169,7 @@ class OrderService:
             raise FileTooLargeError(settings.MAX_FILE_SIZE_MB)
 
         _, ext = os.path.splitext(filename.lower())
-        if ext not in ALLOWED_EXTENSIONS:
+        if ext not in ALLOWED_FILE_EXTENSIONS:
             raise InvalidFileTypeError(ext)
 
         if ext in {".jpg", ".jpeg", ".png", ".gif", ".svg"}:

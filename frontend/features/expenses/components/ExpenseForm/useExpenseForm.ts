@@ -8,6 +8,7 @@ import { isExpenseFormOpenAtom, editingExpenseAtom } from '../../store/expensesA
 import { useCreateExpense, useUpdateExpense } from '../../queries/useExpenses'
 import type { ExpenseFormValues, ExpenseCategory } from '../../types'
 import { EXPENSES_LABELS } from '../../constants/expensesLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
 const EXPENSE_CATEGORIES: ExpenseCategory[] = [
   'ink', 'materials', 'equipment', 'shipping', 'utilities', 'other',
@@ -37,6 +38,8 @@ export interface UseExpenseFormReturn {
   isSubmitting: boolean
   onClose: () => void
   categories: ExpenseCategory[]
+  closeSymbol: string
+  currencySymbol: string
 }
 
 export const useExpenseForm = (): UseExpenseFormReturn => {
@@ -92,5 +95,7 @@ export const useExpenseForm = (): UseExpenseFormReturn => {
     isSubmitting,
     onClose,
     categories: EXPENSE_CATEGORIES,
+    closeSymbol: UI_SYMBOLS.CLOSE,
+    currencySymbol: UI_SYMBOLS.CURRENCY,
   }
 }

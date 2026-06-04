@@ -7,6 +7,8 @@ import { formatCurrency } from '@/shared/utils/formatters'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 import { useConfirm } from '@/shared/hooks/useConfirm'
 import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
+import { ROUTE_ICONS } from '@/shared/constants/routes'
 import type { Product } from '../../types'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
@@ -22,6 +24,8 @@ export interface UseProductsTableReturn {
   closeMenu: () => void
   onPageChange: (page: number) => void
   formatAmount: (value: string | number) => string
+  emptyIcon: string
+  emptyValue: string
 }
 
 export const useProductsTable = (): UseProductsTableReturn => {
@@ -50,8 +54,8 @@ export const useProductsTable = (): UseProductsTableReturn => {
 
   const onRowClick = (product: Product, e: MouseEvent<Element>): void => {
     openMenu(product.name, [
-      { label: PRODUCTS_LABELS.TABLE_EDIT_TITLE, icon: '✏️', onClick: () => onEdit(product.id) },
-      { label: PRODUCTS_LABELS.TABLE_DELETE_TITLE, icon: '🗑️', onClick: () => onDelete(product.id, product.name), variant: 'danger' },
+      { label: PRODUCTS_LABELS.TABLE_EDIT_TITLE, icon: UI_SYMBOLS.EDIT, onClick: () => onEdit(product.id) },
+      { label: PRODUCTS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(product.id, product.name), variant: 'danger' },
     ], e)
   }
 
@@ -67,5 +71,7 @@ export const useProductsTable = (): UseProductsTableReturn => {
     closeMenu,
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
     formatAmount: formatCurrency,
+    emptyIcon: ROUTE_ICONS.PRODUCTS,
+    emptyValue: UI_SYMBOLS.EM_DASH,
   }
 }

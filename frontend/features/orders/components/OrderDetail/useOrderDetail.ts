@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from '@/shared/utils/formatters'
 import { STATUS_LABELS, STATUS_ORDER, PAYMENT_STATE_LABELS, PAYMENT_STATE_ORDER, getPaymentState } from '@/shared/enums/statusEnums'
 import type { OrderStatus, PaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import type { UrgencyLevel } from '../../types'
 
 const URGENCY_ORDER: UrgencyLevel[] = ['normal', 'urgent', 'very_urgent']
@@ -41,6 +42,9 @@ export interface UseOrderDetailReturn {
   formatAmount: (v: string) => string
   formatOrderDate: (v: string) => string
   formatDueDateTime: (v: string | null) => string
+  editSymbol: string
+  closeSymbol: string
+  attachmentSymbol: string
 }
 
 export const useOrderDetail = (): UseOrderDetailReturn => {
@@ -107,6 +111,10 @@ export const useOrderDetail = (): UseOrderDetailReturn => {
       if (!selectedId) return
       updateUrgency.mutate({ id: selectedId, payload: { urgency: level } })
     },
+
+    editSymbol: UI_SYMBOLS.EDIT,
+    closeSymbol: UI_SYMBOLS.CLOSE,
+    attachmentSymbol: UI_SYMBOLS.ATTACHMENT,
 
     formatAmount: formatCurrency,
     formatOrderDate: formatDate,

@@ -12,6 +12,7 @@ import type { AutocompleteOption } from '@/shared/components/Autocomplete/useAut
 import type { Customer } from '@/features/customers/types'
 import type { OrderFormValues, OrderPayload } from '../../types'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
 const itemSchema = z.object({
   product_id:   z.string().nullable(),
@@ -71,6 +72,7 @@ export interface UseOrderFormReturn {
   setCustomerSearch: (query: string) => void
   customerDefaultLabel: string
   onRawInput: (text: string) => void
+  closeSymbol: string
 }
 
 export const useOrderForm = (): UseOrderFormReturn => {
@@ -182,5 +184,6 @@ export const useOrderForm = (): UseOrderFormReturn => {
     // In free-text mode: show the typed name so the input stays populated after blur.
     customerDefaultLabel: existingOrder?.customer_name ?? watchedCustomerName,
     onRawInput,
+    closeSymbol: UI_SYMBOLS.CLOSE,
   }
 }

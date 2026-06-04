@@ -37,6 +37,7 @@ export const OrdersTable = (): ReactElement => {
     getUrgencyLabel,
     getUrgencyClass,
     getPaymentLabel,
+    emptyIcon,
   } = useOrdersTable()
 
   const renderRow = (order: OrderSummary): ReactElement => (
@@ -84,7 +85,7 @@ export const OrdersTable = (): ReactElement => {
         isError={isError}
         emptyTitle={ORDERS_LABELS.EMPTY_TITLE}
         emptyDescription={ORDERS_LABELS.EMPTY_DESC}
-        emptyIcon="📋"
+        emptyIcon={emptyIcon}
         errorTitle={ORDERS_LABELS.ERROR}
         currentPage={currentPage}
         totalPages={totalPages}

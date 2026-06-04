@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
@@ -19,8 +19,8 @@ def _make_expense() -> MagicMock:
     expense.category = "ink"
     expense.amount = Decimal("10")
     expense.notes = None
-    expense.created_at = None
-    expense.updated_at = None
+    expense.created_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    expense.updated_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
     return expense
 
 
