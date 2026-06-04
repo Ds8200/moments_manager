@@ -147,7 +147,16 @@ class AgentRunner:
 
         except Exception as exc:
             logger.error(log_messages.AI_GEMINI_ERROR, exc)
-            yield SSEEventSchema(type="error", error=str(exc))
+            error_str = str(exc)
+            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                friendly = "המכסה החינמית של ה-AI מוצתה. נסה שנית מחר או פנה למנהל המערכת."
+            elif "403" in error_str or "API_KEY" in error_str:
+                friendly = "מפתח ה-API אינו תקין. פנה למנהל המערכת."
+            elif "503" in error_str or "unavailable" in error_str.lower():
+                friendly = "שירות ה-AI אינו זמין כרגע. נסה שנית בעוד מספר דקות."
+            else:
+                friendly = "אירעה שגיאה בשירות ה-AI. נסה שנית."
+            yield SSEEventSchema(type="error", error=friendly)
 
 
 def _tokenize(text: str) -> list[str]:
