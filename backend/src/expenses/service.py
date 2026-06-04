@@ -34,7 +34,10 @@ class ExpenseService:
         pages = params.compute_pages(total)
         return PaginatedResponse(
             items=[ExpenseResponseSchema.model_validate(e) for e in expenses],
-            total=total, page=params.page, page_size=params.page_size, pages=pages,
+            total=total,
+            page=params.page,
+            page_size=params.page_size,
+            pages=pages,
         )
 
     async def create_expense(self, data: ExpenseCreateSchema) -> ExpenseResponseSchema:

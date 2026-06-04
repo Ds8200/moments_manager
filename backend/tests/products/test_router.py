@@ -13,7 +13,12 @@ async def test_list_products_empty(client: AsyncClient) -> None:
 async def test_create_product_no_category(client: AsyncClient) -> None:
     response = await client.post(
         "/api/v1/products",
-        json={"name": "Business Card", "base_price": "10.00", "base_cost": "3.00", "avg_production_days": 2},
+        json={
+            "name": "Business Card",
+            "base_price": "10.00",
+            "base_cost": "3.00",
+            "avg_production_days": 2,
+        },
     )
     assert response.status_code == 201
     data = response.json()
@@ -28,7 +33,12 @@ async def test_create_product_with_category(client: AsyncClient) -> None:
 
     response = await client.post(
         "/api/v1/products",
-        json={"name": "כרטיס ביקור", "category_id": category_id, "base_price": "10.00", "base_cost": "3.00"},
+        json={
+            "name": "כרטיס ביקור",
+            "category_id": category_id,
+            "base_price": "10.00",
+            "base_cost": "3.00",
+        },
     )
     assert response.status_code == 201
     data = response.json()

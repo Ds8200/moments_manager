@@ -63,6 +63,7 @@ class CustomerService:
         if not customer:
             raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
         from src.orders.repository import OrderRepository
+
         order_repo = OrderRepository(self._db)
         stats = await order_repo.get_customer_stats(customer_id)
         result = CustomerWithStatsSchema.model_validate(customer)

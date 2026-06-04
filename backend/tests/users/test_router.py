@@ -88,9 +88,7 @@ async def test_create_user_invalid_email_returns_422(admin_client: AsyncClient) 
     assert response.status_code == 422
 
 
-async def test_delete_user_as_admin_returns_204(
-    admin_client: AsyncClient, test_user: User
-) -> None:
+async def test_delete_user_as_admin_returns_204(admin_client: AsyncClient, test_user: User) -> None:
     response = await admin_client.delete(f"/api/v1/users/{test_user.id}")
     assert response.status_code == 204
 
@@ -104,15 +102,11 @@ async def test_delete_self_as_admin_returns_403(
 
 
 async def test_delete_nonexistent_user_returns_404(admin_client: AsyncClient) -> None:
-    response = await admin_client.delete(
-        "/api/v1/users/00000000-0000-0000-0000-000000000000"
-    )
+    response = await admin_client.delete("/api/v1/users/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 404
     assert response.json()["code"] == "NOT_FOUND"
 
 
-async def test_delete_user_non_admin_returns_403(
-    client: AsyncClient, test_user: User
-) -> None:
+async def test_delete_user_non_admin_returns_403(client: AsyncClient, test_user: User) -> None:
     response = await client.delete(f"/api/v1/users/{test_user.id}")
     assert response.status_code == 403

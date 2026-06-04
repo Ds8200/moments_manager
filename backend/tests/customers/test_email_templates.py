@@ -1,5 +1,3 @@
-import pytest
-
 from src.customers.email_templates import build_customer_email
 
 

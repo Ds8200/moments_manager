@@ -1,4 +1,5 @@
 """Unit tests for AgentRunner — mocks the OpenAI streaming SDK interface."""
+
 import json
 from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -6,11 +7,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from src.ai.schemas import ChatMessageSchema, SSEEventSchema
-from src.ai.service import AgentRunner
+from src.ai.service import AgentRunner, build_system_prompt
 from src.ai.tool_registry import ToolRegistry
 
-
 # ── Streaming chunk helpers ───────────────────────────────────────────────────
+
 
 def _make_chunk(
     content: str | None = None,
@@ -63,6 +64,7 @@ async def _tool_stream(tool_name: str, args: dict) -> AsyncGenerator:
 
 # ── Patch helper ──────────────────────────────────────────────────────────────
 
+
 def _patch_openai(*streams):
     """Patch AsyncOpenAI.chat.completions.create to return streams in order."""
     client_mock = MagicMock()
@@ -75,6 +77,7 @@ async def _collect(gen: AsyncGenerator[SSEEventSchema, None]) -> list[SSEEventSc
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def registry() -> ToolRegistry:
@@ -101,6 +104,7 @@ def messages() -> list[ChatMessageSchema]:
 
 # ── Real streaming: text arrives token-by-token ───────────────────────────────
 
+
 async def test_text_streams_character_by_character(registry, messages) -> None:
     """Each character from OpenAI yields a separate token event immediately."""
     text = "שלום!"
@@ -126,6 +130,7 @@ async def test_event_order_is_tokens_then_done(registry, messages) -> None:
 
 
 # ── Tool call then text ───────────────────────────────────────────────────────
+
 
 async def test_tool_call_then_text(registry, messages) -> None:
     with _patch_openai(
@@ -164,6 +169,7 @@ async def test_tool_result_precedes_tokens(registry, messages) -> None:
 
 # ── Tool raises exception ─────────────────────────────────────────────────────
 
+
 async def test_tool_error_wraps_and_continues(messages) -> None:
     error_registry = ToolRegistry()
 
@@ -191,6 +197,7 @@ async def test_tool_error_wraps_and_continues(messages) -> None:
 
 # ── OpenAI API error ──────────────────────────────────────────────────────────
 
+
 async def test_api_error_yields_single_error_event(registry, messages) -> None:
     client_mock = MagicMock()
     client_mock.chat.completions.create = AsyncMock(side_effect=Exception("API error"))
@@ -203,6 +210,7 @@ async def test_api_error_yields_single_error_event(registry, messages) -> None:
 
 
 # ── Friendly error messages ───────────────────────────────────────────────────
+
 
 @pytest.mark.parametrize(
     ("exc_msg", "expected_fragment"),
@@ -229,6 +237,7 @@ async def test_friendly_error_messages(
 
 # ── Max tool rounds ───────────────────────────────────────────────────────────
 
+
 async def test_max_tool_rounds_terminates_with_done(registry, messages) -> None:
     from src.ai.constants import MAX_TOOL_ROUNDS
 
@@ -241,3 +250,24 @@ async def test_max_tool_rounds_terminates_with_done(registry, messages) -> None:
 
     assert events[-1].type == "done"
     assert len([e for e in events if e.type == "tool_call"]) == MAX_TOOL_ROUNDS
+
+
+# ── build_system_prompt ─────────────���─────────────────────────────────────────
+
+
+def test_build_system_prompt_contains_current_year() -> None:
+    from datetime import date
+
+    prompt = build_system_prompt()
+    assert str(date.today().year) in prompt
+
+
+def test_build_system_prompt_contains_hebrew_date_header() -> None:
+    prompt = build_system_prompt()
+    assert "תאריך ושעה נוכחיים" in prompt
+
+
+def test_build_system_prompt_includes_base_content() -> None:
+    prompt = build_system_prompt()
+    # The base prompt always contains the role section
+    assert "Moments AI" in prompt

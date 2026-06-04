@@ -46,6 +46,4 @@ class RefreshTokenRepository:
             token.is_revoked = True
 
     async def delete_all_for_user(self, user_id: str) -> None:
-        await self._db.execute(
-            delete(RefreshToken).where(RefreshToken.user_id == user_id)
-        )
+        await self._db.execute(delete(RefreshToken).where(RefreshToken.user_id == user_id))

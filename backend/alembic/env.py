@@ -1,26 +1,28 @@
 import asyncio
 import sys
-from pathlib import Path
 from logging.config import fileConfig
+from pathlib import Path
+
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+
 from alembic import context
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.database import Base
-from src.config import settings
+import src.auth.models  # noqa: F401
+import src.customers.models  # noqa: F401
+import src.expense_categories.models  # noqa: F401
+import src.expenses.models  # noqa: F401
+import src.orders.models  # noqa: F401
+import src.product_categories.models  # noqa: F401
+import src.products.models  # noqa: F401
 
 # Import all models so Alembic can detect them
 import src.users.models  # noqa: F401
-import src.auth.models  # noqa: F401
-import src.customers.models  # noqa: F401
-import src.product_categories.models  # noqa: F401
-import src.products.models  # noqa: F401
-import src.orders.models  # noqa: F401
-import src.expense_categories.models  # noqa: F401
-import src.expenses.models  # noqa: F401
+from src.config import settings
+from src.database import Base
 
 config = context.config
 

@@ -6,7 +6,22 @@
   animation: blink 1s step-end infinite;
 }
 
+.toolLabel {
+  display: inline-block;
+  margin-inline-start: 4px;
+  font-size: 0.85em;
+  font-weight: 400;
+  color: var(--color-text-secondary, #757575);
+  font-style: italic;
+  animation: fade 1.5s ease-in-out infinite;
+}
+
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
+}
+
+@keyframes fade {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }

@@ -1,4 +1,5 @@
 """Unit tests for ToolRegistry — no DB required."""
+
 import pytest
 
 from src.ai.tool_registry import ToolRegistry

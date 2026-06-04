@@ -13,9 +13,7 @@ class ExpenseCategoryRepository:
         self._db = db
 
     async def get_all(self) -> list[ExpenseCategory]:
-        result = await self._db.execute(
-            select(ExpenseCategory).order_by(ExpenseCategory.name)
-        )
+        result = await self._db.execute(select(ExpenseCategory).order_by(ExpenseCategory.name))
         return list(result.scalars().all())
 
     async def get_by_id(self, category_id: str) -> ExpenseCategory | None:
@@ -25,9 +23,7 @@ class ExpenseCategoryRepository:
         return result.scalar_one_or_none()
 
     async def get_by_name(self, name: str) -> ExpenseCategory | None:
-        result = await self._db.execute(
-            select(ExpenseCategory).where(ExpenseCategory.name == name)
-        )
+        result = await self._db.execute(select(ExpenseCategory).where(ExpenseCategory.name == name))
         return result.scalar_one_or_none()
 
     async def create(self, data: dict) -> ExpenseCategory:

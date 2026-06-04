@@ -30,17 +30,13 @@ async def test_update_category(client: AsyncClient) -> None:
     create = await client.post("/api/v1/expense-categories", json={"name": "ישן"})
     category_id = create.json()["id"]
 
-    response = await client.put(
-        f"/api/v1/expense-categories/{category_id}", json={"name": "חדש"}
-    )
+    response = await client.put(f"/api/v1/expense-categories/{category_id}", json={"name": "חדש"})
     assert response.status_code == 200
     assert response.json()["name"] == "חדש"
 
 
 async def test_update_category_not_found(client: AsyncClient) -> None:
-    response = await client.put(
-        "/api/v1/expense-categories/missing-id", json={"name": "כלשהו"}
-    )
+    response = await client.put("/api/v1/expense-categories/missing-id", json={"name": "כלשהו"})
     assert response.status_code == 404
 
 

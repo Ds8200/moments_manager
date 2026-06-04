@@ -42,9 +42,7 @@ async def test_month_revenue_by_payment_method_zero_when_empty(
     db_session: AsyncSession,
 ) -> None:
     repo = ReportRepository(db_session)
-    assert (
-        await repo.month_revenue_by_payment_method(2025, 3, PaymentMethod.cash) == 0
-    )
+    assert await repo.month_revenue_by_payment_method(2025, 3, PaymentMethod.cash) == 0
 
 
 async def test_sum_month_expenses_zero_when_empty(db_session: AsyncSession) -> None:

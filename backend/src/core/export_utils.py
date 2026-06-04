@@ -32,12 +32,12 @@ from src.core.constants.log_messages import WEASYPRINT_UNAVAILABLE
 logger = logging.getLogger(__name__)
 
 # ── Design tokens (matching frontend _variables.scss) ──────────────────────
-_PRIMARY_LIGHT = "D4B8E0"   # #D4B8E0 — group header background
-_PRIMARY_DARK  = "6A1B7A"   # font on group header
-_HEADER_BG     = "E9ECEF"   # sub-header background
-_ALT_ROW_BG    = "F8F9FA"   # alternating data row
-_BORDER_COLOR  = "DEE2E6"
-_BORDER_DARK   = "CED4DA"
+_PRIMARY_LIGHT = "D4B8E0"  # #D4B8E0 — group header background
+_PRIMARY_DARK = "6A1B7A"  # font on group header
+_HEADER_BG = "E9ECEF"  # sub-header background
+_ALT_ROW_BG = "F8F9FA"  # alternating data row
+_BORDER_COLOR = "DEE2E6"
+_BORDER_DARK = "CED4DA"
 
 
 @dataclass
@@ -49,13 +49,14 @@ class ColumnGroup:
 @dataclass
 class TableExportConfig:
     title: str
-    first_col_header: str          # primary column; spans 2 header rows
+    first_col_header: str  # primary column; spans 2 header rows
     column_groups: list[ColumnGroup]
-    sub_headers: list[str]         # headers inside the groups
+    sub_headers: list[str]  # headers inside the groups
     rows: list[list[str | int | float]]
 
 
 # ── Excel ───────────────────────────────────────────────────────────────────
+
 
 def _thin_border() -> Border:
     thin = Side(style="thin", color=_BORDER_COLOR)
@@ -83,30 +84,30 @@ def build_excel_bytes(config: TableExportConfig) -> bytes:
     total_cols = 1 + sum(g.col_span for g in config.column_groups)
 
     # ── Fills & fonts ────────────────────────────────────────────────────
-    group_fill   = PatternFill("solid", fgColor=_PRIMARY_LIGHT)
-    header_fill  = PatternFill("solid", fgColor=_HEADER_BG)
-    alt_fill     = PatternFill("solid", fgColor=_ALT_ROW_BG)
-    white_fill   = PatternFill("solid", fgColor="FFFFFF")
+    group_fill = PatternFill("solid", fgColor=_PRIMARY_LIGHT)
+    header_fill = PatternFill("solid", fgColor=_HEADER_BG)
+    alt_fill = PatternFill("solid", fgColor=_ALT_ROW_BG)
+    white_fill = PatternFill("solid", fgColor="FFFFFF")
 
-    group_font   = Font(bold=True, color=_PRIMARY_DARK, size=10)
-    header_font  = Font(bold=True, size=10)
-    data_font    = Font(size=10)
+    group_font = Font(bold=True, color=_PRIMARY_DARK, size=10)
+    header_font = Font(bold=True, size=10)
+    data_font = Font(size=10)
 
     center_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
-    right_align  = Alignment(horizontal="right",  vertical="center")
+    right_align = Alignment(horizontal="right", vertical="center")
 
     # ── Row 1: first col (merge rows 1-2) + group headers ───────────────
-    ws.cell(1, 1, config.first_col_header).font   = header_font
-    ws.cell(1, 1).fill      = header_fill
+    ws.cell(1, 1, config.first_col_header).font = header_font
+    ws.cell(1, 1).fill = header_fill
     ws.cell(1, 1).alignment = center_align
     ws.merge_cells(start_row=1, start_column=1, end_row=2, end_column=1)
 
     col = 2
     for group in config.column_groups:
         end_col = col + group.col_span - 1
-        ws.cell(1, col, group.label).font      = group_font
-        ws.cell(1, col).fill       = group_fill
-        ws.cell(1, col).alignment  = center_align
+        ws.cell(1, col, group.label).font = group_font
+        ws.cell(1, col).fill = group_fill
+        ws.cell(1, col).alignment = center_align
         if group.col_span > 1:
             ws.merge_cells(start_row=1, start_column=col, end_row=1, end_column=end_col)
         col = end_col + 1
@@ -114,8 +115,8 @@ def build_excel_bytes(config: TableExportConfig) -> bytes:
     # ── Row 2: sub-headers ───────────────────────────────────────────────
     for i, header in enumerate(config.sub_headers):
         c = ws.cell(2, i + 2, header)
-        c.font      = header_font
-        c.fill      = header_fill
+        c.font = header_font
+        c.fill = header_fill
         c.alignment = center_align
 
     # ── Data rows ────────────────────────────────────────────────────────
@@ -123,8 +124,8 @@ def build_excel_bytes(config: TableExportConfig) -> bytes:
         fill = alt_fill if row_idx % 2 == 0 else white_fill
         for col_idx, value in enumerate(row_data, start=1):
             c = ws.cell(row_idx, col_idx, value)
-            c.font      = data_font
-            c.fill      = fill
+            c.font = data_font
+            c.fill = fill
             c.alignment = right_align
 
     # ── Borders ──────────────────────────────────────────────────────────
@@ -135,7 +136,7 @@ def build_excel_bytes(config: TableExportConfig) -> bytes:
     all_headers = [config.first_col_header] + config.sub_headers
     for col_idx in range(1, total_cols + 1):
         header_len = len(all_headers[col_idx - 1]) if col_idx - 1 < len(all_headers) else 8
-        max_data   = max(
+        max_data = max(
             (len(str(row[col_idx - 1])) for row in config.rows if col_idx - 1 < len(row)),
             default=0,
         )
@@ -215,15 +216,13 @@ def _build_pdf_html(config: TableExportConfig) -> str:
     # Group header row
     first_th = f'<th rowspan="2" class="th-first">{config.first_col_header}</th>'
     group_ths = "".join(
-        f'<th colspan="{g.col_span}" class="th-group">{g.label}</th>'
-        for g in config.column_groups
+        f'<th colspan="{g.col_span}" class="th-group">{g.label}</th>' for g in config.column_groups
     )
     sub_ths = "".join(f'<th class="th-sub">{h}</th>' for h in config.sub_headers)
 
     # Data rows
     data_rows = "".join(
-        f"<tr>{''.join(f'<td>{cell}</td>' for cell in row)}</tr>"
-        for row in config.rows
+        f"<tr>{''.join(f'<td>{cell}</td>' for cell in row)}</tr>" for row in config.rows
     )
 
     return f"""<!DOCTYPE html>
@@ -232,7 +231,7 @@ def _build_pdf_html(config: TableExportConfig) -> str:
 <body>
   <h2>{config.title}</h2>
   <table>
-    <colgroup>{'<col/>' * total_cols}</colgroup>
+    <colgroup>{"<col/>" * total_cols}</colgroup>
     <thead>
       <tr>{first_th}{group_ths}</tr>
       <tr>{sub_ths}</tr>

@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from src.core.exceptions import ConflictError, NotFoundError
 from src.expense_categories.schemas import (

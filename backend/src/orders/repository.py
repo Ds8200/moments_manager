@@ -37,9 +37,7 @@ class OrderRepository:
         year = datetime.now().year
         prefix = f"{ORDER_NUMBER_PREFIX}-{year}-"
         result = await self._db.execute(
-            select(func.max(Order.order_number)).where(
-                Order.order_number.like(f"{prefix}%")
-            )
+            select(func.max(Order.order_number)).where(Order.order_number.like(f"{prefix}%"))
         )
         max_number = result.scalar_one_or_none()
         last_seq = int(max_number.split("-")[-1]) if max_number else 0
@@ -165,9 +163,7 @@ class OrderRepository:
 
     async def get_file(self, file_id: str, order_id: str) -> OrderFile | None:
         result = await self._db.execute(
-            select(OrderFile).where(
-                OrderFile.id == file_id, OrderFile.order_id == order_id
-            )
+            select(OrderFile).where(OrderFile.id == file_id, OrderFile.order_id == order_id)
         )
         return result.scalar_one_or_none()
 

@@ -23,9 +23,7 @@ class Order(Base, TimestampMixin, SoftDeleteMixin):
     )
     date: Mapped[date] = mapped_column(Date, nullable=False)
     due_datetime: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    status: Mapped[str] = mapped_column(
-        String(50), default=OrderStatus.new, nullable=False
-    )
+    status: Mapped[str] = mapped_column(String(50), default=OrderStatus.new, nullable=False)
     urgency: Mapped[str] = mapped_column(
         String(50), nullable=False, default=UrgencyLevel.normal.value
     )
@@ -56,9 +54,7 @@ class OrderItem(Base, TimestampMixin):
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     order_id: Mapped[str] = mapped_column(String, ForeignKey("orders.id"), nullable=False)
-    product_id: Mapped[str | None] = mapped_column(
-        String, ForeignKey("products.id"), nullable=True
-    )
+    product_id: Mapped[str | None] = mapped_column(String, ForeignKey("products.id"), nullable=True)
     product_name: Mapped[str] = mapped_column(String(200), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     unit_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=0, nullable=False)

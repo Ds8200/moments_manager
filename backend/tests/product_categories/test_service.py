@@ -1,10 +1,10 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from src.core.exceptions import ConflictError, NotFoundError
 from src.product_categories.schemas import (
     ProductCategoryCreateSchema,
-    ProductCategoryUpdateSchema,
 )
 from src.product_categories.service import ProductCategoryService
 

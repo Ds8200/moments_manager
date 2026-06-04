@@ -41,7 +41,13 @@ async def list_orders(
     svc = OrderService(db)
     return await svc.list_orders(
         PaginationParams(page=page, page_size=page_size),
-        status, date_from, date_to, customer_id, is_paid, payment_method, search,
+        status,
+        date_from,
+        date_to,
+        customer_id,
+        is_paid,
+        payment_method,
+        search,
         sort_by.value,
     )
 

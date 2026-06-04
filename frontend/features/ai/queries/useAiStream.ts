@@ -10,6 +10,7 @@ import {
   conversationAtom,
   finalizeStreamAtom,
   isStreamingAtom,
+  setActiveToolAtom,
   streamErrorAtom,
 } from '@/features/ai/store/aiAtoms'
 import type { ChatMessage, SSEEvent } from '@/features/ai/types'
@@ -33,6 +34,7 @@ export const useAiStream = (): UseAiStreamReturn => {
   const finalizeStream = useSetAtom(finalizeStreamAtom)
   const setIsStreaming = useSetAtom(isStreamingAtom)
   const setStreamError = useSetAtom(streamErrorAtom)
+  const setActiveTool = useSetAtom(setActiveToolAtom)
   const clearConversation = useSetAtom(clearConversationAtom)
 
   const sendMessage = useCallback(
@@ -58,9 +60,13 @@ export const useAiStream = (): UseAiStreamReturn => {
         for await (const event of stream) {
           if (event.type === 'token' && event.content) {
             appendToken(event.content)
+          } else if (event.type === 'tool_call') {
+            setActiveTool(event.tool_name ?? null)
           } else if (event.type === 'done') {
+            setActiveTool(null)
             finalizeStream()
           } else if (event.type === 'error') {
+            setActiveTool(null)
             setStreamError(event.error ?? AI_LABELS.ERROR_GENERIC)
             finalizeStream()
           }
@@ -73,7 +79,7 @@ export const useAiStream = (): UseAiStreamReturn => {
         setIsStreaming(false)
       }
     },
-    [conversation, appendMessage, appendToken, finalizeStream, setIsStreaming, setStreamError]
+    [conversation, appendMessage, appendToken, finalizeStream, setIsStreaming, setStreamError, setActiveTool]
   )
 
   const retry = useCallback((): void => {

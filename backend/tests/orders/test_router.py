@@ -148,8 +148,12 @@ async def test_list_orders_sort_by_urgency_most_urgent_first(client: AsyncClient
         "/api/v1/orders",
         json={"customer_id": customer.json()["id"], "date": today, "items": []},
     )
-    await client.patch(f"/api/v1/orders/{order_urgent.json()['id']}/urgency", json={"urgency": "urgent"})
-    await client.patch(f"/api/v1/orders/{order_very.json()['id']}/urgency", json={"urgency": "very_urgent"})
+    await client.patch(
+        f"/api/v1/orders/{order_urgent.json()['id']}/urgency", json={"urgency": "urgent"}
+    )
+    await client.patch(
+        f"/api/v1/orders/{order_very.json()['id']}/urgency", json={"urgency": "very_urgent"}
+    )
 
     response = await client.get("/api/v1/orders?sort_by=urgency")
     assert response.status_code == 200

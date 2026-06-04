@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import AsyncMock
+
+import pytest
 
 from src.core.exceptions import NotFoundError
 from src.orders.enums import OrderStatus, UrgencyLevel
@@ -55,7 +56,9 @@ async def test_update_urgency_not_found() -> None:
     service._repo.get_by_id.return_value = None
 
     with pytest.raises(NotFoundError):
-        await service.update_urgency("missing", OrderUrgencyUpdateSchema(urgency=UrgencyLevel.urgent))
+        await service.update_urgency(
+            "missing", OrderUrgencyUpdateSchema(urgency=UrgencyLevel.urgent)
+        )
 
 
 async def test_delete_order_not_found() -> None:

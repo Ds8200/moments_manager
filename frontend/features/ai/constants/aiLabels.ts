@@ -1,5 +1,26 @@
 import type { SuggestedPrompt } from '@/features/ai/types'
 
+export const TOOL_LABELS: Record<string, string> = {
+  get_dashboard_kpis:      'בודק נתוני לוח בקרה',
+  get_monthly_report:      'מנתח דוח חודשי',
+  get_financial_year:      'טוען נתונים שנתיים',
+  get_top_customers:       'מחפש לקוחות מובילים',
+  get_orders_summary:      'סופר הזמנות',
+  get_recent_orders:       'טוען הזמנות אחרונות',
+  get_overdue_orders:      'בודק הזמנות עוברות זמן',
+  get_monthly_comparison:  'משווה חודשים',
+  get_expense_breakdown:   'מנתח הוצאות',
+  get_customer_detail:     'מחפש פרטי לקוח',
+  get_unpaid_invoices:     'בודק חובות פתוחים',
+  get_pipeline_value:      'מחשב ערך הצנרת',
+  get_product_performance: 'מנתח ביצועי מוצרים',
+  search_orders:           'מחפש הזמנות',
+  get_inactive_customers:  'מזהה לקוחות לא פעילים',
+  draft_email:             'מנסח מייל',
+}
+
+export const ANALYZING_DEFAULT = 'מנתח נתונים'
+
 export const AI_LABELS = {
   NAV_LABEL:           'Moments AI',
   PAGE_TITLE:          'Moments AI',

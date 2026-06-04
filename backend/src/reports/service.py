@@ -42,8 +42,8 @@ class ReportService:
         )
 
     async def get_monthly_report(self, year: int, month: int) -> MonthlyReportSchema:
-        total_revenue, total_cost, total_profit, paid_count = (
-            await self._repo.month_orders_summary(year, month)
+        total_revenue, total_cost, total_profit, paid_count = await self._repo.month_orders_summary(
+            year, month
         )
         unpaid_count = await self._repo.count_month_unpaid_orders(year, month)
         cash_revenue = await self._repo.month_revenue_by_payment_method(
@@ -101,8 +101,18 @@ class ReportService:
     # ── Export ──────────────────────────────────────────────────────────────
 
     _HEBREW_MONTHS = [
-        "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני",
-        "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר",
+        "ינואר",
+        "פברואר",
+        "מרץ",
+        "אפריל",
+        "מאי",
+        "יוני",
+        "יולי",
+        "אוגוסט",
+        "ספטמבר",
+        "אוקטובר",
+        "נובמבר",
+        "דצמבר",
     ]
 
     @staticmethod
@@ -116,9 +126,16 @@ class ReportService:
             ColumnGroup("רווחיות", 2),
         ]
         sub_headers = [
-            "שולם", "לא שולם", 'סה"כ', "% גבייה",
-            "מזומן", "העברה", "לא שולם (₪)", 'סה"כ הכנסות',
-            "הוצאות", "רווח",
+            "שולם",
+            "לא שולם",
+            'סה"כ',
+            "% גבייה",
+            "מזומן",
+            "העברה",
+            "לא שולם (₪)",
+            'סה"כ הכנסות',
+            "הוצאות",
+            "רווח",
         ]
         rows: list[list[str | int | float]] = [
             [

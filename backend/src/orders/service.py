@@ -26,8 +26,6 @@ from src.orders.schemas import (
 logger = logging.getLogger(__name__)
 
 
-
-
 def _compute_item_fields(item_data: dict) -> dict:
     qty = item_data.get("quantity", 1)
     price = Decimal(str(item_data.get("unit_price", 0)))
@@ -55,8 +53,16 @@ class OrderService:
         sort_by: str = OrderSortField.created_at.value,
     ) -> PaginatedResponse[OrderListResponseSchema]:
         orders, total = await self._repo.get_all(
-            status, date_from, date_to, customer_id, is_paid, payment_method, search,
-            params.page_size, params.offset, sort_by
+            status,
+            date_from,
+            date_to,
+            customer_id,
+            is_paid,
+            payment_method,
+            search,
+            params.page_size,
+            params.offset,
+            sort_by,
         )
         pages = params.compute_pages(total)
         items = []
@@ -65,8 +71,7 @@ class OrderService:
             schema = schema.model_copy(update={"item_count": len(o.items)})
             items.append(schema)
         return PaginatedResponse(
-            items=items, total=total, page=params.page,
-            page_size=params.page_size, pages=pages
+            items=items, total=total, page=params.page, page_size=params.page_size, pages=pages
         )
 
     async def get_order(self, order_id: str) -> OrderResponseSchema:
@@ -156,10 +161,9 @@ class OrderService:
         await self._repo.soft_delete(order)
         await self._db.commit()
 
-    async def upload_file(
-        self, order_id: str, filename: str, content: bytes
-    ) -> dict:
+    async def upload_file(self, order_id: str, filename: str, content: bytes) -> dict:
         import uuid
+
         order = await self._repo.get_by_id(order_id)
         if not order:
             raise NotFoundError(RESOURCE_ORDER, order_id)
@@ -187,12 +191,15 @@ class OrderService:
             f.write(content)
 
         storage_path = f"{order_id}/{stored_name}"
-        order_file = await self._repo.add_file(order_id, {
-            "original_name": filename,
-            "storage_path": storage_path,
-            "file_type": file_type,
-            "file_size_bytes": len(content),
-        })
+        order_file = await self._repo.add_file(
+            order_id,
+            {
+                "original_name": filename,
+                "storage_path": storage_path,
+                "file_type": file_type,
+                "file_size_bytes": len(content),
+            },
+        )
         await self._db.commit()
         logger.info(log_messages.FILE_UPLOADED, order_id, filename, len(content))
         return {"id": order_file.id, "storage_path": storage_path, "original_name": filename}

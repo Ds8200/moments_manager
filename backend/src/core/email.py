@@ -48,8 +48,7 @@ async def send_html_email(
             )
             if not response.is_success:
                 logger.error(
-                    WELCOME_EMAIL_FAILED, to_email,
-                    f"{response.status_code} {response.text}"
+                    WELCOME_EMAIL_FAILED, to_email, f"{response.status_code} {response.text}"
                 )
                 return
         logger.info(WELCOME_EMAIL_SENT, to_email)

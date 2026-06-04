@@ -2,6 +2,7 @@ import json
 import logging
 import re
 from collections.abc import AsyncGenerator
+from datetime import datetime
 from pathlib import Path
 
 from openai import AsyncOpenAI
@@ -25,16 +26,29 @@ logger = logging.getLogger(__name__)
 _FUNCTION_CALL_RE = re.compile(r"<function=\w+>.*?</function>", re.DOTALL)
 
 _CACHED_PROMPT: str | None = None
+_HEBREW_DAYS = ["שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת", "ראשון"]
 
 
 def load_system_prompt() -> str:
     global _CACHED_PROMPT  # noqa: PLW0603 — intentional module-level cache
     if _CACHED_PROMPT is None:
-        prompt_path = (
-            Path(__file__).parent.parent.parent / PROMPTS_DIR / BUSINESS_ADVISOR_PROMPT
-        )
+        prompt_path = Path(__file__).parent.parent.parent / PROMPTS_DIR / BUSINESS_ADVISOR_PROMPT
         _CACHED_PROMPT = prompt_path.read_text(encoding="utf-8")
     return _CACHED_PROMPT
+
+
+def build_system_prompt() -> str:
+    """Returns the system prompt with the current Hebrew date/time prepended.
+
+    The base prompt is cached; only the date header is generated per call.
+    """
+    now = datetime.now()
+    day = _HEBREW_DAYS[now.weekday()]
+    date_line = (
+        f"**תאריך ושעה נוכחיים:** יום {day}, "
+        f"{now.strftime('%d/%m/%Y')}, שעה {now.strftime('%H:%M')}"
+    )
+    return f"{date_line}\n\n{load_system_prompt()}"
 
 
 def _build_tools(registry: ToolRegistry) -> list[dict]:
@@ -132,9 +146,7 @@ class AgentRunner:
                                 if tc_delta.function.name:
                                     tool_calls_acc[idx]["name"] += tc_delta.function.name
                                 if tc_delta.function.arguments:
-                                    tool_calls_acc[idx]["arguments"] += (
-                                        tc_delta.function.arguments
-                                    )
+                                    tool_calls_acc[idx]["arguments"] += tc_delta.function.arguments
 
                 # ── Stream for this round is complete ──────────────────────────
 
@@ -171,9 +183,7 @@ class AgentRunner:
                         yield SSEEventSchema(type="tool_call", tool_name=tool_name)
 
                         try:
-                            result = await self._registry.execute(
-                                tool_name, args, self._db
-                            )
+                            result = await self._registry.execute(tool_name, args, self._db)
                         except Exception as exc:
                             logger.error(log_messages.AI_TOOL_ERROR, tool_name, exc)
                             result = {"error": str(exc)}
@@ -183,11 +193,13 @@ class AgentRunner:
                             tool_name=tool_name,
                             data=result,
                         )
-                        conversation.append({
-                            "role": "tool",
-                            "tool_call_id": v["id"],
-                            "content": json.dumps(result, ensure_ascii=False),
-                        })
+                        conversation.append(
+                            {
+                                "role": "tool",
+                                "tool_call_id": v["id"],
+                                "content": json.dumps(result, ensure_ascii=False),
+                            }
+                        )
 
                     tool_rounds += 1
 
@@ -205,9 +217,17 @@ class AgentRunner:
             error_str = str(exc)
             if "insufficient_quota" in error_str.lower() or "billing" in error_str.lower():
                 friendly = "יש בעיה בחשבון OpenAI. בדוק את פרטי התשלום בפלטפורמה."
-            elif "429" in error_str or "rate_limit" in error_str.lower() or "quota" in error_str.lower():  # noqa: E501
+            elif (
+                "429" in error_str
+                or "rate_limit" in error_str.lower()
+                or "quota" in error_str.lower()
+            ):  # noqa: E501
                 friendly = "המכסה של ה-AI מוצתה. נסה שנית בעוד מספר שניות."
-            elif "401" in error_str or "invalid_api_key" in error_str.lower() or "authentication" in error_str.lower():  # noqa: E501
+            elif (
+                "401" in error_str
+                or "invalid_api_key" in error_str.lower()
+                or "authentication" in error_str.lower()
+            ):  # noqa: E501
                 friendly = "מפתח ה-API אינו תקין. פנה למנהל המערכת."
             elif "503" in error_str or "unavailable" in error_str.lower():
                 friendly = "שירות ה-AI אינו זמין כרגע. נסה שנית בעוד מספר דקות."

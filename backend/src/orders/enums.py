@@ -25,6 +25,6 @@ class PaymentMethod(str, Enum):
 
 
 class UrgencyLevel(str, Enum):
-    normal      = "normal"
-    urgent      = "urgent"
+    normal = "normal"
+    urgent = "urgent"
     very_urgent = "very_urgent"

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.ai.constants import MAX_TOOL_ROUNDS  # noqa: F401 — used in service
 from src.ai.schemas import ChatRequestSchema
-from src.ai.service import AgentRunner, load_system_prompt
+from src.ai.service import AgentRunner, build_system_prompt
 from src.ai.tool_registry import tool_registry
 from src.config import settings
 from src.core.constants.http_messages import AI_NOT_CONFIGURED
@@ -32,7 +32,7 @@ async def ai_chat(
     if not body.messages:
         raise HTTPException(status_code=422, detail="messages must not be empty")
 
-    system_prompt = load_system_prompt()
+    system_prompt = build_system_prompt()
     runner = AgentRunner(db, tool_registry)
 
     async def event_generator():

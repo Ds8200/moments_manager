@@ -1,17 +1,16 @@
 """Unit tests for business tools — uses pytest-mock to mock DB + services."""
+
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from src.ai.tools import (
-    draft_email,
-    get_dashboard_kpis,
-    get_financial_year,
-    get_monthly_report,
-    get_orders_summary,
-    get_top_customers,
-)
+# Import from sub-modules where each function is now defined.
+# ReportService monkeypatching must target the sub-module where it is imported.
+from src.ai.tools_customers import get_top_customers
+from src.ai.tools_email import draft_email
+from src.ai.tools_operations import get_dashboard_kpis, get_orders_summary
+from src.ai.tools_reports import get_financial_year, get_monthly_report
 
 
 @pytest.fixture()
@@ -20,6 +19,7 @@ def mock_db() -> MagicMock:
 
 
 # ── Dashboard KPIs ─────────────────────────────────────────────────────────────
+
 
 async def test_get_dashboard_kpis(mock_db, monkeypatch) -> None:
     kpi = MagicMock(
@@ -33,8 +33,7 @@ async def test_get_dashboard_kpis(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_dashboard_kpi = AsyncMock(return_value=kpi)
-
-    monkeypatch.setattr("src.ai.tools.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_operations.ReportService", lambda db: svc_mock)
 
     result = await get_dashboard_kpis(db=mock_db)
 
@@ -45,6 +44,7 @@ async def test_get_dashboard_kpis(mock_db, monkeypatch) -> None:
 
 
 # ── Monthly Report ─────────────────────────────────────────────────────────────
+
 
 async def test_get_monthly_report_uses_defaults(mock_db, monkeypatch) -> None:
     report = MagicMock(
@@ -64,7 +64,7 @@ async def test_get_monthly_report_uses_defaults(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_monthly_report = AsyncMock(return_value=report)
-    monkeypatch.setattr("src.ai.tools.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db: svc_mock)
 
     result = await get_monthly_report(db=mock_db)
 
@@ -91,7 +91,7 @@ async def test_get_monthly_report_explicit_params(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_monthly_report = AsyncMock(return_value=report)
-    monkeypatch.setattr("src.ai.tools.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db: svc_mock)
 
     await get_monthly_report(db=mock_db, year=2024, month=3)
 
@@ -99,6 +99,7 @@ async def test_get_monthly_report_explicit_params(mock_db, monkeypatch) -> None:
 
 
 # ── Financial Year ─────────────────────────────────────────────────────────────
+
 
 async def test_get_financial_year(mock_db, monkeypatch) -> None:
     month_mock = MagicMock(
@@ -119,7 +120,7 @@ async def test_get_financial_year(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_financial_year = AsyncMock(return_value=year_data)
-    monkeypatch.setattr("src.ai.tools.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db: svc_mock)
 
     result = await get_financial_year(db=mock_db, year=2025)
 
@@ -130,6 +131,7 @@ async def test_get_financial_year(mock_db, monkeypatch) -> None:
 
 # ── Top Customers ──────────────────────────────────────────────────────────────
 
+
 async def test_get_top_customers_caps_limit(mock_db, monkeypatch) -> None:
     customer = MagicMock(
         customer_name="Acme",
@@ -139,7 +141,7 @@ async def test_get_top_customers_caps_limit(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_top_customers = AsyncMock(return_value=[customer])
-    monkeypatch.setattr("src.ai.tools.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_customers.ReportService", lambda db: svc_mock)
 
     await get_top_customers(db=mock_db, limit=999)
     svc_mock.get_top_customers.assert_called_once_with(20)
@@ -154,7 +156,7 @@ async def test_get_top_customers_result_shape(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_top_customers = AsyncMock(return_value=[customer])
-    monkeypatch.setattr("src.ai.tools.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_customers.ReportService", lambda db: svc_mock)
 
     result = await get_top_customers(db=mock_db)
 
@@ -164,6 +166,7 @@ async def test_get_top_customers_result_shape(mock_db, monkeypatch) -> None:
 
 
 # ── Orders Summary ─────────────────────────────────────────────────────────────
+
 
 async def test_get_orders_summary_returns_count_and_revenue(mock_db) -> None:
     mock_result = MagicMock()
@@ -189,6 +192,7 @@ async def test_get_orders_summary_zero_count(mock_db) -> None:
 
 
 # ── Email Draft ────────────────────────────────────────────────────────────────
+
 
 async def test_draft_email_returns_subject_and_body(mock_db) -> None:
     result = await draft_email(

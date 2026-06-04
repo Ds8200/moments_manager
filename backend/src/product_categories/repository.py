@@ -13,9 +13,7 @@ class ProductCategoryRepository:
         self._db = db
 
     async def get_all(self) -> list[ProductCategory]:
-        result = await self._db.execute(
-            select(ProductCategory).order_by(ProductCategory.name)
-        )
+        result = await self._db.execute(select(ProductCategory).order_by(ProductCategory.name))
         return list(result.scalars().all())
 
     async def get_by_id(self, category_id: str) -> ProductCategory | None:
@@ -25,9 +23,7 @@ class ProductCategoryRepository:
         return result.scalar_one_or_none()
 
     async def get_by_name(self, name: str) -> ProductCategory | None:
-        result = await self._db.execute(
-            select(ProductCategory).where(ProductCategory.name == name)
-        )
+        result = await self._db.execute(select(ProductCategory).where(ProductCategory.name == name))
         return result.scalar_one_or_none()
 
     async def create(self, data: dict) -> ProductCategory:

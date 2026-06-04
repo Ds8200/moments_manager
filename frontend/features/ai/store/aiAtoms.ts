@@ -46,5 +46,15 @@ export const clearConversationAtom = atom(
     set(conversationAtom, [])
     set(isStreamingAtom, false)
     set(streamErrorAtom, null)
+    set(activeToolAtom, null)
+  }
+)
+
+export const activeToolAtom = atom<string | null>(null)
+
+export const setActiveToolAtom = atom(
+  null,
+  (_get, set, toolName: string | null) => {
+    set(activeToolAtom, toolName)
   }
 )
