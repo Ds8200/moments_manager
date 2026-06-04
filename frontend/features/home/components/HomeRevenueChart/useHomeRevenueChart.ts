@@ -1,13 +1,17 @@
 'use client'
 
-import { CHART_MONTH_LABELS } from '@/features/home/constants/homeLabels'
+import { CHART_MONTH_LABELS, HOME_CHART_LABELS } from '@/features/home/constants/homeLabels'
 import { useHomeRevenue } from '@/features/home/queries/useHomeRevenue'
 import type { RevenueChartDataPoint } from '@/features/home/types'
+import { formatCurrency } from '@/shared/utils/formatters'
 
 export interface UseHomeRevenueChartReturn {
   chartData: RevenueChartDataPoint[]
   isPending: boolean
   hasData: boolean
+  formatYAxis: (v: number) => string
+  formatTooltip: (value: number, name: string) => [string, string]
+  formatLegend: (value: string) => string
 }
 
 export const useHomeRevenueChart = (): UseHomeRevenueChartReturn => {
@@ -36,5 +40,19 @@ export const useHomeRevenueChart = (): UseHomeRevenueChartReturn => {
 
   const hasData = chartData.some((d) => d.revenue > 0 || d.expenses > 0)
 
-  return { chartData, isPending, hasData }
+  const formatYAxis = (v: number): string => {
+    if (v === 0) return '₪0'
+    if (v >= 1000) return `₪${(v / 1000).toFixed(0)}k`
+    return `₪${Math.round(v)}`
+  }
+
+  const formatTooltip = (value: number, name: string): [string, string] => [
+    formatCurrency(value),
+    name === 'revenue' ? HOME_CHART_LABELS.REVENUE : HOME_CHART_LABELS.EXPENSES,
+  ]
+
+  const formatLegend = (value: string): string =>
+    value === 'revenue' ? HOME_CHART_LABELS.REVENUE : HOME_CHART_LABELS.EXPENSES
+
+  return { chartData, isPending, hasData, formatYAxis, formatTooltip, formatLegend }
 }

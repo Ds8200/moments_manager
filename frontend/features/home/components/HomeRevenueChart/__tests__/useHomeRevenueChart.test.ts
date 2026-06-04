@@ -68,4 +68,39 @@ describe('useHomeRevenueChart', () => {
     // MSW handler returns total_revenue: '5000' for all months
     expect(result.current.hasData).toBe(true)
   })
+
+  it('formatYAxis returns ₪0 for zero', async () => {
+    const { result } = renderHook(() => useHomeRevenueChart(), {
+      wrapper: makeWrapper(),
+    })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+    expect(result.current.formatYAxis(0)).toBe('₪0')
+  })
+
+  it('formatYAxis returns raw shekel amount for values under 1000', async () => {
+    const { result } = renderHook(() => useHomeRevenueChart(), {
+      wrapper: makeWrapper(),
+    })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+    expect(result.current.formatYAxis(500)).toBe('₪500')
+    expect(result.current.formatYAxis(999)).toBe('₪999')
+  })
+
+  it('formatYAxis returns k-abbreviated amount for values 1000+', async () => {
+    const { result } = renderHook(() => useHomeRevenueChart(), {
+      wrapper: makeWrapper(),
+    })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+    expect(result.current.formatYAxis(1000)).toBe('₪1k')
+    expect(result.current.formatYAxis(5500)).toBe('₪6k')
+  })
+
+  it('formatLegend maps revenue to Hebrew income label', async () => {
+    const { result } = renderHook(() => useHomeRevenueChart(), {
+      wrapper: makeWrapper(),
+    })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+    expect(result.current.formatLegend('revenue')).toBe('הכנסות')
+    expect(result.current.formatLegend('expenses')).toBe('הוצאות')
+  })
 })

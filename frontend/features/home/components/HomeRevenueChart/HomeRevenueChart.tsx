@@ -12,12 +12,11 @@ import {
   YAxis,
 } from 'recharts'
 import { HOME_CHART_LABELS } from '@/features/home/constants/homeLabels'
-import { formatCurrency } from '@/shared/utils/formatters'
 import { useHomeRevenueChart } from './useHomeRevenueChart'
 import styles from './HomeRevenueChart.module.scss'
 
 export const HomeRevenueChart = (): ReactElement => {
-  const { chartData, isPending, hasData } = useHomeRevenueChart()
+  const { chartData, isPending, hasData, formatYAxis, formatTooltip, formatLegend } = useHomeRevenueChart()
 
   if (isPending) {
     return <div className={styles.skeleton} />
@@ -42,20 +41,16 @@ export const HomeRevenueChart = (): ReactElement => {
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 11, fill: '#888' }}
-            tickFormatter={(v: number) => `₪${(v / 1000).toFixed(0)}k`}
+            tickFormatter={formatYAxis}
             width={48}
           />
           <Tooltip
-            formatter={(value: number, name: string) => [
-              formatCurrency(value),
-              name === 'revenue' ? HOME_CHART_LABELS.REVENUE : HOME_CHART_LABELS.EXPENSES,
-            ]}
+            formatter={formatTooltip}
             contentStyle={{ borderRadius: 8, fontSize: 13, direction: 'rtl' }}
           />
           <Legend
-            formatter={(value: string) =>
-              value === 'revenue' ? HOME_CHART_LABELS.REVENUE : HOME_CHART_LABELS.EXPENSES
-            }
+            formatter={formatLegend}
+            wrapperStyle={{ direction: 'ltr' }}
           />
           <Bar dataKey="revenue" fill="#9c27b0" radius={[4, 4, 0, 0]} maxBarSize={40} />
           <Bar dataKey="expenses" fill="#fa5252" radius={[4, 4, 0, 0]} maxBarSize={40} />
