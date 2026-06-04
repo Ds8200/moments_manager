@@ -29,7 +29,6 @@
 .main {
   flex: 1;
   padding: v.$space-6;
-  max-width: v.$content-max-width;
   width: 100%;
 
   @media (max-width: #{v.$breakpoint-md - 1}) {
