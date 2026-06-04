@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.dependencies import get_current_user, get_db
@@ -54,3 +55,31 @@ async def top_customers(
 ):
     svc = ReportService(db)
     return await svc.get_top_customers(limit)
+
+
+@router.get("/export/excel", response_class=Response)
+async def export_financial_excel(
+    year: int = Query(...),
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+) -> Response:
+    content = await ReportService(db).export_excel(year)
+    return Response(
+        content=content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="reports-{year}.xlsx"'},
+    )
+
+
+@router.get("/export/pdf", response_class=Response)
+async def export_financial_pdf(
+    year: int = Query(...),
+    db: AsyncSession = Depends(get_db),
+    _user=Depends(get_current_user),
+) -> Response:
+    content = await ReportService(db).export_pdf(year)
+    return Response(
+        content=content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="reports-{year}.pdf"'},
+    )

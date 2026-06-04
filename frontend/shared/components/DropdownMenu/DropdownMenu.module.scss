@@ -11,7 +11,7 @@
   position: fixed;
   top: var(--dm-top);
   left: var(--dm-left);
-  width: 220px;
+  width: min(220px, calc(100vw - 32px));
   background: v.$bg-card;
   border-radius: v.$border-radius;
   box-shadow: v.$shadow-elevated;

@@ -11,6 +11,11 @@
   position: relative;
   flex: 1;
   min-width: 200px;
+
+  @media (max-width: #{767px}) {
+    min-width: 0;
+    width: 100%;
+  }
 }
 
 .searchIcon {
@@ -51,6 +56,11 @@
   color: v.$text-primary;
   cursor: pointer;
   min-width: 130px;
+
+  @media (max-width: #{767px}) {
+    min-width: 0;
+    flex: 1;
+  }
 
   &:focus {
     outline: none;

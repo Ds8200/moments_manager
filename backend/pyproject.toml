@@ -18,6 +18,8 @@ dependencies = [
     "pino>=0.1.0",
     "aiosmtplib>=5.1.1",
     "httpx>=0.28.1",
+    "openpyxl>=3.1.5",
+    "weasyprint>=69.0",
 ]
 
 [project.optional-dependencies]

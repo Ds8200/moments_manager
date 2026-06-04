@@ -16,7 +16,7 @@
   font-size: v.$font-size-2xl;
   font-weight: v.$font-weight-bold;
   color: v.$text-primary;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .newBtn {
@@ -43,6 +43,7 @@
   box-shadow: v.$shadow-card;
   border: 1px solid v.$border-color;
   overflow: hidden;
+  overflow-x: auto;
 }
 
 .table {

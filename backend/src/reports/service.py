@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.export_utils import ColumnGroup, TableExportConfig, build_excel_bytes, build_pdf_bytes
 from src.orders.enums import PaymentMethod
 from src.reports.repository import ReportRepository
 from src.reports.schemas import (
@@ -94,6 +95,60 @@ class ReportService:
             annual_net=net_profit,
             annual_unpaid=annual_unpaid,
         )
+
+    # ── Export ──────────────────────────────────────────────────────────────
+
+    _HEBREW_MONTHS = [
+        "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני",
+        "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר",
+    ]
+
+    @staticmethod
+    def _fmt(value: Decimal) -> str:
+        return f"₪{value:,.2f}"
+
+    def _build_export_config(self, data: FinancialYearSchema, year: int) -> TableExportConfig:
+        column_groups = [
+            ColumnGroup("הזמנות", 4),
+            ColumnGroup("תשלומים", 4),
+            ColumnGroup("רווחיות", 2),
+        ]
+        sub_headers = [
+            "שולם", "לא שולם", 'סה"כ', "% גבייה",
+            "מזומן", "העברה", "לא שולם (₪)", 'סה"כ הכנסות',
+            "הוצאות", "רווח",
+        ]
+        rows: list[list[str | int | float]] = [
+            [
+                self._HEBREW_MONTHS[m.month - 1],
+                m.paid_count,
+                m.unpaid_count,
+                m.total_count,
+                f"{m.collection_rate:.1f}%",
+                self._fmt(m.cash_revenue),
+                self._fmt(m.transfer_revenue),
+                self._fmt(m.unpaid_amount),
+                self._fmt(m.paid_revenue),
+                self._fmt(m.total_expenses),
+                self._fmt(m.total_profit),
+            ]
+            for m in data.months
+        ]
+        return TableExportConfig(
+            title=f"סיכום חודשי {year}",
+            first_col_header="חודש",
+            column_groups=column_groups,
+            sub_headers=sub_headers,
+            rows=rows,
+        )
+
+    async def export_excel(self, year: int) -> bytes:
+        data = await self.get_financial_year(year)
+        return build_excel_bytes(self._build_export_config(data, year))
+
+    async def export_pdf(self, year: int) -> bytes:
+        data = await self.get_financial_year(year)
+        return build_pdf_bytes(self._build_export_config(data, year))
 
     async def get_top_customers(self, limit: int = 10) -> list[TopCustomerSchema]:
         rows = await self._repo.get_top_customers(limit)

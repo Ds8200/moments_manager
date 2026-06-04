@@ -2,15 +2,21 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: v.$space-4;
 
   @media (max-width: #{v.$breakpoint-xl - 1}) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   @media (max-width: #{v.$breakpoint-md - 1}) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$space-3;
+  }
+
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
+    gap: v.$space-3;
   }
 }
 

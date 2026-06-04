@@ -1,8 +1,8 @@
 'use client'
 import { useState, type MouseEvent } from 'react'
 import { useFinancialReport, useTopCustomers } from '../../queries/useReports'
+import { reportsApi } from '../../api'
 import { formatCurrency } from '@/shared/utils/formatters'
-import { exportToExcel, exportToPrint, type ColumnGroup } from '@/shared/utils/exportUtils'
 import { useDropdownMenu, type DropdownMenuItem, type DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 import { HEBREW_MONTHS, REPORTS_LABELS } from '../../constants/reportsLabels'
 import type { FinancialReport, TopCustomer } from '../../types'
@@ -22,27 +22,6 @@ export interface UseReportsPageReturn {
   handleExportClick: (e: MouseEvent<HTMLButtonElement>) => void
 }
 
-// headers[0] = primary column (rowspan=2 in PDF), headers[1..] = sub-headers within groups
-const EXPORT_HEADERS = [
-  REPORTS_LABELS.COL_MONTH,
-  REPORTS_LABELS.COL_PAID_ORDERS,
-  REPORTS_LABELS.COL_UNPAID_ORDERS,
-  REPORTS_LABELS.COL_TOTAL_ORDERS,
-  REPORTS_LABELS.COL_COLLECTION_RATE,
-  REPORTS_LABELS.COL_CASH,
-  REPORTS_LABELS.COL_TRANSFER,
-  REPORTS_LABELS.COL_UNPAID_AMOUNT,
-  REPORTS_LABELS.COL_PAID_REVENUE,
-  REPORTS_LABELS.COL_EXPENSES,
-  REPORTS_LABELS.COL_PROFIT,
-]
-
-const COLUMN_GROUPS: ColumnGroup[] = [
-  { label: REPORTS_LABELS.GROUP_ORDERS, colSpan: 4 },
-  { label: REPORTS_LABELS.GROUP_PAYMENTS, colSpan: 4 },
-  { label: REPORTS_LABELS.GROUP_PROFIT, colSpan: 2 },
-]
-
 export const useReportsPage = (): UseReportsPageReturn => {
   const currentYear = new Date().getFullYear()
   const [year, setYear] = useState(currentYear)
@@ -52,49 +31,16 @@ export const useReportsPage = (): UseReportsPageReturn => {
 
   const yearOptions = Array.from({ length: 3 }, (_, i) => currentYear - i)
 
-  const getMonthName = (monthIndex: number): string => HEBREW_MONTHS[monthIndex - 1] ?? ''
-
-  const buildRows = (): (string | number)[][] => {
-    if (!financial) return []
-    return financial.months.map((m) => [
-      getMonthName(m.month),
-      m.paid_count,
-      m.unpaid_count,
-      m.total_count,
-      `${m.collection_rate.toFixed(1)}%`,
-      formatCurrency(m.cash_revenue),
-      formatCurrency(m.transfer_revenue),
-      formatCurrency(m.unpaid_amount),
-      formatCurrency(m.paid_revenue),
-      formatCurrency(m.total_expenses),
-      formatCurrency(m.total_profit),
-    ])
-  }
-
   const exportItems: DropdownMenuItem[] = [
     {
       label: REPORTS_LABELS.EXPORT_EXCEL,
       icon: '📊',
-      onClick: () => {
-        exportToExcel({
-          filename: `reports-${year}`,
-          headers: EXPORT_HEADERS,
-          rows: buildRows(),
-          columnGroups: COLUMN_GROUPS,
-        })
-      },
+      onClick: () => { reportsApi.exportExcel(year).catch(console.error) },
     },
     {
       label: REPORTS_LABELS.EXPORT_PDF,
       icon: '📄',
-      onClick: () => {
-        exportToPrint({
-          title: `${REPORTS_LABELS.MONTHLY_TITLE} ${year}`,
-          headers: EXPORT_HEADERS,
-          rows: buildRows(),
-          columnGroups: COLUMN_GROUPS,
-        })
-      },
+      onClick: () => { reportsApi.exportPdf(year).catch(console.error) },
     },
   ]
 
@@ -111,7 +57,7 @@ export const useReportsPage = (): UseReportsPageReturn => {
     isLoading,
     formatAmount: formatCurrency,
     formatRate: (v: number): string => `${v.toFixed(1)}%`,
-    getMonthName,
+    getMonthName: (monthIndex: number): string => HEBREW_MONTHS[monthIndex - 1] ?? '',
     menuState,
     closeMenu,
     handleExportClick,

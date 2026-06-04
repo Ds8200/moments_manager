@@ -66,7 +66,7 @@ describe('useProductForm', () => {
     expect(updateMutateAsync).not.toHaveBeenCalled()
   })
 
-  it('onSubmit converts empty category_id to null', async () => {
+  it('onSubmit converts empty category_id to undefined', async () => {
     const { result } = renderHook(() => useProductForm(), { wrapper })
 
     await act(async () => {
@@ -82,7 +82,7 @@ describe('useProductForm', () => {
 
     await waitFor(() => {
       expect(createMutateAsync).toHaveBeenCalledWith(
-        expect.objectContaining({ category_id: null }),
+        expect.objectContaining({ category_id: undefined }),
       )
     })
   })

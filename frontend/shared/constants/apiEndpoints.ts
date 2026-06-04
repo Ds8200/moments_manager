@@ -27,10 +27,12 @@ export const API_ENDPOINTS = {
   EXPENSES:     `${BASE}/api/v1/expenses`,
   EXPENSE:      (id: string) => `${BASE}/api/v1/expenses/${id}`,
 
-  REPORTS_DASHBOARD: `${BASE}/api/v1/reports/dashboard`,
-  REPORTS_MONTHLY:   `${BASE}/api/v1/reports/monthly`,
-  REPORTS_FINANCIAL: `${BASE}/api/v1/reports/financial`,
+  REPORTS_DASHBOARD:     `${BASE}/api/v1/reports/dashboard`,
+  REPORTS_MONTHLY:       `${BASE}/api/v1/reports/monthly`,
+  REPORTS_FINANCIAL:     `${BASE}/api/v1/reports/financial`,
   REPORTS_TOP_CUSTOMERS: `${BASE}/api/v1/reports/top-customers`,
+  REPORTS_EXPORT_EXCEL:  `${BASE}/api/v1/reports/export/excel`,
+  REPORTS_EXPORT_PDF:    `${BASE}/api/v1/reports/export/pdf`,
 
   CUSTOMER_SEND_EMAIL: (id: string) => `${BASE}/api/v1/customers/${id}/send-email`,
   COMPOSE_EMAIL: `${BASE}/api/v1/customers/compose-email`,

@@ -10,10 +10,16 @@
   display: flex;
   align-items: center;
   gap: v.$space-4;
+  overflow: hidden;
   transition: box-shadow v.$transition-fast;
 
   &:hover {
     box-shadow: v.$shadow-elevated;
+  }
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    padding: v.$space-3;
+    gap: v.$space-2;
   }
 }
 
@@ -27,6 +33,12 @@
   justify-content: center;
   flex-shrink: 0;
   background: v.$gray-100;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .body {
@@ -34,6 +46,7 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .value {
@@ -41,12 +54,26 @@
   font-weight: v.$font-weight-bold;
   line-height: 1.1;
   color: v.$text-primary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    font-size: v.$font-size-lg;
+  }
 }
 
 .label {
   font-size: v.$font-size-sm;
   color: v.$text-secondary;
   font-weight: v.$font-weight-medium;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    font-size: v.$font-size-xs;
+  }
 }
 
 // Color variants
