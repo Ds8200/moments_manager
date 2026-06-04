@@ -1,21 +1,23 @@
 @use '../../styles/variables' as v;
 
+// Outer container — column on all screen sizes for clean row separation
 .bar {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+}
+
+// ── Row 1: search + new button ──────────────────────────────────────────────
+.primaryRow {
   display: flex;
   align-items: center;
   gap: v.$space-3;
-  flex-wrap: wrap;
 }
 
 .searchWrapper {
   position: relative;
   flex: 1;
-  min-width: 200px;
-
-  @media (max-width: #{767px}) {
-    min-width: 0;
-    width: 100%;
-  }
+  min-width: 0;
 }
 
 .searchIcon {
@@ -38,48 +40,12 @@
   font-family: v.$font-family;
   background: v.$bg-card;
   color: v.$text-primary;
+  min-height: 38px;
 
   &:focus {
     outline: none;
     border-color: v.$primary;
     box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
-  }
-}
-
-.select {
-  padding: v.$space-2 v.$space-3;
-  border: 1px solid v.$border-color;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-family: v.$font-family;
-  background: v.$bg-card;
-  color: v.$text-primary;
-  cursor: pointer;
-  min-width: 130px;
-
-  @media (max-width: #{767px}) {
-    min-width: 0;
-    flex: 1;
-  }
-
-  &:focus {
-    outline: none;
-    border-color: v.$primary;
-  }
-}
-
-.dateInput {
-  padding: v.$space-2 v.$space-3;
-  border: 1px solid v.$border-color;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-family: v.$font-family;
-  background: v.$bg-card;
-  color: v.$text-primary;
-
-  &:focus {
-    outline: none;
-    border-color: v.$primary;
   }
 }
 
@@ -94,10 +60,73 @@
   font-family: v.$font-family;
   cursor: pointer;
   white-space: nowrap;
+  min-height: 38px;
+  flex-shrink: 0;
   transition: background v.$transition-fast;
-  margin-inline-end: auto;
 
   &:hover {
     background: v.$primary-dark;
+  }
+}
+
+// ── Row 2: selects ──────────────────────────────────────────────────────────
+.selectsRow {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  flex-wrap: wrap;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: v.$space-2;
+  }
+}
+
+.select {
+  flex: 1;
+  min-width: 0;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  cursor: pointer;
+  min-height: 38px;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+// ── Row 3: date range ───────────────────────────────────────────────────────
+.datesRow {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    gap: v.$space-2;
+  }
+}
+
+.dateInput {
+  flex: 1;
+  min-width: 0;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  min-height: 38px;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
   }
 }
