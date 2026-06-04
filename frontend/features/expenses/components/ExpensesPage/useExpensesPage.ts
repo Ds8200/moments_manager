@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, type MouseEvent } from 'react'
 import { useSetAtom } from 'jotai'
 import { useExpenses, useDeleteExpense } from '../../queries/useExpenses'
 import { isExpenseFormOpenAtom, editingExpenseAtom } from '../../store/expensesAtoms'
@@ -8,6 +8,8 @@ import { formatCurrency, formatDate } from '@/shared/utils/formatters'
 import { useConfirm } from '@/shared/hooks/useConfirm'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import { ROUTE_ICONS } from '@/shared/constants/routes'
+import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
+import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 import type { Expense, ExpensesResponse } from '../../types'
 
 export interface UseExpensesPageReturn {
@@ -20,12 +22,13 @@ export interface UseExpensesPageReturn {
   onNew: () => void
   onEdit: (expense: Expense) => void
   onDelete: (id: string) => void
+  onRowMenuClick: (expense: Expense, e: MouseEvent<Element>) => void
+  menuState: DropdownMenuState
+  closeMenu: () => void
   formatAmount: (value: string | number) => string
   formatExpenseDate: (date: string) => string
   emptyErrorIcon: string
   emptyStateIcon: string
-  editSymbol: string
-  deleteSymbol: string
   emptyValue: string
 }
 
@@ -36,6 +39,7 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
   const setOpen = useSetAtom(isExpenseFormOpenAtom)
   const setEditingExpense = useSetAtom(editingExpenseAtom)
   const confirm = useConfirm()
+  const { menuState, openMenu, closeMenu } = useDropdownMenu()
 
   const totalAmount = formatCurrency(
     data?.items.reduce((sum, e) => sum + parseFloat(e.amount), 0) ?? 0
@@ -56,6 +60,13 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
     })
   }
 
+  const onRowMenuClick = (expense: Expense, e: MouseEvent<Element>): void => {
+    openMenu(formatDate(expense.date), [
+      { label: EXPENSES_LABELS.TABLE_EDIT_TITLE,   icon: UI_SYMBOLS.EDIT,   onClick: () => onEdit(expense) },
+      { label: EXPENSES_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(expense.id), variant: 'danger' },
+    ], e)
+  }
+
   return {
     data,
     isLoading,
@@ -66,12 +77,13 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
     onNew,
     onEdit,
     onDelete,
+    onRowMenuClick,
+    menuState,
+    closeMenu,
     formatAmount: formatCurrency,
     formatExpenseDate: formatDate,
     emptyErrorIcon: UI_SYMBOLS.WARNING,
     emptyStateIcon: ROUTE_ICONS.EXPENSES,
-    editSymbol: UI_SYMBOLS.EDIT,
-    deleteSymbol: UI_SYMBOLS.DELETE,
     emptyValue: UI_SYMBOLS.EM_DASH,
   }
 }

@@ -65,6 +65,7 @@
 .row {
   border-bottom: 1px solid v.$border-color;
   transition: background v.$transition-fast;
+  cursor: pointer;
 
   &:hover {
     background: v.$gray-50;
@@ -94,19 +95,6 @@
 .amount {
   font-weight: v.$font-weight-semibold;
   color: v.$danger;
-}
-
-.actionBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: v.$space-1;
-  opacity: 0.6;
-  transition: opacity v.$transition-fast;
-
-  &:hover {
-    opacity: 1;
-  }
 }
 
 .totalRow {

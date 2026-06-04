@@ -32,6 +32,9 @@ export const EXPENSES_LABELS = {
   CATEGORY_DELETE_TITLE:    'מחק קטגוריה',
   CATEGORY_IN_USE_ERROR:    'הקטגוריה בשימוש ולא ניתן למחוק אותה',
 
+  TABLE_EDIT_TITLE:         'ערוך הוצאה',
+  TABLE_DELETE_TITLE:       'מחק הוצאה',
+
   VALIDATION_DATE:          'נדרש תאריך',
   VALIDATION_AMOUNT:        'נדרש סכום',
   CREATED_SUCCESS:          'ההוצאה נוספה בהצלחה',
