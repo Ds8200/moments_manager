@@ -20,7 +20,7 @@ class CustomerRepository:
         if search:
             query = query.where(Customer.name.ilike(f"%{search}%"))
         if has_email:
-            query = query.where(Customer.email.isnot(None))
+            query = query.where(Customer.email.isnot(None), Customer.email != "")
         count_query = select(func.count()).select_from(query.subquery())
         total_result = await self._db.execute(count_query)
         total = total_result.scalar_one()

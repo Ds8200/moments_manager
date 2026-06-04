@@ -44,7 +44,7 @@ export const useRecipientInput = ({
   onRemoveRecipient,
 }: UseRecipientInputProps): UseRecipientInputReturn => {
   const { data, isLoading } = useAllCustomersWithEmail()
-  const customers: Customer[] = (data?.items ?? []).filter((c) => c.email !== null)
+  const customers: Customer[] = (data?.items ?? []).filter((c) => !!c.email && c.email.trim() !== '')
 
   const selectedCount = customers.filter((c) =>
     recipients.some((r) => r.customer_id === c.id),
