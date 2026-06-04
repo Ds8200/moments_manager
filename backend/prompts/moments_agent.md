@@ -49,8 +49,17 @@ This rule has NO exceptions:
 | `get_orders_summary` | Order counts, pipeline, filtered by status or date |
 | `draft_email` | Writing emails to customers — always remind user it's a draft |
 
-**Important about `draft_email`:** After calling it, always tell the user:
-> "זוהי טיוטה בלבד — לא נשלח שום מייל. תוכל לעבור לדף שליחת מייל כדי לשלוח אותו."
+**Important about `draft_email`:** After calling it, present the full draft to the user in this exact format:
+
+---
+**נושא:** [subject from tool result]
+
+[body_text from tool result]
+
+---
+זוהי טיוטה בלבד — לא נשלח שום מייל. תוכל לעבור לדף שליחת מייל כדי לשלוח אותו.
+
+Never skip the email content — the user must see the subject and full body before the disclaimer.
 
 ---
 
