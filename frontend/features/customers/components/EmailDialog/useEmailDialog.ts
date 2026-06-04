@@ -1,7 +1,6 @@
 'use client'
 import { useAtom } from 'jotai'
 import { useCallback, useEffect } from 'react'
-import type { MutableRefObject } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -51,14 +50,17 @@ export const useEmailDialog = (): UseEmailDialogReturn => {
     setValue,
   } = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) })
 
-  const emojiInsert = useEmojiInsert('body', getValues, setValue)
+  // Subject emoji support is not used in this dialog, but the hook requires both
+  // field names. Body is the default active field, so emojis go to the body.
+  const emojiInsert = useEmojiInsert('subject', 'body', getValues, setValue)
+  const { closePicker } = emojiInsert
 
   useEffect(() => {
     if (!isOpen) {
       reset()
-      emojiInsert.closePicker()
+      closePicker()
     }
-  }, [isOpen, reset, emojiInsert.closePicker])
+  }, [isOpen, reset, closePicker])
 
   const onClose = (): void => {
     setEmailingCustomerId(null)
@@ -73,18 +75,15 @@ export const useEmailDialog = (): UseEmailDialogReturn => {
     )
   }
 
+  // RHF v7 always returns a callback ref, so no object-ref branch is needed.
   const { ref: rhfBodyRef, ...bodyInputProps } = register('body')
   const mergedBodyRef = useCallback(
     (el: HTMLTextAreaElement | null): void => {
-      emojiInsert.textareaRef.current = el
-      if (typeof rhfBodyRef === 'function') {
-        rhfBodyRef(el)
-      } else if (rhfBodyRef) {
-        (rhfBodyRef as MutableRefObject<HTMLTextAreaElement | null>).current = el
-      }
+      emojiInsert.textareaCallbackRef(el)
+      rhfBodyRef(el)
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rhfBodyRef],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rhfBodyRef identity is stable per react-hook-form
+    [emojiInsert.textareaCallbackRef, rhfBodyRef],
   )
 
   const customerNameSuffix = customer?.name

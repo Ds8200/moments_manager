@@ -18,10 +18,13 @@ export const EmailDialog = (): ReactElement => {
     onClose,
     isPending,
     buttonRef,
+    textareaRef,
+    anchorRef,
     isPickerOpen,
     togglePicker,
     closePicker,
     onEmojiSelect,
+    onBodyFocus,
     mergedBodyRef,
     bodyInputProps,
   } = useEmailDialog()
@@ -77,13 +80,16 @@ export const EmailDialog = (): ReactElement => {
                     placeholder={CUSTOMERS_LABELS.EMAIL_BODY_PLACEHOLDER}
                     rows={6}
                     ref={mergedBodyRef}
+                    onFocus={onBodyFocus}
                     {...bodyInputProps}
                   />
                   <EmojiPicker
                     isOpen={isPickerOpen}
                     onClose={closePicker}
                     onSelect={onEmojiSelect}
-                    buttonRef={buttonRef}
+                    triggerRef={buttonRef}
+                    anchorRef={anchorRef}
+                    safeRefs={[textareaRef]}
                   />
                 </div>
                 {errors.body && <span className={styles.error}>{errors.body.message}</span>}
