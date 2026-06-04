@@ -106,8 +106,9 @@ class AgentRunner:
                     for tool_call in choice.message.tool_calls:
                         tool_name = tool_call.function.name
                         try:
-                            args = json.loads(tool_call.function.arguments)
-                        except json.JSONDecodeError:
+                            raw = json.loads(tool_call.function.arguments or "{}")
+                            args = raw if isinstance(raw, dict) else {}
+                        except (json.JSONDecodeError, TypeError):
                             args = {}
 
                         logger.info(log_messages.AI_TOOL_CALLED, tool_name)

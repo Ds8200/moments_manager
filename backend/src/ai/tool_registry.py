@@ -56,7 +56,7 @@ class ToolRegistry:
         tool = self.get(name)
         if tool is None:
             return {"error": f"Unknown tool: {name}"}
-        return await tool.fn(db=db, **args)
+        return await tool.fn(db=db, **(args or {}))
 
 
 tool_registry = ToolRegistry()
