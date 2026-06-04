@@ -14,11 +14,13 @@ class CustomerRepository:
         self._db = db
 
     async def get_all(
-        self, search: str | None, limit: int, offset: int
+        self, search: str | None, limit: int, offset: int, has_email: bool | None = None
     ) -> tuple[list[Customer], int]:
         query = select(Customer).where(Customer.is_deleted == False)
         if search:
             query = query.where(Customer.name.ilike(f"%{search}%"))
+        if has_email:
+            query = query.where(Customer.email.isnot(None))
         count_query = select(func.count()).select_from(query.subquery())
         total_result = await self._db.execute(count_query)
         total = total_result.scalar_one()

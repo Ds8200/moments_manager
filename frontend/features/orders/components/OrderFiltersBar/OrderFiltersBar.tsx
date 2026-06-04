@@ -24,6 +24,8 @@ export const OrderFiltersBar = (): ReactElement => {
       selects={[statusSelect, paymentSelect, sortSelect]}
       dateFrom={filters.date_from}
       dateTo={filters.date_to}
+      dateFromLabel={ORDERS_LABELS.DATE_FROM}
+      dateToLabel={ORDERS_LABELS.DATE_TO}
       onDateFromChange={onDateFromChange}
       onDateToChange={onDateToChange}
       newButtonLabel={ORDERS_LABELS.NEW_ORDER}

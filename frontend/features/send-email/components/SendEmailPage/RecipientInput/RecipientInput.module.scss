@@ -6,6 +6,34 @@
   gap: $space-2;
 }
 
+.actions {
+  display: flex;
+  gap: $space-2;
+  justify-content: flex-end;
+}
+
+.actionBtn {
+  background: none;
+  border: 1px solid $primary;
+  border-radius: $border-radius-sm;
+  color: $primary;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  padding: $space-1 $space-3;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $primary-light;
+  }
+
+  &:disabled {
+    border-color: $text-disabled;
+    color: $text-disabled;
+    cursor: not-allowed;
+  }
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;

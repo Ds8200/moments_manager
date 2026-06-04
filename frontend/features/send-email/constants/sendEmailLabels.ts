@@ -19,4 +19,6 @@ export const SEND_EMAIL_LABELS = {
   ATTACH_FILE:             'צרף קובץ',
   REMOVE_FILE:             'הסר קובץ',
   ATTACH_BTN_ARIA:         'בחר קובץ לצירוף',
+  SELECT_ALL:              'בחר הכל',
+  CLEAR_ALL:               'נקה הכל',
 } as const

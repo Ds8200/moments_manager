@@ -28,6 +28,12 @@ export const useCustomers = (
     queryFn: () => customersApi.list(page, search, page_size),
   })
 
+export const useAllCustomersWithEmail = (): UseQueryResult<CustomersResponse> =>
+  useQuery({
+    queryKey: ['customers', 'all-with-email'],
+    queryFn: () => customersApi.list(1, '', 100, true),
+  })
+
 export const useCustomer = (id: string | null): UseQueryResult<CustomerDetail> =>
   useQuery({
     queryKey: ['customer', id],

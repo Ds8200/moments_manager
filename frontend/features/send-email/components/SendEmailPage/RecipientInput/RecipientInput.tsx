@@ -11,6 +11,8 @@ export interface RecipientInputProps {
   recipients: Recipient[]
   onAdd: (r: Recipient) => void
   onRemove: (key: string) => void
+  onAddAll: (rs: Recipient[]) => void
+  onClearAll: () => void
   error?: string
 }
 
@@ -18,13 +20,43 @@ export const RecipientInput = ({
   recipients,
   onAdd,
   onRemove,
+  onAddAll,
+  onClearAll,
   error,
 }: RecipientInputProps): JSX.Element => {
-  const { customerOptions, isLoading, onSearch, onCustomerSelect, onFreeTextEmail, autocompleteValue } =
-    useRecipientInput({ recipients, onAdd, onRemove })
+  const {
+    customerOptions,
+    isLoading,
+    onSearch,
+    onCustomerSelect,
+    onFreeTextEmail,
+    autocompleteValue,
+    onSelectAll,
+    onClearAll: handleClearAll,
+    isAllSelected,
+    hasAnyRecipients,
+  } = useRecipientInput({ recipients, onAdd, onRemove, onAddAll, onClearAll })
 
   return (
     <div className={styles.container}>
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={styles.actionBtn}
+          onClick={onSelectAll}
+          disabled={isAllSelected}
+        >
+          {SEND_EMAIL_LABELS.SELECT_ALL}
+        </button>
+        <button
+          type="button"
+          className={styles.actionBtn}
+          onClick={handleClearAll}
+          disabled={!hasAnyRecipients}
+        >
+          {SEND_EMAIL_LABELS.CLEAR_ALL}
+        </button>
+      </div>
       <Autocomplete<Customer>
         value={autocompleteValue}
         onChange={onCustomerSelect}

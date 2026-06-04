@@ -105,7 +105,7 @@
 // ── Row 3: date range ───────────────────────────────────────────────────────
 .datesRow {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: v.$space-3;
 
   @media (max-width: #{v.$breakpoint-md - 1}) {
@@ -113,9 +113,21 @@
   }
 }
 
-.dateInput {
+.dateGroup {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
   flex: 1;
   min-width: 0;
+}
+
+.dateLabel {
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+}
+
+.dateInput {
+  width: 100%;
   padding: v.$space-2 v.$space-3;
   border: 1px solid v.$border-color;
   border-radius: v.$border-radius;

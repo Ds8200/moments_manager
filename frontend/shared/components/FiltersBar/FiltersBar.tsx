@@ -13,6 +13,8 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
     showDates,
     dateFrom,
     dateTo,
+    dateFromLabel,
+    dateToLabel,
     onDateFromChange,
     onDateToChange,
     newButtonLabel,
@@ -59,18 +61,24 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
       {/* Row 3: date inputs — hidden when not applicable */}
       {showDates && (
         <div className={styles.datesRow}>
-          <input
-            type="date"
-            className={styles.dateInput}
-            value={dateFrom}
-            onChange={(e) => onDateFromChange(e.target.value)}
-          />
-          <input
-            type="date"
-            className={styles.dateInput}
-            value={dateTo}
-            onChange={(e) => onDateToChange(e.target.value)}
-          />
+          <label className={styles.dateGroup}>
+            {dateFromLabel && <span className={styles.dateLabel}>{dateFromLabel}</span>}
+            <input
+              type="date"
+              className={styles.dateInput}
+              value={dateFrom}
+              onChange={(e) => onDateFromChange(e.target.value)}
+            />
+          </label>
+          <label className={styles.dateGroup}>
+            {dateToLabel && <span className={styles.dateLabel}>{dateToLabel}</span>}
+            <input
+              type="date"
+              className={styles.dateInput}
+              value={dateTo}
+              onChange={(e) => onDateToChange(e.target.value)}
+            />
+          </label>
         </div>
       )}
     </div>

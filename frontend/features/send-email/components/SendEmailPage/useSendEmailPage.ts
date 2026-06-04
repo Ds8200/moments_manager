@@ -32,6 +32,8 @@ export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   recipients: Recipient[]
   onAddRecipient: (r: Recipient) => void
   onRemoveRecipient: (key: string) => void
+  onAddAllRecipients: (rs: Recipient[]) => void
+  onClearAllRecipients: () => void
   register: ReturnType<typeof useForm<ComposeFormValues>>['register']
   errors: ReturnType<typeof useForm<ComposeFormValues>>['formState']['errors']
   handleSubmit: ReturnType<typeof useForm<ComposeFormValues>>['handleSubmit']
@@ -102,6 +104,19 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
 
   const onRemoveRecipient = useCallback((key: string) => {
     setRecipients((prev) => prev.filter((r) => r.key !== key))
+  }, [])
+
+  const onAddAllRecipients = useCallback((rs: Recipient[]) => {
+    setRecipients((prev) => {
+      const existingKeys = new Set(prev.map((r) => r.key))
+      const newOnes = rs.filter((r) => !existingKeys.has(r.key))
+      return [...prev, ...newOnes]
+    })
+    setRecipientsError(undefined)
+  }, [])
+
+  const onClearAllRecipients = useCallback(() => {
+    setRecipients([])
   }, [])
 
   const addFiles = useCallback((dropped: File[]) => {
@@ -192,6 +207,8 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     recipients,
     onAddRecipient,
     onRemoveRecipient,
+    onAddAllRecipients,
+    onClearAllRecipients,
     register,
     errors,
     handleSubmit,

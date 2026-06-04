@@ -13,6 +13,8 @@ export interface FiltersBarProps {
   selects?: FiltersBarSelectConfig[]
   dateFrom?: string
   dateTo?: string
+  dateFromLabel?: string
+  dateToLabel?: string
   onDateFromChange?: (value: string) => void
   onDateToChange?: (value: string) => void
   newButtonLabel: string
@@ -27,6 +29,8 @@ export interface UseFiltersBarReturn {
   showDates: boolean
   dateFrom: string
   dateTo: string
+  dateFromLabel: string
+  dateToLabel: string
   onDateFromChange: (value: string) => void
   onDateToChange: (value: string) => void
   newButtonLabel: string
@@ -43,6 +47,8 @@ export const useFiltersBar = (props: FiltersBarProps): UseFiltersBarReturn => {
     selects,
     dateFrom,
     dateTo,
+    dateFromLabel,
+    dateToLabel,
     onDateFromChange,
     onDateToChange,
     newButtonLabel,
@@ -57,6 +63,8 @@ export const useFiltersBar = (props: FiltersBarProps): UseFiltersBarReturn => {
     showDates: onDateFromChange !== undefined || onDateToChange !== undefined,
     dateFrom: dateFrom ?? '',
     dateTo: dateTo ?? '',
+    dateFromLabel: dateFromLabel ?? '',
+    dateToLabel: dateToLabel ?? '',
     onDateFromChange: onDateFromChange ?? noop,
     onDateToChange: onDateToChange ?? noop,
     newButtonLabel,

@@ -27,11 +27,13 @@ async def list_customers(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     search: str | None = Query(default=None),
+    has_email: bool | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
     _user=Depends(get_current_user),
 ):
     svc = CustomerService(db)
-    return await svc.list_customers(PaginationParams(page=page, page_size=page_size), search)
+    params = PaginationParams(page=page, page_size=page_size)
+    return await svc.list_customers(params, search, has_email)
 
 
 @router.post("", response_model=CustomerResponseSchema, status_code=201)

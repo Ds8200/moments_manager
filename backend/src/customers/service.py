@@ -41,9 +41,14 @@ class CustomerService:
         self._repo = CustomerRepository(db)
 
     async def list_customers(
-        self, params: PaginationParams, search: str | None = None
+        self,
+        params: PaginationParams,
+        search: str | None = None,
+        has_email: bool | None = None,
     ) -> PaginatedResponse[CustomerResponseSchema]:
-        customers, total = await self._repo.get_all(search, params.page_size, params.offset)
+        customers, total = await self._repo.get_all(
+            search, params.page_size, params.offset, has_email
+        )
         pages = params.compute_pages(total)
         return PaginatedResponse(
             items=[CustomerResponseSchema.model_validate(c) for c in customers],
