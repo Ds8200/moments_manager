@@ -23,6 +23,8 @@ _CACHED_PROMPT: str | None = None
 
 
 def load_system_prompt() -> str:
+    # Re-reads the file on every server restart (module reload).
+    # To hot-reload in dev: restart the uvicorn process.
     global _CACHED_PROMPT  # noqa: PLW0603 — intentional module-level cache
     if _CACHED_PROMPT is None:
         prompt_path = (
