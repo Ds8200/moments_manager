@@ -1,8 +1,11 @@
 'use client'
 
 import type { ReactElement } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useMobileDrawer } from './useMobileDrawer'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { ROUTES } from '@/shared/constants/routes'
 import styles from './MobileDrawer.module.scss'
 
 const LOGOUT_ICON = '🚪'
@@ -21,6 +24,15 @@ export const MobileDrawer = (): ReactElement => {
         className={`${styles.drawer} ${isOpen ? styles.drawerOpen : ''}`}
         aria-hidden={!isOpen}
       >
+        <Link href={ROUTES.DASHBOARD} className={styles.logo} onClick={onClose}>
+          <Image
+            src="/moments_logo.png"
+            alt={UI_LABELS.APP_NAME}
+            width={140}
+            height={52}
+            priority
+          />
+        </Link>
         <nav className={styles.nav}>
           {visibleNavItems.map((item) => (
             <Link

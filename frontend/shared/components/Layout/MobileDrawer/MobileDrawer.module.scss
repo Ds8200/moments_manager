@@ -49,12 +49,24 @@
   transform: translateX(0);
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-4 v.$space-5;
+  border-bottom: 1px solid v.$border-color;
+  transition: opacity v.$transition-fast;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
 .nav {
   display: flex;
   flex-direction: column;
   padding: v.$space-4 v.$space-3;
   gap: v.$space-1;
-  padding-top: calc(#{v.$space-4} + #{v.$header-height});
 }
 
 .navItem {
