@@ -65,10 +65,7 @@ class AgentRunner:
         messages: list[ChatMessageSchema],
         system_prompt: str,
     ) -> AsyncGenerator[SSEEventSchema, None]:
-        client = genai.Client(
-            api_key=settings.GEMINI_API_KEY,
-            http_options={"api_version": "v1"},
-        )
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
         history = _to_genai_contents(messages[:-1]) if len(messages) > 1 else []
         last_user_text = messages[-1].content if messages else ""
