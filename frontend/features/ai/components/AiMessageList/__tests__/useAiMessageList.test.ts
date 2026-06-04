@@ -50,7 +50,7 @@ describe('useAiMessageList', () => {
     })
     expect(result.current.messages).toHaveLength(2)
     expect(result.current.messages[0].role).toBe('user')
-    expect(result.current.messages[1].role).toBe('model')
+    expect(result.current.messages[1].role).toBe('assistant')
   })
 
   it('isStreaming reflects isStreamingAtom', () => {

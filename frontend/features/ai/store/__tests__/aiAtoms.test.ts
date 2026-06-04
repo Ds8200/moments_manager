@@ -50,7 +50,7 @@ describe('aiAtoms', () => {
       const conv = store.get(conversationAtom)
       expect(conv).toHaveLength(2)
       expect(conv[0].role).toBe('user')
-      expect(conv[1].role).toBe('model')
+      expect(conv[1].role).toBe('assistant')
     })
   })
 
