@@ -1,14 +1,14 @@
+import json
 import logging
 from collections.abc import AsyncGenerator
 from pathlib import Path
 
-from google import genai
-from google.genai import types as genai_types
+from groq import AsyncGroq
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.ai.constants import (
     BUSINESS_ADVISOR_PROMPT,
-    GEMINI_MODEL,
+    GROQ_MODEL,
     MAX_TOOL_ROUNDS,
     PROMPTS_DIR,
 )
@@ -32,27 +32,29 @@ def load_system_prompt() -> str:
     return _CACHED_PROMPT
 
 
-def _to_genai_contents(messages: list[ChatMessageSchema]) -> list[genai_types.Content]:
-    """Convert ChatMessageSchema list to google.genai Content objects."""
+def _build_tools(registry: ToolRegistry) -> list[dict]:
+    """Return tool definitions in OpenAI/Groq function-calling format."""
     return [
-        genai_types.Content(
-            role=msg.role,
-            parts=[genai_types.Part.from_text(text=msg.content)],
-        )
-        for msg in messages
-    ]
-
-
-def _build_tool_config(registry: ToolRegistry) -> list[genai_types.Tool]:
-    declarations = [
-        genai_types.FunctionDeclaration(
-            name=t["name"],
-            description=t["description"],
-            parameters=t["parameters"],
-        )
+        {
+            "type": "function",
+            "function": {
+                "name": t["name"],
+                "description": t["description"],
+                "parameters": t["parameters"],
+            },
+        }
         for t in registry.all_declarations()
     ]
-    return [genai_types.Tool(function_declarations=declarations)]
+
+
+def _build_messages(
+    system_prompt: str,
+    messages: list[ChatMessageSchema],
+) -> list[dict]:
+    result: list[dict] = [{"role": "system", "content": system_prompt}]
+    for msg in messages:
+        result.append({"role": msg.role, "content": msg.content})
+    return result
 
 
 class AgentRunner:
@@ -65,44 +67,46 @@ class AgentRunner:
         messages: list[ChatMessageSchema],
         system_prompt: str,
     ) -> AsyncGenerator[SSEEventSchema, None]:
-        client = genai.Client(api_key=settings.GEMINI_API_KEY)
-
-        history = _to_genai_contents(messages[:-1]) if len(messages) > 1 else []
-        last_user_text = messages[-1].content if messages else ""
-
-        config = genai_types.GenerateContentConfig(
-            system_instruction=system_prompt,
-            tools=_build_tool_config(self._registry),
-        )
-
-        chat = client.aio.chats.create(
-            model=GEMINI_MODEL,
-            config=config,
-            history=history,
-        )
+        client = AsyncGroq(api_key=settings.GROQ_API_KEY)
+        tools = _build_tools(self._registry)
+        conversation = _build_messages(system_prompt, messages)
 
         logger.info(log_messages.AI_TURN_START, len(messages))
 
         tool_rounds = 0
-        current_input: str | list = last_user_text
 
         try:
             while tool_rounds < MAX_TOOL_ROUNDS:
-                response = await chat.send_message(current_input)
+                response = await client.chat.completions.create(
+                    model=GROQ_MODEL,
+                    messages=conversation,  # type: ignore[arg-type]
+                    tools=tools,  # type: ignore[arg-type]
+                    tool_choice="auto",
+                )
+                choice = response.choices[0]
 
-                function_call_parts = [
-                    part
-                    for candidate in response.candidates
-                    for part in (candidate.content.parts or [])
-                    if part.function_call and part.function_call.name
-                ]
+                if choice.finish_reason == "tool_calls" and choice.message.tool_calls:
+                    # Append assistant turn (with tool calls) to history
+                    assistant_msg: dict = {"role": "assistant", "content": choice.message.content}
+                    assistant_msg["tool_calls"] = [
+                        {
+                            "id": tc.id,
+                            "type": tc.type,
+                            "function": {
+                                "name": tc.function.name,
+                                "arguments": tc.function.arguments,
+                            },
+                        }
+                        for tc in choice.message.tool_calls
+                    ]
+                    conversation.append(assistant_msg)
 
-                if function_call_parts:
-                    tool_result_parts = []
-                    for part in function_call_parts:
-                        fc = part.function_call
-                        tool_name = fc.name
-                        args = dict(fc.args) if fc.args else {}
+                    for tool_call in choice.message.tool_calls:
+                        tool_name = tool_call.function.name
+                        try:
+                            args = json.loads(tool_call.function.arguments)
+                        except json.JSONDecodeError:
+                            args = {}
 
                         logger.info(log_messages.AI_TOOL_CALLED, tool_name)
                         yield SSEEventSchema(type="tool_call", tool_name=tool_name)
@@ -118,25 +122,18 @@ class AgentRunner:
                             tool_name=tool_name,
                             data=result,
                         )
-                        tool_result_parts.append(
-                            genai_types.Part.from_function_response(
-                                name=tool_name, response=result
-                            )
-                        )
+
+                        conversation.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "content": json.dumps(result, ensure_ascii=False),
+                        })
 
                     tool_rounds += 1
-                    current_input = tool_result_parts
 
                 else:
-                    text_parts = [
-                        part.text
-                        for candidate in response.candidates
-                        for part in (candidate.content.parts or [])
-                        if part.text
-                    ]
-                    full_text = "".join(text_parts)
-
-                    for token in _tokenize(full_text):
+                    text = choice.message.content or ""
+                    for token in _tokenize(text):
                         yield SSEEventSchema(type="token", content=token)
 
                     logger.info(log_messages.AI_TURN_DONE, tool_rounds)
@@ -146,11 +143,11 @@ class AgentRunner:
             yield SSEEventSchema(type="done")
 
         except Exception as exc:
-            logger.error(log_messages.AI_GEMINI_ERROR, exc)
+            logger.error(log_messages.AI_API_ERROR, exc)
             error_str = str(exc)
-            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
-                friendly = "המכסה החינמית של ה-AI מוצתה. נסה שנית מחר או פנה למנהל המערכת."
-            elif "403" in error_str or "API_KEY" in error_str:
+            if "429" in error_str or "rate_limit" in error_str.lower():
+                friendly = "המכסה החינמית של ה-AI מוצתה. נסה שנית בעוד מספר דקות."
+            elif "401" in error_str or "invalid_api_key" in error_str.lower():
                 friendly = "מפתח ה-API אינו תקין. פנה למנהל המערכת."
             elif "503" in error_str or "unavailable" in error_str.lower():
                 friendly = "שירות ה-AI אינו זמין כרגע. נסה שנית בעוד מספר דקות."

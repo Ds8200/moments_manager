@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class ChatMessageSchema(BaseModel):
-    role: Literal["user", "model"]
+    role: Literal["user", "assistant"]
     content: str
 
 

@@ -1,4 +1,4 @@
-"""Unit tests for AgentRunner — mocks the google.genai SDK."""
+"""Unit tests for AgentRunner — mocks the Groq SDK."""
 from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -32,28 +32,35 @@ def messages() -> list[ChatMessageSchema]:
     return [ChatMessageSchema(role="user", content="Hello")]
 
 
-def _make_text_part(text: str) -> MagicMock:
-    part = MagicMock()
-    part.text = text
-    part.function_call = None
-    return part
-
-
-def _make_fc_part(tool_name: str, args: dict) -> MagicMock:
-    fc = MagicMock()
-    fc.name = tool_name
-    fc.args = args
-    part = MagicMock()
-    part.function_call = fc
-    part.text = None
-    return part
-
-
-def _make_response(*parts) -> MagicMock:
-    candidate = MagicMock()
-    candidate.content.parts = list(parts)
+def _make_text_choice(text: str) -> MagicMock:
+    msg = MagicMock()
+    msg.content = text
+    msg.tool_calls = None
+    choice = MagicMock()
+    choice.finish_reason = "stop"
+    choice.message = msg
     response = MagicMock()
-    response.candidates = [candidate]
+    response.choices = [choice]
+    return response
+
+
+def _make_tool_call_choice(tool_name: str, args: dict) -> MagicMock:
+    import json
+    func = MagicMock()
+    func.name = tool_name
+    func.arguments = json.dumps(args)
+    tc = MagicMock()
+    tc.id = "call_test123"
+    tc.type = "function"
+    tc.function = func
+    msg = MagicMock()
+    msg.content = None
+    msg.tool_calls = [tc]
+    choice = MagicMock()
+    choice.finish_reason = "tool_calls"
+    choice.message = msg
+    response = MagicMock()
+    response.choices = [choice]
     return response
 
 
@@ -61,21 +68,16 @@ async def _collect(gen: AsyncGenerator[SSEEventSchema, None]) -> list[SSEEventSc
     return [event async for event in gen]
 
 
-def _patch_genai(chat_mock):
+def _patch_groq(side_effect):
     client_mock = MagicMock()
-    client_mock.aio.chats.create.return_value = chat_mock
-    return patch("src.ai.service.genai.Client", return_value=client_mock)
+    client_mock.chat.completions.create = AsyncMock(side_effect=side_effect)
+    return patch("src.ai.service.AsyncGroq", return_value=client_mock)
 
 
 # ── Text-only turn ─────────────────────────────────────────────────────────────
 
 async def test_text_only_response(registry, messages) -> None:
-    chat_mock = MagicMock()
-    chat_mock.send_message = AsyncMock(
-        return_value=_make_response(_make_text_part("שלום!"))
-    )
-
-    with _patch_genai(chat_mock):
+    with _patch_groq([_make_text_choice("שלום!")]):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
@@ -87,15 +89,10 @@ async def test_text_only_response(registry, messages) -> None:
 # ── Tool call then text ────────────────────────────────────────────────────────
 
 async def test_tool_call_then_text(registry, messages) -> None:
-    tool_response = _make_response(_make_fc_part("echo", {"value": "test"}))
-    text_response = _make_response(_make_text_part("The echo says test"))
-
-    chat_mock = MagicMock()
-    chat_mock.send_message = AsyncMock(
-        side_effect=[tool_response, text_response]
-    )
-
-    with _patch_genai(chat_mock):
+    with _patch_groq([
+        _make_tool_call_choice("echo", {"value": "test"}),
+        _make_text_choice("The echo says test"),
+    ]):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
@@ -126,15 +123,10 @@ async def test_tool_error_continues_stream(messages) -> None:
         parameters={"type": "object", "properties": {}},
     )(failing_tool)
 
-    tool_response = _make_response(_make_fc_part("fail", {}))
-    text_response = _make_response(_make_text_part("Despite the error, here is the answer"))
-
-    chat_mock = MagicMock()
-    chat_mock.send_message = AsyncMock(
-        side_effect=[tool_response, text_response]
-    )
-
-    with _patch_genai(chat_mock):
+    with _patch_groq([
+        _make_tool_call_choice("fail", {}),
+        _make_text_choice("Despite the error, here is the answer"),
+    ]):
         runner = AgentRunner(db=None, registry=error_registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
@@ -144,45 +136,53 @@ async def test_tool_error_continues_stream(messages) -> None:
     assert events[-1].type == "done"
 
 
-# ── Gemini API error ───────────────────────────────────────────────────────────
+# ── Groq API error ─────────────────────────────────────────────────────────────
 
-async def test_gemini_error_yields_error_event(registry, messages) -> None:
-    chat_mock = MagicMock()
-    chat_mock.send_message = AsyncMock(side_effect=Exception("API quota exceeded"))
-
-    with _patch_genai(chat_mock):
+async def test_api_error_yields_error_event(registry, messages) -> None:
+    with _patch_groq(Exception("API quota exceeded")):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     assert len(events) == 1
     assert events[0].type == "error"
-    assert "API quota exceeded" in events[0].error
+
+
+# ── Friendly error messages ────────────────────────────────────────────────────
+
+async def test_rate_limit_shows_friendly_message(registry, messages) -> None:
+    with _patch_groq(Exception("429 rate_limit_exceeded")):
+        runner = AgentRunner(db=None, registry=registry)
+        events = await _collect(runner.run_stream(messages, "sys"))
+
+    assert events[0].type == "error"
+    assert "מכסה" in events[0].error
+
+
+async def test_invalid_key_shows_friendly_message(registry, messages) -> None:
+    with _patch_groq(Exception("401 invalid_api_key")):
+        runner = AgentRunner(db=None, registry=registry)
+        events = await _collect(runner.run_stream(messages, "sys"))
+
+    assert events[0].type == "error"
+    assert "מפתח" in events[0].error
 
 
 # ── Max tool rounds ────────────────────────────────────────────────────────────
 
 async def test_max_tool_rounds_terminates(registry, messages) -> None:
-    # Always returns a tool call — would loop forever without the cap
-    chat_mock = MagicMock()
-    chat_mock.send_message = AsyncMock(
-        return_value=_make_response(_make_fc_part("echo", {"value": "loop"}))
-    )
-
-    with _patch_genai(chat_mock):
+    with _patch_groq(_make_tool_call_choice("echo", {"value": "loop"})):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     assert events[-1].type == "done"
-    tool_call_events = [e for e in events if e.type == "tool_call"]
     from src.ai.constants import MAX_TOOL_ROUNDS
-    assert len(tool_call_events) <= MAX_TOOL_ROUNDS
+    assert len([e for e in events if e.type == "tool_call"]) <= MAX_TOOL_ROUNDS
 
 
-# ── Tokenizer helper ───────────────────────────────────────────────────────────
+# ── Tokenizer ─────────────────────────────────────────────────────────────────
 
 def test_tokenize_splits_on_spaces() -> None:
-    tokens = _tokenize("hello world")
-    assert tokens == ["hello ", "world"]
+    assert _tokenize("hello world") == ["hello ", "world"]
 
 
 def test_tokenize_empty_string() -> None:

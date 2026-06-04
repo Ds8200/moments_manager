@@ -26,7 +26,7 @@ async def ai_chat(
     db: AsyncSession = Depends(get_db),
     _user: object = Depends(get_current_user),
 ) -> StreamingResponse:
-    if not settings.GEMINI_API_KEY:
+    if not settings.GROQ_API_KEY:
         raise HTTPException(status_code=503, detail=AI_NOT_CONFIGURED)
 
     if not body.messages:

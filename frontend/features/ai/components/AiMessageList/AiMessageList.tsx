@@ -20,7 +20,7 @@ export const AiMessageList = ({ onSuggestedPrompt }: AiMessageListProps): ReactE
           <AiMessageBubble
             key={msg.id}
             message={msg}
-            isLastStreaming={isStreaming && idx === messages.length - 1 && msg.role === 'model'}
+            isLastStreaming={isStreaming && idx === messages.length - 1 && msg.role === 'assistant'}
           />
         ))
       )}

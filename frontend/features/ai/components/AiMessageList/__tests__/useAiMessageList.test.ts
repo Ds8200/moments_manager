@@ -18,7 +18,7 @@ function makeWrapper(store: ReturnType<typeof createStore>) {
 }
 
 const userMsg: ChatMessage = { id: '1', role: 'user', content: 'hello' }
-const modelMsg: ChatMessage = { id: '2', role: 'model', content: 'world', isStreaming: false }
+const modelMsg: ChatMessage = { id: '2', role: 'assistant', content: 'world', isStreaming: false }
 
 describe('useAiMessageList', () => {
   let store: ReturnType<typeof createStore>

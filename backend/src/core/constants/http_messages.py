@@ -44,5 +44,5 @@ RESOURCE_EXPENSE_CATEGORY = "ExpenseCategory"
 EXPENSE_CATEGORY_NAME_EXISTS = "A category with this name already exists"
 EXPENSE_CATEGORY_IN_USE = "Category is in use by one or more expenses and cannot be deleted"
 
-AI_NOT_CONFIGURED = "AI service is not configured — set GEMINI_API_KEY"
+AI_NOT_CONFIGURED = "AI service is not configured — set GROQ_API_KEY"
 AI_RATE_LIMIT = "Too many AI requests — please wait before sending another message"

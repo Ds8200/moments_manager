@@ -16,7 +16,7 @@ function makeStore() {
 }
 
 const userMsg: ChatMessage = { id: '1', role: 'user', content: 'hello' }
-const modelMsg: ChatMessage = { id: '2', role: 'model', content: '', isStreaming: true }
+const modelMsg: ChatMessage = { id: '2', role: 'assistant', content: '', isStreaming: true }
 
 describe('aiAtoms', () => {
   let store: ReturnType<typeof makeStore>

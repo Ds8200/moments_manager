@@ -1,4 +1,4 @@
-export type MessageRole = 'user' | 'model'
+export type MessageRole = 'user' | 'assistant'
 
 export interface ChatMessage {
   id: string

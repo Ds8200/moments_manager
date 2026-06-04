@@ -38,7 +38,7 @@ export const useAiStream = (): UseAiStreamReturn => {
   const sendMessage = useCallback(
     async (text: string): Promise<void> => {
       const userMsg: ChatMessage = { id: nextId(), role: 'user', content: text }
-      const modelMsg: ChatMessage = { id: nextId(), role: 'model', content: '', isStreaming: true }
+      const modelMsg: ChatMessage = { id: nextId(), role: 'assistant', content: '', isStreaming: true }
 
       appendMessage(userMsg)
       appendMessage(modelMsg)
