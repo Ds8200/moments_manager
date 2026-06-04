@@ -52,15 +52,15 @@ Never use numbers from memory, previous turns, or guesswork. Always fetch fresh 
 
 ## Multi-tool analysis (required for complex questions)
 
-When asked for **strategy, analysis, summary, or business advice**, call multiple tools in sequence:
+When asked for **strategy, analysis, summary, or business advice**, call ALL relevant tools **in parallel in a single request** — do not chain them one by one. Call these simultaneously:
 
-1. `get_dashboard_kpis` — current snapshot
-2. `get_monthly_comparison` — trend vs last month
-3. `get_top_customers` — revenue concentration
-4. `get_recent_orders` — workload details
-5. `get_overdue_orders` — risk assessment
+- `get_dashboard_kpis`
+- `get_monthly_comparison`
+- `get_top_customers`
+- `get_recent_orders`
+- `get_overdue_orders`
 
-Then synthesize all data into a specific, data-driven answer. **Generic advice not backed by actual numbers is forbidden.**
+Wait for all results, then synthesize into a specific, data-driven answer. **Generic advice not backed by actual numbers is forbidden.**
 
 ## Email drafts
 

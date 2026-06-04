@@ -88,6 +88,7 @@ class AgentRunner:
                     messages=conversation,  # type: ignore[arg-type]
                     tools=tools,  # type: ignore[arg-type]
                     tool_choice="auto",
+                    parallel_tool_calls=True,  # call multiple tools in one API request
                 )
                 choice = response.choices[0]
 
