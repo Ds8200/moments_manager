@@ -1,4 +1,4 @@
-"""Unit tests for AiRepository — all 6 read-only query methods."""
+"""Unit tests for AiRepository — all read-only query methods."""
 
 from datetime import date, timedelta
 from decimal import Decimal
@@ -50,13 +50,13 @@ async def test_get_customer_profile_not_found(mock_db) -> None:
 
 
 async def test_get_customer_profile_found(mock_db) -> None:
-    customer = MagicMock(
-        id="cust-1",
-        name="ישראל ישראלי",
-        phone="050-1234567",
-        email="test@example.com",
-        notes="לקוח טוב",
-    )
+    # MagicMock's 'name' kwarg is special (sets repr) — set attribute after construction
+    customer = MagicMock()
+    customer.id = "cust-1"
+    customer.name = "ישראל ישראלי"
+    customer.phone = "050-1234567"
+    customer.email = "test@example.com"
+    customer.notes = "לקוח טוב"
     # Mock: customer query, stats query, recent orders query
     order = MagicMock(
         order_number="ORD-2025-0001",
@@ -100,7 +100,8 @@ async def test_get_unpaid_invoices_empty(mock_db) -> None:
 
 async def test_get_unpaid_invoices_returns_correct_shape(mock_db) -> None:
     order = MagicMock()
-    order.customer = MagicMock(name="לקוח א")
+    order.customer = MagicMock()
+    order.customer.name = "לקוח א"
     order.order_number = "ORD-2025-0002"
     order.total_amount = Decimal("2000")
     order.date = date.today() - timedelta(days=45)
@@ -206,7 +207,8 @@ async def test_get_product_performance_zero_revenue_margin(mock_db) -> None:
 
 async def test_search_orders_returns_correct_shape(mock_db) -> None:
     order = MagicMock()
-    order.customer = MagicMock(name="לקוח ב")
+    order.customer = MagicMock()
+    order.customer.name = "לקוח ב"
     order.order_number = "ORD-2025-0005"
     order.total_amount = Decimal("800")
     order.status = "printing"
@@ -272,3 +274,116 @@ async def test_get_inactive_customers_no_orders(mock_db) -> None:
 
     assert result[0]["last_order_date"] is None
     assert result[0]["days_inactive"] is None
+
+
+# ── get_order_items_by_number ──────────────────────────────────────────────────
+
+
+async def test_get_order_items_not_found(mock_db) -> None:
+    mock_db.execute = AsyncMock(return_value=_scalar_one_or_none_result(None))
+    repo = AiRepository(mock_db)
+    result = await repo.get_order_items_by_number("ORD-9999-0000")
+    assert result is None
+
+
+async def test_get_order_items_found(mock_db) -> None:
+    item = MagicMock()
+    item.product_name = "הדפסה A3"
+    item.quantity = 50
+    item.unit_price = Decimal("2.50")
+    item.total_price = Decimal("125.00")
+    item.profit = Decimal("50.00")
+    item.design_notes = "פונט עברי בלבד"
+
+    order = MagicMock()
+    order.order_number = "ORD-2025-0010"
+    order.customer = MagicMock()
+    order.customer.name = "לקוח VIP"
+    order.date = date(2025, 6, 1)
+    order.status = "printing"
+    order.urgency = "urgent"
+    order.is_paid = False
+    order.total_amount = Decimal("125.00")
+    order.items = [item]
+
+    mock_db.execute = AsyncMock(return_value=_scalar_one_or_none_result(order))
+    repo = AiRepository(mock_db)
+    result = await repo.get_order_items_by_number("ORD-2025-0010")
+
+    assert result is not None
+    assert result["order_number"] == "ORD-2025-0010"
+    assert result["customer"] == "לקוח VIP"
+    assert result["item_count"] == 1
+    assert result["items"][0]["product_name"] == "הדפסה A3"
+    assert result["items"][0]["quantity"] == 50
+    assert result["items"][0]["design_notes"] == "פונט עברי בלבד"
+
+
+async def test_get_order_items_no_customer_falls_back(mock_db) -> None:
+    order = MagicMock()
+    order.order_number = "ORD-2025-0011"
+    order.customer = None
+    order.date = date(2025, 6, 2)
+    order.status = "new"
+    order.urgency = "normal"
+    order.is_paid = False
+    order.total_amount = Decimal("0")
+    order.items = []
+
+    mock_db.execute = AsyncMock(return_value=_scalar_one_or_none_result(order))
+    repo = AiRepository(mock_db)
+    result = await repo.get_order_items_by_number("ORD-2025-0011")
+
+    assert result is not None
+    assert result["customer"] == "לקוח לא ידוע"
+    assert result["item_count"] == 0
+    assert result["items"] == []
+
+
+# ── get_product_catalog ────────────────────────────────────────────────────────
+
+
+async def test_get_product_catalog_returns_correct_shape(mock_db) -> None:
+    product = MagicMock()
+    product.name = "הדפסה על בד"
+    product.category = MagicMock()
+    product.category.name = "הדפסה"
+    product.base_price = Decimal("150.00")
+    product.base_cost = Decimal("40.00")
+    product.avg_production_days = 3
+    product.is_active = True
+
+    mock_db.execute = AsyncMock(return_value=_scalars_result([product]))
+    repo = AiRepository(mock_db)
+    result = await repo.get_product_catalog(None, True, 20)
+
+    assert len(result) == 1
+    row = result[0]
+    assert row["name"] == "הדפסה על בד"
+    assert row["category"] == "הדפסה"
+    assert row["base_price"] == "150.00"
+    assert row["avg_production_days"] == 3
+    assert row["is_active"] is True
+
+
+async def test_get_product_catalog_no_category(mock_db) -> None:
+    product = MagicMock()
+    product.name = "מוצר ללא קטגוריה"
+    product.category = None
+    product.base_price = Decimal("0")
+    product.base_cost = Decimal("0")
+    product.avg_production_days = 0
+    product.is_active = True
+
+    mock_db.execute = AsyncMock(return_value=_scalars_result([product]))
+    repo = AiRepository(mock_db)
+    result = await repo.get_product_catalog(None, True, 20)
+
+    assert result[0]["category"] is None
+
+
+async def test_get_product_catalog_empty(mock_db) -> None:
+    mock_db.execute = AsyncMock(return_value=_scalars_result([]))
+    repo = AiRepository(mock_db)
+    result = await repo.get_product_catalog("not-found", True, 20)
+    assert result == []

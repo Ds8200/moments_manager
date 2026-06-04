@@ -9,4 +9,6 @@ main.py imports this file once at startup — no other changes required when add
 from src.ai.tools_customers import *  # noqa: F401, F403
 from src.ai.tools_email import *  # noqa: F401, F403
 from src.ai.tools_operations import *  # noqa: F401, F403
+from src.ai.tools_orders import *  # noqa: F401, F403
+from src.ai.tools_products import *  # noqa: F401, F403
 from src.ai.tools_reports import *  # noqa: F401, F403

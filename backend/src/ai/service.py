@@ -4,6 +4,7 @@ import re
 from collections.abc import AsyncGenerator
 from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,7 +43,7 @@ def build_system_prompt() -> str:
 
     The base prompt is cached; only the date header is generated per call.
     """
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Asia/Jerusalem"))
     day = _HEBREW_DAYS[now.weekday()]
     date_line = (
         f"**תאריך ושעה נוכחיים:** יום {day}, "

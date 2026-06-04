@@ -11,6 +11,7 @@ from sqlalchemy.orm import selectinload
 from src.customers.models import Customer
 from src.orders.enums import OrderStatus
 from src.orders.models import Order, OrderItem
+from src.products.models import Product
 
 logger = logging.getLogger(__name__)
 
@@ -249,4 +250,70 @@ class AiRepository:
                 "total_orders": row.total_orders,
             }
             for row in result.all()
+        ]
+
+    async def get_order_items_by_number(self, order_number: str) -> dict | None:
+        """Returns full item breakdown of an order identified by order_number."""
+        result = await self._db.execute(
+            select(Order)
+            .options(
+                selectinload(Order.items),
+                selectinload(Order.customer),
+            )
+            .where(
+                Order.order_number == order_number,
+                Order.is_deleted.is_(False),
+            )
+        )
+        order = result.scalar_one_or_none()
+        if order is None:
+            return None
+        return {
+            "order_number": order.order_number,
+            "customer": order.customer.name if order.customer else "לקוח לא ידוע",
+            "date": str(order.date),
+            "status": order.status,
+            "urgency": order.urgency,
+            "is_paid": order.is_paid,
+            "total_amount": str(order.total_amount),
+            "items": [
+                {
+                    "product_name": item.product_name,
+                    "quantity": item.quantity,
+                    "unit_price": str(item.unit_price),
+                    "total_price": str(item.total_price),
+                    "profit": str(item.profit),
+                    "design_notes": item.design_notes,
+                }
+                for item in order.items
+            ],
+            "item_count": len(order.items),
+        }
+
+    async def get_product_catalog(
+        self, search: str | None, active_only: bool, limit: int
+    ) -> list[dict]:
+        """Returns products from the catalog with category and pricing."""
+        query = (
+            select(Product)
+            .options(selectinload(Product.category))
+            .where(Product.is_deleted.is_(False))
+        )
+        if search:
+            query = query.where(Product.name.ilike(f"%{search}%"))
+        if active_only:
+            query = query.where(Product.is_active.is_(True))
+        query = query.order_by(Product.name).limit(limit)
+
+        result = await self._db.execute(query)
+        return [
+            {
+                "name": p.name,
+                "category": p.category.name if p.category else None,
+                "base_price": str(p.base_price),
+                "base_cost": str(p.base_cost),
+                "avg_production_days": p.avg_production_days,
+                "is_active": p.is_active,
+            }
+            for p in result.scalars().all()
         ]

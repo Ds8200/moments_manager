@@ -16,6 +16,8 @@ export const TOOL_LABELS: Record<string, string> = {
   get_product_performance: 'מנתח ביצועי מוצרים',
   search_orders:           'מחפש הזמנות',
   get_inactive_customers:  'מזהה לקוחות לא פעילים',
+  get_order_items:         'טוען פרטי הזמנה',
+  get_product_catalog:     'טוען קטלוג מוצרים',
   draft_email:             'מנסח מייל',
 }
 
