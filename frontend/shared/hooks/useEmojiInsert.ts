@@ -41,6 +41,12 @@ export const useEmojiInsert = <T extends FieldValues>(
   }, [])
   const textareaCallbackRef = useCallback((el: HTMLTextAreaElement | null) => {
     textareaRef.current = el
+    // Keep anchorRef in sync when textarea mounts/remounts (e.g. dialog re-open).
+    // body is the initial activeField, so the textarea IS the default anchor.
+    // The useEffect below re-syncs anchorRef on focus changes.
+    if (el !== null) {
+      anchorRef.current = el as HTMLElement
+    }
   }, [])
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [activeField, setActiveField] = useState<'subject' | 'body'>('body')
@@ -50,12 +56,10 @@ export const useEmojiInsert = <T extends FieldValues>(
 
   // Keep anchorRef pointing to whichever field is focused
   useEffect(() => {
-    const next =
+    anchorRef.current =
       activeField === 'subject'
         ? (subjectRef.current as HTMLElement | null)
         : (textareaRef.current as HTMLElement | null)
-    // anchorRef.current is writable via the internal ref object
-    ;(anchorRef as React.MutableRefObject<HTMLElement | null>).current = next
   }, [activeField])
 
   const togglePicker = useCallback(() => setIsPickerOpen((v) => !v), [])
