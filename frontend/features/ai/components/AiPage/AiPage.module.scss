@@ -1,9 +1,18 @@
+@use '../../../../../shared/styles/variables' as v;
+
 .page {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 64px); // subtract header height
+  // Pull out of .main padding, fill exactly the space below the header
+  margin: -#{v.$space-6};
+  height: calc(100dvh - #{v.$header-height});
   overflow: hidden;
   background: #fafafa;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    margin: -#{v.$space-4};
+    height: calc(100dvh - #{v.$header-height});
+  }
 }
 
 .header {
