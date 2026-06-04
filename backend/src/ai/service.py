@@ -154,12 +154,12 @@ class AgentRunner:
         except Exception as exc:
             logger.error(log_messages.AI_API_ERROR, exc)
             error_str = str(exc)
-            if "429" in error_str or "rate_limit" in error_str.lower() or "quota" in error_str.lower():
+            if "insufficient_quota" in error_str.lower() or "billing" in error_str.lower():
+                friendly = "יש בעיה בחשבון OpenAI. בדוק את פרטי התשלום בפלטפורמה."
+            elif "429" in error_str or "rate_limit" in error_str.lower() or "quota" in error_str.lower():
                 friendly = "המכסה של ה-AI מוצתה. נסה שנית בעוד מספר שניות."
             elif "401" in error_str or "invalid_api_key" in error_str.lower() or "authentication" in error_str.lower():
                 friendly = "מפתח ה-API אינו תקין. פנה למנהל המערכת."
-            elif "insufficient_quota" in error_str.lower() or "billing" in error_str.lower():
-                friendly = "יש בעיה בחשבון OpenAI. בדוק את פרטי התשלום בפלטפורמה."
             elif "503" in error_str or "unavailable" in error_str.lower():
                 friendly = "שירות ה-AI אינו זמין כרגע. נסה שנית בעוד מספר דקות."
             else:
