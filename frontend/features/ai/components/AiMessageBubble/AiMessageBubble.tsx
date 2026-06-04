@@ -1,29 +1,24 @@
 import type { ReactElement } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { AiStreamingCursor } from '../AiStreamingCursor/AiStreamingCursor'
-import type { ChatMessage } from '@/features/ai/types'
+import { useAiMessageBubble } from './useAiMessageBubble'
+import type { AiMessageBubbleProps } from './useAiMessageBubble'
 import styles from './AiMessageBubble.module.scss'
 
-export interface AiMessageBubbleProps {
-  message: ChatMessage
-  isLastStreaming: boolean
-}
+export type { AiMessageBubbleProps }
 
-export const AiMessageBubble = ({
-  message,
-  isLastStreaming,
-}: AiMessageBubbleProps): ReactElement => {
-  const isUser = message.role === 'user'
-  const lines = message.content.split('\n')
+export const AiMessageBubble = (props: AiMessageBubbleProps): ReactElement => {
+  const { isUser, content, isLastStreaming } = useAiMessageBubble(props)
 
   return (
     <div className={`${styles.bubble} ${isUser ? styles.user : styles.model}`}>
-      <div className={styles.content}>
-        {lines.map((line, i) => (
-          <span key={i}>
-            {line}
-            {i < lines.length - 1 && <br />}
-          </span>
-        ))}
+      <div className={`${styles.content} ${isUser ? '' : styles.modelContent}`}>
+        {isUser ? (
+          content
+        ) : (
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        )}
         {isLastStreaming && <AiStreamingCursor />}
       </div>
     </div>
