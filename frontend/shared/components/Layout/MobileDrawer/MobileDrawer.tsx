@@ -8,10 +8,8 @@ import { UI_LABELS } from '@/shared/constants/uiLabels'
 import { ROUTES } from '@/shared/constants/routes'
 import styles from './MobileDrawer.module.scss'
 
-const LOGOUT_ICON = '🚪'
-
 export const MobileDrawer = (): ReactElement => {
-  const { isOpen, pathname, visibleNavItems, logoutLabel, onClose, onLogout } = useMobileDrawer()
+  const { isOpen, pathname, visibleNavItems, onClose } = useMobileDrawer()
 
   return (
     <>
@@ -46,10 +44,6 @@ export const MobileDrawer = (): ReactElement => {
             </Link>
           ))}
         </nav>
-        <button type="button" className={styles.logoutBtn} onClick={onLogout}>
-          <span className={styles.navIcon}>{LOGOUT_ICON}</span>
-          <span className={styles.navLabel}>{logoutLabel}</span>
-        </button>
       </aside>
     </>
   )

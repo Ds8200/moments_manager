@@ -3,9 +3,11 @@
 .backdrop {
   display: none;
   position: fixed;
-  inset: 0;
+  top: v.$header-height;
+  inset-inline: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.45);
-  z-index: calc(#{v.$z-sidebar} + 1);
+  z-index: calc(#{v.$z-header} + 1);
   transition: opacity v.$transition-normal;
 
   @media (max-width: #{v.$breakpoint-md - 1}) {
@@ -22,21 +24,20 @@
   }
 }
 
-// In Android RTL browsers, right: 0 resolves to the physical LEFT edge.
-// Using left: 0 places the drawer at the physical RIGHT edge (correct for RTL sidebar).
-// translateX(-100%) slides it off-screen to the right when closed.
+// inset-inline-start: 0 = physical RIGHT in RTL browsers.
+// translateX(100%) slides off-screen to the right (inline-start direction).
 .drawer {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
+  top: v.$header-height;
+  inset-inline-start: 0;
+  height: calc(100vh - #{v.$header-height});
   width: min(280px, 85vw);
   background: v.$bg-sidebar;
-  border-inline-start: 1px solid v.$border-color;
-  z-index: calc(#{v.$z-sidebar} + 2);
+  border-inline-end: 1px solid v.$border-color;
+  z-index: calc(#{v.$z-header} + 2);
   display: flex;
   flex-direction: column;
-  transform: translateX(-100%);
+  transform: translateX(100%);
   transition: transform v.$transition-normal;
   overflow-y: auto;
 
@@ -65,7 +66,7 @@
 .nav {
   display: flex;
   flex-direction: column;
-  padding: v.$space-4 v.$space-3;
+  padding: v.$space-3 v.$space-3;
   gap: v.$space-1;
 }
 
