@@ -9,7 +9,7 @@ export interface EmojiPickerProps {
   triggerRef: RefObject<HTMLButtonElement | null>
   anchorRef: RefObject<HTMLElement | null>
   safeRefs: RefObject<HTMLElement | null>[]
-  openDirection?: 'auto' | 'below' | 'above'
+  openDirectionRef?: RefObject<'below' | 'above'>
 }
 
 export interface UseEmojiPickerReturn {
@@ -25,11 +25,12 @@ export const useEmojiPicker = ({
   triggerRef,
   anchorRef,
   safeRefs,
-  openDirection = 'auto',
-}: Pick<EmojiPickerProps, 'isOpen' | 'onClose' | 'triggerRef' | 'anchorRef' | 'safeRefs' | 'openDirection'>): UseEmojiPickerReturn => {
+  openDirectionRef,
+}: Pick<EmojiPickerProps, 'isOpen' | 'onClose' | 'triggerRef' | 'anchorRef' | 'safeRefs' | 'openDirectionRef'>): UseEmojiPickerReturn => {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Position the panel below the anchor field, centered horizontally on it.
+  // Position the panel relative to the anchor field.
+  // openDirectionRef is read at positioning time (synchronous ref — always current).
   // We apply position via element.style.setProperty to avoid the forbidden JSX style={{}} prop.
   useLayoutEffect(() => {
     if (!isOpen || !containerRef.current) return
@@ -42,14 +43,12 @@ export const useEmojiPicker = ({
     const clampedLeft = Math.max(8, Math.min(rawLeft, window.innerWidth - PANEL_WIDTH - 8))
 
     const spaceBelow = window.innerHeight - rect.bottom
-    // If the anchor sits in the top half of the viewport there is always room
-    // below it — never flip up. Only consider flipping when the anchor is in
-    // the bottom half AND there isn't enough space below.
     const anchorInTopHalf = rect.top < window.innerHeight / 2
+    const dir = openDirectionRef?.current ?? 'auto'
     const top =
-      openDirection === 'below'
+      dir === 'below'
         ? rect.bottom + 8
-        : openDirection === 'above'
+        : dir === 'above'
           ? rect.top - PANEL_HEIGHT - 8
           : anchorInTopHalf || spaceBelow >= PANEL_HEIGHT
             ? rect.bottom + 8
@@ -57,7 +56,7 @@ export const useEmojiPicker = ({
 
     panel.style.setProperty('left', `${clampedLeft}px`)
     panel.style.setProperty('top', `${top}px`)
-  }, [isOpen, anchorRef])
+  }, [isOpen, anchorRef, openDirectionRef])
 
   // Outside-click: close unless the click landed on the trigger button,
   // one of the safe refs (subject input / body textarea), or inside the panel.

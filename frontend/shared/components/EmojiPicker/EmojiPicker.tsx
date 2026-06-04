@@ -18,9 +18,9 @@ export const EmojiPicker = ({
   triggerRef,
   anchorRef,
   safeRefs,
-  openDirection,
+  openDirectionRef,
 }: EmojiPickerProps): JSX.Element => {
-  const { containerRef } = useEmojiPicker({ isOpen, onClose, triggerRef, anchorRef, safeRefs, openDirection })
+  const { containerRef } = useEmojiPicker({ isOpen, onClose, triggerRef, anchorRef, safeRefs, openDirectionRef })
 
   return (
     <>

@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useRef, useState, useCallback } from 'react'
 import type { RefObject } from 'react'
 import type {
   FieldValues,
@@ -21,7 +21,7 @@ export interface UseEmojiInsertReturn {
   onEmojiSelect: (emoji: string) => void
   onSubjectFocus: () => void
   onBodyFocus: () => void
-  emojiPickerOpenDirection: 'below' | 'above'
+  openDirectionRef: RefObject<'below' | 'above'>
 }
 
 export const useEmojiInsert = <T extends FieldValues>(
@@ -34,34 +34,32 @@ export const useEmojiInsert = <T extends FieldValues>(
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const anchorRef = useRef<HTMLElement>(null)
+  const activeFieldRef = useRef<'subject' | 'body'>('body')
+  const openDirectionRef = useRef<'below' | 'above'>('above')
 
-  // Expose setters so callers can register inputs without mutating returned ref
-  // objects directly (which triggers react-hooks/immutability).
   const subjectCallbackRef = useCallback((el: HTMLInputElement | null) => {
     subjectRef.current = el
   }, [])
   const textareaCallbackRef = useCallback((el: HTMLTextAreaElement | null) => {
     textareaRef.current = el
-    // Keep anchorRef in sync when textarea mounts/remounts (e.g. dialog re-open).
-    // body is the initial activeField, so the textarea IS the default anchor.
-    // The useEffect below re-syncs anchorRef on focus changes.
     if (el !== null) {
       anchorRef.current = el as HTMLElement
     }
   }, [])
+
   const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const [activeField, setActiveField] = useState<'subject' | 'body'>('body')
 
-  const onSubjectFocus = useCallback(() => setActiveField('subject'), [])
-  const onBodyFocus = useCallback(() => setActiveField('body'), [])
+  const onSubjectFocus = useCallback(() => {
+    activeFieldRef.current = 'subject'
+    anchorRef.current = subjectRef.current as HTMLElement | null
+    openDirectionRef.current = 'below'
+  }, [])
 
-  // Keep anchorRef pointing to whichever field is focused
-  useEffect(() => {
-    anchorRef.current =
-      activeField === 'subject'
-        ? (subjectRef.current as HTMLElement | null)
-        : (textareaRef.current as HTMLElement | null)
-  }, [activeField])
+  const onBodyFocus = useCallback(() => {
+    activeFieldRef.current = 'body'
+    anchorRef.current = textareaRef.current as HTMLElement | null
+    openDirectionRef.current = 'above'
+  }, [])
 
   const togglePicker = useCallback(() => setIsPickerOpen((v) => !v), [])
   const closePicker = useCallback(() => setIsPickerOpen(false), [])
@@ -70,7 +68,7 @@ export const useEmojiInsert = <T extends FieldValues>(
     (rawEmoji: string) => {
       const emoji = rawEmoji
 
-      if (activeField === 'subject') {
+      if (activeFieldRef.current === 'subject') {
         const el = subjectRef.current
         const current = String(getValues(subjectFieldName) ?? '')
         const start = el?.selectionStart ?? current.length
@@ -109,7 +107,7 @@ export const useEmojiInsert = <T extends FieldValues>(
       }
       // Picker intentionally stays open — user may want to insert multiple emojis.
     },
-    [activeField, subjectFieldName, bodyFieldName, getValues, setValue],
+    [subjectFieldName, bodyFieldName, getValues, setValue],
   )
 
   return {
@@ -125,6 +123,6 @@ export const useEmojiInsert = <T extends FieldValues>(
     onEmojiSelect,
     onSubjectFocus,
     onBodyFocus,
-    emojiPickerOpenDirection: activeField === 'subject' ? 'below' : 'above',
+    openDirectionRef,
   }
 }

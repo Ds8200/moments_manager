@@ -19,7 +19,7 @@ export const EmailDialog = (): ReactElement => {
     mergedBodyRef, bodyInputProps,
     files, removeFile, onFileInputChange, fileError,
     isDragOver, onDragOver, onDragLeave, onDrop,
-    emojiPickerOpenDirection,
+    openDirectionRef,
   } = useEmailDialog()
 
   return (
@@ -71,7 +71,7 @@ export const EmailDialog = (): ReactElement => {
               <ComposeToolbar buttonRef={buttonRef} togglePicker={togglePicker} isPickerOpen={isPickerOpen} onFileInputChange={onFileInputChange} isPending={isPending} />
             </form>
 
-            <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[subjectRef, textareaRef]} openDirection={emojiPickerOpenDirection} />
+            <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[subjectRef, textareaRef]} openDirectionRef={openDirectionRef} />
           </div>
         </div>
       )}
