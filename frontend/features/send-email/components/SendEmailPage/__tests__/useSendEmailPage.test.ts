@@ -7,7 +7,7 @@ import { server } from '@/shared/mocks/server'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { useSendEmailPage } from '../useSendEmailPage'
 import { SEND_EMAIL_LABELS } from '../../../constants/sendEmailLabels'
-import type { Recipient } from '../../../types'
+import type { Customer } from '@/features/customers/types'
 
 const notifySuccess = vi.fn()
 const notifyError = vi.fn()
@@ -22,11 +22,24 @@ function makeWrapper(qc: QueryClient) {
   return TestWrapper
 }
 
-const RECIPIENT: Recipient = {
-  key: 'customer-c1',
-  label: 'דניאל (test@example.com)',
+const CUSTOMER: Customer = {
+  id: 'c1',
+  name: 'דניאל',
+  phone: null,
   email: 'test@example.com',
-  customer_id: 'c1',
+  notes: null,
+  created_at: '2025-01-01T00:00:00Z',
+  updated_at: '2025-01-01T00:00:00Z',
+}
+
+const CUSTOMER_2: Customer = {
+  id: 'c2',
+  name: 'שרה',
+  phone: null,
+  email: 'sara@example.com',
+  notes: null,
+  created_at: '2025-01-01T00:00:00Z',
+  updated_at: '2025-01-01T00:00:00Z',
 }
 
 describe('useSendEmailPage', () => {
@@ -43,17 +56,33 @@ describe('useSendEmailPage', () => {
     expect(result.current.recipients).toHaveLength(0)
   })
 
-  it('onAddRecipient adds recipient to list', () => {
+  it('onToggleRecipient adds customer', () => {
     const { result } = renderHook(() => useSendEmailPage(), { wrapper: makeWrapper(qc) })
-    act(() => { result.current.onAddRecipient(RECIPIENT) })
+    act(() => { result.current.onToggleRecipient(CUSTOMER) })
     expect(result.current.recipients).toHaveLength(1)
+    expect(result.current.recipients[0].customer_id).toBe('c1')
     expect(result.current.recipients[0].email).toBe('test@example.com')
   })
 
-  it('onRemoveRecipient removes by key', () => {
+  it('onToggleRecipient removes customer already in list', () => {
     const { result } = renderHook(() => useSendEmailPage(), { wrapper: makeWrapper(qc) })
-    act(() => { result.current.onAddRecipient(RECIPIENT) })
-    act(() => { result.current.onRemoveRecipient('customer-c1') })
+    act(() => { result.current.onToggleRecipient(CUSTOMER) })
+    act(() => { result.current.onToggleRecipient(CUSTOMER) })
+    expect(result.current.recipients).toHaveLength(0)
+  })
+
+  it('onSelectAllRecipients replaces list with all provided customers', () => {
+    const { result } = renderHook(() => useSendEmailPage(), { wrapper: makeWrapper(qc) })
+    act(() => { result.current.onToggleRecipient(CUSTOMER) })
+    act(() => { result.current.onSelectAllRecipients([CUSTOMER, CUSTOMER_2]) })
+    expect(result.current.recipients).toHaveLength(2)
+    expect(result.current.recipients.map((r) => r.customer_id)).toEqual(['c1', 'c2'])
+  })
+
+  it('onClearAllRecipients empties the list', () => {
+    const { result } = renderHook(() => useSendEmailPage(), { wrapper: makeWrapper(qc) })
+    act(() => { result.current.onSelectAllRecipients([CUSTOMER, CUSTOMER_2]) })
+    act(() => { result.current.onClearAllRecipients() })
     expect(result.current.recipients).toHaveLength(0)
   })
 
@@ -72,7 +101,7 @@ describe('useSendEmailPage', () => {
       )
     )
     const { result } = renderHook(() => useSendEmailPage(), { wrapper: makeWrapper(qc) })
-    act(() => { result.current.onAddRecipient(RECIPIENT) })
+    act(() => { result.current.onToggleRecipient(CUSTOMER) })
 
     await act(async () => {
       result.current.onSubmit({ subject: 'נושא', body: 'גוף' })
@@ -91,7 +120,7 @@ describe('useSendEmailPage', () => {
       )
     )
     const { result } = renderHook(() => useSendEmailPage(), { wrapper: makeWrapper(qc) })
-    act(() => { result.current.onAddRecipient(RECIPIENT) })
+    act(() => { result.current.onToggleRecipient(CUSTOMER) })
 
     await act(async () => {
       result.current.onSubmit({ subject: 'נושא', body: 'גוף' })

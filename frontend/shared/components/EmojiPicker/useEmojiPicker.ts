@@ -40,8 +40,12 @@ export const useEmojiPicker = ({
     const clampedLeft = Math.max(8, Math.min(rawLeft, window.innerWidth - PANEL_WIDTH - 8))
 
     const spaceBelow = window.innerHeight - rect.bottom
+    // If the anchor sits in the top half of the viewport there is always room
+    // below it — never flip up. Only consider flipping when the anchor is in
+    // the bottom half AND there isn't enough space below.
+    const anchorInTopHalf = rect.top < window.innerHeight / 2
     const top =
-      spaceBelow >= PANEL_HEIGHT
+      anchorInTopHalf || spaceBelow >= PANEL_HEIGHT
         ? rect.bottom + 8
         : rect.top - PANEL_HEIGHT - 8
 

@@ -10,7 +10,7 @@ import styles from './SendEmailPage.module.scss'
 
 export const SendEmailPage = (): JSX.Element => {
   const {
-    recipients, onAddRecipient, onRemoveRecipient, onAddAllRecipients, onClearAllRecipients,
+    recipients, onToggleRecipient, onSelectAllRecipients, onClearAllRecipients,
     errors, handleSubmit, recipientsError,
     onSubmit, isPending,
     subjectRef, textareaRef, buttonRef, anchorRef,
@@ -34,7 +34,13 @@ export const SendEmailPage = (): JSX.Element => {
       >
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.fieldRow}>
-            <RecipientInput recipients={recipients} onAdd={onAddRecipient} onRemove={onRemoveRecipient} onAddAll={onAddAllRecipients} onClearAll={onClearAllRecipients} error={recipientsError} />
+            <RecipientInput
+              recipients={recipients}
+              onToggle={onToggleRecipient}
+              onSelectAll={onSelectAllRecipients}
+              onClearAll={onClearAllRecipients}
+              error={recipientsError}
+            />
           </div>
 
           <div className={styles.fieldRow}>

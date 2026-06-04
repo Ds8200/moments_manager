@@ -10,6 +10,7 @@ import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import type { EmailAttachment, Recipient } from '../../types'
 import type { UseEmojiInsertReturn } from '@/shared/hooks/useEmojiInsert'
+import type { Customer } from '@/features/customers/types'
 
 const composeSchema = z.object({
   subject: z.string().min(1, SEND_EMAIL_LABELS.VALIDATION_SUBJECT),
@@ -28,11 +29,17 @@ const fileToBase64 = async (file: File): Promise<string> => {
   return btoa(binary)
 }
 
+const customerToRecipient = (c: Customer): Recipient => ({
+  key: `customer-${c.id}`,
+  label: `${c.name} (${c.email})`,
+  email: c.email!,
+  customer_id: c.id,
+})
+
 export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   recipients: Recipient[]
-  onAddRecipient: (r: Recipient) => void
-  onRemoveRecipient: (key: string) => void
-  onAddAllRecipients: (rs: Recipient[]) => void
+  onToggleRecipient: (customer: Customer) => void
+  onSelectAllRecipients: (customers: Customer[]) => void
   onClearAllRecipients: () => void
   register: ReturnType<typeof useForm<ComposeFormValues>>['register']
   errors: ReturnType<typeof useForm<ComposeFormValues>>['formState']['errors']
@@ -97,21 +104,17 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     [emojiInsert.textareaCallbackRef, rhfBodyRef],
   )
 
-  const onAddRecipient = useCallback((r: Recipient) => {
-    setRecipients((prev) => [...prev, r])
+  const onToggleRecipient = useCallback((customer: Customer) => {
+    setRecipients((prev) => {
+      const exists = prev.some((r) => r.customer_id === customer.id)
+      if (exists) return prev.filter((r) => r.customer_id !== customer.id)
+      return [...prev, customerToRecipient(customer)]
+    })
     setRecipientsError(undefined)
   }, [])
 
-  const onRemoveRecipient = useCallback((key: string) => {
-    setRecipients((prev) => prev.filter((r) => r.key !== key))
-  }, [])
-
-  const onAddAllRecipients = useCallback((rs: Recipient[]) => {
-    setRecipients((prev) => {
-      const existingKeys = new Set(prev.map((r) => r.key))
-      const newOnes = rs.filter((r) => !existingKeys.has(r.key))
-      return [...prev, ...newOnes]
-    })
+  const onSelectAllRecipients = useCallback((customers: Customer[]) => {
+    setRecipients(customers.map(customerToRecipient))
     setRecipientsError(undefined)
   }, [])
 
@@ -174,12 +177,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
       return
     }
     setFileError(undefined)
-    const customer_ids = recipients
-      .filter((r) => r.customer_id !== undefined)
-      .map((r) => r.customer_id!)
-    const manual_emails = recipients
-      .filter((r) => r.customer_id === undefined)
-      .map((r) => r.email)
+    const customer_ids = recipients.map((r) => r.customer_id!)
 
     const attachments: EmailAttachment[] = await Promise.all(
       files.map(async (file) => ({
@@ -189,7 +187,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     )
 
     compose.mutate(
-      { customer_ids, manual_emails, subject: values.subject, body: values.body, attachments },
+      { customer_ids, manual_emails: [], subject: values.subject, body: values.body, attachments },
       {
         onSuccess: () => {
           reset()
@@ -205,9 +203,8 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
 
   return {
     recipients,
-    onAddRecipient,
-    onRemoveRecipient,
-    onAddAllRecipients,
+    onToggleRecipient,
+    onSelectAllRecipients,
     onClearAllRecipients,
     register,
     errors,
