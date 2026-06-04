@@ -16,7 +16,7 @@ export const SendEmailPage = (): JSX.Element => {
     onSubmit, isPending,
     subjectRef, textareaRef, buttonRef, anchorRef,
     isPickerOpen, togglePicker, closePicker, onEmojiSelect,
-    onSubjectFocus, onBodyFocus,
+    onSubjectFocus, onBodyFocus, openDirectionRef,
     mergedSubjectRef, subjectRest,
     mergedBodyRef, bodyRest,
     files, removeFile, onFileInputChange, fileError,
@@ -76,7 +76,7 @@ export const SendEmailPage = (): JSX.Element => {
           <ComposeToolbar buttonRef={buttonRef} togglePicker={togglePicker} isPickerOpen={isPickerOpen} onFileInputChange={onFileInputChange} isPending={isPending} />
         </form>
 
-        <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[subjectRef, textareaRef]} />
+        <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[subjectRef, textareaRef]} openDirectionRef={openDirectionRef} />
       </div>
     </div>
   )

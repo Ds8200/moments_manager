@@ -42,7 +42,7 @@ export const useEmojiInsert = <T extends FieldValues>(
   }, [])
   const textareaCallbackRef = useCallback((el: HTMLTextAreaElement | null) => {
     textareaRef.current = el
-    if (el !== null) {
+    if (el !== null && activeFieldRef.current === 'body') {
       anchorRef.current = el as HTMLElement
     }
   }, [])
