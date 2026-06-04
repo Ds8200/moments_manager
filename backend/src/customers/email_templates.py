@@ -11,6 +11,7 @@ def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[s
     safe_subject = _html.escape(subject)
     safe_name = _html.escape(customer_name)
     greeting = f"<p dir=\"auto\">שלום {safe_name},</p>" if safe_name else ""
+    farewell = "<p dir=\"auto\">בברכה,<br>Moments</p>"
     body_html = bidi_paragraphs(body)
 
     html_body = f"""<!DOCTYPE html>
@@ -90,6 +91,7 @@ def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[s
       <h2 dir="auto">{safe_subject}</h2>
       {greeting}
       {body_html}
+      {farewell}
     </div>
     <div class="footer">
       <p>Moments — מערכת ניהול הזמנות ולקוחות</p>

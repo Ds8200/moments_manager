@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, HttpResponse } from 'msw'
 import { server } from '@/shared/mocks/server'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
+import { ROUTES } from '@/shared/constants/routes'
 import { useSendEmailPage } from '../useSendEmailPage'
 import { SEND_EMAIL_LABELS } from '../../../constants/sendEmailLabels'
 import type { Customer } from '@/features/customers/types'
@@ -13,6 +14,13 @@ const notifySuccess = vi.fn()
 const notifyError = vi.fn()
 vi.mock('@/shared/hooks/useNotify', () => ({
   useNotify: () => ({ success: notifySuccess, error: notifyError, info: vi.fn(), warning: vi.fn() }),
+}))
+
+const mockGetParam = vi.fn().mockReturnValue(null)
+const mockRouterPush = vi.fn()
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => ({ get: mockGetParam }),
+  useRouter: () => ({ push: mockRouterPush }),
 }))
 
 function makeWrapper(qc: QueryClient) {
@@ -49,6 +57,8 @@ describe('useSendEmailPage', () => {
     qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     notifySuccess.mockClear()
     notifyError.mockClear()
+    mockGetParam.mockReturnValue(null)
+    mockRouterPush.mockClear()
   })
 
   it('starts with empty recipients', () => {
@@ -128,6 +138,39 @@ describe('useSendEmailPage', () => {
 
     await vi.waitFor(() => {
       expect(notifyError).toHaveBeenCalled()
+    })
+  })
+
+  it('pre-populates recipient when customerId is in URL', async () => {
+    mockGetParam.mockReturnValue('c1')
+    server.use(
+      http.get(API_ENDPOINTS.CUSTOMER('c1'), () => HttpResponse.json(CUSTOMER))
+    )
+    const { result } = renderHook(() => useSendEmailPage(), { wrapper: makeWrapper(qc) })
+    await vi.waitFor(() => {
+      expect(result.current.recipients).toHaveLength(1)
+      expect(result.current.recipients[0].customer_id).toBe('c1')
+    })
+  })
+
+  it('navigates to customers page after successful send when customerId is in URL', async () => {
+    mockGetParam.mockReturnValue('c1')
+    server.use(
+      http.get(API_ENDPOINTS.CUSTOMER('c1'), () => HttpResponse.json(CUSTOMER)),
+      http.post(API_ENDPOINTS.COMPOSE_EMAIL, () =>
+        HttpResponse.json({ message: 'Emails queued', sent_to: 1 })
+      )
+    )
+    const { result } = renderHook(() => useSendEmailPage(), { wrapper: makeWrapper(qc) })
+
+    await vi.waitFor(() => expect(result.current.recipients).toHaveLength(1))
+
+    await act(async () => {
+      result.current.onSubmit({ subject: 'נושא', body: 'גוף' })
+    })
+
+    await vi.waitFor(() => {
+      expect(mockRouterPush).toHaveBeenCalledWith(ROUTES.CUSTOMERS)
     })
   })
 })

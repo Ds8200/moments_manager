@@ -13,9 +13,7 @@ import type {
   Customer,
   CustomerDetail,
   CustomerFormValues,
-  CustomerSendEmailPayload,
   CustomersResponse,
-  EmailSentResponse,
 } from '../types'
 
 export const useCustomers = (
@@ -84,19 +82,5 @@ export const useDeleteCustomer = (): UseMutationResult<void, Error, string> => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
       notify.success(CUSTOMERS_LABELS.DELETED_SUCCESS)
     },
-  })
-}
-
-export const useSendCustomerEmail = (): UseMutationResult<
-  EmailSentResponse,
-  Error,
-  { id: string; payload: CustomerSendEmailPayload }
-> => {
-  const notify = useNotify()
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: CustomerSendEmailPayload }) =>
-      customersApi.sendEmail(id, payload),
-    onSuccess: () => notify.success(CUSTOMERS_LABELS.EMAIL_SENT_SUCCESS),
-    onError: () => notify.error(CUSTOMERS_LABELS.EMAIL_SEND_ERROR),
   })
 }

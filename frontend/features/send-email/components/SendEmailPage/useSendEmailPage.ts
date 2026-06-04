@@ -1,5 +1,6 @@
 'use client'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,6 +9,8 @@ import { useComposeEmail } from '../../queries/useSendEmail'
 import { useEmojiInsert } from '@/shared/hooks/useEmojiInsert'
 import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { ROUTES } from '@/shared/constants/routes'
+import { useCustomer } from '@/features/customers/queries/useCustomers'
 import type { EmailAttachment, Recipient } from '../../types'
 import type { UseEmojiInsertReturn } from '@/shared/hooks/useEmojiInsert'
 import type { Customer } from '@/features/customers/types'
@@ -70,6 +73,19 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
   const [files, setFiles] = useState<File[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
   const [fileError, setFileError] = useState<string | undefined>()
+
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const preselectedId = searchParams.get('customerId')
+  const { data: preselectedCustomer } = useCustomer(preselectedId)
+  const preselectedAddedRef = useRef(false)
+
+  useEffect(() => {
+    if (preselectedCustomer && !preselectedAddedRef.current) {
+      preselectedAddedRef.current = true
+      setRecipients([customerToRecipient(preselectedCustomer)])
+    }
+  }, [preselectedCustomer])
 
   const compose = useComposeEmail()
 
@@ -215,12 +231,16 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
       { customer_ids, manual_emails, subject: values.subject, body: values.body, attachments },
       {
         onSuccess: () => {
-          reset()
-          setRecipients([])
-          setFiles([])
-          setRecipientsError(undefined)
-          setFileError(undefined)
-          emojiInsert.closePicker()
+          if (preselectedId !== null) {
+            router.push(ROUTES.CUSTOMERS)
+          } else {
+            reset()
+            setRecipients([])
+            setFiles([])
+            setRecipientsError(undefined)
+            setFileError(undefined)
+            emojiInsert.closePicker()
+          }
         },
       },
     )

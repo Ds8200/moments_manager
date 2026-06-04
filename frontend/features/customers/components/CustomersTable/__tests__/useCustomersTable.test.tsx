@@ -7,12 +7,16 @@ import { server } from '@/shared/mocks/server'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { useCustomersTable } from '../useCustomersTable'
-import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom, emailingCustomerIdAtom } from '../../../store/customersAtoms'
+import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../../constants/customersLabels'
+import { ROUTES } from '@/shared/constants/routes'
 import type { ConfirmDialogOptions } from '@/shared/store/globalAtoms'
 
 const confirmFn = vi.fn()
 vi.mock('@/shared/hooks/useConfirm', () => ({ useConfirm: () => confirmFn }))
+
+const pushFn = vi.fn()
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: pushFn }) }))
 
 function makeWrapper(store: ReturnType<typeof createStore>, qc: QueryClient) {
   function TestWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
@@ -58,6 +62,7 @@ describe('useCustomersTable', () => {
     store = createStore()
     qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     confirmFn.mockClear()
+    pushFn.mockClear()
   })
 
   it('returns empty customers by default', () => {
@@ -135,7 +140,7 @@ describe('useCustomersTable', () => {
     expect(confirmFn).toHaveBeenCalled()
   })
 
-  it('email menu item sets emailingCustomerIdAtom', () => {
+  it('email menu item navigates to send-email with customerId', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
 
     act(() => {
@@ -145,7 +150,7 @@ describe('useCustomersTable', () => {
     const emailItem = result.current.menuState.items[0]
     act(() => { emailItem.onClick() })
 
-    expect(store.get(emailingCustomerIdAtom)).toBe('c1')
+    expect(pushFn).toHaveBeenCalledWith(ROUTES.SEND_EMAIL + '?customerId=c1')
   })
 
   it('email menu item is absent for customer with no email', () => {
@@ -157,7 +162,6 @@ describe('useCustomersTable', () => {
 
     // customer with no email → only edit + delete (2 items, not 3)
     expect(result.current.menuState.items).toHaveLength(2)
-    expect(store.get(emailingCustomerIdAtom)).toBeNull()
   })
 
   it('closeMenu closes the menu', () => {

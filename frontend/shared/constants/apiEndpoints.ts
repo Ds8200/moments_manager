@@ -37,7 +37,6 @@ export const API_ENDPOINTS = {
   REPORTS_EXPORT_EXCEL:  `${BASE}/api/v1/reports/export/excel`,
   REPORTS_EXPORT_PDF:    `${BASE}/api/v1/reports/export/pdf`,
 
-  CUSTOMER_SEND_EMAIL: (id: string) => `${BASE}/api/v1/customers/${id}/send-email`,
   COMPOSE_EMAIL: `${BASE}/api/v1/customers/compose-email`,
 
   USERS: `${BASE}/api/v1/users`,

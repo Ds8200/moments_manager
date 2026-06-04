@@ -1,14 +1,15 @@
 'use client'
 import { type MouseEvent } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
+import { useRouter } from 'next/navigation'
 import { useCustomers, useDeleteCustomer } from '../../queries/useCustomers'
-import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom, emailingCustomerIdAtom } from '../../store/customersAtoms'
+import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
+import { ROUTES, ROUTE_ICONS } from '@/shared/constants/routes'
 import { useConfirm } from '@/shared/hooks/useConfirm'
 import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
-import { ROUTE_ICONS } from '@/shared/constants/routes'
 import type { Customer } from '../../types'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
@@ -32,7 +33,7 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
   const setFilters = useSetAtom(customerFiltersAtom)
   const setFormOpen = useSetAtom(isCustomerFormOpenAtom)
   const setEditingId = useSetAtom(editingCustomerIdAtom)
-  const setEmailingId = useSetAtom(emailingCustomerIdAtom)
+  const router = useRouter()
   const deleteCustomer = useDeleteCustomer()
   const confirm = useConfirm()
   const { menuState, openMenu, closeMenu } = useDropdownMenu()
@@ -52,7 +53,9 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
     })
   }
 
-  const onEmail = (id: string): void => setEmailingId(id)
+  const onEmail = (id: string): void => {
+    router.push(ROUTES.SEND_EMAIL + '?customerId=' + id)
+  }
 
   const onRowClick = (customer: Customer, e: MouseEvent<Element>): void => {
     openMenu(customer.name, [
