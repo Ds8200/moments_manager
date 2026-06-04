@@ -4,14 +4,18 @@ Each tool is an async function registered with tool_registry.
 Adding a new tool: decorate with @tool_registry.register(...) — no other files change.
 """
 import logging
-from datetime import date
+from datetime import date, datetime, timezone
 from decimal import Decimal
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.ai.tool_registry import tool_registry
 from src.customers.email_templates import build_customer_email
+from src.expense_categories.models import ExpenseCategory
+from src.expenses.models import Expense
+from src.orders.enums import OrderStatus
 from src.orders.models import Order
 from src.reports.service import ReportService
 
@@ -248,6 +252,252 @@ async def get_orders_summary(
             "date_from": date_from,
             "date_to": date_to,
         },
+    }
+
+
+# ── Recent Orders ─────────────────────────────────────────────────────────────
+
+@tool_registry.register(
+    name="get_recent_orders",
+    description=(
+        "Returns the most recent orders with details: order number, customer name, "
+        "amount, status, urgency, and due date. Use to understand current workload, "
+        "identify patterns, or answer questions about specific recent orders."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "limit": {
+                "type": "integer",
+                "description": "How many recent orders to return (1–20). Defaults to 10.",
+            },
+            "status": {
+                "type": "string",
+                "description": (
+                    "Optional status filter: new, waiting_approval, approved, "
+                    "printing, ready, completed, cancelled."
+                ),
+            },
+        },
+    },
+)
+async def get_recent_orders(
+    db: AsyncSession,
+    limit: int = 10,
+    status: str | None = None,
+    **_: object,
+) -> dict:
+    capped = min(max(limit, 1), 20)
+    filters = [Order.is_deleted.is_(False)]
+    if status:
+        filters.append(Order.status == status)
+
+    result = await db.execute(
+        select(Order)
+        .options(selectinload(Order.customer))
+        .where(and_(*filters))
+        .order_by(Order.created_at.desc())
+        .limit(capped)
+    )
+    orders = list(result.scalars().all())
+    return {
+        "orders": [
+            {
+                "order_number": o.order_number,
+                "customer": o.customer.name if o.customer else "לקוח לא ידוע",
+                "total_amount": str(o.total_amount),
+                "status": o.status,
+                "urgency": o.urgency,
+                "date": str(o.date),
+                "due_datetime": str(o.due_datetime) if o.due_datetime else None,
+                "is_paid": o.is_paid,
+            }
+            for o in orders
+        ],
+        "count": len(orders),
+    }
+
+
+# ── Overdue Orders ─────────────────────────────────────────────────────────────
+
+@tool_registry.register(
+    name="get_overdue_orders",
+    description=(
+        "Returns orders that are past their due date and have not been completed or cancelled. "
+        "Use to identify delayed orders, follow up with customers, or assess operational risk."
+    ),
+    parameters={"type": "object", "properties": {}},
+)
+async def get_overdue_orders(db: AsyncSession, **_: object) -> dict:
+    now = datetime.now(timezone.utc)
+    active_statuses = [
+        OrderStatus.new.value,
+        OrderStatus.waiting_approval.value,
+        OrderStatus.approved.value,
+        OrderStatus.printing.value,
+        OrderStatus.ready.value,
+    ]
+    result = await db.execute(
+        select(Order)
+        .options(selectinload(Order.customer))
+        .where(
+            and_(
+                Order.is_deleted.is_(False),
+                Order.due_datetime < now,
+                Order.status.in_(active_statuses),
+            )
+        )
+        .order_by(Order.due_datetime.asc())
+    )
+    orders = list(result.scalars().all())
+    return {
+        "overdue_orders": [
+            {
+                "order_number": o.order_number,
+                "customer": o.customer.name if o.customer else "לקוח לא ידוע",
+                "status": o.status,
+                "due_datetime": str(o.due_datetime),
+                "total_amount": str(o.total_amount),
+                "is_paid": o.is_paid,
+            }
+            for o in orders
+        ],
+        "count": len(orders),
+    }
+
+
+# ── Monthly Comparison ─────────────────────────────────────────────────────────
+
+@tool_registry.register(
+    name="get_monthly_comparison",
+    description=(
+        "Compares the current month to the previous month: revenue, expenses, "
+        "profit, order count, and collection rate. Use for trend analysis, "
+        "'is the business improving?' questions, and strategic advice."
+    ),
+    parameters={"type": "object", "properties": {}},
+)
+async def get_monthly_comparison(db: AsyncSession, **_: object) -> dict:
+    today = date.today()
+    svc = ReportService(db)
+
+    current = await svc.get_monthly_report(today.year, today.month)
+    prev_month = today.month - 1 if today.month > 1 else 12
+    prev_year = today.year if today.month > 1 else today.year - 1
+    previous = await svc.get_monthly_report(prev_year, prev_month)
+
+    def diff(curr: Decimal, prev: Decimal) -> str:
+        d = curr - prev
+        sign = "+" if d >= 0 else ""
+        return f"{sign}{d}"
+
+    return {
+        "current_month": {"year": current.year, "month": current.month},
+        "previous_month": {"year": previous.year, "month": previous.month},
+        "revenue": {
+            "current": str(current.total_revenue),
+            "previous": str(previous.total_revenue),
+            "change": diff(current.total_revenue, previous.total_revenue),
+        },
+        "expenses": {
+            "current": str(current.total_expenses),
+            "previous": str(previous.total_expenses),
+            "change": diff(current.total_expenses, previous.total_expenses),
+        },
+        "net_profit": {
+            "current": str(current.net_profit),
+            "previous": str(previous.net_profit),
+            "change": diff(current.net_profit, previous.net_profit),
+        },
+        "orders": {
+            "current_total": current.total_count,
+            "previous_total": previous.total_count,
+            "current_paid": current.paid_count,
+            "previous_paid": previous.paid_count,
+        },
+        "collection_rate": {
+            "current": current.collection_rate,
+            "previous": previous.collection_rate,
+        },
+    }
+
+
+# ── Expense Breakdown ──────────────────────────────────────────────────────────
+
+@tool_registry.register(
+    name="get_expense_breakdown",
+    description=(
+        "Returns expenses grouped by category for a given month. "
+        "Use to identify which cost areas are highest, give specific cost-cutting advice, "
+        "or understand where the business is spending money."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "year": {
+                "type": "integer",
+                "description": "Year (e.g. 2025). Defaults to current year.",
+            },
+            "month": {
+                "type": "integer",
+                "description": "Month 1–12. Defaults to current month.",
+            },
+        },
+    },
+)
+async def get_expense_breakdown(
+    db: AsyncSession,
+    year: int | None = None,
+    month: int | None = None,
+    **_: object,
+) -> dict:
+    today = date.today()
+    y = year if year is not None else today.year
+    m = month if month is not None else today.month
+    first_day = date(y, m, 1)
+    last_month = m % 12 + 1
+    last_year = y if m < 12 else y + 1
+    last_day = date(last_year, last_month, 1)
+
+    result = await db.execute(
+        select(
+            ExpenseCategory.name,
+            func.coalesce(func.sum(Expense.amount), Decimal("0")).label("total"),
+        )
+        .outerjoin(Expense, and_(
+            Expense.category_id == ExpenseCategory.id,
+            Expense.is_deleted.is_(False),
+            Expense.date >= first_day,
+            Expense.date < last_day,
+        ))
+        .group_by(ExpenseCategory.name)
+        .order_by(func.sum(Expense.amount).desc().nullslast())
+    )
+    rows = result.all()
+
+    # Also count uncategorised expenses
+    uncat_result = await db.execute(
+        select(func.coalesce(func.sum(Expense.amount), Decimal("0")))
+        .where(
+            and_(
+                Expense.is_deleted.is_(False),
+                Expense.category_id.is_(None),
+                Expense.date >= first_day,
+                Expense.date < last_day,
+            )
+        )
+    )
+    uncategorised = uncat_result.scalar_one()
+
+    categories = [{"category": row[0], "total": str(row[1])} for row in rows]
+    if uncategorised > 0:
+        categories.append({"category": "ללא קטגוריה", "total": str(uncategorised)})
+
+    return {
+        "year": y,
+        "month": m,
+        "breakdown": categories,
+        "total": str(sum(Decimal(c["total"]) for c in categories)),
     }
 
 

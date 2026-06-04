@@ -23,7 +23,7 @@ from src.core.constants import log_messages
 
 logger = logging.getLogger(__name__)
 
-_CACHED_PROMPT: str | None = None  # reset on each server restart / deploy
+_CACHED_PROMPT: str | None = None
 
 
 def load_system_prompt() -> str:
