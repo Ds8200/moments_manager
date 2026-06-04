@@ -56,7 +56,7 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
 
   const onRowClick = (customer: Customer, e: MouseEvent<Element>): void => {
     openMenu(customer.name, [
-      { label: UI_LABELS.EMAIL_ACTION, icon: ROUTE_ICONS.EMAIL, onClick: () => onEmail(customer.id) },
+      ...(customer.email ? [{ label: UI_LABELS.EMAIL_ACTION, icon: ROUTE_ICONS.EMAIL, onClick: () => onEmail(customer.id) }] : []),
       { label: CUSTOMERS_LABELS.TABLE_EDIT_TITLE, icon: UI_SYMBOLS.EDIT, onClick: () => onEdit(customer.id) },
       { label: CUSTOMERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(customer.id, customer.name), variant: 'danger' },
     ], e)

@@ -35,6 +35,16 @@ const CUSTOMER_ROW = {
   updated_at: '2025-01-01T00:00:00Z',
 }
 
+const CUSTOMER_NO_EMAIL = {
+  id: 'c2',
+  name: 'ללא מייל',
+  phone: null,
+  email: null,
+  notes: null,
+  created_at: '2025-01-01T00:00:00Z',
+  updated_at: '2025-01-01T00:00:00Z',
+}
+
 function makeMockEvent() {
   const el = document.createElement('tr')
   return { currentTarget: el } as unknown as React.MouseEvent<Element>
@@ -136,6 +146,18 @@ describe('useCustomersTable', () => {
     act(() => { emailItem.onClick() })
 
     expect(store.get(emailingCustomerIdAtom)).toBe('c1')
+  })
+
+  it('email menu item is absent for customer with no email', () => {
+    const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
+
+    act(() => {
+      result.current.onRowClick(CUSTOMER_NO_EMAIL, makeMockEvent())
+    })
+
+    // customer with no email → only edit + delete (2 items, not 3)
+    expect(result.current.menuState.items).toHaveLength(2)
+    expect(store.get(emailingCustomerIdAtom)).toBeNull()
   })
 
   it('closeMenu closes the menu', () => {
