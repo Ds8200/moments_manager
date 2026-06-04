@@ -4,16 +4,13 @@ import re
 from collections.abc import AsyncGenerator
 from pathlib import Path
 
-# Matches embedded function-call syntax that some models accidentally output in text
-_FUNCTION_CALL_RE = re.compile(r"<function=\w+>.*?</function>", re.DOTALL)
-
-from groq import AsyncGroq
+from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.ai.constants import (
     BUSINESS_ADVISOR_PROMPT,
-    GROQ_MODEL,
     MAX_TOOL_ROUNDS,
+    OPENAI_MODEL,
     PROMPTS_DIR,
 )
 from src.ai.schemas import ChatMessageSchema, SSEEventSchema
@@ -23,12 +20,13 @@ from src.core.constants import log_messages
 
 logger = logging.getLogger(__name__)
 
+# Matches embedded function-call syntax that some models accidentally output in text
+_FUNCTION_CALL_RE = re.compile(r"<function=\w+>.*?</function>", re.DOTALL)
+
 _CACHED_PROMPT: str | None = None
 
 
 def load_system_prompt() -> str:
-    # Re-reads the file on every server restart (module reload).
-    # To hot-reload in dev: restart the uvicorn process.
     global _CACHED_PROMPT  # noqa: PLW0603 — intentional module-level cache
     if _CACHED_PROMPT is None:
         prompt_path = (
@@ -39,7 +37,6 @@ def load_system_prompt() -> str:
 
 
 def _build_tools(registry: ToolRegistry) -> list[dict]:
-    """Return tool definitions in OpenAI/Groq function-calling format."""
     return [
         {
             "type": "function",
@@ -73,7 +70,7 @@ class AgentRunner:
         messages: list[ChatMessageSchema],
         system_prompt: str,
     ) -> AsyncGenerator[SSEEventSchema, None]:
-        client = AsyncGroq(api_key=settings.GROQ_API_KEY)
+        client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
         tools = _build_tools(self._registry)
         conversation = _build_messages(system_prompt, messages)
 
@@ -84,28 +81,30 @@ class AgentRunner:
         try:
             while tool_rounds < MAX_TOOL_ROUNDS:
                 response = await client.chat.completions.create(
-                    model=GROQ_MODEL,
+                    model=OPENAI_MODEL,
                     messages=conversation,  # type: ignore[arg-type]
                     tools=tools,  # type: ignore[arg-type]
                     tool_choice="auto",
-                    parallel_tool_calls=True,  # call multiple tools in one API request
+                    parallel_tool_calls=True,
                 )
                 choice = response.choices[0]
 
                 if choice.finish_reason == "tool_calls" and choice.message.tool_calls:
-                    # Append assistant turn (with tool calls) to history
-                    assistant_msg: dict = {"role": "assistant", "content": choice.message.content}
-                    assistant_msg["tool_calls"] = [
-                        {
-                            "id": tc.id,
-                            "type": tc.type,
-                            "function": {
-                                "name": tc.function.name,
-                                "arguments": tc.function.arguments,
-                            },
-                        }
-                        for tc in choice.message.tool_calls
-                    ]
+                    assistant_msg: dict = {
+                        "role": "assistant",
+                        "content": choice.message.content,
+                        "tool_calls": [
+                            {
+                                "id": tc.id,
+                                "type": tc.type,
+                                "function": {
+                                    "name": tc.function.name,
+                                    "arguments": tc.function.arguments,
+                                },
+                            }
+                            for tc in choice.message.tool_calls
+                        ],
+                    }
                     conversation.append(assistant_msg)
 
                     for tool_call in choice.message.tool_calls:
@@ -140,7 +139,9 @@ class AgentRunner:
                     tool_rounds += 1
 
                 else:
-                    text = _FUNCTION_CALL_RE.sub("", choice.message.content or "").strip()
+                    text = _FUNCTION_CALL_RE.sub(
+                        "", choice.message.content or ""
+                    ).strip()
                     for token in _tokenize(text):
                         yield SSEEventSchema(type="token", content=token)
 
@@ -153,10 +154,12 @@ class AgentRunner:
         except Exception as exc:
             logger.error(log_messages.AI_API_ERROR, exc)
             error_str = str(exc)
-            if "429" in error_str or "rate_limit" in error_str.lower():
-                friendly = "המכסה החינמית של ה-AI מוצתה. נסה שנית בעוד מספר דקות."
-            elif "401" in error_str or "invalid_api_key" in error_str.lower():
+            if "429" in error_str or "rate_limit" in error_str.lower() or "quota" in error_str.lower():
+                friendly = "המכסה של ה-AI מוצתה. נסה שנית בעוד מספר שניות."
+            elif "401" in error_str or "invalid_api_key" in error_str.lower() or "authentication" in error_str.lower():
                 friendly = "מפתח ה-API אינו תקין. פנה למנהל המערכת."
+            elif "insufficient_quota" in error_str.lower() or "billing" in error_str.lower():
+                friendly = "יש בעיה בחשבון OpenAI. בדוק את פרטי התשלום בפלטפורמה."
             elif "503" in error_str or "unavailable" in error_str.lower():
                 friendly = "שירות ה-AI אינו זמין כרגע. נסה שנית בעוד מספר דקות."
             else:

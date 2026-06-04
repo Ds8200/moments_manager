@@ -1,4 +1,5 @@
-"""Unit tests for AgentRunner — mocks the Groq SDK."""
+"""Unit tests for AgentRunner — mocks the OpenAI SDK."""
+import json
 from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -45,7 +46,6 @@ def _make_text_choice(text: str) -> MagicMock:
 
 
 def _make_tool_call_choice(tool_name: str, args: dict) -> MagicMock:
-    import json
     func = MagicMock()
     func.name = tool_name
     func.arguments = json.dumps(args)
@@ -68,16 +68,16 @@ async def _collect(gen: AsyncGenerator[SSEEventSchema, None]) -> list[SSEEventSc
     return [event async for event in gen]
 
 
-def _patch_groq(side_effect):
+def _patch_openai(side_effect):
     client_mock = MagicMock()
     client_mock.chat.completions.create = AsyncMock(side_effect=side_effect)
-    return patch("src.ai.service.AsyncGroq", return_value=client_mock)
+    return patch("src.ai.service.AsyncOpenAI", return_value=client_mock)
 
 
 # ── Text-only turn ─────────────────────────────────────────────────────────────
 
 async def test_text_only_response(registry, messages) -> None:
-    with _patch_groq([_make_text_choice("שלום!")]):
+    with _patch_openai([_make_text_choice("שלום!")]):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
@@ -89,7 +89,7 @@ async def test_text_only_response(registry, messages) -> None:
 # ── Tool call then text ────────────────────────────────────────────────────────
 
 async def test_tool_call_then_text(registry, messages) -> None:
-    with _patch_groq([
+    with _patch_openai([
         _make_tool_call_choice("echo", {"value": "test"}),
         _make_text_choice("The echo says test"),
     ]):
@@ -123,7 +123,7 @@ async def test_tool_error_continues_stream(messages) -> None:
         parameters={"type": "object", "properties": {}},
     )(failing_tool)
 
-    with _patch_groq([
+    with _patch_openai([
         _make_tool_call_choice("fail", {}),
         _make_text_choice("Despite the error, here is the answer"),
     ]):
@@ -136,10 +136,10 @@ async def test_tool_error_continues_stream(messages) -> None:
     assert events[-1].type == "done"
 
 
-# ── Groq API error ─────────────────────────────────────────────────────────────
+# ── OpenAI API error ───────────────────────────────────────────────────────────
 
 async def test_api_error_yields_error_event(registry, messages) -> None:
-    with _patch_groq(Exception("API quota exceeded")):
+    with _patch_openai(Exception("API error")):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
@@ -150,7 +150,7 @@ async def test_api_error_yields_error_event(registry, messages) -> None:
 # ── Friendly error messages ────────────────────────────────────────────────────
 
 async def test_rate_limit_shows_friendly_message(registry, messages) -> None:
-    with _patch_groq(Exception("429 rate_limit_exceeded")):
+    with _patch_openai(Exception("429 rate_limit_exceeded")):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
@@ -159,12 +159,21 @@ async def test_rate_limit_shows_friendly_message(registry, messages) -> None:
 
 
 async def test_invalid_key_shows_friendly_message(registry, messages) -> None:
-    with _patch_groq(Exception("401 invalid_api_key")):
+    with _patch_openai(Exception("401 invalid_api_key")):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     assert events[0].type == "error"
     assert "מפתח" in events[0].error
+
+
+async def test_billing_error_shows_friendly_message(registry, messages) -> None:
+    with _patch_openai(Exception("insufficient_quota exceeded billing")):
+        runner = AgentRunner(db=None, registry=registry)
+        events = await _collect(runner.run_stream(messages, "sys"))
+
+    assert events[0].type == "error"
+    assert "OpenAI" in events[0].error
 
 
 # ── Max tool rounds ────────────────────────────────────────────────────────────
@@ -173,10 +182,9 @@ async def test_max_tool_rounds_terminates(registry, messages) -> None:
     tool_response = _make_tool_call_choice("echo", {"value": "loop"})
 
     client_mock = MagicMock()
-    # return_value (not side_effect) so every call returns the same mock response
     client_mock.chat.completions.create = AsyncMock(return_value=tool_response)
 
-    with patch("src.ai.service.AsyncGroq", return_value=client_mock):
+    with patch("src.ai.service.AsyncOpenAI", return_value=client_mock):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 

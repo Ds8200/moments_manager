@@ -10,6 +10,5 @@ export const useHomeRevenue = (): UseQueryResult<FinancialReport> => {
   return useQuery<FinancialReport>({
     queryKey: ['home', 'revenue', year],
     queryFn: () => reportsApi.financial(year),
-    staleTime: 5 * 60 * 1000,
   })
 }
