@@ -170,7 +170,13 @@ async def test_invalid_key_shows_friendly_message(registry, messages) -> None:
 # ── Max tool rounds ────────────────────────────────────────────────────────────
 
 async def test_max_tool_rounds_terminates(registry, messages) -> None:
-    with _patch_groq(_make_tool_call_choice("echo", {"value": "loop"})):
+    tool_response = _make_tool_call_choice("echo", {"value": "loop"})
+
+    client_mock = MagicMock()
+    # return_value (not side_effect) so every call returns the same mock response
+    client_mock.chat.completions.create = AsyncMock(return_value=tool_response)
+
+    with patch("src.ai.service.AsyncGroq", return_value=client_mock):
         runner = AgentRunner(db=None, registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
