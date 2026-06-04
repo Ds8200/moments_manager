@@ -38,7 +38,8 @@
       "Bash(docker compose *)",
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8000/api/v1/auth/login\" -Method POST -ContentType \"application/json\" -Body '{\"email\":\"admin@moments.local\",\"password\":\"changeme123\"}')",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/health/live)",
-      "Bash(Test-Path c:\\\\Users\\\\ds512\\\\Desktop\\\\programs\\\\my_apps\\\\moments\\\\backend\\\\tests -PathType Container)"
+      "Bash(Test-Path c:\\\\Users\\\\ds512\\\\Desktop\\\\programs\\\\my_apps\\\\moments\\\\backend\\\\tests -PathType Container)",
+      "Bash(npx tsc *)"
     ]
   }
 }

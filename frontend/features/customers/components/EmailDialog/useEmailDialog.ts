@@ -44,6 +44,8 @@ export interface UseEmailDialogReturn extends UseEmojiInsertReturn {
   onSubmit: (values: EmailFormValues) => Promise<void>
   onClose: () => void
   isPending: boolean
+  mergedSubjectRef: RefCallback<HTMLInputElement>
+  subjectInputProps: Omit<ReturnType<ReturnType<typeof useForm<EmailFormValues>>['register']>, 'ref'>
   mergedBodyRef: RefCallback<HTMLTextAreaElement>
   bodyInputProps: Omit<ReturnType<ReturnType<typeof useForm<EmailFormValues>>['register']>, 'ref'>
   files: File[]
@@ -76,8 +78,6 @@ export const useEmailDialog = (): UseEmailDialogReturn => {
     setValue,
   } = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) })
 
-  // Subject emoji support is not used in this dialog, but the hook requires both
-  // field names. Body is the default active field, so emojis go to the body.
   const emojiInsert = useEmojiInsert('subject', 'body', getValues, setValue)
   const { closePicker } = emojiInsert
 
@@ -90,6 +90,16 @@ export const useEmailDialog = (): UseEmailDialogReturn => {
   }, [setEmailingCustomerId, reset, closePicker])
 
   // RHF v7 always returns a callback ref — no object-ref branch needed.
+  const { ref: rhfSubjectRef, ...subjectInputProps } = register('subject')
+  const mergedSubjectRef = useCallback(
+    (el: HTMLInputElement | null): void => {
+      emojiInsert.subjectCallbackRef(el)
+      rhfSubjectRef(el)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rhfSubjectRef identity is stable per react-hook-form
+    [emojiInsert.subjectCallbackRef, rhfSubjectRef],
+  )
+
   const { ref: rhfBodyRef, ...bodyInputProps } = register('body')
   const mergedBodyRef = useCallback(
     (el: HTMLTextAreaElement | null): void => {
@@ -182,6 +192,8 @@ export const useEmailDialog = (): UseEmailDialogReturn => {
     onSubmit,
     onClose,
     isPending: sendEmail.isPending,
+    mergedSubjectRef,
+    subjectInputProps,
     mergedBodyRef,
     bodyInputProps,
     files,

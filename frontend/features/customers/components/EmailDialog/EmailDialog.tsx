@@ -11,9 +11,11 @@ import styles from './EmailDialog.module.scss'
 export const EmailDialog = (): ReactElement => {
   const {
     isOpen, customerNameSuffix,
-    register, errors, handleSubmit, onSubmit, onClose, isPending,
-    buttonRef, textareaRef, anchorRef,
-    isPickerOpen, togglePicker, closePicker, onEmojiSelect, onBodyFocus,
+    errors, handleSubmit, onSubmit, onClose, isPending,
+    subjectRef, textareaRef, buttonRef, anchorRef,
+    isPickerOpen, togglePicker, closePicker, onEmojiSelect,
+    onSubjectFocus, onBodyFocus,
+    mergedSubjectRef, subjectInputProps,
     mergedBodyRef, bodyInputProps,
     files, removeFile, onFileInputChange, fileError,
     isDragOver, onDragOver, onDragLeave, onDrop,
@@ -40,7 +42,7 @@ export const EmailDialog = (): ReactElement => {
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="dialog-subject">{CUSTOMERS_LABELS.EMAIL_SUBJECT_LABEL}</label>
-                <input id="dialog-subject" className={styles.input} placeholder={CUSTOMERS_LABELS.EMAIL_SUBJECT_PLACEHOLDER} {...register('subject')} />
+                <input id="dialog-subject" className={styles.input} placeholder={CUSTOMERS_LABELS.EMAIL_SUBJECT_PLACEHOLDER} ref={mergedSubjectRef} onFocus={onSubjectFocus} {...subjectInputProps} />
                 {errors.subject && <span className={styles.error}>{errors.subject.message}</span>}
               </div>
 
@@ -68,7 +70,7 @@ export const EmailDialog = (): ReactElement => {
               <ComposeToolbar buttonRef={buttonRef} togglePicker={togglePicker} isPickerOpen={isPickerOpen} onFileInputChange={onFileInputChange} isPending={isPending} />
             </form>
 
-            <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[textareaRef]} />
+            <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[subjectRef, textareaRef]} />
           </div>
         </div>
       )}
