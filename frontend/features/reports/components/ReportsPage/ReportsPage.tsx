@@ -11,7 +11,7 @@ export const ReportsPage = (): ReactElement => {
   const {
     year, setYear, yearOptions, financial, topCustomers, isLoading,
     formatAmount, formatRate, getMonthName,
-    menuState, closeMenu, handleExportClick,
+    menuState, closeMenu, handleExportClick, isExporting,
   } = useReportsPage()
 
   return (
@@ -28,7 +28,7 @@ export const ReportsPage = (): ReactElement => {
               <option key={y} value={y}>{y}</option>
             ))}
           </select>
-          <Button variant="secondary" size="sm" onClick={handleExportClick}>
+          <Button variant="secondary" size="sm" onClick={handleExportClick} loading={isExporting}>
             {REPORTS_LABELS.EXPORT_BUTTON}
           </Button>
         </div>

@@ -1,14 +1,11 @@
 'use client'
-import { apiClient, ApiError } from '@/shared/utils/apiClient'
+import { apiClient, apiDownload } from '@/shared/utils/apiClient'
 import { downloadBlob } from '@/shared/utils/exportUtils'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import type { MonthlyReport, FinancialReport, TopCustomer } from './types'
 
 async function downloadFromApi(url: string, filename: string): Promise<void> {
-  const token = typeof window !== 'undefined' ? (localStorage.getItem('access_token') ?? '') : ''
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-  if (!res.ok) throw new ApiError(res.status, 'שגיאה בייצוא הקובץ')
-  const blob = await res.blob()
+  const blob = await apiDownload(url)
   downloadBlob(blob, filename)
 }
 

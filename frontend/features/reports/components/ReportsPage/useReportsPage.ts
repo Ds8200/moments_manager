@@ -14,6 +14,7 @@ export interface UseReportsPageReturn {
   financial: FinancialReport | undefined
   topCustomers: TopCustomer[] | undefined
   isLoading: boolean
+  isExporting: boolean
   formatAmount: (v: string | number) => string
   formatRate: (v: number) => string
   getMonthName: (monthIndex: number) => string
@@ -25,22 +26,28 @@ export interface UseReportsPageReturn {
 export const useReportsPage = (): UseReportsPageReturn => {
   const currentYear = new Date().getFullYear()
   const [year, setYear] = useState(currentYear)
+  const [isExporting, setIsExporting] = useState(false)
   const { data: financial, isLoading } = useFinancialReport(year)
   const { data: topCustomers } = useTopCustomers(5)
   const { menuState, openMenu, closeMenu } = useDropdownMenu()
 
   const yearOptions = Array.from({ length: 3 }, (_, i) => currentYear - i)
 
+  const runExport = (fn: () => Promise<void>): void => {
+    setIsExporting(true)
+    fn().catch(console.error).finally(() => setIsExporting(false))
+  }
+
   const exportItems: DropdownMenuItem[] = [
     {
       label: REPORTS_LABELS.EXPORT_EXCEL,
       icon: '📊',
-      onClick: () => { reportsApi.exportExcel(year).catch(console.error) },
+      onClick: () => runExport(() => reportsApi.exportExcel(year)),
     },
     {
       label: REPORTS_LABELS.EXPORT_PDF,
       icon: '📄',
-      onClick: () => { reportsApi.exportPdf(year).catch(console.error) },
+      onClick: () => runExport(() => reportsApi.exportPdf(year)),
     },
   ]
 
@@ -55,6 +62,7 @@ export const useReportsPage = (): UseReportsPageReturn => {
     financial,
     topCustomers,
     isLoading,
+    isExporting,
     formatAmount: formatCurrency,
     formatRate: (v: number): string => `${v.toFixed(1)}%`,
     getMonthName: (monthIndex: number): string => HEBREW_MONTHS[monthIndex - 1] ?? '',

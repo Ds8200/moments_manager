@@ -131,6 +131,40 @@ export async function apiClient<T>(
   return response.json() as Promise<T>
 }
 
+export async function apiDownload(url: string): Promise<Blob> {
+  const response = await fetch(url, { headers: getAuthHeader() })
+
+  if (response.status === 401) {
+    if (isRefreshing) {
+      return new Promise<Blob>((resolve, reject) => {
+        refreshQueue.push((newToken) => {
+          if (!newToken) return reject(new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED))
+          fetch(url, { headers: { Authorization: `Bearer ${newToken}` } })
+            .then((res) => (res.ok ? res.blob() : Promise.reject(new ApiError(res.status, ERROR_MESSAGES.GENERIC))))
+            .then(resolve)
+            .catch(reject)
+        })
+      })
+    }
+
+    isRefreshing = true
+    const newToken = await attemptTokenRefresh()
+    isRefreshing = false
+
+    const pending = refreshQueue
+    refreshQueue = []
+    pending.forEach((cb) => cb(newToken))
+
+    if (!newToken) throw new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED)
+    const retried = await fetch(url, { headers: { Authorization: `Bearer ${newToken}` } })
+    if (!retried.ok) throw new ApiError(retried.status, ERROR_MESSAGES.GENERIC)
+    return retried.blob()
+  }
+
+  if (!response.ok) throw new ApiError(response.status, ERROR_MESSAGES.GENERIC)
+  return response.blob()
+}
+
 export async function apiUpload<T>(url: string, formData: FormData): Promise<T> {
   const headers = getAuthHeader()
   const response = await fetch(url, {
