@@ -21,6 +21,7 @@ export interface UseEmojiInsertReturn {
   onEmojiSelect: (emoji: string) => void
   onSubjectFocus: () => void
   onBodyFocus: () => void
+  emojiPickerOpenDirection: 'below' | 'above'
 }
 
 export const useEmojiInsert = <T extends FieldValues>(
@@ -124,5 +125,6 @@ export const useEmojiInsert = <T extends FieldValues>(
     onEmojiSelect,
     onSubjectFocus,
     onBodyFocus,
+    emojiPickerOpenDirection: activeField === 'subject' ? 'below' : 'above',
   }
 }

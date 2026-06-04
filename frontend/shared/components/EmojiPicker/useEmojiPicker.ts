@@ -9,7 +9,7 @@ export interface EmojiPickerProps {
   triggerRef: RefObject<HTMLButtonElement | null>
   anchorRef: RefObject<HTMLElement | null>
   safeRefs: RefObject<HTMLElement | null>[]
-  openDirection?: 'auto' | 'below'
+  openDirection?: 'auto' | 'below' | 'above'
 }
 
 export interface UseEmojiPickerReturn {
@@ -47,9 +47,13 @@ export const useEmojiPicker = ({
     // the bottom half AND there isn't enough space below.
     const anchorInTopHalf = rect.top < window.innerHeight / 2
     const top =
-      openDirection === 'below' || anchorInTopHalf || spaceBelow >= PANEL_HEIGHT
+      openDirection === 'below'
         ? rect.bottom + 8
-        : rect.top - PANEL_HEIGHT - 8
+        : openDirection === 'above'
+          ? rect.top - PANEL_HEIGHT - 8
+          : anchorInTopHalf || spaceBelow >= PANEL_HEIGHT
+            ? rect.bottom + 8
+            : rect.top - PANEL_HEIGHT - 8
 
     panel.style.setProperty('left', `${clampedLeft}px`)
     panel.style.setProperty('top', `${top}px`)
