@@ -33,12 +33,16 @@
 }
 
 .title {
-  font-size: v.$font-size-2xl;
+  font-size: v.$font-size-xl;
   font-weight: v.$font-weight-bold;
   color: v.$text-primary;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @media (max-width: v.$breakpoint-sm) {
+    font-size: v.$font-size-lg;
+  }
 }
 
 .customer {
