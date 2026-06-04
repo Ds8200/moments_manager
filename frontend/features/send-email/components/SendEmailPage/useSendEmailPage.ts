@@ -27,6 +27,8 @@ export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   recipientsError: string | undefined
   onSubmit: (values: ComposeFormValues) => void
   isPending: boolean
+  mergedSubjectRef: RefCallback<HTMLInputElement>
+  subjectRest: Omit<ReturnType<ReturnType<typeof useForm<ComposeFormValues>>['register']>, 'ref'>
   mergedBodyRef: RefCallback<HTMLTextAreaElement>
   bodyRest: Omit<ReturnType<ReturnType<typeof useForm<ComposeFormValues>>['register']>, 'ref'>
   files: File[]
@@ -58,9 +60,18 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
 
   const emojiInsert = useEmojiInsert('subject', 'body', getValues, setValue)
 
-  // Merge react-hook-form's body ref with our textareaRef in the hook so the
-  // component doesn't need to contain any ref-merging logic.
+  // Merge RHF refs with our internal refs so the component passes a single ref.
   // RHF v7 always returns a callback ref (RefCallBack), so no object-ref branch needed.
+  const { ref: rhfSubjectRef, ...subjectRest } = register('subject')
+  const mergedSubjectRef = useCallback(
+    (el: HTMLInputElement | null) => {
+      emojiInsert.subjectCallbackRef(el)
+      rhfSubjectRef(el)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rhfSubjectRef identity is stable per react-hook-form
+    [emojiInsert.subjectCallbackRef, rhfSubjectRef],
+  )
+
   const { ref: rhfBodyRef, ...bodyRest } = register('body')
   const mergedBodyRef = useCallback(
     (el: HTMLTextAreaElement | null) => {
@@ -159,6 +170,8 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     recipientsError,
     onSubmit,
     isPending: compose.isPending,
+    mergedSubjectRef,
+    subjectRest,
     mergedBodyRef,
     bodyRest,
     files,

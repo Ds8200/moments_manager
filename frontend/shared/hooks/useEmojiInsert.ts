@@ -10,6 +10,7 @@ import type {
 
 export interface UseEmojiInsertReturn {
   subjectRef: RefObject<HTMLInputElement | null>
+  subjectCallbackRef: (el: HTMLInputElement | null) => void
   textareaRef: RefObject<HTMLTextAreaElement | null>
   textareaCallbackRef: (el: HTMLTextAreaElement | null) => void
   buttonRef: RefObject<HTMLButtonElement | null>
@@ -33,8 +34,11 @@ export const useEmojiInsert = <T extends FieldValues>(
   const buttonRef = useRef<HTMLButtonElement>(null)
   const anchorRef = useRef<HTMLElement>(null)
 
-  // Expose a setter so callers can register the textarea without mutating
-  // the returned ref object directly (which triggers react-hooks/immutability).
+  // Expose setters so callers can register inputs without mutating returned ref
+  // objects directly (which triggers react-hooks/immutability).
+  const subjectCallbackRef = useCallback((el: HTMLInputElement | null) => {
+    subjectRef.current = el
+  }, [])
   const textareaCallbackRef = useCallback((el: HTMLTextAreaElement | null) => {
     textareaRef.current = el
   }, [])
@@ -107,6 +111,7 @@ export const useEmojiInsert = <T extends FieldValues>(
 
   return {
     subjectRef,
+    subjectCallbackRef,
     textareaRef,
     textareaCallbackRef,
     buttonRef,

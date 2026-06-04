@@ -11,11 +11,12 @@ import styles from './SendEmailPage.module.scss'
 export const SendEmailPage = (): JSX.Element => {
   const {
     recipients, onAddRecipient, onRemoveRecipient,
-    register, errors, handleSubmit, recipientsError,
+    errors, handleSubmit, recipientsError,
     onSubmit, isPending,
     subjectRef, textareaRef, buttonRef, anchorRef,
     isPickerOpen, togglePicker, closePicker, onEmojiSelect,
     onSubjectFocus, onBodyFocus,
+    mergedSubjectRef, subjectRest,
     mergedBodyRef, bodyRest,
     files, removeFile, onFileInputChange,
     isDragOver, onDragOver, onDragLeave, onDrop,
@@ -38,7 +39,7 @@ export const SendEmailPage = (): JSX.Element => {
 
           <div className={styles.fieldRow}>
             <label className={styles.fieldLabel} htmlFor="compose-subject">{SEND_EMAIL_LABELS.SUBJECT_LABEL}</label>
-            <input id="compose-subject" className={styles.input} placeholder={SEND_EMAIL_LABELS.SUBJECT_PLACEHOLDER} ref={subjectRef} onFocus={onSubjectFocus} {...register('subject')} />
+            <input id="compose-subject" className={styles.input} placeholder={SEND_EMAIL_LABELS.SUBJECT_PLACEHOLDER} ref={mergedSubjectRef} onFocus={onSubjectFocus} {...subjectRest} />
             {errors.subject && <span className={styles.error}>{errors.subject.message}</span>}
           </div>
 
