@@ -105,7 +105,7 @@
 // Compact layout when card is narrower than ~200px (e.g. 6-column desktop grid)
 @container (max-width: 200px) {
   .value {
-    font-size: v.$font-size-lg;
+    font-size: v.$font-size-xl;
   }
 
   .icon {
