@@ -4,7 +4,6 @@ import { useExpensesPage } from './useExpensesPage'
 import { ExpenseForm } from '../ExpenseForm/ExpenseForm'
 import { EmptyState } from '@/shared/components/EmptyState/EmptyState'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
-import { EXPENSE_CATEGORY_LABELS } from '@/shared/enums/statusEnums'
 import { EXPENSES_LABELS } from '../../constants/expensesLabels'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './ExpensesPage.module.scss'
@@ -48,7 +47,7 @@ export const ExpensesPage = (): ReactElement => {
                   <td className={styles.cell}>{formatExpenseDate(expense.date)}</td>
                   <td className={styles.cell}>
                     <span className={styles.categoryBadge}>
-                      {EXPENSE_CATEGORY_LABELS[expense.category] ?? expense.category}
+                      {expense.category?.name ?? emptyValue}
                     </span>
                   </td>
                   <td className={styles.cell}>
