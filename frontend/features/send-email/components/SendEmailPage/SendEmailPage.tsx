@@ -2,8 +2,8 @@
 import type { JSX } from 'react'
 import { useSendEmailPage } from './useSendEmailPage'
 import { RecipientInput } from './RecipientInput/RecipientInput'
-import { AttachmentChips } from './AttachmentChips/AttachmentChips'
-import { ComposeToolbar } from './ComposeToolbar/ComposeToolbar'
+import { AttachmentChips } from '@/shared/components/AttachmentChips/AttachmentChips'
+import { ComposeToolbar } from '@/shared/components/ComposeToolbar/ComposeToolbar'
 import { EmojiPicker } from '@/shared/components/EmojiPicker/EmojiPicker'
 import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
 import styles from './SendEmailPage.module.scss'
@@ -18,7 +18,7 @@ export const SendEmailPage = (): JSX.Element => {
     onSubjectFocus, onBodyFocus,
     mergedSubjectRef, subjectRest,
     mergedBodyRef, bodyRest,
-    files, removeFile, onFileInputChange,
+    files, removeFile, onFileInputChange, fileError,
     isDragOver, onDragOver, onDragLeave, onDrop,
   } = useSendEmailPage()
 
@@ -60,6 +60,7 @@ export const SendEmailPage = (): JSX.Element => {
           {files.length > 0 && (
             <div className={styles.attachmentRow}>
               <AttachmentChips files={files} onRemove={removeFile} />
+              {fileError && <span className={styles.error}>{fileError}</span>}
             </div>
           )}
 

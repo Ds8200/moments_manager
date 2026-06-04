@@ -7,6 +7,7 @@ import type { ChangeEvent, DragEvent, RefCallback } from 'react'
 import { useComposeEmail } from '../../queries/useSendEmail'
 import { useEmojiInsert } from '@/shared/hooks/useEmojiInsert'
 import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
 import type { EmailAttachment, Recipient } from '../../types'
 import type { UseEmojiInsertReturn } from '@/shared/hooks/useEmojiInsert'
 
@@ -37,6 +38,7 @@ export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   recipientsError: string | undefined
   onSubmit: (values: ComposeFormValues) => Promise<void>
   isPending: boolean
+  fileError: string | undefined
   mergedSubjectRef: RefCallback<HTMLInputElement>
   subjectRest: Omit<ReturnType<ReturnType<typeof useForm<ComposeFormValues>>['register']>, 'ref'>
   mergedBodyRef: RefCallback<HTMLTextAreaElement>
@@ -56,6 +58,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
   const [recipientsError, setRecipientsError] = useState<string | undefined>()
   const [files, setFiles] = useState<File[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
+  const [fileError, setFileError] = useState<string | undefined>()
 
   const compose = useComposeEmail()
 
@@ -144,11 +147,18 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     [addFiles],
   )
 
+  const MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024
+
   const onSubmit = async (values: ComposeFormValues): Promise<void> => {
     if (recipients.length === 0) {
       setRecipientsError(SEND_EMAIL_LABELS.VALIDATION_RECIPIENTS)
       return
     }
+    if (files.reduce((sum, f) => sum + f.size, 0) > MAX_ATTACHMENT_BYTES) {
+      setFileError(UI_LABELS.FILE_TOO_LARGE)
+      return
+    }
+    setFileError(undefined)
     const customer_ids = recipients
       .filter((r) => r.customer_id !== undefined)
       .map((r) => r.customer_id!)
@@ -171,6 +181,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
           setRecipients([])
           setFiles([])
           setRecipientsError(undefined)
+          setFileError(undefined)
           emojiInsert.closePicker()
         },
       },
@@ -199,6 +210,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     onDragOver,
     onDragLeave,
     onDrop,
+    fileError,
     ...emojiInsert,
   }
 }

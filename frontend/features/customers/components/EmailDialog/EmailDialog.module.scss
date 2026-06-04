@@ -15,25 +15,63 @@
   background: $bg-card;
   border-radius: $border-radius-lg;
   box-shadow: $shadow-elevated;
-  padding: $space-8;
+  border: 1px solid $border-color;
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
   margin-inline: $space-4;
+  overflow: hidden;
   animation: slideUp $transition-normal;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+}
+
+.dialogDragOver {
+  border-color: $primary;
+  box-shadow: 0 0 0 3px color-mix(in srgb, $primary 20%, transparent), #{$shadow-elevated};
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-5 $space-6 $space-4;
+  border-block-end: 1px solid $border-color;
 }
 
 .title {
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;
   color: $text-primary;
-  margin-block-end: $space-6;
+  margin: 0;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: $border-radius;
+  color: $text-secondary;
+  font-size: $font-size-xl;
+  line-height: 1;
+  cursor: pointer;
+  transition: background $transition-fast, color $transition-fast;
+  flex-shrink: 0;
+
+  &:hover {
+    background: $gray-100;
+    color: $text-primary;
+  }
 }
 
 .field {
   display: flex;
   flex-direction: column;
   gap: $space-1;
-  margin-block-end: $space-5;
+  padding: $space-4 $space-6;
+  border-block-end: 1px solid $border-color;
 }
 
 .label {
@@ -42,7 +80,23 @@
   color: $text-secondary;
 }
 
-.input,
+.input {
+  width: 100%;
+  padding: $space-2 $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  font-size: $font-size-base;
+  font-family: inherit;
+  color: $text-primary;
+  background: $bg-card;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
 .textarea {
   width: 100%;
   padding: $space-2 $space-3;
@@ -61,84 +115,44 @@
   }
 }
 
-.labelRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.emojiToggle {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 0 $space-1;
-  border-radius: $border-radius-sm;
-  transition: background $transition-fast;
-  line-height: 1;
-
-  &:hover {
-    background: $gray-100;
-  }
-}
-
 .bodyWrapper {
   position: relative;
 }
 
+.dragOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  background: color-mix(in srgb, $primary-light 85%, transparent);
+  border: 2px dashed $primary;
+  border-radius: $border-radius;
+  color: $primary-dark;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  pointer-events: none;
+}
+
 .error {
+  display: block;
   font-size: $font-size-xs;
   color: $danger;
 }
 
-.actions {
+.attachmentRow {
+  padding: $space-3 $space-6;
+  border-block-end: 1px solid $border-color;
   display: flex;
-  justify-content: flex-end;
-  gap: $space-3;
-  margin-block-start: $space-6;
+  flex-direction: column;
+  gap: $space-2;
 }
 
-.cancelButton {
-  padding: $space-2 $space-5;
-  border-radius: $border-radius;
-  border: 1px solid $border-color;
-  background: transparent;
-  color: $text-secondary;
-  font-size: $font-size-base;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: background $transition-fast, border-color $transition-fast;
-
-  &:hover:not(:disabled) {
-    background: $gray-100;
-    border-color: $gray-300;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-.sendButton {
-  padding: $space-2 $space-5;
-  border-radius: $border-radius;
-  border: none;
-  background: $primary;
-  color: $text-inverse;
-  font-size: $font-size-base;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: background $transition-fast;
-
-  &:hover:not(:disabled) {
-    background: $primary-dark;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+.fileError {
+  font-size: $font-size-xs;
+  color: $danger;
 }
 
 @keyframes fadeIn {

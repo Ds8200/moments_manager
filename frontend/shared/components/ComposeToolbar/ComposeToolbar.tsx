@@ -2,7 +2,6 @@
 import type { JSX } from 'react'
 import { useComposeToolbar } from './useComposeToolbar'
 import type { ComposeToolbarProps } from './useComposeToolbar'
-import { SEND_EMAIL_LABELS } from '../../../constants/sendEmailLabels'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './ComposeToolbar.module.scss'
 
@@ -16,8 +15,8 @@ export const ComposeToolbar = (props: ComposeToolbarProps): JSX.Element => {
         {/* File attachment — hidden input triggered by label click */}
         <label
           className={styles.iconBtn}
-          title={SEND_EMAIL_LABELS.ATTACH_FILE}
-          aria-label={SEND_EMAIL_LABELS.ATTACH_BTN_ARIA}
+          title={UI_LABELS.ATTACH_FILE}
+          aria-label={UI_LABELS.ATTACH_BTN_ARIA}
         >
           <input
             type="file"
@@ -55,7 +54,7 @@ export const ComposeToolbar = (props: ComposeToolbarProps): JSX.Element => {
           <line x1="22" y1="2" x2="11" y2="13" />
           <polygon points="22 2 15 22 11 13 2 9 22 2" />
         </svg>
-        {isPending ? SEND_EMAIL_LABELS.SENDING : SEND_EMAIL_LABELS.SEND}
+        {isPending ? UI_LABELS.EMAIL_SENDING : UI_LABELS.EMAIL_SEND}
       </button>
     </div>
   )

@@ -1,4 +1,7 @@
 import type { OrderSummary } from '@/features/orders/types'
+import type { EmailAttachment } from '@/features/send-email/types'
+
+export type { EmailAttachment }
 
 export interface Customer {
   id: string
@@ -41,6 +44,7 @@ export interface CustomerFormValues {
 export interface CustomerSendEmailPayload {
   subject: string
   body: string
+  attachments: EmailAttachment[]
 }
 
 export interface EmailSentResponse {

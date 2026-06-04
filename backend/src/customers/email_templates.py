@@ -21,7 +21,7 @@ def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[s
   <title>{safe_subject}</title>
   <style>
     body {{
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Helvetica Neue', Arial, sans-serif;
       background-color: #f5f5f5;
       margin: 0;
       padding: 24px;

@@ -2,14 +2,14 @@
 import type { JSX } from 'react'
 import { useAttachmentChips } from './useAttachmentChips'
 import type { AttachmentChipsProps } from './useAttachmentChips'
-import { SEND_EMAIL_LABELS } from '../../../constants/sendEmailLabels'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './AttachmentChips.module.scss'
 
 export const AttachmentChips = ({ files, onRemove }: AttachmentChipsProps): JSX.Element => {
   const { files: fileList, onRemove: handleRemove } = useAttachmentChips({ files, onRemove })
 
   return (
-    <ul className={styles.list} aria-label={SEND_EMAIL_LABELS.ATTACH_FILE}>
+    <ul className={styles.list} aria-label={UI_LABELS.ATTACH_FILE}>
       {fileList.map((file, index) => (
         <li key={`${file.name}-${file.size}`} className={styles.chip}>
           <svg
@@ -32,7 +32,7 @@ export const AttachmentChips = ({ files, onRemove }: AttachmentChipsProps): JSX.
             type="button"
             className={styles.removeBtn}
             onClick={() => handleRemove(index)}
-            aria-label={SEND_EMAIL_LABELS.REMOVE_FILE}
+            aria-label={UI_LABELS.REMOVE_FILE}
           >
             ×
           </button>

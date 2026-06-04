@@ -44,6 +44,10 @@
   justify-content: center;
   width: 30px;
   height: 30px;
+  // Explicit emoji fonts before the fallback so Windows/Linux always use
+  // a color emoji font rather than inheriting the app's text font (Segoe UI,
+  // Helvetica Neue, etc.) which renders dual-presentation chars as text.
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
   font-size: 18px;
   font-variant-emoji: emoji;
   background: none;

@@ -1,6 +1,8 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useEmailDialog } from './useEmailDialog'
+import { AttachmentChips } from '@/shared/components/AttachmentChips/AttachmentChips'
+import { ComposeToolbar } from '@/shared/components/ComposeToolbar/ComposeToolbar'
 import { EmojiPicker } from '@/shared/components/EmojiPicker/EmojiPicker'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
@@ -8,25 +10,13 @@ import styles from './EmailDialog.module.scss'
 
 export const EmailDialog = (): ReactElement => {
   const {
-    isOpen,
-    customerNameSuffix,
-    emojiPickerSymbol,
-    register,
-    errors,
-    handleSubmit,
-    onSubmit,
-    onClose,
-    isPending,
-    buttonRef,
-    textareaRef,
-    anchorRef,
-    isPickerOpen,
-    togglePicker,
-    closePicker,
-    onEmojiSelect,
-    onBodyFocus,
-    mergedBodyRef,
-    bodyInputProps,
+    isOpen, customerNameSuffix,
+    register, errors, handleSubmit, onSubmit, onClose, isPending,
+    buttonRef, textareaRef, anchorRef,
+    isPickerOpen, togglePicker, closePicker, onEmojiSelect, onBodyFocus,
+    mergedBodyRef, bodyInputProps,
+    files, removeFile, onFileInputChange, fileError,
+    isDragOver, onDragOver, onDragLeave, onDrop,
   } = useEmailDialog()
 
   return (
@@ -34,80 +24,51 @@ export const EmailDialog = (): ReactElement => {
       {isOpen && (
         <div className={styles.backdrop} onClick={onClose}>
           <div
-            className={styles.dialog}
+            className={`${styles.dialog}${isDragOver ? ` ${styles.dialogDragOver}` : ''}`}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
           >
-            <h2 className={styles.title}>
-              {CUSTOMERS_LABELS.EMAIL_DIALOG_TITLE}{customerNameSuffix}
-            </h2>
+            <div className={styles.titleRow}>
+              <h2 className={styles.title}>{CUSTOMERS_LABELS.EMAIL_DIALOG_TITLE}{customerNameSuffix}</h2>
+              <button type="button" className={styles.closeBtn} onClick={onClose} aria-label={UI_LABELS.CLOSE}>×</button>
+            </div>
+
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <div className={styles.field}>
-                <label className={styles.label} htmlFor="email-subject">
-                  {CUSTOMERS_LABELS.EMAIL_SUBJECT_LABEL}
-                </label>
-                <input
-                  id="email-subject"
-                  className={styles.input}
-                  placeholder={CUSTOMERS_LABELS.EMAIL_SUBJECT_PLACEHOLDER}
-                  {...register('subject')}
-                />
-                {errors.subject && (
-                  <span className={styles.error}>{errors.subject.message}</span>
-                )}
+                <label className={styles.label} htmlFor="dialog-subject">{CUSTOMERS_LABELS.EMAIL_SUBJECT_LABEL}</label>
+                <input id="dialog-subject" className={styles.input} placeholder={CUSTOMERS_LABELS.EMAIL_SUBJECT_PLACEHOLDER} {...register('subject')} />
+                {errors.subject && <span className={styles.error}>{errors.subject.message}</span>}
               </div>
+
               <div className={styles.field}>
-                <div className={styles.labelRow}>
-                  <label className={styles.label} htmlFor="email-body">
-                    {CUSTOMERS_LABELS.EMAIL_BODY_LABEL}
-                  </label>
-                  <button
-                    type="button"
-                    ref={buttonRef}
-                    className={styles.emojiToggle}
-                    onClick={togglePicker}
-                    title={UI_LABELS.EMOJI_PICKER_BTN}
-                    aria-label={UI_LABELS.EMOJI_PICKER_BTN}
-                  >
-                    {emojiPickerSymbol}
-                  </button>
-                </div>
+                <label className={styles.label} htmlFor="dialog-body">{CUSTOMERS_LABELS.EMAIL_BODY_LABEL}</label>
                 <div className={styles.bodyWrapper}>
-                  <textarea
-                    id="email-body"
-                    className={styles.textarea}
-                    placeholder={CUSTOMERS_LABELS.EMAIL_BODY_PLACEHOLDER}
-                    rows={6}
-                    ref={mergedBodyRef}
-                    onFocus={onBodyFocus}
-                    {...bodyInputProps}
-                  />
-                  <EmojiPicker
-                    isOpen={isPickerOpen}
-                    onClose={closePicker}
-                    onSelect={onEmojiSelect}
-                    triggerRef={buttonRef}
-                    anchorRef={anchorRef}
-                    safeRefs={[textareaRef]}
-                  />
+                  <textarea id="dialog-body" className={styles.textarea} placeholder={CUSTOMERS_LABELS.EMAIL_BODY_PLACEHOLDER} rows={6} ref={mergedBodyRef} onFocus={onBodyFocus} {...bodyInputProps} />
+                  {isDragOver && (
+                    <div className={styles.dragOverlay}>
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                      <span>{UI_LABELS.ATTACH_FILE}</span>
+                    </div>
+                  )}
                 </div>
                 {errors.body && <span className={styles.error}>{errors.body.message}</span>}
               </div>
-              <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.cancelButton}
-                  onClick={onClose}
-                  disabled={isPending}
-                >
-                  {CUSTOMERS_LABELS.EMAIL_CANCEL}
-                </button>
-                <button type="submit" className={styles.sendButton} disabled={isPending}>
-                  {isPending ? CUSTOMERS_LABELS.EMAIL_SENDING : CUSTOMERS_LABELS.EMAIL_SEND}
-                </button>
-              </div>
+
+              {files.length > 0 && (
+                <div className={styles.attachmentRow}>
+                  <AttachmentChips files={files} onRemove={removeFile} />
+                  {fileError && <span className={styles.fileError}>{fileError}</span>}
+                </div>
+              )}
+
+              <ComposeToolbar buttonRef={buttonRef} togglePicker={togglePicker} isPickerOpen={isPickerOpen} onFileInputChange={onFileInputChange} isPending={isPending} />
             </form>
+
+            <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[textareaRef]} />
           </div>
         </div>
       )}
