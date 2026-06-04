@@ -40,6 +40,7 @@ export const useUpdateOrderStatus = (): UseMutationResult<
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
       queryClient.invalidateQueries({ queryKey: ['order'] })
+      queryClient.invalidateQueries({ queryKey: ['home'] })
       notify.success(ORDERS_LABELS.UPDATED_SUCCESS)
     },
   })
@@ -58,6 +59,7 @@ export const useUpdateOrderPayment = (): UseMutationResult<
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
       queryClient.invalidateQueries({ queryKey: ['order'] })
+      queryClient.invalidateQueries({ queryKey: ['home'] })
       notify.success(ORDERS_LABELS.UPDATED_SUCCESS)
     },
   })
@@ -88,6 +90,7 @@ export const useDeleteOrder = (): UseMutationResult<void, Error, string> => {
     mutationFn: (id: string) => ordersApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: ['home'] })
       notify.success(ORDERS_LABELS.DELETED_SUCCESS)
     },
   })

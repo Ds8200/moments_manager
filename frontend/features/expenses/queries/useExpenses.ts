@@ -28,6 +28,7 @@ export const useCreateExpense = (): UseMutationResult<
     mutationFn: (payload: ExpenseFormValues) => expensesApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] })
+      queryClient.invalidateQueries({ queryKey: ['home'] })
       notify.success(EXPENSES_LABELS.CREATED_SUCCESS)
     },
   })
@@ -45,6 +46,7 @@ export const useUpdateExpense = (): UseMutationResult<
       expensesApi.update(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] })
+      queryClient.invalidateQueries({ queryKey: ['home'] })
       notify.success(EXPENSES_LABELS.UPDATED_SUCCESS)
     },
   })
@@ -57,6 +59,7 @@ export const useDeleteExpense = (): UseMutationResult<void, Error, string> => {
     mutationFn: (id: string) => expensesApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] })
+      queryClient.invalidateQueries({ queryKey: ['home'] })
       notify.success(EXPENSES_LABELS.DELETED_SUCCESS)
     },
   })

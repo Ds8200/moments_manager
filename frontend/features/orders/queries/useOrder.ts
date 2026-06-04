@@ -44,6 +44,7 @@ export const useUpdateOrder = (): UseMutationResult<
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
       queryClient.invalidateQueries({ queryKey: ['order', id] })
+      queryClient.invalidateQueries({ queryKey: ['home'] })
       notify.success(ORDERS_LABELS.UPDATED_SUCCESS)
     },
   })
