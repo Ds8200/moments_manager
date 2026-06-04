@@ -116,12 +116,17 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
   }, [])
 
   const onSelectAllRecipients = useCallback((customers: Customer[]) => {
-    setRecipients(customers.map(customerToRecipient))
+    // Replace only customer-based recipients, keep manual emails intact
+    setRecipients((prev) => [
+      ...prev.filter((r) => r.customer_id === undefined),
+      ...customers.map(customerToRecipient),
+    ])
     setRecipientsError(undefined)
   }, [])
 
   const onClearAllRecipients = useCallback(() => {
-    setRecipients([])
+    // Only remove customer-based recipients — manual emails are kept
+    setRecipients((prev) => prev.filter((r) => r.customer_id === undefined))
   }, [])
 
   const onAddManualRecipient = useCallback((email: string) => {
