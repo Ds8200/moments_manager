@@ -1,52 +1,70 @@
 'use client'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
 export interface EmojiPickerProps {
   isOpen: boolean
   onClose: () => void
   onSelect: (emoji: string) => void
-  buttonRef: RefObject<HTMLButtonElement | null>
+  triggerRef: RefObject<HTMLButtonElement | null>
+  anchorRef: RefObject<HTMLElement | null>
+  safeRefs: RefObject<HTMLElement | null>[]
 }
 
 export interface UseEmojiPickerReturn {
   containerRef: RefObject<HTMLDivElement | null>
-  flipUp: boolean
 }
 
 const PANEL_HEIGHT = 300 // conservative estimate in px
+const PANEL_WIDTH  = 280 // matches min-width in SCSS
 
 export const useEmojiPicker = ({
   isOpen,
   onClose,
-  buttonRef,
-}: Pick<EmojiPickerProps, 'isOpen' | 'onClose' | 'buttonRef'>): UseEmojiPickerReturn => {
+  triggerRef,
+  anchorRef,
+  safeRefs,
+}: Pick<EmojiPickerProps, 'isOpen' | 'onClose' | 'triggerRef' | 'anchorRef' | 'safeRefs'>): UseEmojiPickerReturn => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [flipUp, setFlipUp] = useState(false)
 
-  // Determine flip direction before rendering so there's no visual jump.
+  // Position the panel below the anchor field, centered horizontally on it.
+  // We apply position via element.style.setProperty to avoid the forbidden JSX style={{}} prop.
   useLayoutEffect(() => {
-    if (!isOpen || !buttonRef.current) return
-    const rect = buttonRef.current.getBoundingClientRect()
-    setFlipUp(window.innerHeight - rect.bottom < PANEL_HEIGHT)
-  }, [isOpen, buttonRef])
+    if (!isOpen || !containerRef.current) return
+    const panel = containerRef.current
+    const anchor = anchorRef.current
+    if (!anchor) return
 
-  // Outside-click: close unless the click was on the toggle button itself.
-  // Without the button exclusion, mousedown fires onClose() and then the
-  // button's click fires togglePicker(), resulting in the picker re-opening.
+    const rect = anchor.getBoundingClientRect()
+    const rawLeft = rect.left + rect.width / 2 - PANEL_WIDTH / 2
+    const clampedLeft = Math.max(8, Math.min(rawLeft, window.innerWidth - PANEL_WIDTH - 8))
+
+    const spaceBelow = window.innerHeight - rect.bottom
+    const top =
+      spaceBelow >= PANEL_HEIGHT
+        ? rect.bottom + 8
+        : rect.top - PANEL_HEIGHT - 8
+
+    panel.style.setProperty('left', `${clampedLeft}px`)
+    panel.style.setProperty('top', `${top}px`)
+  }, [isOpen, anchorRef])
+
+  // Outside-click: close unless the click landed on the trigger button,
+  // one of the safe refs (subject input / body textarea), or inside the panel.
   useEffect(() => {
     if (!isOpen) return
 
     const handleMouseDown = (e: MouseEvent): void => {
       const target = e.target as Node
-      const inPanel = containerRef.current?.contains(target)
-      const inButton = buttonRef.current?.contains(target)
-      if (!inPanel && !inButton) onClose()
+      const inPanel   = containerRef.current?.contains(target)
+      const inTrigger = triggerRef.current?.contains(target)
+      const inSafe    = safeRefs.some((r) => r.current?.contains(target))
+      if (!inPanel && !inTrigger && !inSafe) onClose()
     }
 
     document.addEventListener('mousedown', handleMouseDown)
     return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [isOpen, onClose, buttonRef])
+  }, [isOpen, onClose, triggerRef, safeRefs])
 
-  return { containerRef, flipUp }
+  return { containerRef }
 }

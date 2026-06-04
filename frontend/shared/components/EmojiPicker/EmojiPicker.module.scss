@@ -1,25 +1,18 @@
 @use '@/shared/styles/variables' as *;
 
 .panel {
-  position: absolute;
-  inset-inline-end: 0;
-  top: calc(100% + $space-1);
+  position: fixed;
+  // top and left are set dynamically by useEmojiPicker via element.style.setProperty
   z-index: $z-dropdown;
   background: $bg-card;
   border: 1px solid $border-color;
   border-radius: $border-radius-lg;
   box-shadow: $shadow-elevated;
   padding: $space-3;
-  min-width: 260px;
-  max-height: 280px;
+  min-width: 280px;
+  max-height: 300px;
   overflow-y: auto;
   animation: fadeIn $transition-fast;
-
-  // Flip upward when there isn't enough space below the textarea
-  &[data-flip="true"] {
-    top: auto;
-    bottom: calc(100% + $space-1);
-  }
 }
 
 .category {

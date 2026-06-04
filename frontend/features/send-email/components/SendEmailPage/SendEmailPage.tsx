@@ -1,111 +1,71 @@
 'use client'
-import type { MutableRefObject, ReactElement } from 'react'
+import type { JSX } from 'react'
 import { useSendEmailPage } from './useSendEmailPage'
 import { RecipientInput } from './RecipientInput/RecipientInput'
+import { AttachmentChips } from './AttachmentChips/AttachmentChips'
+import { ComposeToolbar } from './ComposeToolbar/ComposeToolbar'
 import { EmojiPicker } from '@/shared/components/EmojiPicker/EmojiPicker'
 import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
-import { UI_LABELS } from '@/shared/constants/uiLabels'
 import styles from './SendEmailPage.module.scss'
 
-export const SendEmailPage = (): ReactElement => {
+export const SendEmailPage = (): JSX.Element => {
   const {
-    recipients,
-    onAddRecipient,
-    onRemoveRecipient,
-    register,
-    errors,
-    handleSubmit,
-    recipientsError,
-    onSubmit,
-    isPending,
-    textareaRef,
-    buttonRef,
-    isPickerOpen,
-    togglePicker,
-    closePicker,
-    onEmojiSelect,
+    recipients, onAddRecipient, onRemoveRecipient,
+    register, errors, handleSubmit, recipientsError,
+    onSubmit, isPending,
+    subjectRef, textareaRef, buttonRef, anchorRef,
+    isPickerOpen, togglePicker, closePicker, onEmojiSelect,
+    onSubjectFocus, onBodyFocus,
+    mergedBodyRef, bodyRest,
+    files, removeFile, onFileInputChange,
+    isDragOver, onDragOver, onDragLeave, onDrop,
   } = useSendEmailPage()
-
-  const { ref: bodyRef, ...bodyRest } = register('body')
 
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>{SEND_EMAIL_LABELS.PAGE_TITLE}</h1>
 
-      <div className={styles.card}>
+      <div
+        className={`${styles.card}${isDragOver ? ` ${styles.cardDragOver}` : ''}`}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+      >
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className={styles.field}>
-            <RecipientInput
-              recipients={recipients}
-              onAdd={onAddRecipient}
-              onRemove={onRemoveRecipient}
-              error={recipientsError}
-            />
+          <div className={styles.fieldRow}>
+            <RecipientInput recipients={recipients} onAdd={onAddRecipient} onRemove={onRemoveRecipient} error={recipientsError} />
           </div>
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="compose-subject">
-              {SEND_EMAIL_LABELS.SUBJECT_LABEL}
-            </label>
-            <input
-              id="compose-subject"
-              className={styles.input}
-              placeholder={SEND_EMAIL_LABELS.SUBJECT_PLACEHOLDER}
-              {...register('subject')}
-            />
-            {errors.subject && (
-              <span className={styles.error}>{errors.subject.message}</span>
-            )}
+          <div className={styles.fieldRow}>
+            <label className={styles.fieldLabel} htmlFor="compose-subject">{SEND_EMAIL_LABELS.SUBJECT_LABEL}</label>
+            <input id="compose-subject" className={styles.input} placeholder={SEND_EMAIL_LABELS.SUBJECT_PLACEHOLDER} ref={subjectRef} onFocus={onSubjectFocus} {...register('subject')} />
+            {errors.subject && <span className={styles.error}>{errors.subject.message}</span>}
           </div>
 
-          <div className={styles.field}>
-            <div className={styles.labelRow}>
-              <label className={styles.label} htmlFor="compose-body">
-                {SEND_EMAIL_LABELS.BODY_LABEL}
-              </label>
-              <button
-                type="button"
-                ref={buttonRef}
-                className={styles.emojiToggle}
-                onClick={togglePicker}
-                title={UI_LABELS.EMOJI_PICKER_BTN}
-                aria-label={UI_LABELS.EMOJI_PICKER_BTN}
-              >
-                😊
-              </button>
-            </div>
+          <div className={styles.fieldRow}>
+            <label className={styles.fieldLabel} htmlFor="compose-body">{SEND_EMAIL_LABELS.BODY_LABEL}</label>
             <div className={styles.bodyWrapper}>
-              <textarea
-                id="compose-body"
-                className={styles.textarea}
-                placeholder={SEND_EMAIL_LABELS.BODY_PLACEHOLDER}
-                rows={8}
-                ref={(el) => {
-                  textareaRef.current = el
-                  if (typeof bodyRef === 'function') {
-                    bodyRef(el)
-                  } else if (bodyRef) {
-                    (bodyRef as MutableRefObject<HTMLTextAreaElement | null>).current = el
-                  }
-                }}
-                {...bodyRest}
-              />
-              <EmojiPicker
-                isOpen={isPickerOpen}
-                onClose={closePicker}
-                onSelect={onEmojiSelect}
-                buttonRef={buttonRef}
-              />
+              <textarea id="compose-body" className={styles.textarea} placeholder={SEND_EMAIL_LABELS.BODY_PLACEHOLDER} rows={9} onFocus={onBodyFocus} ref={mergedBodyRef} {...bodyRest} />
+              {isDragOver && (
+                <div className={styles.dragOverlay}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                  <span>{SEND_EMAIL_LABELS.DRAG_DROP_HINT}</span>
+                </div>
+              )}
             </div>
             {errors.body && <span className={styles.error}>{errors.body.message}</span>}
           </div>
 
-          <div className={styles.actions}>
-            <button type="submit" className={styles.sendButton} disabled={isPending}>
-              {isPending ? SEND_EMAIL_LABELS.SENDING : SEND_EMAIL_LABELS.SEND}
-            </button>
-          </div>
+          {files.length > 0 && (
+            <div className={styles.attachmentRow}>
+              <AttachmentChips files={files} onRemove={removeFile} />
+            </div>
+          )}
+
+          <ComposeToolbar buttonRef={buttonRef} togglePicker={togglePicker} isPickerOpen={isPickerOpen} onFileInputChange={onFileInputChange} isPending={isPending} />
         </form>
+
+        <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[subjectRef, textareaRef]} />
       </div>
     </div>
   )

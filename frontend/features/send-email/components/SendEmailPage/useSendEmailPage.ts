@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { ChangeEvent, DragEvent, RefCallback } from 'react'
 import { useComposeEmail } from '../../queries/useSendEmail'
 import { useEmojiInsert } from '@/shared/hooks/useEmojiInsert'
 import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
@@ -26,11 +27,23 @@ export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   recipientsError: string | undefined
   onSubmit: (values: ComposeFormValues) => void
   isPending: boolean
+  mergedBodyRef: RefCallback<HTMLTextAreaElement>
+  bodyRest: Omit<ReturnType<ReturnType<typeof useForm<ComposeFormValues>>['register']>, 'ref'>
+  files: File[]
+  addFiles: (dropped: File[]) => void
+  removeFile: (index: number) => void
+  onFileInputChange: (e: ChangeEvent<HTMLInputElement>) => void
+  isDragOver: boolean
+  onDragOver: (e: DragEvent<HTMLDivElement>) => void
+  onDragLeave: (e: DragEvent<HTMLDivElement>) => void
+  onDrop: (e: DragEvent<HTMLDivElement>) => void
 }
 
 export const useSendEmailPage = (): UseSendEmailPageReturn => {
   const [recipients, setRecipients] = useState<Recipient[]>([])
   const [recipientsError, setRecipientsError] = useState<string | undefined>()
+  const [files, setFiles] = useState<File[]>([])
+  const [isDragOver, setIsDragOver] = useState(false)
 
   const compose = useComposeEmail()
 
@@ -43,7 +56,20 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     setValue,
   } = useForm<ComposeFormValues>({ resolver: zodResolver(composeSchema) })
 
-  const emojiInsert = useEmojiInsert('body', getValues, setValue)
+  const emojiInsert = useEmojiInsert('subject', 'body', getValues, setValue)
+
+  // Merge react-hook-form's body ref with our textareaRef in the hook so the
+  // component doesn't need to contain any ref-merging logic.
+  // RHF v7 always returns a callback ref (RefCallBack), so no object-ref branch needed.
+  const { ref: rhfBodyRef, ...bodyRest } = register('body')
+  const mergedBodyRef = useCallback(
+    (el: HTMLTextAreaElement | null) => {
+      emojiInsert.textareaCallbackRef(el)
+      rhfBodyRef(el)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rhfBodyRef identity is stable per react-hook-form
+    [emojiInsert.textareaCallbackRef, rhfBodyRef],
+  )
 
   const onAddRecipient = useCallback((r: Recipient) => {
     setRecipients((prev) => [...prev, r])
@@ -53,6 +79,49 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
   const onRemoveRecipient = useCallback((key: string) => {
     setRecipients((prev) => prev.filter((r) => r.key !== key))
   }, [])
+
+  const addFiles = useCallback((dropped: File[]) => {
+    setFiles((prev) => {
+      const existing = new Set(prev.map((f) => `${f.name}-${f.size}`))
+      const next = dropped.filter((f) => !existing.has(`${f.name}-${f.size}`))
+      return [...prev, ...next]
+    })
+  }, [])
+
+  const removeFile = useCallback((index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index))
+  }, [])
+
+  const onFileInputChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const picked = Array.from(e.target.files ?? [])
+      if (picked.length > 0) addFiles(picked)
+      e.target.value = '' // allow re-selecting the same file
+    },
+    [addFiles],
+  )
+
+  const onDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDragOver(true)
+  }, [])
+
+  const onDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
+    // Only clear when leaving the card itself, not a child element
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      setIsDragOver(false)
+    }
+  }, [])
+
+  const onDrop = useCallback(
+    (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      setIsDragOver(false)
+      const dropped = Array.from(e.dataTransfer.files)
+      if (dropped.length > 0) addFiles(dropped)
+    },
+    [addFiles],
+  )
 
   const onSubmit = (values: ComposeFormValues): void => {
     if (recipients.length === 0) {
@@ -72,6 +141,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
         onSuccess: () => {
           reset()
           setRecipients([])
+          setFiles([])
           setRecipientsError(undefined)
           emojiInsert.closePicker()
         },
@@ -89,6 +159,16 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     recipientsError,
     onSubmit,
     isPending: compose.isPending,
+    mergedBodyRef,
+    bodyRest,
+    files,
+    addFiles,
+    removeFile,
+    onFileInputChange,
+    isDragOver,
+    onDragOver,
+    onDragLeave,
+    onDrop,
     ...emojiInsert,
   }
 }

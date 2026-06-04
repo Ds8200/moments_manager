@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import type { RefObject } from 'react'
 import type {
   FieldValues,
@@ -9,22 +9,50 @@ import type {
 } from 'react-hook-form'
 
 export interface UseEmojiInsertReturn {
+  subjectRef: RefObject<HTMLInputElement | null>
   textareaRef: RefObject<HTMLTextAreaElement | null>
+  textareaCallbackRef: (el: HTMLTextAreaElement | null) => void
   buttonRef: RefObject<HTMLButtonElement | null>
+  anchorRef: RefObject<HTMLElement | null>
   isPickerOpen: boolean
   togglePicker: () => void
   closePicker: () => void
   onEmojiSelect: (emoji: string) => void
+  onSubjectFocus: () => void
+  onBodyFocus: () => void
 }
 
 export const useEmojiInsert = <T extends FieldValues>(
-  fieldName: Path<T>,
+  subjectFieldName: Path<T>,
+  bodyFieldName: Path<T>,
   getValues: UseFormGetValues<T>,
   setValue: UseFormSetValue<T>,
 ): UseEmojiInsertReturn => {
+  const subjectRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const anchorRef = useRef<HTMLElement>(null)
+
+  // Expose a setter so callers can register the textarea without mutating
+  // the returned ref object directly (which triggers react-hooks/immutability).
+  const textareaCallbackRef = useCallback((el: HTMLTextAreaElement | null) => {
+    textareaRef.current = el
+  }, [])
   const [isPickerOpen, setIsPickerOpen] = useState(false)
+  const [activeField, setActiveField] = useState<'subject' | 'body'>('body')
+
+  const onSubjectFocus = useCallback(() => setActiveField('subject'), [])
+  const onBodyFocus = useCallback(() => setActiveField('body'), [])
+
+  // Keep anchorRef pointing to whichever field is focused
+  useEffect(() => {
+    const next =
+      activeField === 'subject'
+        ? (subjectRef.current as HTMLElement | null)
+        : (textareaRef.current as HTMLElement | null)
+    // anchorRef.current is writable via the internal ref object
+    ;(anchorRef as React.MutableRefObject<HTMLElement | null>).current = next
+  }, [activeField])
 
   const togglePicker = useCallback(() => setIsPickerOpen((v) => !v), [])
   const closePicker = useCallback(() => setIsPickerOpen(false), [])
@@ -35,35 +63,59 @@ export const useEmojiInsert = <T extends FieldValues>(
       // U+FE0F in source gets mangled by some tools; the escape is reliable.
       const emoji = rawEmoji.replace(/️/g, '')
 
-      const el = textareaRef.current
-      const current = String(getValues(fieldName) ?? '')
-
-      const start = el?.selectionStart ?? current.length
-      const end = el?.selectionEnd ?? current.length
-
-      const next = current.slice(0, start) + emoji + current.slice(end)
-
-      setValue(fieldName, next as T[Path<T>], {
-        shouldValidate: true,
-        shouldDirty: true,
-      })
-
-      setIsPickerOpen(false)
-
-      // Use emoji.length (UTF-16 code units) — NOT [...emoji].length (code points).
-      // setSelectionRange counts UTF-16 code units, just like selectionStart.
-      // Supplementary-plane emojis (😊, 👍, …) are 2 code units / 1 code point,
-      // so using code-point length would place the cursor inside a surrogate pair,
-      // causing the next keystroke to insert a replacement character (U+FFFD "?").
-      requestAnimationFrame(() => {
-        if (!el) return
-        el.focus()
-        const pos = start + emoji.length
-        el.setSelectionRange(pos, pos)
-      })
+      if (activeField === 'subject') {
+        const el = subjectRef.current
+        const current = String(getValues(subjectFieldName) ?? '')
+        const start = el?.selectionStart ?? current.length
+        const end = el?.selectionEnd ?? current.length
+        const next = current.slice(0, start) + emoji + current.slice(end)
+        setValue(subjectFieldName, next as T[Path<T>], {
+          shouldValidate: true,
+          shouldDirty: true,
+        })
+        requestAnimationFrame(() => {
+          if (!el) return
+          el.focus()
+          const pos = start + emoji.length
+          el.setSelectionRange(pos, pos)
+        })
+      } else {
+        const el = textareaRef.current
+        const current = String(getValues(bodyFieldName) ?? '')
+        const start = el?.selectionStart ?? current.length
+        const end = el?.selectionEnd ?? current.length
+        const next = current.slice(0, start) + emoji + current.slice(end)
+        setValue(bodyFieldName, next as T[Path<T>], {
+          shouldValidate: true,
+          shouldDirty: true,
+        })
+        // Use emoji.length (UTF-16 code units) — NOT [...emoji].length (code points).
+        // setSelectionRange counts UTF-16 code units, just like selectionStart.
+        // Supplementary-plane emojis (😊, 👍, …) are 2 code units / 1 code point,
+        // so using code-point length would place the cursor inside a surrogate pair.
+        requestAnimationFrame(() => {
+          if (!el) return
+          el.focus()
+          const pos = start + emoji.length
+          el.setSelectionRange(pos, pos)
+        })
+      }
+      // Picker intentionally stays open — user may want to insert multiple emojis.
     },
-    [fieldName, getValues, setValue],
+    [activeField, subjectFieldName, bodyFieldName, getValues, setValue],
   )
 
-  return { textareaRef, buttonRef, isPickerOpen, togglePicker, closePicker, onEmojiSelect }
+  return {
+    subjectRef,
+    textareaRef,
+    textareaCallbackRef,
+    buttonRef,
+    anchorRef,
+    isPickerOpen,
+    togglePicker,
+    closePicker,
+    onEmojiSelect,
+    onSubjectFocus,
+    onBodyFocus,
+  }
 }

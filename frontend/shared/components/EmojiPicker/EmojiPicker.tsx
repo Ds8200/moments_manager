@@ -15,9 +15,11 @@ export const EmojiPicker = ({
   isOpen,
   onClose,
   onSelect,
-  buttonRef,
+  triggerRef,
+  anchorRef,
+  safeRefs,
 }: EmojiPickerProps): JSX.Element => {
-  const { containerRef, flipUp } = useEmojiPicker({ isOpen, onClose, buttonRef })
+  const { containerRef } = useEmojiPicker({ isOpen, onClose, triggerRef, anchorRef, safeRefs })
 
   return (
     <>
@@ -27,7 +29,6 @@ export const EmojiPicker = ({
           ref={containerRef}
           role="dialog"
           aria-label="בחר אמוג'י"
-          data-flip={String(flipUp)}
         >
           {EMOJI_CATEGORIES.map((category) => (
             <div key={category.label} className={styles.category}>

@@ -1,0 +1,53 @@
+@use '@/shared/styles/variables' as *;
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  padding: 0;
+  margin: 0;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  background: $gray-100;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  max-width: 200px;
+}
+
+.fileIcon {
+  flex-shrink: 0;
+  color: $text-secondary;
+}
+
+.chipName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.removeBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $text-secondary;
+  font-size: $font-size-md;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: $border-radius-sm;
+  transition: color $transition-fast, background $transition-fast;
+
+  &:hover {
+    color: $danger;
+    background: color-mix(in srgb, $danger 10%, transparent);
+  }
+}

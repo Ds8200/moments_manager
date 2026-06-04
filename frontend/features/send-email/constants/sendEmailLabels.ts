@@ -15,4 +15,8 @@ export const SEND_EMAIL_LABELS = {
   VALIDATION_BODY:         'נדרש תוכן מייל',
   REMOVE_RECIPIENT:        'הסר נמען',
   INVALID_EMAIL:           'כתובת מייל לא תקינה',
+  DRAG_DROP_HINT:          'שחרר קבצים כאן',
+  ATTACH_FILE:             'צרף קובץ',
+  REMOVE_FILE:             'הסר קובץ',
+  ATTACH_BTN_ARIA:         'בחר קובץ לצירוף',
 } as const
