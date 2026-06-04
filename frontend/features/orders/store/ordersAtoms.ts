@@ -15,8 +15,6 @@ export const DEFAULT_FILTERS: OrderFilters = {
 
 export const orderFiltersAtom = atom<OrderFilters>({ ...DEFAULT_FILTERS })
 
-export const selectedOrderIdAtom = atom<string | null>(null)
-
 export const isOrderFormOpenAtom = atom<boolean>(false)
 
 export const editingOrderIdAtom = atom<string | null>(null)

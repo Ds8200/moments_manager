@@ -1,8 +1,9 @@
 'use client'
 import { type MouseEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { useSetAtom } from 'jotai'
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/useOrders'
-import { orderFiltersAtom, selectedOrderIdAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
+import { orderFiltersAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
 import { formatCurrency, formatDateTime } from '@/shared/utils/formatters'
 import { useConfirm } from '@/shared/hooks/useConfirm'
 import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
@@ -11,7 +12,7 @@ import type { OrderStatus } from '@/shared/enums/statusEnums'
 import { PAYMENT_STATE_LABELS, getPaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
-import { ROUTE_ICONS } from '@/shared/constants/routes'
+import { ORDER_DETAIL_ROUTE, ROUTE_ICONS } from '@/shared/constants/routes'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
 export interface UseOrdersTableReturn {
@@ -55,9 +56,9 @@ const dueDateTimeFormatter = new Intl.DateTimeFormat('he-IL', {
 })
 
 export const useOrdersTable = (): UseOrdersTableReturn => {
+  const router = useRouter()
   const { data, isLoading, isError } = useOrders()
   const setFilters = useSetAtom(orderFiltersAtom)
-  const setSelectedId = useSetAtom(selectedOrderIdAtom)
   const setFormOpen = useSetAtom(isOrderFormOpenAtom)
   const setEditingId = useSetAtom(editingOrderIdAtom)
   const updateStatus = useUpdateOrderStatus()
@@ -65,7 +66,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
   const confirm = useConfirm()
   const { menuState, openMenu, closeMenu } = useDropdownMenu()
 
-  const onViewOrder = (id: string): void => setSelectedId(id)
+  const onViewOrder = (id: string): void => router.push(ORDER_DETAIL_ROUTE(id))
 
   const onEditOrder = (id: string): void => {
     setEditingId(id)
@@ -82,7 +83,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
 
   const onRowMenuClick = (order: OrderSummary, e: MouseEvent<Element>): void => {
     openMenu(`#${order.order_number}`, [
-      { label: ORDERS_LABELS.DETAIL_EDIT_TITLE, icon: ROUTE_ICONS.ORDERS, onClick: () => onViewOrder(order.id) },
+      { label: ORDERS_LABELS.TABLE_VIEW_TITLE, icon: ROUTE_ICONS.ORDERS, onClick: () => onViewOrder(order.id) },
       { label: ORDERS_LABELS.TABLE_EDIT_TITLE, icon: UI_SYMBOLS.EDIT, onClick: () => onEditOrder(order.id) },
       { label: ORDERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDeleteOrder(order.id), variant: 'danger' },
     ], e)

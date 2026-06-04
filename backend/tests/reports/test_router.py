@@ -11,6 +11,7 @@ async def test_dashboard_kpi_returns_shape(client: AsyncClient) -> None:
     assert "open_orders" in body
     assert "ready_orders" in body
     assert "monthly_revenue" in body
+    assert "monthly_expenses" in body
     assert "unpaid_amount" in body
 
 

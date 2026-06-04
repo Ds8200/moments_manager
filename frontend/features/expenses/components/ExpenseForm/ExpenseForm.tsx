@@ -1,14 +1,16 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useExpenseForm } from './useExpenseForm'
+import { CategoryManagerModal } from '@/shared/components/CategoryManagerModal/CategoryManagerModal'
 import { EXPENSES_LABELS } from '../../constants/expensesLabels'
-import { EXPENSE_CATEGORY_LABELS } from '@/shared/enums/statusEnums'
 import styles from './ExpenseForm.module.scss'
 
 export const ExpenseForm = (): ReactElement | null => {
   const {
     isOpen, isEditing, register, handleSubmit, onSubmit,
-    errors, isSubmitting, onClose, categories, closeSymbol, currencySymbol,
+    errors, isSubmitting, onClose, categories,
+    isCategoryManagerOpen, openCategoryManager,
+    categoryManagerOptions, closeSymbol, currencySymbol,
   } = useExpenseForm()
 
   return isOpen ? (
@@ -27,11 +29,17 @@ export const ExpenseForm = (): ReactElement | null => {
             </div>
             <div className={styles.field}>
               <label className={styles.label}>{EXPENSES_LABELS.FORM_CATEGORY}</label>
-              <select className={styles.input} {...register('category')}>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{EXPENSE_CATEGORY_LABELS[cat] ?? cat}</option>
-                ))}
-              </select>
+              <div className={styles.categoryRow}>
+                <select className={styles.input} {...register('category_id')}>
+                  <option value="">{EXPENSES_LABELS.FORM_CATEGORY_PLACEHOLDER}</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <button type="button" className={styles.manageBtn} onClick={openCategoryManager}>
+                  {EXPENSES_LABELS.FORM_MANAGE_CATEGORIES}
+                </button>
+              </div>
             </div>
             <div className={`${styles.field} ${styles.fieldFull}`}>
               <label className={styles.label}>{EXPENSES_LABELS.FORM_AMOUNT}</label>
@@ -50,6 +58,7 @@ export const ExpenseForm = (): ReactElement | null => {
             </button>
           </div>
         </form>
+        {isCategoryManagerOpen && <CategoryManagerModal {...categoryManagerOptions} />}
       </div>
     </div>
   ) : null

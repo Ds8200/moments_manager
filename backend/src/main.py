@@ -17,6 +17,7 @@ from src.core.middleware import register_middleware
 from src.core.rate_limit import limiter
 from src.customers.router import router as customers_router
 from src.database import engine
+from src.expense_categories.router import router as expense_categories_router
 from src.expenses.router import router as expenses_router
 from src.orders.router import router as orders_router
 from src.product_categories.router import router as product_categories_router
@@ -67,6 +68,7 @@ app.include_router(customers_router)
 app.include_router(product_categories_router)
 app.include_router(products_router)
 app.include_router(orders_router)
+app.include_router(expense_categories_router)
 app.include_router(expenses_router)
 app.include_router(reports_router)
 

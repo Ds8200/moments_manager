@@ -11,6 +11,11 @@ import type { ConfirmDialogOptions } from '@/shared/store/globalAtoms'
 const deleteMutate = vi.fn()
 const statusMutate = vi.fn()
 const confirmFn = vi.fn()
+const pushFn = vi.fn()
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: pushFn }),
+}))
 
 vi.mock('../../../queries/useOrders', () => ({
   useOrders: () => ({
@@ -54,6 +59,7 @@ describe('useOrdersTable', () => {
     deleteMutate.mockClear()
     statusMutate.mockClear()
     confirmFn.mockClear()
+    pushFn.mockClear()
   })
 
   it('exposes orders from query data', () => {

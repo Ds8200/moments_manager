@@ -11,6 +11,8 @@ export const ROUTES = {
   LOGIN: '/login',
 } as const
 
+export const ORDER_DETAIL_ROUTE = (id: string): string => `/orders/${id}`
+
 export const ROUTE_ICONS = {
   HOME:      '🏠',
   ORDERS:    '📋',

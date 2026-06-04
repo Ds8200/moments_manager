@@ -1,0 +1,89 @@
+@use '../../../../shared/styles/variables' as v;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+}
+
+.section {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-card;
+  border: 1px solid v.$border-color;
+  padding: v.$space-5 v.$space-6;
+}
+
+.sectionTitle {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-primary;
+  margin-block-end: v.$space-4;
+  padding-block-end: v.$space-3;
+  border-block-end: 1px solid v.$border-color;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: v.$space-2;
+  border-block-end: 1px solid v.$gray-100;
+
+  &:last-child {
+    border-block-end: none;
+  }
+}
+
+.summaryLabel {
+  font-size: v.$font-size-base;
+  color: v.$text-secondary;
+}
+
+.summaryValue {
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.summaryProfit .summaryValue {
+  color: v.$success-dark;
+  font-weight: v.$font-weight-semibold;
+}
+
+.notes {
+  font-size: v.$font-size-base;
+  color: v.$text-primary;
+  line-height: v.$line-height-relaxed;
+  white-space: pre-wrap;
+}
+
+.fileList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-3;
+}
+
+.fileChip {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  padding: v.$space-2 v.$space-4;
+  background: v.$gray-100;
+  border-radius: v.$border-radius;
+  border: 1px solid v.$border-color;
+  font-size: v.$font-size-sm;
+  color: v.$text-primary;
+  text-decoration: none;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-200;
+  }
+}

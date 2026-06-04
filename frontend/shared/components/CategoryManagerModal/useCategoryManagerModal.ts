@@ -3,21 +3,39 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useProductCategories, useCreateProductCategory, useDeleteProductCategory } from '@/features/productCategories'
 import { ApiError } from '@/shared/utils/apiClient'
-import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
-import type { ProductCategory } from '../../types'
 
 const addSchema = z.object({ name: z.string().min(1) })
 type AddFormValues = z.infer<typeof addSchema>
 
-export interface CategoryManagerModalProps {
+export interface CategoryManagerItem {
+  id: string
+  name: string
+}
+
+export interface CategoryManagerLabels {
+  title: string
+  addPlaceholder: string
+  addBtn: string
+  empty: string
+  deleteTitle: string
+}
+
+export interface UseCategoryManagerModalOptions {
+  categories: CategoryManagerItem[]
+  isLoading: boolean
+  onCreate: (name: string) => Promise<unknown>
+  onDelete: (id: string) => Promise<void>
+  isCreating: boolean
+  inUseErrorCode: string
+  inUseErrorMessage: string
   onClose: () => void
+  labels: CategoryManagerLabels
 }
 
 export interface UseCategoryManagerModalReturn {
-  categories: ProductCategory[]
+  categories: CategoryManagerItem[]
   isLoading: boolean
   addRegister: ReturnType<typeof useForm<AddFormValues>>['register']
   addHandleSubmit: ReturnType<typeof useForm<AddFormValues>>['handleSubmit']
@@ -27,15 +45,16 @@ export interface UseCategoryManagerModalReturn {
   deleteErrors: Record<string, string>
   onClose: () => void
   closeSymbol: string
+  labels: CategoryManagerLabels
 }
 
 export const useCategoryManagerModal = (
-  props: CategoryManagerModalProps,
+  options: UseCategoryManagerModalOptions,
 ): UseCategoryManagerModalReturn => {
-  const { onClose } = props
-  const { data: categories = [], isLoading } = useProductCategories()
-  const createCategory = useCreateProductCategory()
-  const deleteCategory = useDeleteProductCategory()
+  const {
+    categories, isLoading, onCreate, onDelete: deleteFn,
+    isCreating, inUseErrorCode, inUseErrorMessage, onClose, labels,
+  } = options
   const [deleteErrors, setDeleteErrors] = useState<Record<string, string>>({})
 
   const {
@@ -45,17 +64,17 @@ export const useCategoryManagerModal = (
   } = useForm<AddFormValues>({ resolver: zodResolver(addSchema) })
 
   const onAdd = async (values: AddFormValues): Promise<void> => {
-    await createCategory.mutateAsync(values.name)
+    await onCreate(values.name)
     resetAdd()
   }
 
   const onDelete = async (id: string): Promise<void> => {
     setDeleteErrors((prev) => ({ ...prev, [id]: '' }))
     try {
-      await deleteCategory.mutateAsync(id)
+      await deleteFn(id)
     } catch (err) {
-      if (err instanceof ApiError && err.code === 'CATEGORY_IN_USE') {
-        setDeleteErrors((prev) => ({ ...prev, [id]: PRODUCTS_LABELS.CATEGORY_IN_USE_ERROR }))
+      if (err instanceof ApiError && err.code === inUseErrorCode) {
+        setDeleteErrors((prev) => ({ ...prev, [id]: inUseErrorMessage }))
       }
     }
   }
@@ -66,10 +85,11 @@ export const useCategoryManagerModal = (
     addRegister,
     addHandleSubmit,
     onAdd,
-    isAdding: createCategory.isPending,
+    isAdding: isCreating,
     onDelete,
     deleteErrors,
     onClose,
     closeSymbol: UI_SYMBOLS.CLOSE,
+    labels,
   }
 }

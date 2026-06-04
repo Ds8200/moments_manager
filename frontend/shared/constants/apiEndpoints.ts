@@ -13,6 +13,9 @@ export const API_ENDPOINTS = {
   PRODUCT_CATEGORIES:  `${BASE}/api/v1/product-categories`,
   PRODUCT_CATEGORY:    (id: string) => `${BASE}/api/v1/product-categories/${id}`,
 
+  EXPENSE_CATEGORIES:  `${BASE}/api/v1/expense-categories`,
+  EXPENSE_CATEGORY:    (id: string) => `${BASE}/api/v1/expense-categories/${id}`,
+
   PRODUCTS:     `${BASE}/api/v1/products`,
   PRODUCT:      (id: string) => `${BASE}/api/v1/products/${id}`,
 

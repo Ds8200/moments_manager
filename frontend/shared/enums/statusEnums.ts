@@ -44,12 +44,3 @@ export const getPaymentState = (isPaid: boolean, method: string | null): Payment
   if (method === 'transfer') return 'transfer'
   return 'cash'
 }
-
-export const EXPENSE_CATEGORY_LABELS: Record<string, string> = {
-  ink:       'דיו וצבעים',
-  materials: 'חומרי גלם',
-  equipment: 'ציוד',
-  shipping:  'משלוחים',
-  utilities: 'חשמל/מים',
-  other:     'אחר',
-}

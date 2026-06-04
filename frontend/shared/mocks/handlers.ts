@@ -34,11 +34,21 @@ export const handlers = [
     )
   }),
   http.delete(API_ENDPOINTS.PRODUCT_CATEGORY(':id'), () => new HttpResponse(null, { status: 204 })),
+  http.get(API_ENDPOINTS.EXPENSE_CATEGORIES, () => HttpResponse.json([])),
+  http.post(API_ENDPOINTS.EXPENSE_CATEGORIES, async ({ request }) => {
+    const body = await request.json() as { name: string }
+    return HttpResponse.json(
+      { id: 'ecat-1', name: body.name, created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-01T00:00:00Z' },
+      { status: 201 },
+    )
+  }),
+  http.delete(API_ENDPOINTS.EXPENSE_CATEGORY(':id'), () => new HttpResponse(null, { status: 204 })),
   http.get(API_ENDPOINTS.REPORTS_HOME, () =>
     HttpResponse.json({
       open_orders: 0,
       ready_orders: 0,
       monthly_revenue: '0',
+      monthly_expenses: '0',
       monthly_profit: '0',
       unpaid_amount: '0',
       today_orders: 0,

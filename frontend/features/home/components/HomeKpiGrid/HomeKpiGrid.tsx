@@ -10,7 +10,7 @@ export const HomeKpiGrid = (): ReactElement => {
   return (
     <div className={styles.grid}>
       {isPending
-        ? Array.from({ length: 5 }).map((_, i) => <div key={i} className={styles.skeleton} />)
+        ? Array.from({ length: 6 }).map((_, i) => <div key={i} className={styles.skeleton} />)
         : kpiCards.map((card) => <KpiCard key={card.label} {...card} />)
       }
     </div>

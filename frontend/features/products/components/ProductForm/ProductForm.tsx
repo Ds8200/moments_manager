@@ -1,15 +1,15 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useProductForm } from './useProductForm'
-import { CategoryManagerModal } from '../CategoryManagerModal/CategoryManagerModal'
+import { CategoryManagerModal } from '@/shared/components/CategoryManagerModal/CategoryManagerModal'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 import styles from './ProductForm.module.scss'
 
 export const ProductForm = (): ReactElement | null => {
   const {
     isOpen, isEditing, register, handleSubmit, onSubmit, errors, isSubmitting, onClose,
-    categories, isCategoryManagerOpen, openCategoryManager, closeCategoryManager,
-    closeSymbol, currencySymbol,
+    categories, isCategoryManagerOpen, openCategoryManager,
+    categoryManagerOptions, closeSymbol, currencySymbol,
   } = useProductForm()
 
   return isOpen ? (
@@ -68,7 +68,7 @@ export const ProductForm = (): ReactElement | null => {
             </button>
           </div>
         </form>
-        {isCategoryManagerOpen && <CategoryManagerModal onClose={closeCategoryManager} />}
+        {isCategoryManagerOpen && <CategoryManagerModal {...categoryManagerOptions} />}
       </div>
     </div>
   ) : null

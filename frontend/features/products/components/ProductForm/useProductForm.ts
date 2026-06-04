@@ -7,7 +7,12 @@ import { z } from 'zod'
 import { useAtom } from 'jotai'
 import { isProductFormOpenAtom, editingProductIdAtom } from '../../store/productsAtoms'
 import { useProduct, useCreateProduct, useUpdateProduct } from '../../queries/useProducts'
-import { useProductCategories } from '@/features/productCategories'
+import {
+  useProductCategories,
+  useCreateProductCategory,
+  useDeleteProductCategory,
+} from '@/features/productCategories'
+import type { UseCategoryManagerModalOptions } from '@/shared/components/CategoryManagerModal/useCategoryManagerModal'
 import type { ProductCategory, ProductFormValues } from '../../types'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
@@ -49,6 +54,7 @@ export interface UseProductFormReturn {
   isCategoryManagerOpen: boolean
   openCategoryManager: () => void
   closeCategoryManager: () => void
+  categoryManagerOptions: UseCategoryManagerModalOptions
   closeSymbol: string
   currencySymbol: string
 }
@@ -59,7 +65,9 @@ export const useProductForm = (): UseProductFormReturn => {
   const { data: existingProduct }   = useProduct(editingId)
   const createProduct               = useCreateProduct()
   const updateProduct               = useUpdateProduct()
-  const { data: categories = [] }   = useProductCategories()
+  const { data: categories = [], isLoading: categoriesLoading } = useProductCategories()
+  const createCategory              = useCreateProductCategory()
+  const deleteCategory              = useDeleteProductCategory()
   const [isCategoryManagerOpen, setCategoryManagerOpen] = useState(false)
 
   const {
@@ -104,6 +112,24 @@ export const useProductForm = (): UseProductFormReturn => {
     onClose()
   }
 
+  const categoryManagerOptions: UseCategoryManagerModalOptions = {
+    categories,
+    isLoading: categoriesLoading,
+    onCreate: (name) => createCategory.mutateAsync(name),
+    onDelete: (id) => deleteCategory.mutateAsync(id),
+    isCreating: createCategory.isPending,
+    inUseErrorCode: 'CATEGORY_IN_USE',
+    inUseErrorMessage: PRODUCTS_LABELS.CATEGORY_IN_USE_ERROR,
+    onClose: () => setCategoryManagerOpen(false),
+    labels: {
+      title:          PRODUCTS_LABELS.CATEGORY_MANAGER_TITLE,
+      addPlaceholder: PRODUCTS_LABELS.CATEGORY_ADD_PLACEHOLDER,
+      addBtn:         PRODUCTS_LABELS.CATEGORY_ADD_BTN,
+      empty:          PRODUCTS_LABELS.CATEGORY_EMPTY,
+      deleteTitle:    PRODUCTS_LABELS.CATEGORY_DELETE_TITLE,
+    },
+  }
+
   return {
     isOpen,
     isEditing: !!editingId,
@@ -117,6 +143,7 @@ export const useProductForm = (): UseProductFormReturn => {
     isCategoryManagerOpen,
     openCategoryManager: () => setCategoryManagerOpen(true),
     closeCategoryManager: () => setCategoryManagerOpen(false),
+    categoryManagerOptions,
     closeSymbol: UI_SYMBOLS.CLOSE,
     currencySymbol: UI_SYMBOLS.CURRENCY,
   }

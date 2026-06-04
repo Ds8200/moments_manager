@@ -22,6 +22,16 @@ export const EXPENSES_LABELS = {
   FORM_SAVE:                'שמור',
   FORM_SAVING:              'שומר...',
 
+  FORM_CATEGORY_PLACEHOLDER: '-- בחר קטגוריה --',
+  FORM_MANAGE_CATEGORIES:   'נהל קטגוריות',
+
+  CATEGORY_MANAGER_TITLE:   'ניהול קטגוריות הוצאות',
+  CATEGORY_ADD_PLACEHOLDER: 'שם קטגוריה חדשה',
+  CATEGORY_ADD_BTN:         'הוסף',
+  CATEGORY_EMPTY:           'אין קטגוריות עדיין',
+  CATEGORY_DELETE_TITLE:    'מחק קטגוריה',
+  CATEGORY_IN_USE_ERROR:    'הקטגוריה בשימוש ולא ניתן למחוק אותה',
+
   VALIDATION_DATE:          'נדרש תאריך',
   VALIDATION_AMOUNT:        'נדרש סכום',
   CREATED_SUCCESS:          'ההוצאה נוספה בהצלחה',

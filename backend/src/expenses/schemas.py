@@ -5,17 +5,19 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from src.expense_categories.schemas import ExpenseCategoryResponseSchema
+
 
 class ExpenseCreateSchema(BaseModel):
     date: Date
-    category: str
+    category_id: Optional[str] = None
     amount: Decimal
     notes: Optional[str] = None
 
 
 class ExpenseUpdateSchema(BaseModel):
     date: Optional[Date] = None
-    category: Optional[str] = None
+    category_id: Optional[str] = None
     amount: Optional[Decimal] = None
     notes: Optional[str] = None
 
@@ -25,7 +27,8 @@ class ExpenseResponseSchema(BaseModel):
 
     id: str
     date: Date
-    category: str
+    category_id: Optional[str]
+    category: Optional[ExpenseCategoryResponseSchema]
     amount: Decimal
     notes: Optional[str]
     created_at: datetime

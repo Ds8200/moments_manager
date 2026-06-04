@@ -1,0 +1,80 @@
+@use '../../../../../shared/styles/variables' as v;
+
+.section {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-card;
+  border: 1px solid v.$border-color;
+  padding: v.$space-5 v.$space-6;
+}
+
+.sectionTitle {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-primary;
+  margin-block-end: v.$space-4;
+  padding-block-end: v.$space-3;
+  border-block-end: 1px solid v.$border-color;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: v.$font-size-base;
+}
+
+.th {
+  padding: v.$space-3 v.$space-4;
+  text-align: start;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-block-end: 2px solid v.$border-color;
+  white-space: nowrap;
+
+  &.numeric {
+    text-align: end;
+  }
+}
+
+.row {
+  &:nth-child(even) {
+    background: v.$gray-50;
+  }
+
+  &:hover {
+    background: v.$primary-light;
+  }
+}
+
+.td {
+  padding: v.$space-3 v.$space-4;
+  color: v.$text-primary;
+  border-block-end: 1px solid v.$gray-100;
+
+  &.numeric {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &.notes {
+    color: v.$text-secondary;
+    font-size: v.$font-size-sm;
+    max-width: 200px;
+  }
+}
+
+.profit {
+  color: v.$success-dark;
+  font-weight: v.$font-weight-medium;
+}
+
+.profitCol {
+  color: v.$success-dark;
+}

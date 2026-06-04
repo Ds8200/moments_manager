@@ -39,3 +39,7 @@ RESOURCE_PRODUCT_CATEGORY = "ProductCategory"
 PRODUCT_CATEGORY_NOT_FOUND = "Product category not found"
 PRODUCT_CATEGORY_NAME_EXISTS = "A category with this name already exists"
 PRODUCT_CATEGORY_IN_USE = "Category is in use by one or more products and cannot be deleted"
+
+RESOURCE_EXPENSE_CATEGORY = "ExpenseCategory"
+EXPENSE_CATEGORY_NAME_EXISTS = "A category with this name already exists"
+EXPENSE_CATEGORY_IN_USE = "Category is in use by one or more expenses and cannot be deleted"

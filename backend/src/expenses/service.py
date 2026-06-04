@@ -26,10 +26,10 @@ class ExpenseService:
         params: PaginationParams,
         date_from: date | None = None,
         date_to: date | None = None,
-        category: str | None = None,
+        category_id: str | None = None,
     ) -> PaginatedResponse[ExpenseResponseSchema]:
         expenses, total = await self._repo.get_all(
-            date_from, date_to, category, params.page_size, params.offset
+            date_from, date_to, category_id, params.page_size, params.offset
         )
         pages = params.compute_pages(total)
         return PaginatedResponse(
@@ -38,7 +38,7 @@ class ExpenseService:
         )
 
     async def create_expense(self, data: ExpenseCreateSchema) -> ExpenseResponseSchema:
-        expense = await self._repo.create(data.model_dump())
+        expense = await self._repo.create(data.model_dump(exclude_none=True))
         await self._db.commit()
         refreshed = await self._repo.get_by_id(expense.id)
         return ExpenseResponseSchema.model_validate(refreshed)
@@ -49,7 +49,10 @@ class ExpenseService:
         expense = await self._repo.get_by_id(expense_id)
         if not expense:
             raise NotFoundError(RESOURCE_EXPENSE, expense_id)
-        await self._repo.update(expense, data.model_dump(exclude_none=True))
+        update_data = data.model_dump(exclude_none=True)
+        if "category_id" in data.model_fields_set and data.category_id is None:
+            update_data["category_id"] = None
+        await self._repo.update(expense, update_data)
         await self._db.commit()
         refreshed = await self._repo.get_by_id(expense_id)
         return ExpenseResponseSchema.model_validate(refreshed)

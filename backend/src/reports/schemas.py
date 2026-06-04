@@ -7,6 +7,7 @@ class DashboardKpiSchema(BaseModel):
     open_orders: int
     ready_orders: int
     monthly_revenue: Decimal
+    monthly_expenses: Decimal
     monthly_profit: Decimal
     unpaid_amount: Decimal
     today_orders: int

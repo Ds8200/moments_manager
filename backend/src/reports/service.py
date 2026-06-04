@@ -26,6 +26,7 @@ class ReportService:
         open_orders = await self._repo.count_open_orders()
         ready_orders = await self._repo.count_ready_orders()
         monthly_revenue = await self._repo.sum_month_paid_revenue(today.year, today.month)
+        monthly_expenses = await self._repo.sum_month_expenses(today.year, today.month)
         monthly_profit = await self._repo.sum_month_profit(today.year, today.month)
         unpaid_amount = await self._repo.sum_unpaid_amount()
         today_orders = await self._repo.count_orders_on_date(today)
@@ -34,6 +35,7 @@ class ReportService:
             open_orders=open_orders,
             ready_orders=ready_orders,
             monthly_revenue=monthly_revenue,
+            monthly_expenses=monthly_expenses,
             monthly_profit=monthly_profit,
             unpaid_amount=unpaid_amount,
             today_orders=today_orders,

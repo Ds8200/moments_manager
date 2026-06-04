@@ -23,13 +23,13 @@ async def list_expenses(
     page_size: int = Query(default=50, ge=1, le=200),
     date_from: date | None = Query(default=None),
     date_to: date | None = Query(default=None),
-    category: str | None = Query(default=None),
+    category_id: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
     _user=Depends(get_current_user),
 ):
     svc = ExpenseService(db)
     return await svc.list_expenses(
-        PaginationParams(page=page, page_size=page_size), date_from, date_to, category
+        PaginationParams(page=page, page_size=page_size), date_from, date_to, category_id
     )
 
 

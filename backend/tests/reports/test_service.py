@@ -14,7 +14,8 @@ async def test_get_dashboard_kpi_assembles_from_repo() -> None:
     service._repo = AsyncMock()
     service._repo.count_open_orders.return_value = 4
     service._repo.count_ready_orders.return_value = 2
-    service._repo.sum_month_revenue.return_value = Decimal("100")
+    service._repo.sum_month_paid_revenue.return_value = Decimal("100")
+    service._repo.sum_month_expenses.return_value = Decimal("20")
     service._repo.sum_month_profit.return_value = Decimal("30")
     service._repo.sum_unpaid_amount.return_value = Decimal("50")
     service._repo.count_orders_on_date.return_value = 1
@@ -24,6 +25,7 @@ async def test_get_dashboard_kpi_assembles_from_repo() -> None:
     assert result.open_orders == 4
     assert result.ready_orders == 2
     assert result.monthly_revenue == Decimal("100")
+    assert result.monthly_expenses == Decimal("20")
     assert result.unpaid_amount == Decimal("50")
     assert result.today_orders == 1
 

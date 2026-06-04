@@ -3,6 +3,7 @@ from datetime import date, datetime, timezone
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.expenses.models import Expense
 
@@ -17,26 +18,35 @@ class ExpenseRepository:
         self,
         date_from: date | None,
         date_to: date | None,
-        category: str | None,
+        category_id: str | None,
         limit: int,
         offset: int,
     ) -> tuple[list[Expense], int]:
-        query = select(Expense).where(Expense.is_deleted == False)
+        base = select(Expense).where(Expense.is_deleted.is_(False))
         if date_from:
-            query = query.where(Expense.date >= date_from)
+            base = base.where(Expense.date >= date_from)
         if date_to:
-            query = query.where(Expense.date <= date_to)
-        if category:
-            query = query.where(Expense.category == category)
-        count_q = select(func.count()).select_from(query.subquery())
+            base = base.where(Expense.date <= date_to)
+        if category_id:
+            base = base.where(Expense.category_id == category_id)
+
+        count_q = select(func.count()).select_from(base.subquery())
         total = (await self._db.execute(count_q)).scalar_one()
-        query = query.order_by(Expense.date.desc()).limit(limit).offset(offset)
-        result = await self._db.execute(query)
-        return result.scalars().all(), total
+
+        items_q = (
+            base.options(selectinload(Expense.category))
+            .order_by(Expense.date.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._db.execute(items_q)
+        return list(result.scalars().all()), total
 
     async def get_by_id(self, expense_id: str) -> Expense | None:
         result = await self._db.execute(
-            select(Expense).where(Expense.id == expense_id, Expense.is_deleted == False)
+            select(Expense)
+            .options(selectinload(Expense.category))
+            .where(Expense.id == expense_id, Expense.is_deleted.is_(False))
         )
         return result.scalar_one_or_none()
 

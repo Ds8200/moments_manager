@@ -1,9 +1,12 @@
-export type ExpenseCategory = 'ink' | 'materials' | 'equipment' | 'shipping' | 'utilities' | 'other'
+import type { ExpenseCategory } from '@/features/expenseCategories/types'
+
+export type { ExpenseCategory }
 
 export interface Expense {
   id: string
   date: string
-  category: ExpenseCategory
+  category_id: string | null
+  category: ExpenseCategory | null
   amount: string
   notes: string | null
   created_at: string
@@ -20,7 +23,7 @@ export interface ExpensesResponse {
 
 export interface ExpenseFormValues {
   date: string
-  category: ExpenseCategory
+  category_id: string
   amount: string
   notes: string
 }
