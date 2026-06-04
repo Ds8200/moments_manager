@@ -17,9 +17,93 @@
   color: $danger;
 }
 
-.listBox {
+.manualRow {
+  display: flex;
+  gap: $space-2;
+  align-items: center;
+}
+
+.manualInput {
+  flex: 1;
+  padding: $space-2 $space-3;
   border: 1px solid $border-color;
   border-radius: $border-radius;
+  font-size: $font-size-base;
+  font-family: inherit;
+  color: $text-primary;
+  background: $bg-card;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
+.addBtn {
+  padding: $space-2 $space-4;
+  border-radius: $border-radius;
+  border: none;
+  background: $primary;
+  color: $text-inverse;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.manualError {
+  font-size: $font-size-xs;
+  color: $danger;
+  margin-block-start: -$space-1;
+}
+
+.listToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: $space-2 $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  background: $gray-50;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $gray-100;
+  }
+
+  &[aria-expanded='true'] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
+    background: $gray-100;
+  }
+}
+
+.chevron {
+  transition: transform $transition-fast;
+  flex-shrink: 0;
+
+  .listToggle[aria-expanded='true'] & {
+    transform: rotate(180deg);
+  }
+}
+
+.listBox {
+  border: 1px solid $border-color;
+  border-top: none;
+  border-bottom-left-radius: $border-radius;
+  border-bottom-right-radius: $border-radius;
   max-height: 240px;
   overflow-y: auto;
 }

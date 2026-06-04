@@ -41,6 +41,8 @@ export interface UseSendEmailPageReturn extends UseEmojiInsertReturn {
   onToggleRecipient: (customer: Customer) => void
   onSelectAllRecipients: (customers: Customer[]) => void
   onClearAllRecipients: () => void
+  onAddManualRecipient: (email: string) => void
+  onRemoveRecipient: (key: string) => void
   register: ReturnType<typeof useForm<ComposeFormValues>>['register']
   errors: ReturnType<typeof useForm<ComposeFormValues>>['formState']['errors']
   handleSubmit: ReturnType<typeof useForm<ComposeFormValues>>['handleSubmit']
@@ -122,6 +124,19 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     setRecipients([])
   }, [])
 
+  const onAddManualRecipient = useCallback((email: string) => {
+    const key = `manual-${email}`
+    setRecipients((prev) => {
+      if (prev.some((r) => r.key === key)) return prev
+      return [...prev, { key, label: email, email }]
+    })
+    setRecipientsError(undefined)
+  }, [])
+
+  const onRemoveRecipient = useCallback((key: string) => {
+    setRecipients((prev) => prev.filter((r) => r.key !== key))
+  }, [])
+
   const addFiles = useCallback((dropped: File[]) => {
     setFiles((prev) => {
       const existing = new Set(prev.map((f) => `${f.name}-${f.size}`))
@@ -177,7 +192,12 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
       return
     }
     setFileError(undefined)
-    const customer_ids = recipients.map((r) => r.customer_id!)
+    const customer_ids = recipients
+      .filter((r) => r.customer_id !== undefined)
+      .map((r) => r.customer_id!)
+    const manual_emails = recipients
+      .filter((r) => r.customer_id === undefined)
+      .map((r) => r.email)
 
     const attachments: EmailAttachment[] = await Promise.all(
       files.map(async (file) => ({
@@ -187,7 +207,7 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     )
 
     compose.mutate(
-      { customer_ids, manual_emails: [], subject: values.subject, body: values.body, attachments },
+      { customer_ids, manual_emails, subject: values.subject, body: values.body, attachments },
       {
         onSuccess: () => {
           reset()
@@ -206,6 +226,8 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     onToggleRecipient,
     onSelectAllRecipients,
     onClearAllRecipients,
+    onAddManualRecipient,
+    onRemoveRecipient,
     register,
     errors,
     handleSubmit,

@@ -66,6 +66,15 @@ describe('useRecipientInput', () => {
   const onToggle = vi.fn()
   const onSelectAll = vi.fn()
   const onClearAll = vi.fn()
+  const onAddManual = vi.fn()
+  const onRemoveRecipient = vi.fn()
+
+  function renderInput() {
+    return renderHook(
+      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll, onAddManual, onRemoveRecipient }),
+      { wrapper: makeWrapper(qc) }
+    )
+  }
 
   beforeEach(() => {
     qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -73,34 +82,27 @@ describe('useRecipientInput', () => {
     onToggle.mockClear()
     onSelectAll.mockClear()
     onClearAll.mockClear()
+    onAddManual.mockClear()
+    onRemoveRecipient.mockClear()
     setupHandlers()
   })
 
   it('customers returns only those with email', async () => {
-    const { result } = renderHook(
-      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll }),
-      { wrapper: makeWrapper(qc) }
-    )
+    const { result } = renderInput()
     await vi.waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.customers).toHaveLength(2)
     expect(result.current.customers.every((c) => c.email !== null)).toBe(true)
   })
 
   it('isCustomerSelected is false for unselected customer', async () => {
-    const { result } = renderHook(
-      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll }),
-      { wrapper: makeWrapper(qc) }
-    )
+    const { result } = renderInput()
     await vi.waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.isCustomerSelected('c1')).toBe(false)
   })
 
   it('isCustomerSelected is true for selected customer', async () => {
     recipients = [{ key: 'customer-c1', label: 'דניאל', email: 'daniel@example.com', customer_id: 'c1' }]
-    const { result } = renderHook(
-      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll }),
-      { wrapper: makeWrapper(qc) }
-    )
+    const { result } = renderInput()
     await vi.waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.isCustomerSelected('c1')).toBe(true)
     expect(result.current.isCustomerSelected('c3')).toBe(false)
@@ -111,30 +113,21 @@ describe('useRecipientInput', () => {
       { key: 'customer-c1', label: 'דניאל', email: 'daniel@example.com', customer_id: 'c1' },
       { key: 'customer-c3', label: 'שרה', email: 'sara@example.com', customer_id: 'c3' },
     ]
-    const { result } = renderHook(
-      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll }),
-      { wrapper: makeWrapper(qc) }
-    )
+    const { result } = renderInput()
     await vi.waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.isAllSelected).toBe(true)
   })
 
   it('isIndeterminate is true when some but not all are selected', async () => {
     recipients = [{ key: 'customer-c1', label: 'דניאל', email: 'daniel@example.com', customer_id: 'c1' }]
-    const { result } = renderHook(
-      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll }),
-      { wrapper: makeWrapper(qc) }
-    )
+    const { result } = renderInput()
     await vi.waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.isIndeterminate).toBe(true)
     expect(result.current.isAllSelected).toBe(false)
   })
 
   it('onSelectAll calls prop with all email customers', async () => {
-    const { result } = renderHook(
-      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll }),
-      { wrapper: makeWrapper(qc) }
-    )
+    const { result } = renderInput()
     await vi.waitFor(() => expect(result.current.isLoading).toBe(false))
     act(() => { result.current.onSelectAll() })
     expect(onSelectAll).toHaveBeenCalledWith(
@@ -147,21 +140,53 @@ describe('useRecipientInput', () => {
   })
 
   it('onClearAll calls the onClearAll prop', () => {
-    const { result } = renderHook(
-      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll }),
-      { wrapper: makeWrapper(qc) }
-    )
+    const { result } = renderInput()
     act(() => { result.current.onClearAll() })
     expect(onClearAll).toHaveBeenCalledOnce()
   })
 
   it('onToggle calls the onToggle prop with the customer', async () => {
-    const { result } = renderHook(
-      () => useRecipientInput({ recipients, onToggle, onSelectAll, onClearAll }),
-      { wrapper: makeWrapper(qc) }
-    )
+    const { result } = renderInput()
     await vi.waitFor(() => expect(result.current.isLoading).toBe(false))
     act(() => { result.current.onToggle(CUSTOMER_WITH_EMAIL) })
     expect(onToggle).toHaveBeenCalledWith(CUSTOMER_WITH_EMAIL)
+  })
+
+  it('toggleList opens and closes the customer list', () => {
+    const { result } = renderInput()
+    expect(result.current.isListOpen).toBe(false)
+    act(() => { result.current.toggleList() })
+    expect(result.current.isListOpen).toBe(true)
+    act(() => { result.current.toggleList() })
+    expect(result.current.isListOpen).toBe(false)
+  })
+
+  it('onAddManual shows error for invalid email', () => {
+    const { result } = renderInput()
+    act(() => { result.current.onManualInputChange('not-an-email') })
+    act(() => { result.current.onAddManual() })
+    expect(result.current.manualError).toBeTruthy()
+    expect(onAddManual).not.toHaveBeenCalled()
+  })
+
+  it('onAddManual calls prop and clears input for valid email', () => {
+    const { result } = renderInput()
+    act(() => { result.current.onManualInputChange('test@example.com') })
+    act(() => { result.current.onAddManual() })
+    expect(onAddManual).toHaveBeenCalledWith('test@example.com')
+    expect(result.current.manualInput).toBe('')
+    expect(result.current.manualError).toBeUndefined()
+  })
+
+  it('onManualKeyDown with Enter key triggers add', () => {
+    const { result } = renderInput()
+    act(() => { result.current.onManualInputChange('hello@test.com') })
+    act(() => {
+      result.current.onManualKeyDown({
+        key: 'Enter',
+        preventDefault: vi.fn(),
+      } as unknown as React.KeyboardEvent<HTMLInputElement>)
+    })
+    expect(onAddManual).toHaveBeenCalledWith('hello@test.com')
   })
 })

@@ -9,6 +9,7 @@ export interface EmojiPickerProps {
   triggerRef: RefObject<HTMLButtonElement | null>
   anchorRef: RefObject<HTMLElement | null>
   safeRefs: RefObject<HTMLElement | null>[]
+  openDirection?: 'auto' | 'below'
 }
 
 export interface UseEmojiPickerReturn {
@@ -24,7 +25,8 @@ export const useEmojiPicker = ({
   triggerRef,
   anchorRef,
   safeRefs,
-}: Pick<EmojiPickerProps, 'isOpen' | 'onClose' | 'triggerRef' | 'anchorRef' | 'safeRefs'>): UseEmojiPickerReturn => {
+  openDirection = 'auto',
+}: Pick<EmojiPickerProps, 'isOpen' | 'onClose' | 'triggerRef' | 'anchorRef' | 'safeRefs' | 'openDirection'>): UseEmojiPickerReturn => {
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Position the panel below the anchor field, centered horizontally on it.
@@ -45,7 +47,7 @@ export const useEmojiPicker = ({
     // the bottom half AND there isn't enough space below.
     const anchorInTopHalf = rect.top < window.innerHeight / 2
     const top =
-      anchorInTopHalf || spaceBelow >= PANEL_HEIGHT
+      openDirection === 'below' || anchorInTopHalf || spaceBelow >= PANEL_HEIGHT
         ? rect.bottom + 8
         : rect.top - PANEL_HEIGHT - 8
 

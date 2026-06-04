@@ -18,5 +18,10 @@ export const SEND_EMAIL_LABELS = {
   ATTACH_BTN_ARIA:             'בחר קובץ לצירוף',
   SELECT_ALL:                  'בחר הכל',
   CLEAR_ALL:                   'נקה הכל',
-  NO_CUSTOMERS_WITH_EMAIL:     'אין לקוחות עם כתובת מייל מעודכנת',
+  NO_CUSTOMERS_WITH_EMAIL:      'אין לקוחות עם כתובת מייל מעודכנת',
+  MANUAL_EMAIL_PLACEHOLDER:     'הכנס מייל ידנית',
+  ADD_MANUAL_BTN:               'הוסף',
+  SHOW_LIST_BTN:                'הוסף מתוך רשימת לקוחות',
+  INVALID_EMAIL:                'כתובת מייל לא תקינה',
+  REMOVE_RECIPIENT:             'הסר נמען',
 } as const

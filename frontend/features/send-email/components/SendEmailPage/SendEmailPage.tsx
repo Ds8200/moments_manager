@@ -11,6 +11,7 @@ import styles from './SendEmailPage.module.scss'
 export const SendEmailPage = (): JSX.Element => {
   const {
     recipients, onToggleRecipient, onSelectAllRecipients, onClearAllRecipients,
+    onAddManualRecipient, onRemoveRecipient,
     errors, handleSubmit, recipientsError,
     onSubmit, isPending,
     subjectRef, textareaRef, buttonRef, anchorRef,
@@ -39,6 +40,8 @@ export const SendEmailPage = (): JSX.Element => {
               onToggle={onToggleRecipient}
               onSelectAll={onSelectAllRecipients}
               onClearAll={onClearAllRecipients}
+              onAddManual={onAddManualRecipient}
+              onRemoveRecipient={onRemoveRecipient}
               error={recipientsError}
             />
           </div>

@@ -70,7 +70,7 @@ export const EmailDialog = (): ReactElement => {
               <ComposeToolbar buttonRef={buttonRef} togglePicker={togglePicker} isPickerOpen={isPickerOpen} onFileInputChange={onFileInputChange} isPending={isPending} />
             </form>
 
-            <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[subjectRef, textareaRef]} />
+            <EmojiPicker isOpen={isPickerOpen} onClose={closePicker} onSelect={onEmojiSelect} triggerRef={buttonRef} anchorRef={anchorRef} safeRefs={[subjectRef, textareaRef]} openDirection="below" />
           </div>
         </div>
       )}
