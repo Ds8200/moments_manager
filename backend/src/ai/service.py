@@ -1,7 +1,11 @@
 import json
 import logging
+import re
 from collections.abc import AsyncGenerator
 from pathlib import Path
+
+# Matches embedded function-call syntax that some models accidentally output in text
+_FUNCTION_CALL_RE = re.compile(r"<function=\w+>.*?</function>", re.DOTALL)
 
 from groq import AsyncGroq
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -135,7 +139,7 @@ class AgentRunner:
                     tool_rounds += 1
 
                 else:
-                    text = choice.message.content or ""
+                    text = _FUNCTION_CALL_RE.sub("", choice.message.content or "").strip()
                     for token in _tokenize(text):
                         yield SSEEventSchema(type="token", content=token)
 
