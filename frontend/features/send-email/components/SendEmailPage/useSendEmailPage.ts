@@ -10,7 +10,7 @@ import { useEmojiInsert } from '@/shared/hooks/useEmojiInsert'
 import { SEND_EMAIL_LABELS } from '../../constants/sendEmailLabels'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import { ROUTES } from '@/shared/constants/routes'
-import { useCustomer } from '@/features/customers/queries/useCustomers'
+import { useAllCustomersWithEmail, useCustomer } from '@/features/customers/queries/useCustomers'
 import type { EmailAttachment, Recipient } from '../../types'
 import type { UseEmojiInsertReturn } from '@/shared/hooks/useEmojiInsert'
 import type { Customer } from '@/features/customers/types'
@@ -79,8 +79,11 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
   const preselectedId = searchParams.get('customerId')
   const prefilledSubject = searchParams.get('subject') ?? ''
   const prefilledBody = searchParams.get('body') ?? ''
+  const isSelectAll = searchParams.get('selectAll') === 'true'
   const { data: preselectedCustomer } = useCustomer(preselectedId)
+  const { data: allCustomersData } = useAllCustomersWithEmail()
   const preselectedAddedRef = useRef(false)
+  const selectAllAppliedRef = useRef(false)
 
   useEffect(() => {
     if (preselectedCustomer && !preselectedAddedRef.current) {
@@ -88,6 +91,16 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
       setRecipients([customerToRecipient(preselectedCustomer)])
     }
   }, [preselectedCustomer])
+
+  useEffect(() => {
+    if (isSelectAll && allCustomersData && !selectAllAppliedRef.current) {
+      selectAllAppliedRef.current = true
+      const withEmail = (allCustomersData.items ?? []).filter(
+        (c) => !!c.email && c.email.trim() !== '',
+      )
+      setRecipients(withEmail.map(customerToRecipient))
+    }
+  }, [isSelectAll, allCustomersData])
 
   const compose = useComposeEmail()
 

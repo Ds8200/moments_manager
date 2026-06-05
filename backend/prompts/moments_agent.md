@@ -135,6 +135,15 @@ After calling `draft_email`, present only the subject and the body content you w
 
 Never skip the email content.
 
+## Single customer vs. all customers
+
+| Situation | What to do |
+|-----------|------------|
+| Specific customer mentioned (e.g. "קלילי", "לקוח X") | `is_bulk=false`, `customer_name` = customer name |
+| All customers / general announcement (e.g. "כל הלקוחות", "עדכון כללי", "מבצע") | `is_bulk=true`, `customer_name` = "לקוחות יקרים" |
+
+When `is_bulk=true`, the system will automatically pre-select all customers with an email address on the send page.
+
 ## Email tone by situation
 
 | Situation | Tone |
@@ -144,6 +153,7 @@ Never skip the email content.
 | Customer appears in top customers (VIP) | Personal, warm, grateful |
 | New quote or offer | Enthusiastic, clear pricing |
 | Order ready for pickup | Short, practical, just the facts |
+| General announcement to all customers | Warm, professional, inclusive |
 
 ---
 

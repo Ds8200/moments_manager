@@ -11,7 +11,7 @@ export const AiEmailDraftCta = (): JSX.Element | null => {
   return (
     <div className={styles.container}>
       <button type="button" className={styles.button} onClick={handleSend}>
-        {AI_LABELS.SEND_EMAIL_CTA}
+        {draft.is_bulk ? AI_LABELS.SEND_BULK_EMAIL_CTA : AI_LABELS.SEND_EMAIL_CTA}
       </button>
     </div>
   )

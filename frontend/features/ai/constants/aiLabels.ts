@@ -26,6 +26,7 @@ export const ANALYZING_DEFAULT = 'מנתח נתונים'
 export const AI_LABELS = {
   NAV_LABEL:           'Moments AI',
   SEND_EMAIL_CTA:      'שלח מייל ←',
+  SEND_BULK_EMAIL_CTA: 'שלח לכל הלקוחות ←',
   PAGE_TITLE:          'Moments AI',
   PAGE_SUBTITLE:       'עוזר עסקי חכם',
   CLEAR_BUTTON:        'שיחה חדשה',

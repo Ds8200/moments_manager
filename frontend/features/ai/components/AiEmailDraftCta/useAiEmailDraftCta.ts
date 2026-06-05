@@ -20,7 +20,11 @@ export const useAiEmailDraftCta = (): UseAiEmailDraftCtaReturn => {
   const handleSend = useCallback((): void => {
     if (!draft) return
     const params = new URLSearchParams()
-    if (draft.customer_id) params.set('customerId', draft.customer_id)
+    if (draft.is_bulk) {
+      params.set('selectAll', 'true')
+    } else if (draft.customer_id) {
+      params.set('customerId', draft.customer_id)
+    }
     params.set('subject', draft.subject)
     params.set('body', draft.body_text)
     setDraft(null)

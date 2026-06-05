@@ -6,6 +6,7 @@ export interface EmailDraft {
   customer_name: string
   subject: string
   body_text: string
+  is_bulk: boolean
 }
 
 export const conversationAtom = atom<ChatMessage[]>([])

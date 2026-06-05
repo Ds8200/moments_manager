@@ -74,6 +74,7 @@ export const useAiStream = (): UseAiStreamReturn => {
               customer_name: (event.data.customer_name as string) ?? '',
               subject: (event.data.subject as string) ?? '',
               body_text: (event.data.body_text as string) ?? '',
+              is_bulk: (event.data.is_bulk as boolean) === true,
             })
           } else if (event.type === 'done') {
             setActiveTool(null)
