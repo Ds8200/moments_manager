@@ -1,27 +1,28 @@
 .container {
+  margin-block-start: 14px;
+  padding-block-start: 10px;
+  border-block-start: 1px solid #d9a8e8;
   display: flex;
-  justify-content: flex-end;
-  padding-inline: 20px;
-  padding-block: 8px;
-  flex-shrink: 0;
+  justify-content: flex-start;
 }
 
 .button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  background: #9c27b0;
-  color: #fff;
-  font-size: 0.9375rem;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1.5px solid #9c27b0;
+  background: #fff;
+  color: #9c27b0;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition: background 0.15s, color 0.15s;
 
   &:hover {
-    background: #7b1fa2;
+    background: #9c27b0;
+    color: #fff;
   }
 
   &:active {
