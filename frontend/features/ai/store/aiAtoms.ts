@@ -1,6 +1,13 @@
 import { atom } from 'jotai'
 import type { ChatMessage } from '@/features/ai/types'
 
+export interface EmailDraft {
+  customer_id: string | null
+  customer_name: string
+  subject: string
+  body_text: string
+}
+
 export const conversationAtom = atom<ChatMessage[]>([])
 
 export const isStreamingAtom = atom<boolean>(false)
@@ -47,6 +54,7 @@ export const clearConversationAtom = atom(
     set(isStreamingAtom, false)
     set(streamErrorAtom, null)
     set(activeToolAtom, null)
+    set(emailDraftAtom, null)
   }
 )
 
@@ -56,5 +64,14 @@ export const setActiveToolAtom = atom(
   null,
   (_get, set, toolName: string | null) => {
     set(activeToolAtom, toolName)
+  }
+)
+
+export const emailDraftAtom = atom<EmailDraft | null>(null)
+
+export const setEmailDraftAtom = atom(
+  null,
+  (_get, set, draft: EmailDraft | null) => {
+    set(emailDraftAtom, draft)
   }
 )

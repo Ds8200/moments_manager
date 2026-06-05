@@ -2,6 +2,7 @@
 
 import type { ReactElement } from 'react'
 import { AI_LABELS } from '@/features/ai/constants/aiLabels'
+import { AiEmailDraftCta } from '../AiEmailDraftCta/AiEmailDraftCta'
 import { AiInputBar } from '../AiInputBar/AiInputBar'
 import { AiMessageList } from '../AiMessageList/AiMessageList'
 import { useAiPage } from './useAiPage'
@@ -27,6 +28,7 @@ export const AiPage = (): ReactElement => {
         </button>
       </div>
       <AiMessageList onSuggestedPrompt={handleSuggestedPrompt} />
+      <AiEmailDraftCta />
       <AiInputBar />
     </div>
   )

@@ -11,6 +11,7 @@ import {
   finalizeStreamAtom,
   isStreamingAtom,
   setActiveToolAtom,
+  setEmailDraftAtom,
   streamErrorAtom,
 } from '@/features/ai/store/aiAtoms'
 import type { ChatMessage, SSEEvent } from '@/features/ai/types'
@@ -35,6 +36,7 @@ export const useAiStream = (): UseAiStreamReturn => {
   const setIsStreaming = useSetAtom(isStreamingAtom)
   const setStreamError = useSetAtom(streamErrorAtom)
   const setActiveTool = useSetAtom(setActiveToolAtom)
+  const setEmailDraft = useSetAtom(setEmailDraftAtom)
   const clearConversation = useSetAtom(clearConversationAtom)
 
   const sendMessage = useCallback(
@@ -62,6 +64,17 @@ export const useAiStream = (): UseAiStreamReturn => {
             appendToken(event.content)
           } else if (event.type === 'tool_call') {
             setActiveTool(event.tool_name ?? null)
+          } else if (
+            event.type === 'tool_result' &&
+            event.tool_name === 'draft_email' &&
+            event.data
+          ) {
+            setEmailDraft({
+              customer_id: (event.data.customer_id as string | null) ?? null,
+              customer_name: (event.data.customer_name as string) ?? '',
+              subject: (event.data.subject as string) ?? '',
+              body_text: (event.data.body_text as string) ?? '',
+            })
           } else if (event.type === 'done') {
             setActiveTool(null)
             finalizeStream()
@@ -79,7 +92,7 @@ export const useAiStream = (): UseAiStreamReturn => {
         setIsStreaming(false)
       }
     },
-    [conversation, appendMessage, appendToken, finalizeStream, setIsStreaming, setStreamError, setActiveTool]
+    [conversation, appendMessage, appendToken, finalizeStream, setIsStreaming, setStreamError, setActiveTool, setEmailDraft]
   )
 
   const retry = useCallback((): void => {

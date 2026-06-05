@@ -195,26 +195,36 @@ async def test_get_orders_summary_zero_count(mock_db) -> None:
 
 
 async def test_draft_email_returns_subject_and_body(mock_db) -> None:
+    # draft_email now looks up the customer ID via AiRepository
+    id_result = MagicMock()
+    id_result.scalar_one_or_none.return_value = "customer-uuid-123"
+    mock_db.execute = AsyncMock(return_value=id_result)
+
     result = await draft_email(
         db=mock_db,
         customer_name="ישראל ישראלי",
         subject="תזכורת תשלום",
-        body="שלום, אנא שלם את החשבון.",
+        body="אנא שלם את החשבון.",
     )
 
     assert result["subject"] == "תזכורת תשלום"
-    assert "שלום, אנא שלם" in result["body_text"]
+    assert "אנא שלם" in result["body_text"]
     assert "<html" in result["preview_html"]
+    assert result["customer_id"] == "customer-uuid-123"
+    assert result["customer_name"] == "ישראל ישראלי"
     assert result["note"] == "This is a draft only — no email has been sent."
 
 
-async def test_draft_email_does_not_require_db(mock_db) -> None:
-    # draft_email should work even if db is None (it doesn't use the DB)
+async def test_draft_email_customer_not_found(mock_db) -> None:
+    id_result = MagicMock()
+    id_result.scalar_one_or_none.return_value = None
+    mock_db.execute = AsyncMock(return_value=id_result)
+
     result = await draft_email(
-        db=None,
-        customer_name="Test",
+        db=mock_db,
+        customer_name="לקוח לא קיים",
         subject="Subject",
-        body="Body text",
+        body="Body",
     )
-    assert "subject" in result
-    assert "body_text" in result
+    assert result["customer_id"] is None
+    assert result["customer_name"] == "לקוח לא קיים"

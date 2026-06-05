@@ -317,3 +317,16 @@ class AiRepository:
             }
             for p in result.scalars().all()
         ]
+
+    async def find_customer_id_by_name(self, customer_name: str) -> str | None:
+        """Returns the ID of the first customer whose name contains customer_name."""
+        result = await self._db.execute(
+            select(Customer.id)
+            .where(
+                Customer.name.ilike(f"%{customer_name}%"),
+                Customer.is_deleted.is_(False),
+            )
+            .order_by(Customer.name)
+            .limit(1)
+        )
+        return result.scalar_one_or_none()

@@ -77,6 +77,8 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const preselectedId = searchParams.get('customerId')
+  const prefilledSubject = searchParams.get('subject') ?? ''
+  const prefilledBody = searchParams.get('body') ?? ''
   const { data: preselectedCustomer } = useCustomer(preselectedId)
   const preselectedAddedRef = useRef(false)
 
@@ -97,6 +99,14 @@ export const useSendEmailPage = (): UseSendEmailPageReturn => {
     getValues,
     setValue,
   } = useForm<ComposeFormValues>({ resolver: zodResolver(composeSchema) })
+
+  const prefilledAppliedRef = useRef(false)
+  useEffect(() => {
+    if ((prefilledSubject || prefilledBody) && !prefilledAppliedRef.current) {
+      prefilledAppliedRef.current = true
+      reset({ subject: prefilledSubject, body: prefilledBody })
+    }
+  }, [prefilledSubject, prefilledBody, reset])
 
   const emojiInsert = useEmojiInsert('subject', 'body', getValues, setValue)
 
