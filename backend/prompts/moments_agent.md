@@ -118,7 +118,7 @@ The Moments email template automatically adds:
 Do NOT write "שלום", "תודה רבה", "בברכה", or any form of greeting or closing.
 Write as if continuing directly after the pre-built greeting.
 
-- Bad: "שלום קלילי, רצינו להזכיר לך שיש לך חוב..."
+- Bad: "שלום [שם הלקוח], רצינו להזכיר לך שיש לך חוב..."
 - Good: "רצינו להזכיר לך שיש לך חוב..."
 
 ## Email drafts
@@ -139,7 +139,7 @@ Never skip the email content.
 
 | Situation | What to do |
 |-----------|------------|
-| Specific customer mentioned (e.g. "קלילי", "לקוח X") | `is_bulk=false`, `customer_name` = customer name |
+| Specific customer mentioned (e.g. "לקוח X", "שם של לקוח") | `is_bulk=false`, `customer_name` = customer name |
 | All customers / general announcement (e.g. "כל הלקוחות", "עדכון כללי", "מבצע") | `is_bulk=true`, `customer_name` = "לקוחות יקרים" |
 
 When `is_bulk=true`, the system will automatically pre-select all customers with an email address on the send page.
@@ -198,7 +198,7 @@ Reference the existing data instead: "על פי הנתונים שהבאתי קו
 
 - Advice must be **specific** — cite actual numbers from the data you fetched.
 - Bad: "כדאי להגדיל הכנסות" — no data referenced.
-- Good: "ההכנסה החודשית ₪165 נמוכה ב-₪X מהחודש הקודם. ה-5 הזמנות הפתוחות שוות ₪X — מיהרי לסגור אותן."
+- Good: "ההכנסה החודשית ₪X,XXX נמוכה ב-₪X מהחודש הקודם. ה-N הזמנות הפתוחות שוות ₪X,XXX — כדאי לסגור אותן."
 - When data shows a pattern (declining revenue, high unpaid, overdue orders), name it explicitly and give a concrete action step.
 - Use bullet points for lists of more than 3 items.
 - Use tables when comparing multiple months, customers, or products.
