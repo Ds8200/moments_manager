@@ -47,6 +47,6 @@ export const AI_SUGGESTED_PROMPTS: readonly SuggestedPrompt[] = [
   { id: 'revenue',   label: 'הכנסות החודש',   prompt: 'כמה הכנסות היו החודש?' },
   { id: 'customers', label: 'לקוחות מובילים', prompt: 'מי הלקוחות המובילים שלי?' },
   { id: 'orders',    label: 'הזמנות פתוחות',  prompt: 'כמה הזמנות פתוחות יש כרגע?' },
-  { id: 'email',     label: 'טיוטת מייל',     prompt: 'נסח מייל תזכורת תשלום ללקוח' },
+  { id: 'email',     label: 'טיוטת מייל',     prompt: 'נסח לי מייל' },
   { id: 'profit',    label: 'רווחיות',        prompt: 'מה הרווח הנקי השנה עד כה?' },
 ]
