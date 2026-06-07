@@ -67,7 +67,15 @@ async def draft_email(
 
     customer_id: str | None = None
     if not is_bulk:
-        customer_id = await AiRepository(db).find_customer_id_by_name(customer_name)
+        repo = AiRepository(db)
+        customer_id = await repo.find_customer_id_by_name(customer_name)
+        if customer_id is None:
+            candidates = await repo.get_all_customer_names()
+            return {
+                "not_found": True,
+                "searched_for": customer_name,
+                "candidates": candidates,
+            }
 
     final_subject, html_body = build_customer_email(customer_name, subject, body)
     return {

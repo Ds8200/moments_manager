@@ -24,6 +24,17 @@ _ACTIVE_STATUSES = [
 ]
 
 
+def _search_terms(query: str) -> list[str]:
+    """Return search variants by stripping the longest matching Hebrew plural suffix."""
+    suffixes = ("יות", "ות", "ים", "ם")
+    terms: set[str] = {query}
+    for suffix in suffixes:
+        if query.endswith(suffix) and len(query) - len(suffix) >= 2:
+            terms.add(query[: -len(suffix)])
+            break
+    return list(terms)
+
+
 class AiRepository:
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
@@ -176,18 +187,24 @@ class AiRepository:
         ]
 
     async def search_orders(self, query: str, limit: int) -> dict:
-        """Free-text search across order numbers, customer names, and notes."""
-        term = f"%{query}%"
-        customer_ids = select(Customer.id).where(Customer.name.ilike(term))
+        """Free-text search across order numbers, customer names, notes, and product names."""
+        terms = [f"%{t}%" for t in _search_terms(query)]
+        customer_ids = select(Customer.id).where(
+            or_(*[Customer.name.ilike(t) for t in terms])
+        )
+        order_ids_by_product = select(OrderItem.order_id).where(
+            or_(*[OrderItem.product_name.ilike(t) for t in terms])
+        )
         result = await self._db.execute(
             select(Order)
             .options(selectinload(Order.customer))
             .where(
                 Order.is_deleted.is_(False),
                 or_(
-                    Order.order_number.ilike(term),
+                    *[Order.order_number.ilike(t) for t in terms],
                     Order.customer_id.in_(customer_ids),
-                    Order.notes.ilike(term),
+                    *[Order.notes.ilike(t) for t in terms],
+                    Order.id.in_(order_ids_by_product),
                 ),
             )
             .order_by(Order.created_at.desc())
@@ -300,7 +317,8 @@ class AiRepository:
             .where(Product.is_deleted.is_(False))
         )
         if search:
-            query = query.where(Product.name.ilike(f"%{search}%"))
+            search_filters = [Product.name.ilike(f"%{t}%") for t in _search_terms(search)]
+            query = query.where(or_(*search_filters))
         if active_only:
             query = query.where(Product.is_active.is_(True))
         query = query.order_by(Product.name).limit(limit)
@@ -331,16 +349,33 @@ class AiRepository:
         )
         return result.scalar_one_or_none()
 
-    async def find_customer_suggestions(self, query: str, limit: int = 5) -> list[str]:
-        """Returns customer names matching any word in query — used for fuzzy suggestions."""
-        words = [w.strip() for w in query.split() if len(w.strip()) >= 2]
-        if not words:
-            return []
-        filters = [Customer.name.ilike(f"%{word}%") for word in words]
+    async def search_order_numbers(self, partial: str, limit: int = 10) -> list[str]:
+        """Returns order numbers matching a partial string — for order disambiguation."""
+        result = await self._db.execute(
+            select(Order.order_number)
+            .where(
+                Order.is_deleted.is_(False),
+                Order.order_number.ilike(f"%{partial.strip()}%"),
+            )
+            .order_by(Order.created_at.desc())
+            .limit(limit)
+        )
+        return list(result.scalars().all())
+
+    async def get_all_customer_names(self, limit: int = 50) -> list[str]:
+        """Returns all active customer names — passed to the LLM for disambiguation."""
         result = await self._db.execute(
             select(Customer.name)
-            .where(or_(*filters), Customer.is_deleted.is_(False))
+            .where(Customer.is_deleted.is_(False))
             .order_by(Customer.name)
             .limit(limit)
         )
+        return list(result.scalars().all())
+
+    async def get_all_product_names(self, active_only: bool = True, limit: int = 50) -> list[str]:
+        """Returns all product names — passed to the LLM for disambiguation."""
+        query = select(Product.name).where(Product.is_deleted.is_(False))
+        if active_only:
+            query = query.where(Product.is_active.is_(True))
+        result = await self._db.execute(query.order_by(Product.name).limit(limit))
         return list(result.scalars().all())

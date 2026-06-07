@@ -120,5 +120,10 @@ async def get_order_items(
     repo = AiRepository(db)
     result = await repo.get_order_items_by_number(order_number.strip())
     if result is None:
-        return {"found": False, "message": f"לא נמצאה הזמנה עם מספר '{order_number}'"}
+        candidates = await repo.search_order_numbers(order_number.strip())
+        return {
+            "not_found": True,
+            "searched_for": order_number,
+            "candidates": candidates,
+        }
     return {"found": True, **result}
