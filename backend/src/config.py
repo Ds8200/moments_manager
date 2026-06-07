@@ -15,9 +15,11 @@ class Settings(BaseSettings):
     UPLOADS_DIR: str = "./uploads"
     MAX_FILE_SIZE_MB: int = 10
     BREVO_API_KEY: str = ""
-    EMAIL_FROM_NAME: str = "Moments"
+    EMAIL_FROM_NAME: str = "Management System"
     EMAIL_FROM: str = ""
     APP_URL: str = "http://localhost:3000"
+    APP_DOMAIN: str = "localhost:3000"
+    SYSTEM_ADMIN_EMAIL: str = ""
     OPENAI_API_KEY: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")

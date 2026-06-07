@@ -36,9 +36,9 @@ def _compute_item_fields(item_data: dict) -> dict:
 
 
 class OrderService:
-    def __init__(self, db: AsyncSession) -> None:
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
         self._db = db
-        self._repo = OrderRepository(db)
+        self._repo = OrderRepository(db, org_id)
 
     async def list_orders(
         self,

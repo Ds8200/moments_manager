@@ -3,13 +3,12 @@
 import type { ReactElement } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMobileDrawer } from './useMobileDrawer'
-import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { useMobileDrawer, type MobileDrawerProps } from './useMobileDrawer'
 import { ROUTES } from '@/shared/constants/routes'
 import styles from './MobileDrawer.module.scss'
 
-export const MobileDrawer = (): ReactElement => {
-  const { isOpen, pathname, visibleNavItems, onClose } = useMobileDrawer()
+export const MobileDrawer = (props: MobileDrawerProps): ReactElement => {
+  const { isOpen, pathname, visibleNavItems, logoSrc, logoAlt, onClose } = useMobileDrawer(props)
 
   return (
     <>
@@ -23,13 +22,7 @@ export const MobileDrawer = (): ReactElement => {
         aria-hidden={!isOpen}
       >
         <Link href={ROUTES.HOME} className={styles.logo} onClick={onClose}>
-          <Image
-            src="/moments_logo.png"
-            alt={UI_LABELS.APP_NAME}
-            width={140}
-            height={52}
-            priority
-          />
+          <Image src={logoSrc} alt={logoAlt} width={140} height={52} priority />
         </Link>
         <nav className={styles.nav}>
           {visibleNavItems.map((item) => (

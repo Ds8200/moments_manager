@@ -1,16 +1,19 @@
 // ============================================================
-// Design Tokens — Moments
+// Design Tokens — מערכת ניהול
 // ============================================================
 
-// Primary palette — מותאם ללוגו Moments (סגול → מג'נטה + כתום-זהב)
-$primary:       #9C27B0;
+// Primary palette — סגול → מג'נטה + כתום-זהב
+// Tenant subdomains override these via --color-* CSS custom properties injected
+// in app/(app)/layout.tsx (AI-extracted org brand colors); the hex values below
+// are the fallback used on the main domain and wherever no org branding applies.
+$primary:       var(--color-primary, #9C27B0);
 $primary-light: #F3E5F5;
-$primary-dark:  #6A1B7A;
-$accent:        #D81B60;
+$primary-dark:  var(--color-secondary, #6A1B7A);
+$accent:        var(--color-accent, #D81B60);
 $accent-gold:   #FF9F1C;
 
 // גרדיאנט המותג — לכותרות/מותג/מייל
-$gradient-brand: linear-gradient(135deg, #9C27B0 0%, #D81B60 100%);
+$gradient-brand: linear-gradient(135deg, var(--color-primary, #9C27B0) 0%, var(--color-accent, #D81B60) 100%);
 
 // Order status colors
 $status-new:              #339AF0;

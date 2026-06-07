@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class ReportService:
-    def __init__(self, db: AsyncSession) -> None:
-        self._repo = ReportRepository(db)
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
+        self._repo = ReportRepository(db, org_id)
 
     async def get_dashboard_kpi(self) -> DashboardKpiSchema:
         today = date.today()

@@ -1,0 +1,39 @@
+@use '../../../../../shared/styles/variables' as v;
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-3;
+  text-align: center;
+}
+
+.title {
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.subtitle {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  margin-bottom: v.$space-4;
+}
+
+.dashboardLink {
+  display: inline-block;
+  width: 100%;
+  padding: v.$space-3;
+  background: v.$primary;
+  color: v.$text-inverse;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-semibold;
+  text-align: center;
+  text-decoration: none;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$primary-dark;
+  }
+}

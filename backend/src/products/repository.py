@@ -5,14 +5,15 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from src.database import BaseRepository
 from src.products.models import Product
 
 logger = logging.getLogger(__name__)
 
 
-class ProductRepository:
-    def __init__(self, db: AsyncSession) -> None:
-        self._db = db
+class ProductRepository(BaseRepository):
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
+        super().__init__(db, org_id)
 
     async def get_all(
         self,
@@ -22,7 +23,11 @@ class ProductRepository:
         limit: int,
         offset: int,
     ) -> tuple[list[Product], int]:
-        base = select(Product).where(Product.is_deleted.is_(False))
+        await self._apply_org_rls()
+        base = select(Product).where(
+            Product.is_deleted.is_(False),
+            Product.organization_id == self._org_id,
+        )
         if search:
             base = base.where(Product.name.ilike(f"%{search}%"))
         if category_id:
@@ -43,14 +48,21 @@ class ProductRepository:
         return list(result.scalars().all()), total
 
     async def get_by_id(self, product_id: str) -> Product | None:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(Product)
             .options(selectinload(Product.category))
-            .where(Product.id == product_id, Product.is_deleted.is_(False))
+            .where(
+                Product.id == product_id,
+                Product.is_deleted.is_(False),
+                Product.organization_id == self._org_id,
+            )
         )
         return result.scalar_one_or_none()
 
     async def create(self, data: dict) -> Product:
+        await self._apply_org_rls()
+        data["organization_id"] = self._org_id
         product = Product(**data)
         self._db.add(product)
         await self._db.flush()

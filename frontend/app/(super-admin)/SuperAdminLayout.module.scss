@@ -1,0 +1,36 @@
+@use '../../shared/styles/variables' as v;
+
+.root {
+  display: flex;
+  min-height: 100vh;
+  background: v.$bg-page;
+}
+
+.content {
+  flex: 1;
+  margin-right: v.$sidebar-width;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: margin-right v.$transition-normal;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    margin-right: 0;
+  }
+}
+
+.contentExpanded {
+  @media (min-width: #{v.$breakpoint-md}) {
+    margin-right: 0;
+  }
+}
+
+.main {
+  flex: 1;
+  padding: v.$space-6;
+  width: 100%;
+
+  @media (max-width: #{v.$breakpoint-md - 1}) {
+    padding: v.$space-4;
+  }
+}

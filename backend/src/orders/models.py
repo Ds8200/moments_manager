@@ -3,7 +3,18 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import (
+    Boolean,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base, SoftDeleteMixin, TimestampMixin
@@ -15,9 +26,16 @@ if TYPE_CHECKING:
 
 class Order(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "orders"
+    __table_args__ = (
+        UniqueConstraint("organization_id", "order_number", name="uq_order_org_number"),
+        Index("ix_orders_organization_id", "organization_id"),
+    )
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    order_number: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    organization_id: Mapped[str] = mapped_column(
+        String, ForeignKey("organizations.id"), nullable=False, index=False
+    )
+    order_number: Mapped[str] = mapped_column(String(20), nullable=False)
     customer_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("customers.id"), nullable=True
     )

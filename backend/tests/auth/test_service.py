@@ -57,7 +57,7 @@ async def test_magic_login_rejects_a_regular_access_token() -> None:
     db = AsyncMock()
     service = AuthService(db)
     # A normal access token has no magic_login purpose claim.
-    access = create_access_token("user-1", "user")
+    access = create_access_token("user-1", org_id="org-x", org_role="member")
 
     with pytest.raises(UnauthorizedError):
         await service.magic_login(access)
@@ -68,10 +68,12 @@ async def test_magic_login_with_valid_token_issues_token_pair() -> None:
     service = AuthService(db)
     user = MagicMock()
     user.id = "user-1"
-    user.role = "admin"
+    user.role = "user"
     service._users = AsyncMock()
     service._users.get_by_id.return_value = user
     service._tokens = AsyncMock()
+    # _resolve_org does a real DB call — mock it at the service level
+    service._resolve_org = AsyncMock(return_value=("org-test", "owner"))
 
     token = create_magic_login_token("user-1")
     result = await service.magic_login(token)

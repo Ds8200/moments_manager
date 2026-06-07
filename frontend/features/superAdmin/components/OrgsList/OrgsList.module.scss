@@ -1,0 +1,115 @@
+@use '../../../../shared/styles/variables' as v;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-4;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.addOrgBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: v.$space-2 v.$space-5;
+  background: v.$primary;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius-sm;
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity v.$transition-fast;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.empty {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  background: v.$bg-card;
+  box-shadow: v.$shadow-card;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  padding: v.$space-3 v.$space-4;
+  text-align: start;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-secondary;
+  background: v.$bg-page;
+  border-bottom: 1px solid v.$border-color;
+  white-space: nowrap;
+}
+
+.tr {
+  &:not(:last-child) {
+    border-bottom: 1px solid v.$border-color;
+  }
+
+  &:hover {
+    background: v.$bg-page;
+  }
+}
+
+.td {
+  padding: v.$space-3 v.$space-4;
+  font-size: v.$font-size-sm;
+  color: v.$text-primary;
+  vertical-align: middle;
+}
+
+.activateBtn,
+.deactivateBtn {
+  padding: v.$space-2 v.$space-4;
+  border: none;
+  border-radius: v.$border-radius-sm;
+  font-family: inherit;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  cursor: pointer;
+  transition: opacity v.$transition-fast;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.activateBtn {
+  background: v.$success;
+  color: v.$text-inverse;
+}
+
+.deactivateBtn {
+  background: v.$danger;
+  color: v.$text-inverse;
+}

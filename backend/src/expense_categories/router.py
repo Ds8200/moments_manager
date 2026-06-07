@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.dependencies import get_current_user, get_db
+from src.core.dependencies import get_db, get_org_context
 from src.expense_categories.schemas import (
     ExpenseCategoryCreateSchema,
     ExpenseCategoryResponseSchema,
@@ -18,9 +18,9 @@ router = APIRouter(prefix="/api/v1/expense-categories", tags=["expense-categorie
 @router.get("", response_model=list[ExpenseCategoryResponseSchema])
 async def list_categories(
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ExpenseCategoryService(db)
+    svc = ExpenseCategoryService(db, ctx.org_id)
     return await svc.list_categories()
 
 
@@ -28,9 +28,9 @@ async def list_categories(
 async def create_category(
     body: ExpenseCategoryCreateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ExpenseCategoryService(db)
+    svc = ExpenseCategoryService(db, ctx.org_id)
     return await svc.create_category(body)
 
 
@@ -39,9 +39,9 @@ async def update_category(
     category_id: str,
     body: ExpenseCategoryUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ExpenseCategoryService(db)
+    svc = ExpenseCategoryService(db, ctx.org_id)
     return await svc.update_category(category_id, body)
 
 
@@ -49,7 +49,7 @@ async def update_category(
 async def delete_category(
     category_id: str,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ExpenseCategoryService(db)
+    svc = ExpenseCategoryService(db, ctx.org_id)
     await svc.delete_category(category_id)

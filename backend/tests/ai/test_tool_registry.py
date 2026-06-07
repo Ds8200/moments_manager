@@ -70,7 +70,7 @@ async def test_execute_calls_tool_fn(registry: ToolRegistry) -> None:
         parameters={"type": "object", "properties": {}},
     )(tracking_fn)
 
-    result = await registry.execute("tracked", {"extra": 1}, db=None)
+    result = await registry.execute("tracked", {"extra": 1}, db=None, org_id="test-org-id")
 
     assert result == {"result": "ok"}
     assert len(calls) == 1
@@ -78,6 +78,6 @@ async def test_execute_calls_tool_fn(registry: ToolRegistry) -> None:
 
 
 async def test_execute_unknown_tool_returns_error(registry: ToolRegistry) -> None:
-    result = await registry.execute("unknown_tool", {}, db=None)
+    result = await registry.execute("unknown_tool", {}, db=None, org_id="test-org-id")
     assert "error" in result
     assert "unknown_tool" in result["error"].lower()

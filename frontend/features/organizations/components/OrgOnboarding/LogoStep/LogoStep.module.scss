@@ -1,0 +1,110 @@
+@use '../../../../../shared/styles/variables' as v;
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-3;
+  text-align: center;
+}
+
+.title {
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.subtitle {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  margin-bottom: v.$space-2;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.uploadButton {
+  padding: v.$space-3 v.$space-6;
+  background: v.$primary;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  cursor: pointer;
+  transition: background v.$transition-fast;
+
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.hint {
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+}
+
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: v.$space-3;
+  list-style: none;
+  margin: v.$space-2 0;
+  padding: 0;
+  width: 100%;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-1;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  min-width: 96px;
+}
+
+.swatchLabel {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.swatchHex {
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+  font-family: monospace;
+}
+
+.nextButton {
+  width: 100%;
+  padding: v.$space-3;
+  background: v.$primary;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  cursor: pointer;
+  transition: background v.$transition-fast;
+  margin-top: v.$space-4;
+
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

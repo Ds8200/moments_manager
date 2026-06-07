@@ -18,11 +18,22 @@ def test_password_round_trip() -> None:
 
 
 def test_access_token_round_trip() -> None:
-    token = create_access_token("user-123", "user")
+    token = create_access_token("user-123", org_id="org-abc", org_role="member")
     payload = decode_access_token(token)
     assert payload is not None
     assert payload["sub"] == "user-123"
-    assert payload["role"] == "user"
+    assert payload["org_id"] == "org-abc"
+    assert payload["org_role"] == "member"
+    assert payload["sys_admin"] is False
+
+
+def test_access_token_sys_admin_no_org() -> None:
+    token = create_access_token("user-456", org_id=None, org_role=None, sys_admin=True)
+    payload = decode_access_token(token)
+    assert payload is not None
+    assert payload["sys_admin"] is True
+    assert "org_id" not in payload
+    assert "org_role" not in payload
 
 
 def test_decode_invalid_token_returns_none() -> None:

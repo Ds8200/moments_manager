@@ -52,11 +52,11 @@ class ToolRegistry:
             for tool in self._tools.values()
         ]
 
-    async def execute(self, name: str, args: dict, db: AsyncSession) -> dict:
+    async def execute(self, name: str, args: dict, db: AsyncSession, org_id: str) -> dict:
         tool = self.get(name)
         if tool is None:
             return {"error": f"Unknown tool: {name}"}
-        return await tool.fn(db=db, **(args or {}))
+        return await tool.fn(db=db, org_id=org_id, **(args or {}))
 
 
 tool_registry = ToolRegistry()

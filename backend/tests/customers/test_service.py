@@ -31,7 +31,7 @@ def _make_customer(customer_id: str = "c-1", name: str = "Test") -> MagicMock:
 
 async def test_get_customer_raises_not_found_when_missing() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -41,7 +41,7 @@ async def test_get_customer_raises_not_found_when_missing() -> None:
 
 async def test_update_customer_raises_not_found_when_missing() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -51,7 +51,7 @@ async def test_update_customer_raises_not_found_when_missing() -> None:
 
 async def test_delete_customer_raises_not_found_when_missing() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -61,7 +61,7 @@ async def test_delete_customer_raises_not_found_when_missing() -> None:
 
 async def test_create_customer_commits() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     customer = _make_customer()
     service._repo.create.return_value = customer
@@ -75,7 +75,7 @@ async def test_create_customer_commits() -> None:
 
 async def test_list_customers_computes_pages() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     service._repo.get_all.return_value = ([_make_customer() for _ in range(5)], 12)
 
@@ -88,19 +88,22 @@ async def test_list_customers_computes_pages() -> None:
 
 async def test_send_email_to_customer_not_found() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
     with pytest.raises(NotFoundError):
         await service.send_email_to_customer(
-            "nope", CustomerSendEmailSchema(subject="hi", body="hello"), BackgroundTasks()
+            "nope",
+            CustomerSendEmailSchema(subject="hi", body="hello"),
+            BackgroundTasks(),
+            "עסק לדוגמה",
         )
 
 
 async def test_send_email_to_customer_no_email() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     customer = _make_customer()
     customer.email = None
@@ -108,13 +111,16 @@ async def test_send_email_to_customer_no_email() -> None:
 
     with pytest.raises(ConflictError):
         await service.send_email_to_customer(
-            "c-1", CustomerSendEmailSchema(subject="hi", body="hello"), BackgroundTasks()
+            "c-1",
+            CustomerSendEmailSchema(subject="hi", body="hello"),
+            BackgroundTasks(),
+            "עסק לדוגמה",
         )
 
 
 async def test_send_email_to_customer_queues_task() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     customer = _make_customer()
     customer.email = "test@example.com"
@@ -123,7 +129,7 @@ async def test_send_email_to_customer_queues_task() -> None:
     bg = BackgroundTasks()
     with patch("src.customers.service.send_html_email") as mock_send:
         result = await service.send_email_to_customer(
-            "c-1", CustomerSendEmailSchema(subject="נושא", body="גוף"), bg
+            "c-1", CustomerSendEmailSchema(subject="נושא", body="גוף"), bg, "עסק לדוגמה"
         )
 
     assert result.message
@@ -134,7 +140,7 @@ async def test_send_email_to_customer_queues_task() -> None:
 
 async def test_compose_email_sends_to_all_recipients() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     c1 = _make_customer("c-1", "Alice")
     c1.email = "alice@example.com"
@@ -152,6 +158,7 @@ async def test_compose_email_sends_to_all_recipients() -> None:
                 body="גוף",
             ),
             bg,
+            "עסק לדוגמה",
         )
 
     assert result.sent_to == 3
@@ -160,7 +167,7 @@ async def test_compose_email_sends_to_all_recipients() -> None:
 
 async def test_compose_email_skips_customer_without_email() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     customer = _make_customer("c-1", "No Email")
     customer.email = None
@@ -171,6 +178,7 @@ async def test_compose_email_skips_customer_without_email() -> None:
         result = await service.compose_email(
             ComposeEmailSchema(customer_ids=["c-1"], manual_emails=[], subject="s", body="b"),
             bg,
+            "עסק לדוגמה",
         )
 
     assert result.sent_to == 0
@@ -179,7 +187,7 @@ async def test_compose_email_skips_customer_without_email() -> None:
 
 async def test_compose_email_skips_missing_customer_id() -> None:
     db = AsyncMock()
-    service = CustomerService(db)
+    service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -190,6 +198,7 @@ async def test_compose_email_skips_missing_customer_id() -> None:
                 customer_ids=["missing-id"], manual_emails=[], subject="s", body="b"
             ),
             bg,
+            "עסק לדוגמה",
         )
 
     assert result.sent_to == 0

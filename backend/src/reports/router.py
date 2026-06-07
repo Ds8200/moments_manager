@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.dependencies import get_current_user, get_db
+from src.core.dependencies import get_db, get_org_context
 from src.reports.schemas import (
     DashboardKpiSchema,
     FinancialYearSchema,
@@ -20,9 +20,9 @@ router = APIRouter(prefix="/api/v1/reports", tags=["reports"])
 @router.get("/dashboard", response_model=DashboardKpiSchema)
 async def dashboard_kpi(
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ReportService(db)
+    svc = ReportService(db, ctx.org_id)
     return await svc.get_dashboard_kpi()
 
 
@@ -31,9 +31,9 @@ async def monthly_report(
     year: int = Query(...),
     month: int = Query(..., ge=1, le=12),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ReportService(db)
+    svc = ReportService(db, ctx.org_id)
     return await svc.get_monthly_report(year, month)
 
 
@@ -41,9 +41,9 @@ async def monthly_report(
 async def financial_year(
     year: int = Query(...),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ReportService(db)
+    svc = ReportService(db, ctx.org_id)
     return await svc.get_financial_year(year)
 
 
@@ -51,9 +51,9 @@ async def financial_year(
 async def top_customers(
     limit: int = Query(default=10, ge=1, le=50),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ReportService(db)
+    svc = ReportService(db, ctx.org_id)
     return await svc.get_top_customers(limit)
 
 
@@ -61,9 +61,9 @@ async def top_customers(
 async def export_financial_excel(
     year: int = Query(...),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ) -> Response:
-    content = await ReportService(db).export_excel(year)
+    content = await ReportService(db, ctx.org_id).export_excel(year)
     return Response(
         content=content,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -75,9 +75,9 @@ async def export_financial_excel(
 async def export_financial_pdf(
     year: int = Query(...),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ) -> Response:
-    content = await ReportService(db).export_pdf(year)
+    content = await ReportService(db, ctx.org_id).export_pdf(year)
     return Response(
         content=content,
         media_type="application/pdf",

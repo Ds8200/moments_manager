@@ -6,10 +6,17 @@ import { z } from 'zod'
 import { useSetAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { authApi } from '../../api'
-import { setTokensAtom } from '../../store/authAtoms'
+import { setTokensAtom, decodePayload } from '../../store/authAtoms'
 import { ROUTES } from '@/shared/constants/routes'
 import { AUTH_LABELS } from '../../constants/authLabels'
 import type { LoginFormValues } from '../../types'
+
+function resolvePostLoginRoute(accessToken: string): string {
+  const payload = decodePayload(accessToken)
+  if (payload?.sys_admin) return ROUTES.SUPER_ADMIN_ORGS
+  if (!payload?.org_id) return ROUTES.ONBOARDING
+  return ROUTES.HOME
+}
 
 const schema = z.object({
   email: z.string().min(1, AUTH_LABELS.EMAIL_REQUIRED).email(AUTH_LABELS.EMAIL_INVALID),
@@ -54,7 +61,7 @@ export const useLoginForm = (): UseLoginFormReturn => {
       try {
         const tokens = await authApi.magicLogin(magicToken)
         setTokens({ access: tokens.access_token, refresh: tokens.refresh_token })
-        router.push(ROUTES.HOME)
+        router.push(resolvePostLoginRoute(tokens.access_token))
       } catch {
         setError('root', { message: AUTH_LABELS.MAGIC_LOGIN_FAILED })
         setIsMagicLoggingIn(false)
@@ -68,7 +75,7 @@ export const useLoginForm = (): UseLoginFormReturn => {
     try {
       const tokens = await authApi.login(values.email, values.password)
       setTokens({ access: tokens.access_token, refresh: tokens.refresh_token })
-      router.push(ROUTES.HOME)
+      router.push(resolvePostLoginRoute(tokens.access_token))
     } catch {
       setError('root', { message: AUTH_LABELS.LOGIN_FAILED })
     }

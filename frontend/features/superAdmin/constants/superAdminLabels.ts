@@ -1,0 +1,48 @@
+export const SUPER_ADMIN_LABELS = {
+  PAGE_TITLE: 'ניהול עסקים',
+  TABLE_COL_NAME: 'שם',
+  TABLE_COL_SLUG: 'מזהה',
+  TABLE_COL_PLAN: 'מנוי',
+  TABLE_COL_STATUS: 'סטטוס',
+  TABLE_COL_MEMBERS: 'חברים',
+  TABLE_COL_CREATED: 'נוצר',
+  TABLE_COL_ACTIONS: 'פעולות',
+
+  PLAN_TRIAL: 'ניסיון',
+  PLAN_BASIC: 'בסיסי',
+  PLAN_PROFESSIONAL: 'מקצועי',
+  PLAN_ENTERPRISE: 'ארגוני',
+
+  STATUS_ACTIVE: 'פעיל',
+  STATUS_INACTIVE: 'מושבת',
+
+  TOGGLE_ACTIVATE: 'הפעלה',
+  TOGGLE_DEACTIVATE: 'השבתה',
+  CONFIRM_DEACTIVATE: 'להשבית את העסק? לא ניתן יהיה להתחבר עד להפעלה מחדש.',
+  ORG_ACTIVATED_SUCCESS: 'העסק הופעל',
+  ORG_DEACTIVATED_SUCCESS: 'העסק הושבת',
+  ORG_STATUS_ERROR: 'עדכון סטטוס נכשל. נסו שוב',
+
+  EMPTY: 'לא נמצאו עסקים',
+  LOADING: 'טוען עסקים...',
+
+  // Create org form
+  CREATE_ORG_TITLE: 'יצירת עסק חדש',
+  ADD_ORG_BUTTON: 'עסק חדש',
+  FIELD_BUSINESS_NAME: 'שם העסק',
+  FIELD_SLUG: 'מזהה (slug)',
+  FIELD_SLUG_HINT: 'אותיות קטנות, מספרים ומקפים בלבד',
+  FIELD_OWNER_EMAIL: 'אימייל בעל העסק',
+  FIELD_OWNER_FULL_NAME: 'שם מלא בעל העסק',
+  FIELD_OWNER_PASSWORD: 'סיסמה ראשונית',
+  FIELD_PLAN: 'מנוי',
+  SUBMIT_CREATE_ORG: 'צור עסק',
+  SUBMITTING: 'שומר...',
+  ORG_CREATED_SUCCESS: 'העסק נוצר בהצלחה',
+  ORG_CREATE_ERROR: 'יצירת העסק נכשלה',
+  VALIDATION_REQUIRED: 'שדה חובה',
+  VALIDATION_SLUG: 'מזהה: אותיות קטנות, מספרים ומקפים בלבד',
+  VALIDATION_EMAIL: 'כתובת אימייל לא תקינה',
+  VALIDATION_PASSWORD_MIN: 'סיסמה חייבת להכיל לפחות 8 תווים',
+  BACK_TO_ORGS: 'חזרה לרשימה',
+} as const

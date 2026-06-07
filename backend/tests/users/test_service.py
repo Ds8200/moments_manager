@@ -37,6 +37,7 @@ async def test_create_user_duplicate_email_raises() -> None:
         await svc.create_user(
             MagicMock(email="dup@example.com", full_name="Dup"),
             MagicMock(),
+            "עסק לדוגמה",
         )
 
 
@@ -53,6 +54,7 @@ async def test_create_user_success_calls_repo_and_commit() -> None:
         result = await svc.create_user(
             MagicMock(email="new@example.com", full_name="New", role=UserRole.user.value),
             background_tasks,
+            "עסק לדוגמה",
         )
 
     svc._repo.create.assert_called_once()

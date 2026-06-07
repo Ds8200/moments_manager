@@ -1,6 +1,6 @@
 'use client'
 import { atom } from 'jotai'
-import type { TokenPayload, UserRole } from '../types'
+import type { OrgRole, TokenPayload, UserRole } from '../types'
 
 const ACCESS_TOKEN_KEY = 'access_token'
 const REFRESH_TOKEN_KEY = 'refresh_token'
@@ -10,7 +10,7 @@ function readToken(): string | null {
   return localStorage.getItem(ACCESS_TOKEN_KEY)
 }
 
-function decodePayload(token: string): TokenPayload | null {
+export function decodePayload(token: string): TokenPayload | null {
   try {
     return JSON.parse(atob(token.split('.')[1])) as TokenPayload
   } catch {
@@ -28,11 +28,27 @@ export const isAuthenticatedAtom = atom((get) => get(accessTokenAtom) !== null)
 
 export const userRoleAtom = atom<UserRole | null>(null)
 
-export const isAdminAtom = atom((get) => get(userRoleAtom) === 'admin')
+export const isSysAdminAtom = atom((get) => {
+  const token = get(accessTokenAtom)
+  return token ? (decodePayload(token)?.sys_admin ?? false) : false
+})
+
+// Kept for backwards-compat; routes that checked isAdminAtom now use isSysAdminAtom
+export const isAdminAtom = isSysAdminAtom
 
 export const currentUserIdAtom = atom((get) => {
   const token = get(accessTokenAtom)
   return token ? (decodePayload(token)?.sub ?? null) : null
+})
+
+export const currentOrgIdAtom = atom((get) => {
+  const token = get(accessTokenAtom)
+  return token ? (decodePayload(token)?.org_id ?? null) : null
+})
+
+export const currentOrgRoleAtom = atom<OrgRole | null>((get) => {
+  const token = get(accessTokenAtom)
+  return token ? (decodePayload(token)?.org_role ?? null) : null
 })
 
 export const setTokensAtom = atom(

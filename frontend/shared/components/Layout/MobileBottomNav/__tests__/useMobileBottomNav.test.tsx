@@ -3,12 +3,16 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { createStore, Provider } from 'jotai'
 import { useMobileBottomNav } from '../useMobileBottomNav'
-import { userRoleAtom } from '@/features/auth/store/authAtoms'
+import { accessTokenAtom } from '@/features/auth/store/authAtoms'
 import { ROUTES } from '@/shared/constants/routes'
 
 vi.mock('next/navigation', () => ({
   usePathname: () => ROUTES.HOME,
 }))
+
+function makeToken(payload: Record<string, unknown>): string {
+  return `header.${btoa(JSON.stringify(payload))}.signature`
+}
 
 function makeWrapper(store: ReturnType<typeof createStore>) {
   function TestWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
@@ -30,14 +34,14 @@ describe('useMobileBottomNav', () => {
   })
 
   it('includes the admin-only Users item in overflow for an admin', () => {
-    store.set(userRoleAtom, 'admin')
+    store.set(accessTokenAtom, makeToken({ sub: 'u1', sys_admin: true }))
     const { result } = renderHook(() => useMobileBottomNav(), { wrapper: makeWrapper(store) })
     const hrefs = result.current.overflowItems.map((i) => i.href)
     expect(hrefs).toContain(ROUTES.USERS)
   })
 
   it('excludes the admin-only Users item for a non-admin', () => {
-    store.set(userRoleAtom, 'user')
+    store.set(accessTokenAtom, makeToken({ sub: 'u2', sys_admin: false }))
     const { result } = renderHook(() => useMobileBottomNav(), { wrapper: makeWrapper(store) })
     const allHrefs = [
       ...result.current.primaryItems,

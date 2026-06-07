@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.customers.models import Customer
+from src.database import BaseRepository
 from src.orders.constants import ORDER_NUMBER_PREFIX
 from src.orders.enums import OrderSortField, UrgencyLevel
 from src.orders.models import Order, OrderFile, OrderItem
@@ -29,15 +30,19 @@ def _build_order_clause(sort_by: str) -> list:
     return [Order.created_at.desc()]
 
 
-class OrderRepository:
-    def __init__(self, db: AsyncSession) -> None:
-        self._db = db
+class OrderRepository(BaseRepository):
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
+        super().__init__(db, org_id)
 
     async def get_next_order_number(self) -> str:
+        await self._apply_org_rls()
         year = datetime.now().year
         prefix = f"{ORDER_NUMBER_PREFIX}-{year}-"
         result = await self._db.execute(
-            select(func.max(Order.order_number)).where(Order.order_number.like(f"{prefix}%"))
+            select(func.max(Order.order_number)).where(
+                Order.order_number.like(f"{prefix}%"),
+                Order.organization_id == self._org_id,
+            )
         )
         max_number = result.scalar_one_or_none()
         last_seq = int(max_number.split("-")[-1]) if max_number else 0
@@ -56,7 +61,8 @@ class OrderRepository:
         offset: int,
         sort_by: str = OrderSortField.created_at.value,
     ) -> tuple[list[Order], int]:
-        filters = [Order.is_deleted.is_(False)]
+        await self._apply_org_rls()
+        filters = [Order.is_deleted.is_(False), Order.organization_id == self._org_id]
         if status:
             filters.append(Order.status == status)
         if date_from:
@@ -92,6 +98,7 @@ class OrderRepository:
         return result.scalars().all(), total
 
     async def get_by_id(self, order_id: str) -> Order | None:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(Order)
             .options(
@@ -99,20 +106,31 @@ class OrderRepository:
                 selectinload(Order.files),
                 selectinload(Order.customer),
             )
-            .where(Order.id == order_id, Order.is_deleted.is_(False))
+            .where(
+                Order.id == order_id,
+                Order.is_deleted.is_(False),
+                Order.organization_id == self._org_id,
+            )
         )
         return result.scalar_one_or_none()
 
     async def get_by_customer(self, customer_id: str) -> list[Order]:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(Order)
             .options(selectinload(Order.items), selectinload(Order.customer))
-            .where(Order.customer_id == customer_id, Order.is_deleted.is_(False))
+            .where(
+                Order.customer_id == customer_id,
+                Order.is_deleted.is_(False),
+                Order.organization_id == self._org_id,
+            )
             .order_by(Order.due_datetime.asc().nullslast(), Order.date.desc())
         )
         return result.scalars().all()
 
     async def create(self, data: dict, items_data: list[dict]) -> Order:
+        await self._apply_org_rls()
+        data["organization_id"] = self._org_id
         order = Order(**data)
         self._db.add(order)
         await self._db.flush()
@@ -156,12 +174,14 @@ class OrderRepository:
         await self._db.flush()
 
     async def add_file(self, order_id: str, file_data: dict) -> OrderFile:
+        await self._apply_org_rls()
         f = OrderFile(order_id=order_id, **file_data)
         self._db.add(f)
         await self._db.flush()
         return f
 
     async def get_file(self, file_id: str, order_id: str) -> OrderFile | None:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(OrderFile).where(OrderFile.id == file_id, OrderFile.order_id == order_id)
         )
@@ -172,11 +192,16 @@ class OrderRepository:
         await self._db.flush()
 
     async def get_customer_stats(self, customer_id: str) -> dict:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(
                 func.count(Order.id),
                 func.coalesce(func.sum(Order.total_amount), 0),
-            ).where(Order.customer_id == customer_id, Order.is_deleted.is_(False))
+            ).where(
+                Order.customer_id == customer_id,
+                Order.is_deleted.is_(False),
+                Order.organization_id == self._org_id,
+            )
         )
         row = result.one()
         return {"total_orders": row[0], "total_spent": float(row[1])}

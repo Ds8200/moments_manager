@@ -36,9 +36,10 @@ logger = logging.getLogger(__name__)
 
 
 class CustomerService:
-    def __init__(self, db: AsyncSession) -> None:
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
         self._db = db
-        self._repo = CustomerRepository(db)
+        self._org_id = org_id
+        self._repo = CustomerRepository(db, org_id)
 
     async def list_customers(
         self,
@@ -64,7 +65,7 @@ class CustomerService:
             raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
         from src.orders.repository import OrderRepository
 
-        order_repo = OrderRepository(self._db)
+        order_repo = OrderRepository(self._db, self._org_id)
         stats = await order_repo.get_customer_stats(customer_id)
         result = CustomerWithStatsSchema.model_validate(customer)
         result.total_orders = stats["total_orders"]
@@ -100,15 +101,20 @@ class CustomerService:
         customer_id: str,
         data: CustomerSendEmailSchema,
         background_tasks: BackgroundTasks,
+        org_name: str,
+        smtp_from_name: str | None = None,
     ) -> EmailSentResponseSchema:
         customer = await self._repo.get_by_id(customer_id)
         if not customer:
             raise NotFoundError(RESOURCE_CUSTOMER, customer_id)
         if not customer.email:
             raise ConflictError(CUSTOMER_NO_EMAIL, code=ErrorCode.CUSTOMER_NO_EMAIL)
-        subject, html_body = build_customer_email(customer.name, data.subject, data.body)
+        from_name = smtp_from_name or org_name
+        subject, html_body = build_customer_email(customer.name, data.subject, data.body, org_name)
         attachments = [a.model_dump() for a in data.attachments] if data.attachments else None
-        background_tasks.add_task(send_html_email, customer.email, subject, html_body, attachments)
+        background_tasks.add_task(
+            send_html_email, customer.email, subject, html_body, attachments, from_name
+        )
         logger.info(CUSTOMER_EMAIL_DISPATCHED, customer.email, customer_id)
         return EmailSentResponseSchema(message=CUSTOMER_EMAIL_SENT)
 
@@ -116,8 +122,11 @@ class CustomerService:
         self,
         data: ComposeEmailSchema,
         background_tasks: BackgroundTasks,
+        org_name: str,
+        smtp_from_name: str | None = None,
     ) -> ComposeEmailResponseSchema:
         sent_to = 0
+        from_name = smtp_from_name or org_name
 
         attachments = [a.model_dump() for a in data.attachments] if data.attachments else None
 
@@ -129,15 +138,19 @@ class CustomerService:
             if not customer.email:
                 logger.warning(COMPOSE_EMAIL_CUSTOMER_NO_EMAIL, customer_id)
                 continue
-            subject, html_body = build_customer_email(customer.name, data.subject, data.body)
+            subject, html_body = build_customer_email(
+                customer.name, data.subject, data.body, org_name
+            )
             background_tasks.add_task(
-                send_html_email, customer.email, subject, html_body, attachments
+                send_html_email, customer.email, subject, html_body, attachments, from_name
             )
             sent_to += 1
 
         for email in data.manual_emails:
-            subject, html_body = build_customer_email("", data.subject, data.body)
-            background_tasks.add_task(send_html_email, email, subject, html_body, attachments)
+            subject, html_body = build_customer_email("", data.subject, data.body, org_name)
+            background_tasks.add_task(
+                send_html_email, email, subject, html_body, attachments, from_name
+            )
             sent_to += 1
 
         logger.info(

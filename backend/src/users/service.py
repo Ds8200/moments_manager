@@ -47,6 +47,8 @@ class UserService:
         self,
         data: UserCreateSchema,
         background_tasks: BackgroundTasks,
+        org_name: str,
+        smtp_from_name: str | None = None,
     ) -> UserResponseSchema:
         existing = await self._repo.get_by_email(data.email)
         if existing:
@@ -68,8 +70,11 @@ class UserService:
         logger.info(USER_CREATED, user.email, user.role)
 
         magic_token = create_magic_login_token(user.id)
-        subject, html_body = build_welcome_email(data.email, temp_password, magic_token)
-        background_tasks.add_task(send_html_email, data.email, subject, html_body)
+        from_name = smtp_from_name or org_name
+        subject, html_body = build_welcome_email(data.email, temp_password, magic_token, org_name)
+        background_tasks.add_task(
+            send_html_email, data.email, subject, html_body, None, from_name
+        )
 
         return UserResponseSchema.model_validate(user)
 

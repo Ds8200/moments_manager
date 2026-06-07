@@ -1,0 +1,59 @@
+@use '../../../../shared/styles/variables' as v;
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: v.$bg-page;
+  padding: v.$space-4;
+}
+
+.card {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-xl;
+  box-shadow: v.$shadow-elevated;
+  padding: v.$space-10;
+  width: 100%;
+  max-width: 560px;
+}
+
+.stepper {
+  display: flex;
+  justify-content: center;
+  gap: v.$space-6;
+  list-style: none;
+  margin-block-end: v.$space-8;
+  padding: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-1;
+  opacity: 0.5;
+  transition: opacity v.$transition-fast;
+}
+
+.stepActive {
+  opacity: 1;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: v.$primary;
+  color: v.$text-inverse;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+}
+
+.stepLabel {
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+}

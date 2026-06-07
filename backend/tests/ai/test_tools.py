@@ -33,9 +33,9 @@ async def test_get_dashboard_kpis(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_dashboard_kpi = AsyncMock(return_value=kpi)
-    monkeypatch.setattr("src.ai.tools_operations.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_operations.ReportService", lambda db, org_id: svc_mock)
 
-    result = await get_dashboard_kpis(db=mock_db)
+    result = await get_dashboard_kpis(db=mock_db, org_id="test-org-id")
 
     assert result["open_orders"] == 5
     assert result["ready_orders"] == 2
@@ -64,9 +64,9 @@ async def test_get_monthly_report_uses_defaults(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_monthly_report = AsyncMock(return_value=report)
-    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db, org_id: svc_mock)
 
-    result = await get_monthly_report(db=mock_db)
+    result = await get_monthly_report(db=mock_db, org_id="test-org-id")
 
     svc_mock.get_monthly_report.assert_called_once()
     assert result["total_revenue"] == "10000"
@@ -91,9 +91,9 @@ async def test_get_monthly_report_explicit_params(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_monthly_report = AsyncMock(return_value=report)
-    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db, org_id: svc_mock)
 
-    await get_monthly_report(db=mock_db, year=2024, month=3)
+    await get_monthly_report(db=mock_db, org_id="test-org-id", year=2024, month=3)
 
     svc_mock.get_monthly_report.assert_called_once_with(2024, 3)
 
@@ -120,9 +120,9 @@ async def test_get_financial_year(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_financial_year = AsyncMock(return_value=year_data)
-    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_reports.ReportService", lambda db, org_id: svc_mock)
 
-    result = await get_financial_year(db=mock_db, year=2025)
+    result = await get_financial_year(db=mock_db, org_id="test-org-id", year=2025)
 
     assert result["year"] == 2025
     assert result["annual_revenue"] == "12000"
@@ -141,9 +141,9 @@ async def test_get_top_customers_caps_limit(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_top_customers = AsyncMock(return_value=[customer])
-    monkeypatch.setattr("src.ai.tools_customers.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_customers.ReportService", lambda db, org_id: svc_mock)
 
-    await get_top_customers(db=mock_db, limit=999)
+    await get_top_customers(db=mock_db, org_id="test-org-id", limit=999)
     svc_mock.get_top_customers.assert_called_once_with(20)
 
 
@@ -156,9 +156,9 @@ async def test_get_top_customers_result_shape(mock_db, monkeypatch) -> None:
     )
     svc_mock = MagicMock()
     svc_mock.get_top_customers = AsyncMock(return_value=[customer])
-    monkeypatch.setattr("src.ai.tools_customers.ReportService", lambda db: svc_mock)
+    monkeypatch.setattr("src.ai.tools_customers.ReportService", lambda db, org_id: svc_mock)
 
-    result = await get_top_customers(db=mock_db)
+    result = await get_top_customers(db=mock_db, org_id="test-org-id")
 
     assert len(result["customers"]) == 1
     assert result["customers"][0]["name"] == "Test"
@@ -173,7 +173,7 @@ async def test_get_orders_summary_returns_count_and_revenue(mock_db) -> None:
     mock_result.one.return_value = (7, Decimal("14000"))
     mock_db.execute = AsyncMock(return_value=mock_result)
 
-    result = await get_orders_summary(db=mock_db)
+    result = await get_orders_summary(db=mock_db, org_id="test-org-id")
 
     assert result["count"] == 7
     assert result["total_revenue"] == "14000"
@@ -185,7 +185,7 @@ async def test_get_orders_summary_zero_count(mock_db) -> None:
     mock_result.one.return_value = (0, Decimal("0"))
     mock_db.execute = AsyncMock(return_value=mock_result)
 
-    result = await get_orders_summary(db=mock_db)
+    result = await get_orders_summary(db=mock_db, org_id="test-org-id")
 
     assert result["count"] == 0
     assert result["avg_order_value"] == 0.0
@@ -195,13 +195,18 @@ async def test_get_orders_summary_zero_count(mock_db) -> None:
 
 
 async def test_draft_email_returns_subject_and_body(mock_db) -> None:
-    # draft_email now looks up the customer ID via AiRepository
+    # find_customer_id_by_name: RLS execute + query execute, then org name lookup
     id_result = MagicMock()
     id_result.scalar_one_or_none.return_value = "customer-uuid-123"
-    mock_db.execute = AsyncMock(return_value=id_result)
+    org_mock = MagicMock()
+    org_mock.name = "עסק לדוגמה"
+    org_result = MagicMock()
+    org_result.scalar_one_or_none.return_value = org_mock
+    mock_db.execute = AsyncMock(side_effect=[MagicMock(), id_result, org_result])
 
     result = await draft_email(
         db=mock_db,
+        org_id="test-org-id",
         customer_name="ישראל ישראלי",
         subject="תזכורת תשלום",
         body="אנא שלם את החשבון.",
@@ -216,15 +221,23 @@ async def test_draft_email_returns_subject_and_body(mock_db) -> None:
 
 
 async def test_draft_email_customer_not_found(mock_db) -> None:
+    # find_customer_id_by_name: RLS+query(None) → then get_all_customer_names: RLS+query(empty)
     id_result = MagicMock()
     id_result.scalar_one_or_none.return_value = None
-    mock_db.execute = AsyncMock(return_value=id_result)
+    names_result = MagicMock()
+    names_result.scalars.return_value.all.return_value = []
+    mock_db.execute = AsyncMock(
+        side_effect=[MagicMock(), id_result, MagicMock(), names_result]
+    )
 
     result = await draft_email(
         db=mock_db,
+        org_id="test-org-id",
         customer_name="לקוח לא קיים",
         subject="Subject",
         body="Body",
     )
-    assert result["customer_id"] is None
-    assert result["customer_name"] == "לקוח לא קיים"
+    assert result["not_found"] is True
+    assert result["searched_for"] == "לקוח לא קיים"
+    assert result["candidates"] == []
+

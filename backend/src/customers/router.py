@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.dependencies import get_current_user, get_db
+from src.core.dependencies import get_db, get_org_context
 from src.core.rate_limit import limiter
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.customers.schemas import (
@@ -29,9 +29,9 @@ async def list_customers(
     search: str | None = Query(default=None),
     has_email: bool | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = CustomerService(db)
+    svc = CustomerService(db, ctx.org_id)
     params = PaginationParams(page=page, page_size=page_size)
     return await svc.list_customers(params, search, has_email)
 
@@ -40,9 +40,9 @@ async def list_customers(
 async def create_customer(
     body: CustomerCreateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = CustomerService(db)
+    svc = CustomerService(db, ctx.org_id)
     return await svc.create_customer(body)
 
 
@@ -53,19 +53,19 @@ async def compose_email(
     body: ComposeEmailSchema,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = CustomerService(db)
-    return await svc.compose_email(body, background_tasks)
+    svc = CustomerService(db, ctx.org_id)
+    return await svc.compose_email(body, background_tasks, ctx.org.name, ctx.org.smtp_from_name)
 
 
 @router.get("/{customer_id}", response_model=CustomerWithStatsSchema)
 async def get_customer(
     customer_id: str,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = CustomerService(db)
+    svc = CustomerService(db, ctx.org_id)
     return await svc.get_customer(customer_id)
 
 
@@ -74,9 +74,9 @@ async def update_customer(
     customer_id: str,
     body: CustomerUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = CustomerService(db)
+    svc = CustomerService(db, ctx.org_id)
     return await svc.update_customer(customer_id, body)
 
 
@@ -84,9 +84,9 @@ async def update_customer(
 async def delete_customer(
     customer_id: str,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = CustomerService(db)
+    svc = CustomerService(db, ctx.org_id)
     await svc.delete_customer(customer_id)
 
 
@@ -98,7 +98,9 @@ async def send_email_to_customer(
     body: CustomerSendEmailSchema,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = CustomerService(db)
-    return await svc.send_email_to_customer(customer_id, body, background_tasks)
+    svc = CustomerService(db, ctx.org_id)
+    return await svc.send_email_to_customer(
+        customer_id, body, background_tasks, ctx.org.name, ctx.org.smtp_from_name
+    )

@@ -4,7 +4,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, File, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.dependencies import get_current_user, get_db
+from src.core.dependencies import get_db, get_org_context
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.orders.enums import OrderSortField
 from src.orders.schemas import (
@@ -36,9 +36,9 @@ async def list_orders(
     payment_method: str | None = Query(default=None),
     sort_by: OrderSortField = Query(default=OrderSortField.created_at),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     return await svc.list_orders(
         PaginationParams(page=page, page_size=page_size),
         status,
@@ -56,9 +56,9 @@ async def list_orders(
 async def create_order(
     body: OrderCreateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     return await svc.create_order(body)
 
 
@@ -66,9 +66,9 @@ async def create_order(
 async def get_order(
     order_id: str,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     return await svc.get_order(order_id)
 
 
@@ -77,9 +77,9 @@ async def update_order(
     order_id: str,
     body: OrderUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     return await svc.update_order(order_id, body)
 
 
@@ -88,9 +88,9 @@ async def update_status(
     order_id: str,
     body: OrderStatusUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     return await svc.update_status(order_id, body)
 
 
@@ -99,9 +99,9 @@ async def update_payment(
     order_id: str,
     body: OrderPaymentUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     return await svc.update_payment(order_id, body)
 
 
@@ -110,9 +110,9 @@ async def update_urgency(
     order_id: str,
     body: OrderUrgencyUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     return await svc.update_urgency(order_id, body)
 
 
@@ -120,9 +120,9 @@ async def update_urgency(
 async def delete_order(
     order_id: str,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     await svc.delete_order(order_id)
 
 
@@ -131,9 +131,9 @@ async def upload_file(
     order_id: str,
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     content = await file.read()
     return await svc.upload_file(order_id, file.filename or "file", content)
 
@@ -143,7 +143,7 @@ async def delete_file(
     order_id: str,
     file_id: str,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = OrderService(db)
+    svc = OrderService(db, ctx.org_id)
     await svc.delete_file(order_id, file_id)

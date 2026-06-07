@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class ProductService:
-    def __init__(self, db: AsyncSession) -> None:
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
         self._db = db
-        self._repo = ProductRepository(db)
+        self._repo = ProductRepository(db, org_id)
 
     async def list_products(
         self,

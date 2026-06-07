@@ -5,7 +5,8 @@ Usage (from backend/ directory):
     uv run python scripts/create_user.py <email> <password> <full_name> [--role admin|user]
 
 Usage (exec from host via Docker):
-    docker compose exec -e PYTHONPATH=/app backend uv run python scripts/create_user.py <email> <password> <full_name> [--role admin]
+    docker compose exec -e PYTHONPATH=/app backend uv run python scripts/create_user.py \
+        <email> <password> <full_name> [--role admin]
 """
 
 import argparse
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     parser.add_argument("full_name")
     parser.add_argument(
         "--role",
-        choices=[UserRole.admin.value, UserRole.user.value],
+        choices=[UserRole.system_admin.value, UserRole.user.value],
         default=UserRole.user.value,
     )
     args = parser.parse_args()

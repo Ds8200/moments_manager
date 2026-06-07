@@ -10,9 +10,12 @@ pytestmark = pytest.mark.asyncio  # applies only to async test functions
 
 
 def test_build_welcome_email_contains_logo_and_brand_colors() -> None:
-    subject, html = build_welcome_email("new@example.com", "temp-pass-123", "magic-token-abc")
+    subject, html = build_welcome_email(
+        "new@example.com", "temp-pass-123", "magic-token-abc", "עסק לדוגמה"
+    )
 
     assert subject
+    assert "עסק לדוגמה" in subject
     # logo referenced via hosted URL
     assert LOGO_URL in html
     # brand purple applied to headings/buttons
@@ -22,10 +25,12 @@ def test_build_welcome_email_contains_logo_and_brand_colors() -> None:
     # credential values interpolated
     assert "new@example.com" in html
     assert "temp-pass-123" in html
+    # org name interpolated into body and footer
+    assert "עסק לדוגמה" in html
 
 
 def test_build_welcome_email_returns_two_tuple() -> None:
-    result = build_welcome_email("a@b.com", "pw", "tok")
+    result = build_welcome_email("a@b.com", "pw", "tok", "עסק לדוגמה")
     assert isinstance(result, tuple)
     assert len(result) == 2
     subject, html = result

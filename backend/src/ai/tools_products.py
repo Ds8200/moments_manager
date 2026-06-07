@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 )
 async def get_product_catalog(
     db: AsyncSession,
+    org_id: str,
     search: str | None = None,
     active_only: bool = True,
     limit: int = 20,
@@ -46,7 +47,7 @@ async def get_product_catalog(
 ) -> dict:
     from src.ai.repository import AiRepository
 
-    repo = AiRepository(db)
+    repo = AiRepository(db, org_id)
     capped = min(max(limit, 1), 50)
     products = await repo.get_product_catalog(search, active_only, capped)
     if search and len(products) == 0:

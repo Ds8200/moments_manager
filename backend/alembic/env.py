@@ -16,6 +16,7 @@ import src.customers.models  # noqa: F401
 import src.expense_categories.models  # noqa: F401
 import src.expenses.models  # noqa: F401
 import src.orders.models  # noqa: F401
+import src.organizations.models  # noqa: F401
 import src.product_categories.models  # noqa: F401
 import src.products.models  # noqa: F401
 

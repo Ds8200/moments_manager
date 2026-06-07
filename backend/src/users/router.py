@@ -47,10 +47,10 @@ async def create_user(
     body: UserCreateSchema,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    _admin=Depends(require_admin),
+    admin=Depends(require_admin),
 ):
     svc = UserService(db)
-    return await svc.create_user(body, background_tasks)
+    return await svc.create_user(body, background_tasks, admin.org.name, admin.org.smtp_from_name)
 
 
 @router.delete("/{user_id}", status_code=204, response_model=None)
@@ -60,4 +60,4 @@ async def delete_user(
     admin=Depends(require_admin),
 ):
     svc = UserService(db)
-    await svc.delete_user(user_id, admin.id)
+    await svc.delete_user(user_id, admin.user.id)

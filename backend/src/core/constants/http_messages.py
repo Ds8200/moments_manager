@@ -46,3 +46,14 @@ EXPENSE_CATEGORY_IN_USE = "Category is in use by one or more expenses and cannot
 
 AI_NOT_CONFIGURED = "AI service is not configured — set OPENAI_API_KEY"
 AI_RATE_LIMIT = "Too many AI requests — please wait before sending another message"
+
+ORG_NOT_FOUND = "Organization not found"
+ORG_INACTIVE = "Organization account is inactive or suspended"
+ORG_ACCESS_DENIED = "You are not a member of this organization"
+ORG_CONTEXT_REQUIRED = "This action requires an organization context"
+NO_ORG_FOR_USER = "No active organization found for this account"
+
+SUPER_ADMIN_REQUIRED = "System administrator access required"
+ORG_ACTIVATED = "Organization activated"
+ORG_DEACTIVATED = "Organization deactivated"
+ORG_PLAN_UPDATED = "Organization plan updated"

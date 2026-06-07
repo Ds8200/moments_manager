@@ -1,0 +1,86 @@
+@use '../../../../../shared/styles/variables' as v;
+
+.section {
+  background: v.$bg-card;
+  border-radius: v.$border-radius;
+  box-shadow: v.$shadow-card;
+  padding: v.$space-6;
+}
+
+.sectionTitle {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-primary;
+  margin-block-end: v.$space-5;
+  padding-block-end: v.$space-3;
+  border-bottom: 1px solid v.$border-color;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+  max-width: 480px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-secondary;
+}
+
+.input {
+  width: 100%;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius-sm;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  color: v.$text-primary;
+  background: v.$bg-card;
+  transition: border-color v.$transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+.inputError {
+  border-color: v.$danger;
+}
+
+.errorMsg {
+  font-size: v.$font-size-xs;
+  color: v.$danger;
+}
+
+.submitBtn {
+  align-self: flex-start;
+  padding: v.$space-3 v.$space-6;
+  background: v.$primary;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius-sm;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  cursor: pointer;
+  transition: background v.$transition-fast;
+  min-height: 44px;
+
+  &:hover:not(:disabled) {
+    background: v.$primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

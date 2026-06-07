@@ -43,6 +43,10 @@ select = ["E", "F", "I"]
 # E712: SQLAlchemy intentionally uses == True/False to generate SQL boolean comparisons
 ignore = ["E712"]
 
+[tool.ruff.lint.per-file-ignores]
+# HTML template strings contain long CSS/inline content that cannot be meaningfully split
+"src/customers/email_templates.py" = ["E501"]
+
 [dependency-groups]
 dev = [
     "httpx>=0.28.1",
@@ -55,3 +59,4 @@ dev = [
 
 [tool.ruff]
 line-length = 100
+exclude = ["alembic/versions/"]

@@ -1,11 +1,13 @@
 'use client'
 import { useEffect, useState, startTransition } from 'react'
-import { useAtom, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useRouter, usePathname } from 'next/navigation'
 import {
   accessTokenAtom,
   clearTokensAtom,
   initAuthAtom,
+  isSysAdminAtom,
+  currentOrgIdAtom,
 } from '@/features/auth/store/authAtoms'
 import { ROUTES } from '@/shared/constants/routes'
 
@@ -22,6 +24,8 @@ export const useAuthGuard = (): UseAuthGuardReturn => {
   const router = useRouter()
   const pathname = usePathname()
   const [accessToken] = useAtom(accessTokenAtom)
+  const isSysAdmin = useAtomValue(isSysAdminAtom)
+  const currentOrgId = useAtomValue(currentOrgIdAtom)
   const initAuth = useSetAtom(initAuthAtom)
   const clearTokens = useSetAtom(clearTokensAtom)
   const [checked, setChecked] = useState(false)
@@ -32,10 +36,19 @@ export const useAuthGuard = (): UseAuthGuardReturn => {
   }, [initAuth])
 
   useEffect(() => {
-    if (checked && accessToken === null && pathname !== ROUTES.LOGIN) {
-      router.replace(ROUTES.LOGIN)
+    if (!checked) return
+    if (accessToken === null) {
+      if (pathname !== ROUTES.LOGIN) router.replace(ROUTES.LOGIN)
+      return
     }
-  }, [checked, accessToken, pathname, router])
+    if (isSysAdmin && !pathname.startsWith(ROUTES.SUPER_ADMIN_ORGS)) {
+      router.replace(ROUTES.SUPER_ADMIN_ORGS)
+      return
+    }
+    if (!isSysAdmin && !currentOrgId && pathname !== ROUTES.ONBOARDING) {
+      router.replace(ROUTES.ONBOARDING)
+    }
+  }, [checked, accessToken, isSysAdmin, currentOrgId, pathname, router])
 
   useEffect(() => {
     const handleAuthExpired = (): void => {

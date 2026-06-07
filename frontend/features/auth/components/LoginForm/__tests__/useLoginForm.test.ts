@@ -15,6 +15,12 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
 }))
 
+function makeJwt(payload: Record<string, unknown>): string {
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const body = btoa(JSON.stringify(payload))
+  return `${header}.${body}.fakesig`
+}
+
 describe('useLoginForm', () => {
   beforeEach(() => {
     pushMock.mockClear()
@@ -22,10 +28,11 @@ describe('useLoginForm', () => {
     mockSearchParams = new URLSearchParams()
   })
 
-  it('stores tokens and navigates to home on successful login', async () => {
+  it('stores tokens and navigates to home on successful login for org user', async () => {
+    const token = makeJwt({ sub: '1', org_id: 'org-1', org_role: 'owner', sys_admin: false, exp: 9999999999 })
     server.use(
       http.post(API_ENDPOINTS.AUTH_LOGIN, () =>
-        HttpResponse.json({ access_token: 'a-token', refresh_token: 'r-token' }),
+        HttpResponse.json({ access_token: token, refresh_token: 'r-token' }),
       ),
     )
 
@@ -38,7 +45,45 @@ describe('useLoginForm', () => {
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith(ROUTES.HOME)
     })
-    expect(localStorage.getItem('access_token')).toBe('a-token')
+    expect(localStorage.getItem('access_token')).toBe(token)
+  })
+
+  it('navigates to super admin page after login for sys_admin', async () => {
+    const token = makeJwt({ sub: '2', org_id: null, org_role: null, sys_admin: true, exp: 9999999999 })
+    server.use(
+      http.post(API_ENDPOINTS.AUTH_LOGIN, () =>
+        HttpResponse.json({ access_token: token, refresh_token: 'r-token' }),
+      ),
+    )
+
+    const { result } = renderHook(() => useLoginForm())
+
+    await act(async () => {
+      await result.current.onSubmit({ email: 'admin@b.com', password: 'pw' })
+    })
+
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith(ROUTES.SUPER_ADMIN_ORGS)
+    })
+  })
+
+  it('navigates to onboarding after login for user without org', async () => {
+    const token = makeJwt({ sub: '3', org_id: null, org_role: null, sys_admin: false, exp: 9999999999 })
+    server.use(
+      http.post(API_ENDPOINTS.AUTH_LOGIN, () =>
+        HttpResponse.json({ access_token: token, refresh_token: 'r-token' }),
+      ),
+    )
+
+    const { result } = renderHook(() => useLoginForm())
+
+    await act(async () => {
+      await result.current.onSubmit({ email: 'new@b.com', password: 'pw' })
+    })
+
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith(ROUTES.ONBOARDING)
+    })
   })
 
   it('sets submitError to LOGIN_FAILED on auth failure', async () => {
@@ -61,10 +106,11 @@ describe('useLoginForm', () => {
   })
 
   it('auto-logs-in with a magic token in the URL and navigates to home', async () => {
+    const token = makeJwt({ sub: '1', org_id: 'org-1', org_role: 'owner', sys_admin: false, exp: 9999999999 })
     mockSearchParams = new URLSearchParams({ token: 'magic-123' })
     server.use(
       http.post(API_ENDPOINTS.AUTH_MAGIC_LOGIN, () =>
-        HttpResponse.json({ access_token: 'm-access', refresh_token: 'm-refresh' }),
+        HttpResponse.json({ access_token: token, refresh_token: 'm-refresh' }),
       ),
     )
 
@@ -75,7 +121,7 @@ describe('useLoginForm', () => {
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith(ROUTES.HOME)
     })
-    expect(localStorage.getItem('access_token')).toBe('m-access')
+    expect(localStorage.getItem('access_token')).toBe(token)
   })
 
   it('shows MAGIC_LOGIN_FAILED and reveals the form when the magic token is invalid', async () => {

@@ -7,6 +7,7 @@ from decimal import Decimal
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from sqlalchemy.sql import text
 
 from src.ai.tool_registry import tool_registry
 from src.orders.enums import OrderStatus
@@ -28,8 +29,8 @@ logger = logging.getLogger(__name__)
     ),
     parameters={"type": "object", "properties": {}},
 )
-async def get_dashboard_kpis(db: AsyncSession, **_: object) -> dict:
-    svc = ReportService(db)
+async def get_dashboard_kpis(db: AsyncSession, org_id: str, **_: object) -> dict:
+    svc = ReportService(db, org_id)
     kpi = await svc.get_dashboard_kpi()
     return {
         "open_orders": kpi.open_orders,
@@ -76,12 +77,16 @@ async def get_dashboard_kpis(db: AsyncSession, **_: object) -> dict:
 )
 async def get_orders_summary(
     db: AsyncSession,
+    org_id: str,
     status: str | None = None,
     date_from: str | None = None,
     date_to: str | None = None,
     **_: object,
 ) -> dict:
-    filters = [Order.is_deleted.is_(False)]
+    # Raw SQL required: PostgreSQL SET LOCAL has no SQLAlchemy ORM equivalent.
+    await db.execute(text("SET LOCAL app.current_org_id = :org_id"), {"org_id": org_id})
+
+    filters = [Order.organization_id == org_id, Order.is_deleted.is_(False)]
     if status:
         filters.append(Order.status == status)
     if date_from:
@@ -139,12 +144,16 @@ async def get_orders_summary(
 )
 async def get_recent_orders(
     db: AsyncSession,
+    org_id: str,
     limit: int = 10,
     status: str | None = None,
     **_: object,
 ) -> dict:
+    # Raw SQL required: PostgreSQL SET LOCAL has no SQLAlchemy ORM equivalent.
+    await db.execute(text("SET LOCAL app.current_org_id = :org_id"), {"org_id": org_id})
+
     capped = min(max(limit, 1), 20)
-    filters = [Order.is_deleted.is_(False)]
+    filters = [Order.organization_id == org_id, Order.is_deleted.is_(False)]
     if status:
         filters.append(Order.status == status)
 
@@ -185,7 +194,10 @@ async def get_recent_orders(
     ),
     parameters={"type": "object", "properties": {}},
 )
-async def get_overdue_orders(db: AsyncSession, **_: object) -> dict:
+async def get_overdue_orders(db: AsyncSession, org_id: str, **_: object) -> dict:
+    # Raw SQL required: PostgreSQL SET LOCAL has no SQLAlchemy ORM equivalent.
+    await db.execute(text("SET LOCAL app.current_org_id = :org_id"), {"org_id": org_id})
+
     now = datetime.now(timezone.utc)
     active_statuses = [
         OrderStatus.new.value,
@@ -199,6 +211,7 @@ async def get_overdue_orders(db: AsyncSession, **_: object) -> dict:
         .options(selectinload(Order.customer))
         .where(
             and_(
+                Order.organization_id == org_id,
                 Order.is_deleted.is_(False),
                 Order.due_datetime < now,
                 Order.status.in_(active_statuses),
@@ -234,8 +247,8 @@ async def get_overdue_orders(db: AsyncSession, **_: object) -> dict:
     ),
     parameters={"type": "object", "properties": {}},
 )
-async def get_pipeline_value(db: AsyncSession, **_: object) -> dict:
+async def get_pipeline_value(db: AsyncSession, org_id: str, **_: object) -> dict:
     from src.ai.repository import AiRepository
 
-    repo = AiRepository(db)
+    repo = AiRepository(db, org_id)
     return await repo.get_pipeline_by_status()

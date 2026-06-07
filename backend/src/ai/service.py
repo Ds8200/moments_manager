@@ -30,7 +30,7 @@ _CACHED_PROMPT: str | None = None
 _HEBREW_DAYS = ["שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת", "ראשון"]
 
 
-def load_system_prompt() -> str:
+def load_prompt_template() -> str:
     global _CACHED_PROMPT  # noqa: PLW0603 — intentional module-level cache
     if _CACHED_PROMPT is None:
         prompt_path = Path(__file__).parent.parent.parent / PROMPTS_DIR / BUSINESS_ADVISOR_PROMPT
@@ -38,10 +38,11 @@ def load_system_prompt() -> str:
     return _CACHED_PROMPT
 
 
-def build_system_prompt() -> str:
+def build_system_prompt(org_name: str) -> str:
     """Returns the system prompt with the current Hebrew date/time prepended.
 
-    The base prompt is cached; only the date header is generated per call.
+    The base template is cached; the date header and the org name are
+    interpolated per call.
     """
     now = datetime.now(ZoneInfo("Asia/Jerusalem"))
     day = _HEBREW_DAYS[now.weekday()]
@@ -49,7 +50,8 @@ def build_system_prompt() -> str:
         f"**תאריך ושעה נוכחיים:** יום {day}, "
         f"{now.strftime('%d/%m/%Y')}, שעה {now.strftime('%H:%M')}"
     )
-    return f"{date_line}\n\n{load_system_prompt()}"
+    prompt = load_prompt_template().replace("{org_name}", org_name)
+    return f"{date_line}\n\n{prompt}"
 
 
 def _build_tools(registry: ToolRegistry) -> list[dict]:
@@ -77,16 +79,24 @@ def _build_messages(
 
 
 class AgentRunner:
-    def __init__(self, db: AsyncSession, registry: ToolRegistry) -> None:
+    def __init__(
+        self,
+        db: AsyncSession,
+        org_id: str,
+        registry: ToolRegistry,
+        openai_api_key: str | None = None,
+    ) -> None:
         self._db = db
+        self._org_id = org_id
         self._registry = registry
+        self._api_key = openai_api_key or settings.OPENAI_API_KEY
 
     async def run_stream(
         self,
         messages: list[ChatMessageSchema],
         system_prompt: str,
     ) -> AsyncGenerator[SSEEventSchema, None]:
-        client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        client = AsyncOpenAI(api_key=self._api_key)
         tools = _build_tools(self._registry)
         conversation = _build_messages(system_prompt, messages)
 
@@ -184,7 +194,9 @@ class AgentRunner:
                         yield SSEEventSchema(type="tool_call", tool_name=tool_name)
 
                         try:
-                            result = await self._registry.execute(tool_name, args, self._db)
+                            result = await self._registry.execute(
+                                tool_name, args, self._db, self._org_id
+                            )
                         except Exception as exc:
                             logger.error(log_messages.AI_TOOL_ERROR, tool_name, exc)
                             result = {"error": str(exc)}

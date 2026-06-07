@@ -6,6 +6,7 @@ from sqlalchemy import and_, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.customers.models import Customer
+from src.database import BaseRepository
 from src.expenses.models import Expense
 from src.orders.enums import OrderStatus, PaymentMethod
 from src.orders.models import Order
@@ -13,11 +14,12 @@ from src.orders.models import Order
 logger = logging.getLogger(__name__)
 
 
-class ReportRepository:
-    def __init__(self, db: AsyncSession) -> None:
-        self._db = db
+class ReportRepository(BaseRepository):
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
+        super().__init__(db, org_id)
 
     async def count_open_orders(self) -> int:
+        await self._apply_org_rls()
         active_statuses = [
             OrderStatus.new,
             OrderStatus.waiting_approval,
@@ -27,24 +29,29 @@ class ReportRepository:
         result = await self._db.execute(
             select(func.count(Order.id)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 Order.status.in_([s.value for s in active_statuses]),
             )
         )
         return result.scalar_one()
 
     async def count_ready_orders(self) -> int:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.count(Order.id)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 Order.status == OrderStatus.ready.value,
             )
         )
         return result.scalar_one()
 
     async def sum_month_revenue(self, year: int, month: int) -> Decimal:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.coalesce(func.sum(Order.total_amount), 0)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 extract("year", Order.date) == year,
                 extract("month", Order.date) == month,
             )
@@ -52,9 +59,11 @@ class ReportRepository:
         return Decimal(str(result.scalar_one()))
 
     async def sum_month_profit(self, year: int, month: int) -> Decimal:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.coalesce(func.sum(Order.total_profit), 0)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 Order.is_paid == True,
                 extract("year", Order.date) == year,
                 extract("month", Order.date) == month,
@@ -63,9 +72,11 @@ class ReportRepository:
         return Decimal(str(result.scalar_one()))
 
     async def sum_unpaid_amount(self) -> Decimal:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.coalesce(func.sum(Order.total_amount), 0)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 Order.is_paid == False,
                 Order.status != OrderStatus.cancelled.value,
             )
@@ -73,9 +84,11 @@ class ReportRepository:
         return Decimal(str(result.scalar_one()))
 
     async def count_orders_on_date(self, day: date) -> int:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.count(Order.id)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 Order.date == day,
             )
         )
@@ -84,8 +97,10 @@ class ReportRepository:
     async def month_orders_summary(
         self, year: int, month: int
     ) -> tuple[Decimal, Decimal, Decimal, int]:
+        await self._apply_org_rls()
         base_filter = and_(
             Order.is_deleted == False,
+            Order.organization_id == self._org_id,
             Order.is_paid == True,
             extract("year", Order.date) == year,
             extract("month", Order.date) == month,
@@ -109,8 +124,10 @@ class ReportRepository:
     async def month_revenue_by_payment_method(
         self, year: int, month: int, method: PaymentMethod
     ) -> Decimal:
+        await self._apply_org_rls()
         base_filter = and_(
             Order.is_deleted == False,
+            Order.organization_id == self._org_id,
             Order.is_paid == True,
             extract("year", Order.date) == year,
             extract("month", Order.date) == month,
@@ -123,9 +140,11 @@ class ReportRepository:
         return Decimal(str(result.scalar_one()))
 
     async def sum_month_paid_revenue(self, year: int, month: int) -> Decimal:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.coalesce(func.sum(Order.total_amount), 0)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 Order.is_paid == True,
                 extract("year", Order.date) == year,
                 extract("month", Order.date) == month,
@@ -134,9 +153,11 @@ class ReportRepository:
         return Decimal(str(result.scalar_one()))
 
     async def count_month_unpaid_orders(self, year: int, month: int) -> int:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.count(Order.id)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 Order.is_paid == False,
                 Order.status != OrderStatus.cancelled.value,
                 extract("year", Order.date) == year,
@@ -146,9 +167,11 @@ class ReportRepository:
         return result.scalar_one()
 
     async def sum_month_unpaid_amount(self, year: int, month: int) -> Decimal:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.coalesce(func.sum(Order.total_amount), 0)).where(
                 Order.is_deleted == False,
+                Order.organization_id == self._org_id,
                 Order.is_paid == False,
                 Order.status != OrderStatus.cancelled.value,
                 extract("year", Order.date) == year,
@@ -158,9 +181,11 @@ class ReportRepository:
         return Decimal(str(result.scalar_one()))
 
     async def sum_month_expenses(self, year: int, month: int) -> Decimal:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(func.coalesce(func.sum(Expense.amount), 0)).where(
                 Expense.is_deleted == False,
+                Expense.organization_id == self._org_id,
                 extract("year", Expense.date) == year,
                 extract("month", Expense.date) == month,
             )
@@ -168,6 +193,7 @@ class ReportRepository:
         return Decimal(str(result.scalar_one()))
 
     async def get_top_customers(self, limit: int) -> list[tuple]:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(
                 Customer.id,
@@ -177,7 +203,12 @@ class ReportRepository:
                 func.coalesce(func.sum(Order.total_profit), 0).label("total_profit"),
             )
             .join(Order, Order.customer_id == Customer.id, isouter=True)
-            .where(Customer.is_deleted == False, Order.is_deleted == False)
+            .where(
+                Customer.is_deleted == False,
+                Customer.organization_id == self._org_id,
+                Order.is_deleted == False,
+                Order.organization_id == self._org_id,
+            )
             .group_by(Customer.id, Customer.name)
             .order_by(func.sum(Order.total_amount).desc())
             .limit(limit)

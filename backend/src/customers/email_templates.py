@@ -4,14 +4,17 @@ from src.core.bidi import bidi_paragraphs, detect_dir
 from src.users.email_templates import BRAND_GRADIENT, BRAND_PURPLE, LOGO_URL
 
 
-def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[str, str]:
+def build_customer_email(
+    customer_name: str, subject: str, body: str, org_name: str
+) -> tuple[str, str]:
     # Detect primary direction from the actual content, not a hardcoded assumption.
     content_dir = detect_dir(subject + " " + body)
 
     safe_subject = _html.escape(subject)
     safe_name = _html.escape(customer_name)
+    safe_org_name = _html.escape(org_name)
     greeting = f'<p dir="auto">שלום {safe_name},</p>' if safe_name else ""
-    farewell = '<p dir="auto">בברכה,<br>Moments</p>'
+    farewell = f'<p dir="auto">בברכה,<br>{safe_org_name}</p>'
     body_html = bidi_paragraphs(body)
 
     html_body = f"""<!DOCTYPE html>
@@ -84,7 +87,7 @@ def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[s
 <body>
   <div class="container">
     <div class="header">
-      <img src="{LOGO_URL}" alt="Moments" width="200" />
+      <img src="{LOGO_URL}" alt="{safe_org_name}" width="200" />
     </div>
     <div class="accent-bar"></div>
     <div class="body">
@@ -94,7 +97,7 @@ def build_customer_email(customer_name: str, subject: str, body: str) -> tuple[s
       {farewell}
     </div>
     <div class="footer">
-      <p>Moments — מערכת ניהול הזמנות ולקוחות</p>
+      <p>{safe_org_name} — מערכת ניהול הזמנות ולקוחות</p>
     </div>
   </div>
 </body>

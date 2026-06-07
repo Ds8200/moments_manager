@@ -5,17 +5,20 @@ import { useCallback } from 'react'
 import { clearConversationAtom, isStreamingAtom } from '@/features/ai/store/aiAtoms'
 import { useAiStream } from '@/features/ai/queries/useAiStream'
 import { useAtomValue } from 'jotai'
+import { useAssistantName } from '@/shared/hooks/useAssistantName'
 
 export interface UseAiPageReturn {
   handleClear: () => void
   handleSuggestedPrompt: (prompt: string) => void
   isStreaming: boolean
+  assistantName: string
 }
 
 export const useAiPage = (): UseAiPageReturn => {
   const clearConversation = useSetAtom(clearConversationAtom)
   const isStreaming = useAtomValue(isStreamingAtom)
   const { sendMessage } = useAiStream()
+  const assistantName = useAssistantName()
 
   const handleClear = useCallback((): void => {
     clearConversation()
@@ -28,5 +31,5 @@ export const useAiPage = (): UseAiPageReturn => {
     [sendMessage]
   )
 
-  return { handleClear, handleSuggestedPrompt, isStreaming }
+  return { handleClear, handleSuggestedPrompt, isStreaming, assistantName }
 }

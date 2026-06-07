@@ -8,13 +8,13 @@ import { useAiPage } from './useAiPage'
 import styles from './AiPage.module.scss'
 
 export const AiPage = (): ReactElement => {
-  const { handleClear, handleSuggestedPrompt, isStreaming } = useAiPage()
+  const { handleClear, handleSuggestedPrompt, isStreaming, assistantName } = useAiPage()
 
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div className={styles.headerText}>
-          <h1 className={styles.title}>{AI_LABELS.PAGE_TITLE}</h1>
+          <h1 className={styles.title}>{assistantName}</h1>
           <p className={styles.subtitle}>{AI_LABELS.PAGE_SUBTITLE}</p>
         </div>
         <button

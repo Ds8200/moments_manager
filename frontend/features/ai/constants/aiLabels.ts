@@ -24,10 +24,8 @@ export const TOOL_LABELS: Record<string, string> = {
 export const ANALYZING_DEFAULT = 'מנתח נתונים'
 
 export const AI_LABELS = {
-  NAV_LABEL:           'Moments AI',
   SEND_EMAIL_CTA:      'שלח מייל ←',
   SEND_BULK_EMAIL_CTA: 'שלח לכל הלקוחות ←',
-  PAGE_TITLE:          'Moments AI',
   PAGE_SUBTITLE:       'עוזר עסקי חכם',
   CLEAR_BUTTON:        'שיחה חדשה',
   SEND_BUTTON:         'שלח',
@@ -39,7 +37,6 @@ export const AI_LABELS = {
   EMPTY_STATE_TITLE:   'שאל אותי כל שאלה על העסק',
   EMPTY_STATE_SUBTITLE:'אני יכול לעזור עם נתוני הזמנות, לקוחות, פיננסים ועוד',
   YOU_LABEL:           'אתה',
-  AI_LABEL:            'Moments AI',
 } as const
 
 export const AI_SUGGESTED_PROMPTS: readonly SuggestedPrompt[] = [

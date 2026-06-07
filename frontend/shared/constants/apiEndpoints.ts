@@ -44,4 +44,19 @@ export const API_ENDPOINTS = {
   ME: `${BASE}/api/v1/users/me`,
 
   AI_CHAT: `${BASE}/api/v1/ai/chat`,
+
+  ORGS_ME:        `${BASE}/api/v1/orgs/me`,
+  ORGS_ME_LOGO:   `${BASE}/api/v1/orgs/me/logo`,
+  ORGS_ME_MEMBERS: `${BASE}/api/v1/orgs/me/members`,
+  ORGS_ME_MEMBER: (userId: string) => `${BASE}/api/v1/orgs/me/members/${userId}`,
+  ORGS_ME_INVITE: `${BASE}/api/v1/orgs/me/invite`,
+
+  REGISTER: `${BASE}/api/v1/register`,
+
+  ADMIN_ORGS:        `${BASE}/api/v1/admin/orgs`,
+  ADMIN_ORG:         (id: string) => `${BASE}/api/v1/admin/orgs/${id}`,
+  ADMIN_ORG_STATUS:  (id: string) => `${BASE}/api/v1/admin/orgs/${id}/status`,
+  ADMIN_ORG_PLAN:    (id: string) => `${BASE}/api/v1/admin/orgs/${id}/plan`,
+
+  ORG_BRANDING: (slug: string) => `${BASE}/api/v1/orgs/branding/${slug}`,
 } as const

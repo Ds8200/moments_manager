@@ -20,9 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 class ExpenseCategoryService:
-    def __init__(self, db: AsyncSession) -> None:
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
         self._db = db
-        self._repo = ExpenseCategoryRepository(db)
+        self._repo = ExpenseCategoryRepository(db, org_id)
 
     async def list_categories(self) -> list[ExpenseCategoryResponseSchema]:
         categories = await self._repo.get_all()

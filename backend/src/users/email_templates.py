@@ -4,15 +4,16 @@ from src.config import settings
 
 LOGO_URL = "https://moments-manager.vercel.app/moments_logo.png"
 
-# Brand colors — מותאם ללוגו Moments (סגול → מג'נטה)
+# Brand colors — מותאם ללוגו ברירת המחדל (סגול → מג'נטה)
 BRAND_PURPLE = "#9C27B0"
 BRAND_GRADIENT = "linear-gradient(135deg, #9C27B0 0%, #D81B60 100%)"
 
 
 def build_welcome_email(
-    recipient_email: str, temp_password: str, magic_token: str
+    recipient_email: str, temp_password: str, magic_token: str, org_name: str
 ) -> tuple[str, str]:
-    subject = "ברוכים הבאים ל-Moments"
+    safe_org_name = _html.escape(org_name)
+    subject = f"ברוכים הבאים ל-{org_name}"
     login_url = f"{settings.APP_URL}/login"
     quick_login_url = f"{login_url}?token={magic_token}"
 
@@ -25,7 +26,7 @@ def build_welcome_email(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{subject}</title>
+  <title>{_html.escape(subject)}</title>
   <style>
     body {{
       font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -139,12 +140,12 @@ def build_welcome_email(
 <body>
   <div class="container">
     <div class="header">
-      <img src="{LOGO_URL}" alt="Moments" width="200" />
+      <img src="{LOGO_URL}" alt="{safe_org_name}" width="200" />
     </div>
     <div class="accent-bar"></div>
     <div class="body">
       <h2 dir="auto">ברוכים הבאים!</h2>
-      <p dir="auto">נוצר עבורך חשבון חדש במערכת ניהול Moments.</p>
+      <p dir="auto">נוצר עבורך חשבון חדש במערכת הניהול של {safe_org_name}.</p>
 
       <div class="credential-box">
         <div class="label">אימייל</div>
@@ -164,7 +165,7 @@ def build_welcome_email(
       </div>
     </div>
     <div class="footer">
-      <p>Moments — מערכת ניהול הזמנות ולקוחות</p>
+      <p>{safe_org_name} — מערכת ניהול הזמנות ולקוחות</p>
     </div>
   </div>
 </body>

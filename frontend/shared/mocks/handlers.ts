@@ -24,7 +24,23 @@ const ORDER_STUB = {
   updated_at: '2025-01-01T00:00:00Z',
 }
 
+const ORG_ADMIN_STUB = {
+  id: 'org-new-1',
+  slug: 'new-org',
+  name: 'New Org',
+  logo_path: null,
+  plan: 'trial',
+  trial_ends_at: null,
+  is_active: true,
+  max_users: 2,
+  owner_id: 'owner-1',
+  member_count: 1,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+}
+
 export const handlers = [
+  http.post(API_ENDPOINTS.ADMIN_ORGS, () => HttpResponse.json(ORG_ADMIN_STUB, { status: 201 })),
   http.get(API_ENDPOINTS.PRODUCT_CATEGORIES, () => HttpResponse.json([])),
   http.post(API_ENDPOINTS.PRODUCT_CATEGORIES, async ({ request }) => {
     const body = await request.json() as { name: string }
