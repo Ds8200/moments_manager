@@ -83,7 +83,12 @@ async def get_customer_detail(
     repo = AiRepository(db)
     profile = await repo.get_customer_profile(customer_name)
     if profile is None:
-        return {"found": False, "message": f"לא נמצא לקוח בשם '{customer_name}'"}
+        suggestions = await repo.find_customer_suggestions(customer_name)
+        return {
+            "found": False,
+            "searched_for": customer_name,
+            "suggestions": suggestions,
+        }
     return {"found": True, **profile}
 
 

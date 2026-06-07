@@ -330,3 +330,17 @@ class AiRepository:
             .limit(1)
         )
         return result.scalar_one_or_none()
+
+    async def find_customer_suggestions(self, query: str, limit: int = 5) -> list[str]:
+        """Returns customer names matching any word in query — used for fuzzy suggestions."""
+        words = [w.strip() for w in query.split() if len(w.strip()) >= 2]
+        if not words:
+            return []
+        filters = [Customer.name.ilike(f"%{word}%") for word in words]
+        result = await self._db.execute(
+            select(Customer.name)
+            .where(or_(*filters), Customer.is_deleted.is_(False))
+            .order_by(Customer.name)
+            .limit(limit)
+        )
+        return list(result.scalars().all())

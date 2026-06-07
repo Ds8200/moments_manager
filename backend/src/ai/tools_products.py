@@ -49,6 +49,16 @@ async def get_product_catalog(
     repo = AiRepository(db)
     capped = min(max(limit, 1), 50)
     products = await repo.get_product_catalog(search, active_only, capped)
+    if search and len(products) == 0:
+        all_products = await repo.get_product_catalog(None, active_only, min(capped, 20))
+        return {
+            "products": [],
+            "count": 0,
+            "active_only": active_only,
+            "search_not_found": True,
+            "searched_for": search,
+            "available_products": [p["name"] for p in all_products],
+        }
     return {
         "products": products,
         "count": len(products),
