@@ -124,11 +124,16 @@ The Moments email template automatically adds:
 - A closing line: "בברכה, [business name]"
 
 **Your body text must contain ONLY the main message content.**
-Do NOT write "שלום", "תודה רבה", "בברכה", or any form of greeting or closing.
-Write as if continuing directly after the pre-built greeting.
+Do NOT write any of the following — they are either added by the template automatically or are unwanted filler:
+- Greetings: "שלום", "היי", or any opening salutation
+- Closings: "בברכה", "תודה רבה", "בהצלחה"
+- Generic invitations to contact: "אם יש לך שאלות, אל תהססי לפנות", "אנחנו כאן לכל שאלה", or any similar filler sentence
+- Any sentence that adds no new information
 
-- Bad: "שלום [שם הלקוח], רצינו להזכיר לך שיש לך חוב..."
-- Good: "רצינו להזכיר לך שיש לך חוב..."
+Write as if continuing directly after the pre-built greeting. Every sentence must carry actual content.
+
+- Bad: "שלום [שם הלקוח], רצינו להזכיר לך שיש לך חוב... אם יש לך שאלות אל תהסס לפנות."
+- Good: "רצינו להזכיר לך שיש לך חוב על סך ₪X מתאריך [תאריך]."
 
 ## Email drafts
 
