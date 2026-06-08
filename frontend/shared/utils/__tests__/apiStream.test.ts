@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { http, HttpResponse } from 'msw'
 import { server } from '@/shared/mocks/server'
 import { ApiError } from '@/shared/utils/apiClient'
@@ -51,7 +51,8 @@ describe('apiStream', () => {
 
     let caughtError: unknown
     try {
-      for await (const _ of apiStream(API_ENDPOINTS.AI_CHAT, {})) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- discard variable; loop runs to trigger error
+      for await (const _chunk of apiStream(API_ENDPOINTS.AI_CHAT, {})) {
         // nothing
       }
     } catch (err) {
@@ -74,7 +75,8 @@ describe('apiStream', () => {
 
     let caughtError: unknown
     try {
-      for await (const _ of apiStream(API_ENDPOINTS.AI_CHAT, {})) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- discard variable; loop runs to trigger error
+      for await (const _chunk of apiStream(API_ENDPOINTS.AI_CHAT, {})) {
         // nothing
       }
     } catch (err) {

@@ -11,12 +11,15 @@ from src.expenses.service import ExpenseService
 
 pytestmark = pytest.mark.asyncio
 
+_ORG_ID = "00000000-0000-0000-0000-000000000000"
+
 
 def _make_expense() -> MagicMock:
     expense = MagicMock()
     expense.id = "e-1"
     expense.date = date.today()
-    expense.category = "ink"
+    expense.category_id = None
+    expense.category = None
     expense.amount = Decimal("10")
     expense.notes = None
     expense.created_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
@@ -26,7 +29,7 @@ def _make_expense() -> MagicMock:
 
 async def test_update_expense_not_found() -> None:
     db = AsyncMock()
-    service = ExpenseService(db)
+    service = ExpenseService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -36,7 +39,7 @@ async def test_update_expense_not_found() -> None:
 
 async def test_delete_expense_not_found() -> None:
     db = AsyncMock()
-    service = ExpenseService(db)
+    service = ExpenseService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -46,7 +49,7 @@ async def test_delete_expense_not_found() -> None:
 
 async def test_create_expense_commits() -> None:
     db = AsyncMock()
-    service = ExpenseService(db)
+    service = ExpenseService(db, _ORG_ID)
     service._repo = AsyncMock()
     expense = _make_expense()
     service._repo.create.return_value = expense
@@ -61,7 +64,7 @@ async def test_create_expense_commits() -> None:
 
 async def test_list_expenses_pagination() -> None:
     db = AsyncMock()
-    service = ExpenseService(db)
+    service = ExpenseService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_all.return_value = ([_make_expense() for _ in range(3)], 7)
 

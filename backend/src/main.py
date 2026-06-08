@@ -28,6 +28,7 @@ from src.products.router import router as products_router
 from src.registration.router import router as registration_router
 from src.reports.router import router as reports_router
 from src.super_admin.router import router as super_admin_router
+from src.system_settings.router import router as system_settings_router
 from src.users.router import router as users_router
 
 logger = logging.getLogger(__name__)
@@ -79,6 +80,7 @@ app.include_router(expense_categories_router)
 app.include_router(expenses_router)
 app.include_router(reports_router)
 app.include_router(super_admin_router)
+app.include_router(system_settings_router)
 app.include_router(ai_router)
 
 app.mount("/uploads", StaticFiles(directory=settings.UPLOADS_DIR), name="uploads")

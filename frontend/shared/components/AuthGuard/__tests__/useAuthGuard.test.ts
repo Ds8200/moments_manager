@@ -1,5 +1,6 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { setModuleToken } from '@/shared/utils/apiClient'
 import { useAuthGuard } from '../useAuthGuard'
 import { ROUTES } from '@/shared/constants/routes'
 
@@ -11,15 +12,22 @@ vi.mock('next/navigation', () => ({
   usePathname: () => currentPathname,
 }))
 
+function makeToken(payload: Record<string, unknown>): string {
+  const futureExp = Math.floor(Date.now() / 1000) + 3600
+  return `header.${btoa(JSON.stringify({ exp: futureExp, ...payload }))}.signature`
+}
+
 describe('useAuthGuard', () => {
   beforeEach(() => {
-    localStorage.clear()
+    setModuleToken(null)
+    document.cookie = 'access_token=; max-age=0'
     replaceMock.mockClear()
     currentPathname = '/home'
   })
 
   afterEach(() => {
-    localStorage.clear()
+    setModuleToken(null)
+    document.cookie = 'access_token=; max-age=0'
   })
 
   it('marks checked=true after init and reports unauthenticated when no token', async () => {
@@ -31,8 +39,9 @@ describe('useAuthGuard', () => {
     expect(result.current.isAuthenticated).toBe(false)
   })
 
-  it('reports isAuthenticated=true when token exists in storage', async () => {
-    localStorage.setItem('access_token', 'token-abc')
+  it('reports isAuthenticated=true when valid token exists in cookie', async () => {
+    const token = makeToken({ sub: 'u1', role: 'user', sys_admin: false })
+    document.cookie = `access_token=${encodeURIComponent(token)}`
     const { result } = renderHook(() => useAuthGuard())
 
     await waitFor(() => {
@@ -61,8 +70,8 @@ describe('useAuthGuard', () => {
   })
 
   it('clears token when auth:expired event fires', async () => {
-    localStorage.setItem('access_token', 'token-abc')
-    localStorage.setItem('refresh_token', 'r-abc')
+    const token = makeToken({ sub: 'u1', role: 'user', sys_admin: false })
+    document.cookie = `access_token=${encodeURIComponent(token)}`
     const { result } = renderHook(() => useAuthGuard())
 
     await waitFor(() => {
@@ -76,6 +85,5 @@ describe('useAuthGuard', () => {
     await waitFor(() => {
       expect(result.current.isAuthenticated).toBe(false)
     })
-    expect(localStorage.getItem('access_token')).toBeNull()
   })
 })

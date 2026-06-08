@@ -8,23 +8,25 @@ export const authApi = {
     apiClient<TokenResponse>(API_ENDPOINTS.AUTH_LOGIN, {
       method: 'POST',
       body: JSON.stringify({ email, password }),
+      credentials: 'include',
     }),
 
-  refresh: (refreshToken: string): Promise<TokenResponse> =>
+  refresh: (): Promise<TokenResponse> =>
     apiClient<TokenResponse>(API_ENDPOINTS.AUTH_REFRESH, {
       method: 'POST',
-      body: JSON.stringify({ refresh_token: refreshToken }),
+      credentials: 'include',
     }),
 
   magicLogin: (token: string): Promise<TokenResponse> =>
     apiClient<TokenResponse>(API_ENDPOINTS.AUTH_MAGIC_LOGIN, {
       method: 'POST',
       body: JSON.stringify({ token }),
+      credentials: 'include',
     }),
 
-  logout: (refreshToken: string): Promise<void> =>
+  logout: (): Promise<void> =>
     apiClient<void>(API_ENDPOINTS.AUTH_LOGOUT, {
       method: 'POST',
-      body: JSON.stringify({ refresh_token: refreshToken }),
+      credentials: 'include',
     }),
 }

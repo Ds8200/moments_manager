@@ -73,8 +73,13 @@ class RegistrationService:
 
         logger.info("Organization registered: %s (slug=%s, owner=%s)", org.name, org.slug, user.id)
 
+        from src.core.email import platform_smtp_kwargs
+        from src.system_settings.repository import SystemSettingsRepository
+
+        sys_settings = await SystemSettingsRepository(self._db).get()
+        smtp_kw = platform_smtp_kwargs(sys_settings)
         background_tasks.add_task(
-            _send_welcome_email, data.owner_email, data.business_name, data.slug
+            _send_welcome_email, data.owner_email, data.business_name, data.slug, smtp_kw
         )
 
         return RegistrationResponseSchema(
@@ -85,9 +90,24 @@ class RegistrationService:
         )
 
 
-async def _send_welcome_email(owner_email: str, business_name: str, org_slug: str) -> None:
+async def _send_welcome_email(
+    owner_email: str,
+    business_name: str,
+    org_slug: str,
+    smtp_kw: dict | None,
+) -> None:
+    import logging as _logging
+
     from src.config import settings
-    from src.core.email import send_html_email
+    from src.core.email import send_html_email_via_smtp
+
+    _log = _logging.getLogger(__name__)
+    if not smtp_kw:
+        _log.warning(
+            "Platform SMTP not configured — skipping registration welcome email to %s",
+            owner_email,
+        )
+        return
 
     app_url = f"http://{org_slug}.{settings.APP_DOMAIN}"
     subject = f"ברוכים הבאים ל-{business_name}"
@@ -107,4 +127,9 @@ async def _send_welcome_email(owner_email: str, business_name: str, org_slug: st
       </p>
     </div>
     """
-    await send_html_email(owner_email, subject, html_body)
+    await send_html_email_via_smtp(
+        to_email=owner_email,
+        subject=subject,
+        html_body=html_body,
+        **smtp_kw,
+    )

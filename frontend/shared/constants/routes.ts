@@ -13,12 +13,16 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   ONBOARDING: '/onboarding',
-  SUPER_ADMIN_ORGS: '/orgs',
-  SUPER_ADMIN_NEW_ORG: '/orgs/new',
-  SUPER_ADMIN_PROFILE: '/orgs/profile',
+  SUPER_ADMIN_BASE: '/super-admin',
+  SUPER_ADMIN_ORGS: '/super-admin/orgs',
+  SUPER_ADMIN_NEW_ORG: '/super-admin/orgs/new',
+  SUPER_ADMIN_PROFILE: '/super-admin/orgs/profile',
+  SUPER_ADMIN_SETTINGS: '/super-admin/settings',
+  SUPER_ADMIN_EMAIL: '/super-admin/email',
 } as const
 
 export const ORDER_DETAIL_ROUTE = (id: string): string => `/orders/${id}`
+export const SUPER_ADMIN_ORG_DETAIL_ROUTE = (id: string): string => `/super-admin/orgs/${id}`
 
 export const ROUTE_ICONS = {
   HOME:      '🏠',
@@ -43,6 +47,7 @@ export interface NavItem {
 
 export const SUPER_ADMIN_NAV_ITEMS: NavItem[] = [
   { href: ROUTES.SUPER_ADMIN_ORGS, label: 'ניהול עסקים', shortLabel: 'עסקים', icon: ROUTE_ICONS.ORGS },
+  { href: ROUTES.SUPER_ADMIN_EMAIL, label: 'שליחת מייל', shortLabel: 'מייל', icon: ROUTE_ICONS.EMAIL },
 ]
 
 export const NAV_ITEMS: NavItem[] = [

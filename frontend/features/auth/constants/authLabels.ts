@@ -1,5 +1,5 @@
 export const AUTH_LABELS = {
-  TITLE:            'מערכת ניהול',
+  TITLE:            'Nihulo',
   SUBTITLE:         'מערכת לניהול עסקים',
   EMAIL_LABEL:      'אימייל',
   EMAIL_PLACEHOLDER:'admin@example.com',

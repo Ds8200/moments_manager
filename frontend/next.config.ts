@@ -3,12 +3,15 @@ import path from 'path'
 
 const isVercel = !!process.env.VERCEL
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moments-manager.onrender.com'
+const BACKEND_URL = process.env.BACKEND_URL || 'https://nihulo.onrender.com'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   sassOptions: {
     includePaths: [path.resolve(__dirname)],

@@ -1,14 +1,7 @@
 'use client'
 import { atom } from 'jotai'
+import { getModuleToken, getOrRefreshToken, setModuleToken } from '@/shared/utils/apiClient'
 import type { OrgRole, TokenPayload, UserRole } from '../types'
-
-const ACCESS_TOKEN_KEY = 'access_token'
-const REFRESH_TOKEN_KEY = 'refresh_token'
-
-function readToken(): string | null {
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem(ACCESS_TOKEN_KEY)
-}
 
 export function decodePayload(token: string): TokenPayload | null {
   try {
@@ -20,6 +13,17 @@ export function decodePayload(token: string): TokenPayload | null {
 
 function decodeRole(token: string): UserRole | null {
   return decodePayload(token)?.role ?? null
+}
+
+function readCookieToken(): string | null {
+  if (typeof document === 'undefined') return null
+  const match = document.cookie.match(/(?:^|;\s*)access_token=([^;]*)/)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+function isTokenExpired(token: string): boolean {
+  const payload = decodePayload(token)
+  return !payload || payload.exp * 1000 < Date.now()
 }
 
 export const accessTokenAtom = atom<string | null>(null)
@@ -53,23 +57,41 @@ export const currentOrgRoleAtom = atom<OrgRole | null>((get) => {
 
 export const setTokensAtom = atom(
   null,
-  (_get, set, { access, refresh }: { access: string; refresh: string }) => {
-    localStorage.setItem(ACCESS_TOKEN_KEY, access)
-    localStorage.setItem(REFRESH_TOKEN_KEY, refresh)
+  (_get, set, { access }: { access: string }) => {
+    setModuleToken(access)
     set(accessTokenAtom, access)
     set(userRoleAtom, decodeRole(access))
   },
 )
 
 export const clearTokensAtom = atom(null, (_get, set) => {
-  localStorage.removeItem(ACCESS_TOKEN_KEY)
-  localStorage.removeItem(REFRESH_TOKEN_KEY)
+  setModuleToken(null)
   set(accessTokenAtom, null)
   set(userRoleAtom, null)
 })
 
-export const initAuthAtom = atom(null, (_get, set) => {
-  const token = readToken()
-  set(accessTokenAtom, token)
-  set(userRoleAtom, token ? decodeRole(token) : null)
+export const initAuthAtom = atom(null, async (_get, set) => {
+  // Fast path: access_token cookie is still valid — no network call needed
+  const cookieToken = readCookieToken()
+  if (cookieToken && !isTokenExpired(cookieToken)) {
+    setModuleToken(cookieToken)
+    set(accessTokenAtom, cookieToken)
+    set(userRoleAtom, decodeRole(cookieToken))
+    return
+  }
+
+  // Slow path: use httpOnly refresh_token cookie to silently issue a new pair
+  const existingModuleToken = getModuleToken()
+  if (existingModuleToken && !isTokenExpired(existingModuleToken)) {
+    set(accessTokenAtom, existingModuleToken)
+    set(userRoleAtom, decodeRole(existingModuleToken))
+    return
+  }
+
+  const newToken = await getOrRefreshToken()
+  if (newToken) {
+    set(accessTokenAtom, newToken)
+    set(userRoleAtom, decodeRole(newToken))
+  }
+  // null → remains unauthenticated; AuthGuard redirects to login
 })

@@ -25,7 +25,7 @@ async def test_register_creates_org_and_user(db_session: AsyncSession) -> None:
 
     app.dependency_overrides[get_db] = override_get_db
 
-    with patch("src.registration.service.RegistrationService._send_welcome_email"):
+    with patch("src.registration.service._send_welcome_email"):
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             response = await ac.post("/api/v1/register", json=VALID_PAYLOAD)
@@ -50,7 +50,7 @@ async def test_register_duplicate_slug_returns_409(db_session: AsyncSession) -> 
 
     app.dependency_overrides[get_db] = override_get_db
 
-    with patch("src.registration.service.RegistrationService._send_welcome_email"):
+    with patch("src.registration.service._send_welcome_email"):
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             await ac.post("/api/v1/register", json=VALID_PAYLOAD)

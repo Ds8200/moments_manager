@@ -10,4 +10,7 @@ export const UI_SYMBOLS = {
   DELETE:        '🗑️',
   EMOJI_PICKER:  '😊',
   SETTINGS:      '⚙️',
+  DETAILS:       'ℹ️',
+  KEY:           '🔑',
+  MENU:          '⋮',
 } as const

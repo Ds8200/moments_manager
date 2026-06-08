@@ -50,9 +50,7 @@ def _one_result(*values) -> MagicMock:
 
 
 async def test_get_customer_profile_not_found(mock_db) -> None:
-    mock_db.execute = AsyncMock(
-        side_effect=[_rls_result(), _scalar_one_or_none_result(None)]
-    )
+    mock_db.execute = AsyncMock(side_effect=[_rls_result(), _scalar_one_or_none_result(None)])
     repo = AiRepository(mock_db, TEST_ORG_ID)
     result = await repo.get_customer_profile("does not exist")
     assert result is None
@@ -290,9 +288,7 @@ async def test_get_inactive_customers_no_orders(mock_db) -> None:
 
 
 async def test_get_order_items_not_found(mock_db) -> None:
-    mock_db.execute = AsyncMock(
-        side_effect=[_rls_result(), _scalar_one_or_none_result(None)]
-    )
+    mock_db.execute = AsyncMock(side_effect=[_rls_result(), _scalar_one_or_none_result(None)])
     repo = AiRepository(mock_db, TEST_ORG_ID)
     result = await repo.get_order_items_by_number("ORD-9999-0000")
     assert result is None
@@ -318,9 +314,7 @@ async def test_get_order_items_found(mock_db) -> None:
     order.total_amount = Decimal("125.00")
     order.items = [item]
 
-    mock_db.execute = AsyncMock(
-        side_effect=[_rls_result(), _scalar_one_or_none_result(order)]
-    )
+    mock_db.execute = AsyncMock(side_effect=[_rls_result(), _scalar_one_or_none_result(order)])
     repo = AiRepository(mock_db, TEST_ORG_ID)
     result = await repo.get_order_items_by_number("ORD-2025-0010")
 
@@ -344,9 +338,7 @@ async def test_get_order_items_no_customer_falls_back(mock_db) -> None:
     order.total_amount = Decimal("0")
     order.items = []
 
-    mock_db.execute = AsyncMock(
-        side_effect=[_rls_result(), _scalar_one_or_none_result(order)]
-    )
+    mock_db.execute = AsyncMock(side_effect=[_rls_result(), _scalar_one_or_none_result(order)])
     repo = AiRepository(mock_db, TEST_ORG_ID)
     result = await repo.get_order_items_by_number("ORD-2025-0011")
 

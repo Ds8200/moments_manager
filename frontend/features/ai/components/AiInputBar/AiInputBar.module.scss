@@ -1,7 +1,9 @@
+@use '../../../../shared/styles/variables' as v;
+
 .wrapper {
   padding: 12px 16px 16px;
-  border-top: 1px solid #e8d5f0;
-  background: #fff;
+  border-block-start: 1px solid v.$primary-light;
+  background: v.$bg-card;
 }
 
 .errorStrip {
@@ -10,27 +12,27 @@
   gap: 12px;
   padding: 8px 12px;
   margin-block-end: 10px;
-  background: #fff3f3;
-  border: 1px solid #fca5a5;
+  background: rgba(v.$danger, 0.08);
+  border: 1px solid rgba(v.$danger, 0.4);
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #dc2626;
+  color: v.$danger-dark;
 }
 
 .retryButton {
   margin-inline-start: auto;
   padding: 4px 12px;
   border-radius: 6px;
-  border: 1px solid #dc2626;
+  border: 1px solid v.$danger-dark;
   background: transparent;
-  color: #dc2626;
+  color: v.$danger-dark;
   font-size: 0.8125rem;
   cursor: pointer;
   white-space: nowrap;
 
   &:hover {
-    background: #dc2626;
-    color: #fff;
+    background: v.$danger-dark;
+    color: v.$text-inverse;
   }
 }
 
@@ -43,7 +45,7 @@
 .textarea {
   flex: 1;
   padding: 10px 14px;
-  border: 1.5px solid #ddd;
+  border: 1.5px solid v.$border-color;
   border-radius: 12px;
   font-size: 0.9375rem;
   font-family: inherit;
@@ -56,7 +58,7 @@
 
   &:focus {
     outline: none;
-    border-color: #9c27b0;
+    border-color: v.$primary;
   }
 }
 
@@ -64,8 +66,8 @@
   padding: 10px 20px;
   border-radius: 12px;
   border: none;
-  background: #9c27b0;
-  color: #fff;
+  background: v.$primary;
+  color: v.$text-inverse;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
@@ -73,7 +75,7 @@
   transition: background 0.15s, opacity 0.15s;
 
   &:hover:not(:disabled) {
-    background: #7b1fa2;
+    background: v.$primary-dark;
   }
 
   &:disabled {

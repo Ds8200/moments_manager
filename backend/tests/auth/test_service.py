@@ -79,7 +79,7 @@ async def test_magic_login_with_valid_token_issues_token_pair() -> None:
     result = await service.magic_login(token)
 
     assert result.access_token
-    assert result.refresh_token
+    assert result.raw_refresh
     service._users.get_by_id.assert_called_once_with("user-1")
 
 

@@ -1,4 +1,5 @@
 import asyncio
+import sys
 import uuid
 from typing import AsyncGenerator
 
@@ -7,11 +8,14 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
-    async_sessionmaker,
     create_async_engine,
 )
 
 from src.config import settings
+
+if sys.platform == "win32":
+    # SelectorEventLoop avoids IOCP proactor instability (WinError 10054) on Windows
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 from src.core.dependencies import (
     OrgContext,
     get_current_user,
@@ -42,7 +46,17 @@ async def engine():
 
     test_engine = create_async_engine(
         settings.TEST_DATABASE_URL,
+        pool_size=5,
+        max_overflow=10,
         pool_pre_ping=True,
+        pool_recycle=300,
+        connect_args={
+            "server_settings": {
+                "tcp_keepalives_idle": "10",
+                "tcp_keepalives_interval": "5",
+                "tcp_keepalives_count": "3",
+            }
+        },
     )
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -54,15 +68,15 @@ async def engine():
 
 @pytest_asyncio.fixture
 async def db_session(engine) -> AsyncGenerator[AsyncSession, None]:
-    session_factory = async_sessionmaker(bind=engine, expire_on_commit=False)
-    async with session_factory() as session:
-        try:
+    async with engine.connect() as conn:
+        await conn.begin()
+        async with AsyncSession(
+            bind=conn,
+            expire_on_commit=False,
+            join_transaction_mode="create_savepoint",
+        ) as session:
             yield session
-        finally:
-            await session.rollback()
-            for table in reversed(Base.metadata.sorted_tables):
-                await session.execute(table.delete())
-            await session.commit()
+        await conn.rollback()
 
 
 @pytest_asyncio.fixture
@@ -91,6 +105,12 @@ async def organization(db_session: AsyncSession, test_user: User) -> Organizatio
         is_active=True,
         max_users=10,
         owner_id=test_user.id,
+        smtp_host="smtp.example.com",
+        smtp_port=587,
+        smtp_username="org@example.com",
+        smtp_password="secret",
+        smtp_from_email="org@example.com",
+        smtp_from_name="Test Org",
     )
     db_session.add(org)
     await db_session.commit()

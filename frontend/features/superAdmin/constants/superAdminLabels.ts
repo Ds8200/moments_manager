@@ -45,4 +45,19 @@ export const SUPER_ADMIN_LABELS = {
   VALIDATION_EMAIL: 'כתובת אימייל לא תקינה',
   VALIDATION_PASSWORD_MIN: 'סיסמה חייבת להכיל לפחות 8 תווים',
   BACK_TO_ORGS: 'חזרה לרשימה',
+
+  // Row action menu
+  MENU_DETAILS:        'פרטים',
+  MENU_DISABLE:        'השבתה',
+  MENU_ENABLE:         'הפעלה',
+  MENU_DELETE:         'מחיקה',
+  MENU_RESET_PASSWORD: 'איפוס סיסמה',
+
+  CONFIRM_DELETE:         'למחוק את העסק לצמיתות? לא ניתן לשחזר.',
+  CONFIRM_RESET_PASSWORD: 'לשלוח מייל איפוס סיסמה לבעל העסק?',
+
+  ORG_DELETED_SUCCESS:        'העסק נמחק',
+  ORG_DELETE_ERROR:           'מחיקת העסק נכשלה',
+  ORG_PASSWORD_RESET_SUCCESS: 'מייל איפוס סיסמה נשלח',
+  ORG_PASSWORD_RESET_ERROR:   'שליחת מייל נכשלה',
 } as const

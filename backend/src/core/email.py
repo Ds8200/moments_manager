@@ -1,66 +1,30 @@
+import base64
 import logging
+from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Any
 
 import aiosmtplib
-import httpx
 
-from src.config import settings
-from src.core.constants.log_messages import (
-    BREVO_API_KEY_NOT_CONFIGURED,
-    WELCOME_EMAIL_FAILED,
-    WELCOME_EMAIL_SENT,
-)
+from src.core.constants.log_messages import SMTP_EMAIL_FAILED, SMTP_EMAIL_SENT
 
 logger = logging.getLogger(__name__)
 
-SMTP_EMAIL_FAILED = "SMTP email to %s failed: %s"
-SMTP_EMAIL_SENT = "SMTP email sent to %s via %s"
 
-BREVO_SEND_URL = "https://api.brevo.com/v3/smtp/email"
-
-
-async def send_html_email(
-    to_email: str,
-    subject: str,
-    html_body: str,
-    attachments: list[dict[str, str]] | None = None,
-    from_name: str | None = None,
-) -> None:
-    if not settings.BREVO_API_KEY:
-        logger.warning(BREVO_API_KEY_NOT_CONFIGURED, to_email)
-        return
-
-    payload: dict[str, Any] = {
-        "sender": {
-            "name": from_name or settings.EMAIL_FROM_NAME,
-            "email": settings.EMAIL_FROM,
-        },
-        "to": [{"email": to_email}],
-        "subject": subject,
-        "htmlContent": html_body,
+def platform_smtp_kwargs(sys_settings) -> dict | None:
+    """Return SMTP kwargs dict for the platform sender, or None if not configured."""
+    if not (sys_settings.platform_smtp_host and sys_settings.platform_smtp_password):
+        return None
+    return {
+        "host": sys_settings.platform_smtp_host,
+        "port": sys_settings.platform_smtp_port or 587,
+        "username": sys_settings.platform_smtp_username or "",
+        "password": sys_settings.platform_smtp_password,
+        "from_email": sys_settings.platform_smtp_from_email
+        or sys_settings.platform_smtp_username
+        or "",
+        "from_name": sys_settings.platform_smtp_from_name or "Nihulo",
     }
-
-    if attachments:
-        # Brevo attachment format: [{"name": "file.pdf", "content": "<base64>"}]
-        payload["attachment"] = attachments
-
-    try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            response = await client.post(
-                BREVO_SEND_URL,
-                json=payload,
-                headers={"api-key": settings.BREVO_API_KEY},
-            )
-            if not response.is_success:
-                logger.error(
-                    WELCOME_EMAIL_FAILED, to_email, f"{response.status_code} {response.text}"
-                )
-                return
-        logger.info(WELCOME_EMAIL_SENT, to_email)
-    except Exception as exc:
-        logger.error(WELCOME_EMAIL_FAILED, to_email, exc)
 
 
 async def send_html_email_via_smtp(
@@ -73,12 +37,18 @@ async def send_html_email_via_smtp(
     to_email: str,
     subject: str,
     html_body: str,
+    attachments: list[dict[str, str]] | None = None,
 ) -> None:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = f"{from_name} <{from_email}>"
     msg["To"] = to_email
     msg.attach(MIMEText(html_body, "html", "utf-8"))
+
+    for attachment in attachments or []:
+        part = MIMEApplication(base64.b64decode(attachment["content"]))
+        part.add_header("Content-Disposition", "attachment", filename=attachment["name"])
+        msg.attach(part)
 
     try:
         await aiosmtplib.send(

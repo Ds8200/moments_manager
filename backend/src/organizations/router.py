@@ -1,9 +1,9 @@
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Request, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.dependencies import OrgContext, get_db, get_org_context
+from src.core.dependencies import OrgContext, get_db, get_org_context, require_admin
 from src.core.rate_limit import limiter
 from src.organizations.constants import ORG_INVITE_ACCEPTED
 from src.organizations.schemas import (
@@ -44,7 +44,7 @@ async def get_my_org(
 @router.patch("/me", response_model=OrgResponseSchema)
 async def update_my_org(
     body: OrgUpdateSchema,
-    ctx: OrgContext = Depends(get_org_context),
+    ctx: OrgContext = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ) -> OrgResponseSchema:
     svc = OrgService(db)
@@ -54,7 +54,7 @@ async def update_my_org(
 @router.post("/me/logo", response_model=OrgBrandingResponseSchema, status_code=200)
 async def upload_org_logo(
     file: UploadFile = File(...),
-    ctx: OrgContext = Depends(get_org_context),
+    ctx: OrgContext = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ) -> OrgBrandingResponseSchema:
     svc = OrgService(db)
@@ -73,10 +73,10 @@ async def list_members(
 @router.post("/me/invite", response_model=InviteResponseSchema, status_code=201)
 @limiter.limit("10/minute")
 async def invite_member(
-    request,
+    request: Request,
     body: InviteCreateSchema,
     background_tasks: BackgroundTasks,
-    ctx: OrgContext = Depends(get_org_context),
+    ctx: OrgContext = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ) -> InviteResponseSchema:
     svc = OrgService(db)
@@ -86,7 +86,7 @@ async def invite_member(
 @router.delete("/me/members/{user_id}", status_code=204, response_model=None)
 async def remove_member(
     user_id: str,
-    ctx: OrgContext = Depends(get_org_context),
+    ctx: OrgContext = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ) -> None:
     svc = OrgService(db)

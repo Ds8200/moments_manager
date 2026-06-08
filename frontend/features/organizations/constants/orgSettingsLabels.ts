@@ -56,6 +56,14 @@ export const ORG_SETTINGS_LABELS = {
   INTEGRATIONS_SAVE_SUCCESS:  'הגדרות האינטגרציה נשמרו',
   INTEGRATIONS_SAVE_ERROR:    'שמירת הגדרות האינטגרציה נכשלה',
 
+  PASSWORD_SECTION_TITLE:   'שינוי סיסמה',
+  PASSWORD_CURRENT_LABEL:   'סיסמה נוכחית',
+  PASSWORD_NEW_LABEL:       'סיסמה חדשה',
+  PASSWORD_NEW_MIN:         'הסיסמה חייבת להכיל לפחות 8 תווים',
+  PASSWORD_REQUIRED:        'שדה חובה',
+  PASSWORD_CHANGE_SUCCESS:  'הסיסמה שונתה בהצלחה',
+  PASSWORD_CHANGE_ERROR:    'שינוי הסיסמה נכשל',
+
   INVITE_SECTION_TITLE: 'הזמנת חבר צוות',
   EMAIL_LABEL: 'אימייל',
   EMAIL_PLACEHOLDER: 'colleague@example.com',

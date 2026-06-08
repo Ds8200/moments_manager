@@ -7,10 +7,12 @@ from src.reports.service import ReportService
 
 pytestmark = pytest.mark.asyncio
 
+_ORG_ID = "00000000-0000-0000-0000-000000000000"
+
 
 async def test_get_dashboard_kpi_assembles_from_repo() -> None:
     db = AsyncMock()
-    service = ReportService(db)
+    service = ReportService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.count_open_orders.return_value = 4
     service._repo.count_ready_orders.return_value = 2
@@ -32,7 +34,7 @@ async def test_get_dashboard_kpi_assembles_from_repo() -> None:
 
 async def test_get_monthly_report_computes_net_profit() -> None:
     db = AsyncMock()
-    service = ReportService(db)
+    service = ReportService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.month_orders_summary.return_value = (
         Decimal("200"),
@@ -40,7 +42,10 @@ async def test_get_monthly_report_computes_net_profit() -> None:
         Decimal("120"),
         5,
     )
+    service._repo.count_month_unpaid_orders.return_value = 2
     service._repo.month_revenue_by_payment_method.return_value = Decimal("60")
+    service._repo.sum_month_unpaid_amount.return_value = Decimal("100")
+    service._repo.sum_month_paid_revenue.return_value = Decimal("180")
     service._repo.sum_month_expenses.return_value = Decimal("40")
 
     result = await service.get_monthly_report(2025, 3)
@@ -49,12 +54,12 @@ async def test_get_monthly_report_computes_net_profit() -> None:
     assert result.total_profit == Decimal("120")
     assert result.total_expenses == Decimal("40")
     assert result.net_profit == Decimal("80")
-    assert result.order_count == 5
+    assert result.paid_count == 5
 
 
 async def test_get_top_customers_maps_repo_rows() -> None:
     db = AsyncMock()
-    service = ReportService(db)
+    service = ReportService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_top_customers.return_value = [
         ("c-1", "Alice", 3, Decimal("500"), Decimal("200")),

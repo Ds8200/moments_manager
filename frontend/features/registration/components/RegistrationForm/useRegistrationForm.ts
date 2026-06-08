@@ -65,6 +65,7 @@ export const useRegistrationForm = (): UseRegistrationFormReturn => {
     defaultValues: DEFAULT_VALUES,
   })
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form watch() is not memoizable; useWatch refactor deferred
   const businessName = watch('business_name')
   const slug = watch('slug')
 

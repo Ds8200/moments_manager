@@ -14,6 +14,11 @@ vi.mock('@/shared/hooks/useNotify', () => ({
   useNotify: () => ({ success: notifySuccess, error: notifyError, info: vi.fn(), warning: vi.fn() }),
 }))
 
+const refreshMock = vi.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: refreshMock }),
+}))
+
 function makeWrapper(qc: QueryClient) {
   function TestWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
     return React.createElement(QueryClientProvider, { client: qc }, children)
@@ -39,6 +44,7 @@ describe('useLogoStep', () => {
     qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
     notifySuccess.mockClear()
     notifyError.mockClear()
+    refreshMock.mockClear()
     onNext.mockClear()
   })
 
@@ -48,7 +54,7 @@ describe('useLogoStep', () => {
     expect(result.current.canProceed).toBe(false)
   })
 
-  it('uploads the selected file and exposes the extracted palette', async () => {
+  it('uploads the selected file, refreshes the server layout, and exposes the extracted palette', async () => {
     server.use(
       http.post(API_ENDPOINTS.ORGS_ME_LOGO, () =>
         HttpResponse.json({ logo_path: 'uploads/logos/org1/logo.png', brand_colors: BRAND_COLORS, message: 'ok' }),
@@ -69,6 +75,7 @@ describe('useLogoStep', () => {
       { key: 'text', label: ONBOARDING_LABELS.COLOR_TEXT, hex: BRAND_COLORS.text },
     ])
     expect(notifySuccess).toHaveBeenCalledWith(ONBOARDING_LABELS.LOGO_UPLOADED_SUCCESS)
+    expect(refreshMock).toHaveBeenCalledOnce()
   })
 
   it('notifies an error and keeps the next button disabled when the upload fails', async () => {
@@ -81,6 +88,7 @@ describe('useLogoStep', () => {
 
     await waitFor(() => expect(notifyError).toHaveBeenCalledWith(ONBOARDING_LABELS.LOGO_UPLOAD_ERROR))
     expect(result.current.canProceed).toBe(false)
+    expect(refreshMock).not.toHaveBeenCalled()
   })
 
   it('does not upload when no file is selected', () => {
@@ -91,6 +99,7 @@ describe('useLogoStep', () => {
     })
 
     expect(result.current.canProceed).toBe(false)
+    expect(refreshMock).not.toHaveBeenCalled()
   })
 
   it('calls onNext when the next step is requested', () => {

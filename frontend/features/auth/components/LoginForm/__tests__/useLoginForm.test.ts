@@ -4,6 +4,8 @@ import { http, HttpResponse } from 'msw'
 import { server } from '@/shared/mocks/server'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { ROUTES } from '@/shared/constants/routes'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { setModuleToken, getModuleToken } from '@/shared/utils/apiClient'
 import { useLoginForm } from '../useLoginForm'
 import { AUTH_LABELS } from '../../../constants/authLabels'
 
@@ -21,22 +23,32 @@ function makeJwt(payload: Record<string, unknown>): string {
   return `${header}.${body}.fakesig`
 }
 
+const defaultProps = { logoSrc: UI_LABELS.GENERIC_LOGO_SRC, logoAlt: UI_LABELS.APP_NAME }
+
 describe('useLoginForm', () => {
   beforeEach(() => {
     pushMock.mockClear()
-    localStorage.clear()
+    setModuleToken(null)
     mockSearchParams = new URLSearchParams()
   })
 
-  it('stores tokens and navigates to home on successful login for org user', async () => {
+  it('passes through logoSrc and logoAlt from props', () => {
+    const props = { logoSrc: '/uploads/logos/acme/logo.png', logoAlt: 'דפוס אקמה' }
+    const { result } = renderHook(() => useLoginForm(props))
+
+    expect(result.current.logoSrc).toBe('/uploads/logos/acme/logo.png')
+    expect(result.current.logoAlt).toBe('דפוס אקמה')
+  })
+
+  it('stores token in module and navigates to home on successful login for org user', async () => {
     const token = makeJwt({ sub: '1', org_id: 'org-1', org_role: 'owner', sys_admin: false, exp: 9999999999 })
     server.use(
       http.post(API_ENDPOINTS.AUTH_LOGIN, () =>
-        HttpResponse.json({ access_token: token, refresh_token: 'r-token' }),
+        HttpResponse.json({ access_token: token }),
       ),
     )
 
-    const { result } = renderHook(() => useLoginForm())
+    const { result } = renderHook(() => useLoginForm(defaultProps))
 
     await act(async () => {
       await result.current.onSubmit({ email: 'a@b.com', password: 'pw' })
@@ -45,18 +57,18 @@ describe('useLoginForm', () => {
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith(ROUTES.HOME)
     })
-    expect(localStorage.getItem('access_token')).toBe(token)
+    expect(getModuleToken()).toBe(token)
   })
 
   it('navigates to super admin page after login for sys_admin', async () => {
     const token = makeJwt({ sub: '2', org_id: null, org_role: null, sys_admin: true, exp: 9999999999 })
     server.use(
       http.post(API_ENDPOINTS.AUTH_LOGIN, () =>
-        HttpResponse.json({ access_token: token, refresh_token: 'r-token' }),
+        HttpResponse.json({ access_token: token }),
       ),
     )
 
-    const { result } = renderHook(() => useLoginForm())
+    const { result } = renderHook(() => useLoginForm(defaultProps))
 
     await act(async () => {
       await result.current.onSubmit({ email: 'admin@b.com', password: 'pw' })
@@ -71,11 +83,11 @@ describe('useLoginForm', () => {
     const token = makeJwt({ sub: '3', org_id: null, org_role: null, sys_admin: false, exp: 9999999999 })
     server.use(
       http.post(API_ENDPOINTS.AUTH_LOGIN, () =>
-        HttpResponse.json({ access_token: token, refresh_token: 'r-token' }),
+        HttpResponse.json({ access_token: token }),
       ),
     )
 
-    const { result } = renderHook(() => useLoginForm())
+    const { result } = renderHook(() => useLoginForm(defaultProps))
 
     await act(async () => {
       await result.current.onSubmit({ email: 'new@b.com', password: 'pw' })
@@ -93,7 +105,7 @@ describe('useLoginForm', () => {
       ),
     )
 
-    const { result } = renderHook(() => useLoginForm())
+    const { result } = renderHook(() => useLoginForm(defaultProps))
 
     await act(async () => {
       await result.current.onSubmit({ email: 'a@b.com', password: 'wrong' })
@@ -110,18 +122,18 @@ describe('useLoginForm', () => {
     mockSearchParams = new URLSearchParams({ token: 'magic-123' })
     server.use(
       http.post(API_ENDPOINTS.AUTH_MAGIC_LOGIN, () =>
-        HttpResponse.json({ access_token: token, refresh_token: 'm-refresh' }),
+        HttpResponse.json({ access_token: token }),
       ),
     )
 
-    const { result } = renderHook(() => useLoginForm())
+    const { result } = renderHook(() => useLoginForm(defaultProps))
 
     expect(result.current.isMagicLoggingIn).toBe(true)
 
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith(ROUTES.HOME)
     })
-    expect(localStorage.getItem('access_token')).toBe(token)
+    expect(getModuleToken()).toBe(token)
   })
 
   it('shows MAGIC_LOGIN_FAILED and reveals the form when the magic token is invalid', async () => {
@@ -132,7 +144,7 @@ describe('useLoginForm', () => {
       ),
     )
 
-    const { result } = renderHook(() => useLoginForm())
+    const { result } = renderHook(() => useLoginForm(defaultProps))
 
     await waitFor(() => {
       expect(result.current.submitError).toBe(AUTH_LABELS.MAGIC_LOGIN_FAILED)

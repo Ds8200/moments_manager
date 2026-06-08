@@ -91,7 +91,7 @@ async def test_compose_email_success(client: AsyncClient) -> None:
     )
     customer_id = create.json()["id"]
 
-    with patch("src.customers.service.send_html_email"):
+    with patch("src.customers.service.send_html_email_via_smtp"):
         response = await client.post(
             "/api/v1/customers/compose-email",
             json={
@@ -109,7 +109,7 @@ async def test_compose_email_success(client: AsyncClient) -> None:
 
 
 async def test_compose_email_empty_recipients_still_202(client: AsyncClient) -> None:
-    with patch("src.customers.service.send_html_email"):
+    with patch("src.customers.service.send_html_email_via_smtp"):
         response = await client.post(
             "/api/v1/customers/compose-email",
             json={"customer_ids": [], "manual_emails": [], "subject": "נושא", "body": "גוף"},
@@ -125,7 +125,7 @@ async def test_send_email_success(client: AsyncClient) -> None:
     )
     customer_id = create.json()["id"]
 
-    with patch("src.customers.service.send_html_email"):
+    with patch("src.customers.service.send_html_email_via_smtp"):
         response = await client.post(
             f"/api/v1/customers/{customer_id}/send-email",
             json={"subject": "שלום", "body": "תוכן המייל"},

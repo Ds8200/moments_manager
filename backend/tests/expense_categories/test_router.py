@@ -4,11 +4,15 @@ from httpx import AsyncClient
 pytestmark = pytest.mark.asyncio
 
 
-async def test_list_categories_includes_seeded(client: AsyncClient) -> None:
+async def test_list_categories_returns_list(client: AsyncClient) -> None:
+    await client.post("/api/v1/expense-categories", json={"name": "דיו"})
+    await client.post("/api/v1/expense-categories", json={"name": "ציוד"})
+
     response = await client.get("/api/v1/expense-categories")
     assert response.status_code == 200
-    # Migration seeded 6 default categories
-    assert len(response.json()) >= 6
+    names = [c["name"] for c in response.json()]
+    assert "דיו" in names
+    assert "ציוד" in names
 
 
 async def test_create_category(client: AsyncClient) -> None:

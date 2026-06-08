@@ -83,8 +83,12 @@ async def draft_email(
 
     org = await OrgRepository(db).get_by_id(org_id)
     org_name = org.name if org else ""
+    logo_path = org.logo_path if org else None
+    brand_colors = org.brand_colors if org else None
 
-    final_subject, html_body = build_customer_email(customer_name, subject, body, org_name)
+    final_subject, html_body = build_customer_email(
+        customer_name, subject, body, org_name, logo_path, brand_colors
+    )
     return {
         "subject": final_subject,
         "body_text": body,

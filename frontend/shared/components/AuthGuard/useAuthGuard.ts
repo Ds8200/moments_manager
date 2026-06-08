@@ -31,8 +31,11 @@ export const useAuthGuard = (): UseAuthGuardReturn => {
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    initAuth()
-    startTransition(() => setChecked(true))
+    let cancelled = false
+    void initAuth().then(() => {
+      if (!cancelled) startTransition(() => setChecked(true))
+    })
+    return () => { cancelled = true }
   }, [initAuth])
 
   useEffect(() => {
@@ -41,7 +44,7 @@ export const useAuthGuard = (): UseAuthGuardReturn => {
       if (pathname !== ROUTES.LOGIN) router.replace(ROUTES.LOGIN)
       return
     }
-    if (isSysAdmin && !pathname.startsWith(ROUTES.SUPER_ADMIN_ORGS)) {
+    if (isSysAdmin && !pathname.startsWith(ROUTES.SUPER_ADMIN_BASE)) {
       router.replace(ROUTES.SUPER_ADMIN_ORGS)
       return
     }

@@ -1,3 +1,5 @@
+@use '../../../../shared/styles/variables' as v;
+
 .container {
   display: flex;
   flex-direction: column;
@@ -9,13 +11,13 @@
 .title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: v.$text-primary;
   margin-block-end: 8px;
 }
 
 .subtitle {
   font-size: 0.9rem;
-  color: #666;
+  color: v.$text-secondary;
   margin-block-end: 32px;
 }
 
@@ -30,21 +32,21 @@
 .chip {
   padding: 8px 18px;
   border-radius: 20px;
-  border: 1.5px solid #9c27b0;
+  border: 1.5px solid v.$primary;
   background: transparent;
-  color: #9c27b0;
+  color: v.$primary;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 
   &:hover {
-    background: #9c27b0;
-    color: #fff;
+    background: v.$primary;
+    color: v.$text-inverse;
   }
 
   &:focus-visible {
-    outline: 2px solid #9c27b0;
+    outline: 2px solid v.$primary;
     outline-offset: 2px;
   }
 }

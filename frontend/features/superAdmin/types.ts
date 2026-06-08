@@ -33,3 +33,7 @@ export interface OrgPlanUpdatePayload {
   max_users?: number
   trial_ends_at?: string | null
 }
+
+export interface OrgActionResponse {
+  message: string
+}

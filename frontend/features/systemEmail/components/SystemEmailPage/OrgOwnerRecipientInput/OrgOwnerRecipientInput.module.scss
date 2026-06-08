@@ -1,0 +1,207 @@
+@use '@/shared/styles/variables' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.error {
+  font-size: $font-size-sm;
+  color: $danger;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-1;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  background: $primary-light;
+  color: $primary-dark;
+  border-radius: 100px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  list-style: none;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: $primary-dark;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: $danger;
+  }
+}
+
+.manualRow {
+  display: flex;
+  gap: $space-2;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.manualInput {
+  flex: 1;
+  min-width: 160px;
+  padding: $space-2 $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  font-size: $font-size-base;
+  font-family: inherit;
+  color: $text-primary;
+  background: $bg-card;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
+.addBtn {
+  padding: $space-2 $space-4;
+  border-radius: $border-radius;
+  border: none;
+  background: $primary;
+  color: $text-inverse;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.manualError {
+  font-size: $font-size-xs;
+  color: $danger;
+  margin-block-start: -$space-1;
+}
+
+.listToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: $space-2 $space-3;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  background: $gray-50;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $gray-100;
+  }
+
+  &[aria-expanded='true'] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
+    background: $gray-100;
+  }
+}
+
+.chevron {
+  transition: transform $transition-fast;
+  flex-shrink: 0;
+
+  .listToggle[aria-expanded='true'] & {
+    transform: rotate(180deg);
+  }
+}
+
+.listBox {
+  border: 1px solid $border-color;
+  border-top: none;
+  border-bottom-left-radius: $border-radius;
+  border-bottom-right-radius: $border-radius;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  background: $gray-50;
+  border-bottom: 1px solid $border-color;
+  position: sticky;
+  top: 0;
+}
+
+.headerLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  cursor: pointer;
+  user-select: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-2 $space-3;
+  cursor: pointer;
+  border-bottom: 1px solid $border-color;
+  transition: background-color $transition-fast;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: $primary-light;
+  }
+}
+
+.name {
+  flex: 1;
+  font-size: $font-size-base;
+  color: $text-primary;
+}
+
+.orgName {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.email {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.empty {
+  display: block;
+  padding: $space-4 $space-3;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  text-align: center;
+}

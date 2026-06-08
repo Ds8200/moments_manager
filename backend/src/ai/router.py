@@ -8,10 +8,10 @@ from src.ai.constants import MAX_TOOL_ROUNDS  # noqa: F401 — used in service
 from src.ai.schemas import ChatRequestSchema
 from src.ai.service import AgentRunner, build_system_prompt
 from src.ai.tool_registry import tool_registry
-from src.config import settings
 from src.core.constants.http_messages import AI_NOT_CONFIGURED
 from src.core.dependencies import get_db, get_org_context
 from src.core.rate_limit import limiter
+from src.system_settings.repository import SystemSettingsRepository
 
 logger = logging.getLogger(__name__)
 
@@ -27,14 +27,19 @@ async def ai_chat(
     ctx=Depends(get_org_context),
 ) -> StreamingResponse:
     org_api_key: str | None = getattr(ctx.org, "openai_api_key", None)
-    if not org_api_key and not settings.OPENAI_API_KEY:
+    effective_key = org_api_key
+    if not effective_key:
+        sys_settings = await SystemSettingsRepository(db).get()
+        effective_key = sys_settings.platform_openai_api_key or None
+
+    if not effective_key:
         raise HTTPException(status_code=503, detail=AI_NOT_CONFIGURED)
 
     if not body.messages:
         raise HTTPException(status_code=422, detail="messages must not be empty")
 
     system_prompt = build_system_prompt(ctx.org.name)
-    runner = AgentRunner(db, ctx.org_id, tool_registry, openai_api_key=org_api_key)
+    runner = AgentRunner(db, ctx.org_id, tool_registry, openai_api_key=effective_key)
 
     async def event_generator():
         async for event in runner.run_stream(body.messages, system_prompt):

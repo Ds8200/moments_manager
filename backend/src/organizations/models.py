@@ -45,9 +45,7 @@ class OrganizationMembership(Base, TimestampMixin):
     organization_id: Mapped[str] = mapped_column(
         String, ForeignKey("organizations.id"), nullable=False, index=True
     )
-    user_id: Mapped[str] = mapped_column(
-        String, ForeignKey("users.id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False, index=True)
     role: Mapped[str] = mapped_column(
         String(20),
         nullable=False,

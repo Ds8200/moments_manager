@@ -1,19 +1,20 @@
 // ============================================================
-// Design Tokens — מערכת ניהול
+// Design Tokens — Nihulo
 // ============================================================
 
-// Primary palette — סגול → מג'נטה + כתום-זהב
+// Primary palette — אינדיגו/ויולט + קורל
 // Tenant subdomains override these via --color-* CSS custom properties injected
 // in app/(app)/layout.tsx (AI-extracted org brand colors); the hex values below
 // are the fallback used on the main domain and wherever no org branding applies.
-$primary:       var(--color-primary, #9C27B0);
-$primary-light: #F3E5F5;
-$primary-dark:  var(--color-secondary, #6A1B7A);
-$accent:        var(--color-accent, #D81B60);
+// DEFAULT_BRAND_COLORS in shared/utils/branding.ts must stay in sync with these fallbacks.
+$primary:       var(--color-primary, #6C63FF);
+$primary-light: #EEEDFF;
+$primary-dark:  var(--color-secondary, #5650E5);
+$accent:        var(--color-accent, #FF6584);
 $accent-gold:   #FF9F1C;
 
 // גרדיאנט המותג — לכותרות/מותג/מייל
-$gradient-brand: linear-gradient(135deg, var(--color-primary, #9C27B0) 0%, var(--color-accent, #D81B60) 100%);
+$gradient-brand: linear-gradient(135deg, var(--color-primary, #6C63FF) 0%, var(--color-accent, #FF6584) 100%);
 
 // Order status colors
 $status-new:              #339AF0;

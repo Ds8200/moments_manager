@@ -5,6 +5,7 @@ import { OrgNameForm } from './OrgNameForm/OrgNameForm'
 import { OrgLogoCard } from './OrgLogoCard/OrgLogoCard'
 import { OrgMembersSection } from './OrgMembersSection/OrgMembersSection'
 import { OrgIntegrationsSection } from './OrgIntegrationsSection/OrgIntegrationsSection'
+import { OrgPasswordSection } from './OrgPasswordSection/OrgPasswordSection'
 import styles from './OrgSettings.module.scss'
 
 export const OrgSettings = (): ReactElement => {
@@ -17,6 +18,7 @@ export const OrgSettings = (): ReactElement => {
         <OrgNameForm />
         <OrgLogoCard />
         <OrgIntegrationsSection />
+        <OrgPasswordSection />
         <OrgMembersSection />
       </div>
     </div>

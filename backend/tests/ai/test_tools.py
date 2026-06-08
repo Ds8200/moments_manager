@@ -226,9 +226,7 @@ async def test_draft_email_customer_not_found(mock_db) -> None:
     id_result.scalar_one_or_none.return_value = None
     names_result = MagicMock()
     names_result.scalars.return_value.all.return_value = []
-    mock_db.execute = AsyncMock(
-        side_effect=[MagicMock(), id_result, MagicMock(), names_result]
-    )
+    mock_db.execute = AsyncMock(side_effect=[MagicMock(), id_result, MagicMock(), names_result])
 
     result = await draft_email(
         db=mock_db,
@@ -240,4 +238,3 @@ async def test_draft_email_customer_not_found(mock_db) -> None:
     assert result["not_found"] is True
     assert result["searched_for"] == "לקוח לא קיים"
     assert result["candidates"] == []
-

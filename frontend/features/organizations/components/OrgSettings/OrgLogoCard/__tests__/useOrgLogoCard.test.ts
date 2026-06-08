@@ -15,6 +15,11 @@ vi.mock('@/shared/hooks/useNotify', () => ({
   useNotify: () => ({ success: notifySuccess, error: notifyError, info: vi.fn(), warning: vi.fn() }),
 }))
 
+const refreshMock = vi.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: refreshMock }),
+}))
+
 const BRAND_COLORS = {
   primary: '#9C27B0',
   secondary: '#6A1B7A',
@@ -54,6 +59,7 @@ describe('useOrgLogoCard', () => {
     qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
     notifySuccess.mockClear()
     notifyError.mockClear()
+    refreshMock.mockClear()
     server.use(http.get(API_ENDPOINTS.ORGS_ME, () => HttpResponse.json(ORG_RESPONSE)))
   })
 
@@ -70,7 +76,7 @@ describe('useOrgLogoCard', () => {
     ])
   })
 
-  it('uploads a new logo and prefers the freshly extracted palette', async () => {
+  it('uploads a new logo, refreshes the server layout, and prefers the freshly extracted palette', async () => {
     const NEW_COLORS = { ...BRAND_COLORS, primary: '#000000' }
     server.use(
       http.post(API_ENDPOINTS.ORGS_ME_LOGO, () =>
@@ -90,6 +96,7 @@ describe('useOrgLogoCard', () => {
       hex: NEW_COLORS.primary,
     })
     expect(notifySuccess).toHaveBeenCalledWith(ONBOARDING_LABELS.LOGO_UPLOADED_SUCCESS)
+    expect(refreshMock).toHaveBeenCalledOnce()
   })
 
   it('notifies an error when the upload fails', async () => {
@@ -101,6 +108,7 @@ describe('useOrgLogoCard', () => {
     })
 
     await waitFor(() => expect(notifyError).toHaveBeenCalledWith(ONBOARDING_LABELS.LOGO_UPLOAD_ERROR))
+    expect(refreshMock).not.toHaveBeenCalled()
   })
 
   it('does not upload when no file is selected', async () => {
@@ -112,6 +120,7 @@ describe('useOrgLogoCard', () => {
     })
 
     expect(result.current.isUploading).toBe(false)
+    expect(refreshMock).not.toHaveBeenCalled()
   })
 
   it('shows the placeholder label when the organization has no logo', async () => {

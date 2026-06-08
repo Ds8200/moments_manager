@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, func, text
+from sqlalchemy import Boolean, DateTime, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -27,12 +27,14 @@ class Base(DeclarativeBase):
 
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True),
+        server_default=text("clock_timestamp()"),
+        nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
+        server_default=text("clock_timestamp()"),
+        onupdate=text("clock_timestamp()"),
         nullable=False,
     )
 
@@ -51,6 +53,6 @@ class BaseRepository:
 
     async def _apply_org_rls(self) -> None:
         # Raw SQL required: PostgreSQL SET LOCAL has no SQLAlchemy ORM equivalent.
-        await self._db.execute(
-            text("SET LOCAL app.current_org_id = :org_id"), {"org_id": self._org_id}
-        )
+        # SET LOCAL rejects bind parameters ($1 syntax); UUID contains only hex and
+        # hyphens so direct interpolation is safe here.
+        await self._db.execute(text(f"SET LOCAL app.current_org_id = '{self._org_id}'"))

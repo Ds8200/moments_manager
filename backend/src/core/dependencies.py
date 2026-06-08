@@ -35,9 +35,9 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 class OrgContext:
     """Resolved per-request tenant context derived from the JWT."""
 
-    user: object          # src.users.models.User
-    org: object           # src.organizations.models.Organization
-    membership: object    # src.organizations.models.OrganizationMembership
+    user: object  # src.users.models.User
+    org: object  # src.organizations.models.Organization
+    membership: object  # src.organizations.models.OrganizationMembership
 
     @property
     def org_id(self) -> str:

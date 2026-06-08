@@ -1,7 +1,13 @@
 'use client'
 import { apiClient } from '@/shared/utils/apiClient'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
-import type { OrgAdminResponse, OrgCreatePayload, OrgStatusUpdatePayload, OrgPlanUpdatePayload } from './types'
+import type {
+  OrgActionResponse,
+  OrgAdminResponse,
+  OrgCreatePayload,
+  OrgPlanUpdatePayload,
+  OrgStatusUpdatePayload,
+} from './types'
 import type { PaginatedResponse } from '@/shared/types/pagination'
 
 export const superAdminApi = {
@@ -27,4 +33,10 @@ export const superAdminApi = {
       method: 'PATCH',
       body: JSON.stringify(payload),
     }),
+
+  deleteOrg: (id: string): Promise<OrgActionResponse> =>
+    apiClient<OrgActionResponse>(API_ENDPOINTS.ADMIN_ORG(id), { method: 'DELETE' }),
+
+  resetOrgOwnerPassword: (id: string): Promise<OrgActionResponse> =>
+    apiClient<OrgActionResponse>(API_ENDPOINTS.ADMIN_ORG_RESET_PASSWORD(id), { method: 'POST' }),
 }

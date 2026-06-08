@@ -1,6 +1,6 @@
-# Moments
+# Nihulo
 
-מערכת ניהול הזמנות, לקוחות ופיננסים לעסק גרפיקה והדפסות.
+מערכת ניהול הזמנות, לקוחות ופיננסים לעסקים.
 
 @.claude/rules/shared.md
 @.claude/rules/frontend.md

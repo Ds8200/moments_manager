@@ -17,6 +17,7 @@ from src.customers.schemas import (
     EmailSentResponseSchema,
 )
 from src.customers.service import CustomerService
+from src.system_settings.repository import SystemSettingsRepository
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/customers", tags=["customers"])
@@ -39,11 +40,13 @@ async def list_customers(
 @router.post("", response_model=CustomerResponseSchema, status_code=201)
 async def create_customer(
     body: CustomerCreateSchema,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     ctx=Depends(get_org_context),
 ):
+    sys_settings = await SystemSettingsRepository(db).get()
     svc = CustomerService(db, ctx.org_id)
-    return await svc.create_customer(body)
+    return await svc.create_customer(body, background_tasks, ctx.org, sys_settings)
 
 
 @router.post("/compose-email", response_model=ComposeEmailResponseSchema, status_code=202)
@@ -56,7 +59,7 @@ async def compose_email(
     ctx=Depends(get_org_context),
 ):
     svc = CustomerService(db, ctx.org_id)
-    return await svc.compose_email(body, background_tasks, ctx.org.name, ctx.org.smtp_from_name)
+    return await svc.compose_email(body, background_tasks, ctx.org)
 
 
 @router.get("/{customer_id}", response_model=CustomerWithStatsSchema)
@@ -101,6 +104,4 @@ async def send_email_to_customer(
     ctx=Depends(get_org_context),
 ):
     svc = CustomerService(db, ctx.org_id)
-    return await svc.send_email_to_customer(
-        customer_id, body, background_tasks, ctx.org.name, ctx.org.smtp_from_name
-    )
+    return await svc.send_email_to_customer(customer_id, body, background_tasks, ctx.org)

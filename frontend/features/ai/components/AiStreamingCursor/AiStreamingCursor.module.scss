@@ -1,8 +1,10 @@
+@use '../../../../shared/styles/variables' as v;
+
 .cursor {
   display: inline-block;
   margin-inline-start: 2px;
   font-weight: 300;
-  color: var(--color-primary, #9c27b0);
+  color: v.$primary;
   animation: blink 1s step-end infinite;
 }
 
@@ -11,7 +13,7 @@
   margin-inline-start: 4px;
   font-size: 0.85em;
   font-weight: 400;
-  color: var(--color-text-secondary, #757575);
+  color: v.$text-secondary;
   font-style: italic;
   animation: fade 1.5s ease-in-out infinite;
 }

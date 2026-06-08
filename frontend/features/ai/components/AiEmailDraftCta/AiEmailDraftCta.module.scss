@@ -1,7 +1,9 @@
+@use '../../../../shared/styles/variables' as v;
+
 .container {
   margin-block-start: 14px;
   padding-block-start: 10px;
-  border-block-start: 1px solid #d9a8e8;
+  border-block-start: 1px solid v.$primary-light;
   display: flex;
   justify-content: flex-start;
 }
@@ -12,17 +14,17 @@
   gap: 6px;
   padding: 8px 18px;
   border-radius: 8px;
-  border: 1.5px solid #9c27b0;
-  background: #fff;
-  color: #9c27b0;
+  border: 1.5px solid v.$primary;
+  background: v.$bg-card;
+  color: v.$primary;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 
   &:hover {
-    background: #9c27b0;
-    color: #fff;
+    background: v.$primary;
+    color: v.$text-inverse;
   }
 
   &:active {

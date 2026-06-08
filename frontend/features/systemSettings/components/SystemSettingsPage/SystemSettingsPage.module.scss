@@ -1,0 +1,20 @@
+@use '../../../../shared/styles/variables' as v;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+}
+
+.title {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+  max-width: 640px;
+}

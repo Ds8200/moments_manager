@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import BackgroundTasks, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.constants.http_messages import ORG_EMAIL_NOT_CONFIGURED
 from src.core.enums.error_codes import ErrorCode
 from src.core.exceptions import ConflictError, ForbiddenError, NotFoundError
 from src.organizations.branding_service import extract_brand_colors, upload_logo
@@ -47,11 +48,15 @@ def _preview_key(key: str) -> str:
 
 def _org_to_schema(org) -> OrgResponseSchema:
     schema = OrgResponseSchema.model_validate(org)
-    return schema.model_copy(update={
-        "has_openai_key": bool(org.openai_api_key),
-        "openai_key_preview": _preview_key(org.openai_api_key) if org.openai_api_key else None,
-        "has_smtp_config": bool(org.smtp_host and org.smtp_password),
-    })
+    return schema.model_copy(
+        update={
+            "has_openai_key": bool(org.openai_api_key),
+            "openai_key_preview": _preview_key(org.openai_api_key) if org.openai_api_key else None,
+            "has_smtp_config": bool(org.smtp_host and org.smtp_password),
+        }
+    )
+
+
 _PLAN_MAX_USERS = {
     OrgPlan.trial.value: 2,
     OrgPlan.basic.value: 5,
@@ -128,6 +133,8 @@ class OrgService:
         org = await self._orgs.get_by_id(org_id)
         if not org:
             raise NotFoundError(RESOURCE_ORG, org_id)
+        if not (org.smtp_host and org.smtp_password):
+            raise ConflictError(ORG_EMAIL_NOT_CONFIGURED, code=ErrorCode.ORG_EMAIL_NOT_CONFIGURED)
 
         current_count = await self._members.count_active(org_id)
         if current_count >= org.max_users:
@@ -155,6 +162,8 @@ class OrgService:
             to_email=data.email,
             org_name=org.name,
             invite_url=invite_url,
+            logo_path=org.logo_path,
+            brand_colors=org.brand_colors,
             smtp_host=org.smtp_host,
             smtp_port=org.smtp_port,
             smtp_username=org.smtp_username,
@@ -194,9 +203,7 @@ class OrgService:
         await self._db.commit()
         return invite.organization_id
 
-    async def remove_member(
-        self, org_id: str, target_user_id: str, requester_id: str
-    ) -> None:
+    async def remove_member(self, org_id: str, target_user_id: str, requester_id: str) -> None:
         org = await self._orgs.get_by_id(org_id)
         if not org:
             raise NotFoundError(RESOURCE_ORG, org_id)
@@ -215,38 +222,47 @@ async def _send_invite_email(
     to_email: str,
     org_name: str,
     invite_url: str,
-    smtp_host: str | None = None,
-    smtp_port: int | None = None,
-    smtp_username: str | None = None,
-    smtp_password: str | None = None,
-    smtp_from_email: str | None = None,
-    smtp_from_name: str | None = None,
+    logo_path: str | None,
+    brand_colors: dict | None,
+    smtp_host: str,
+    smtp_port: int | None,
+    smtp_username: str | None,
+    smtp_password: str,
+    smtp_from_email: str | None,
+    smtp_from_name: str | None,
 ) -> None:
-    from src.core.email import send_html_email, send_html_email_via_smtp
+    import html as _html
+
+    from src.core.email import send_html_email_via_smtp
+    from src.users.email_templates import resolve_brand_colors, resolve_logo_url
+
+    colors = resolve_brand_colors(brand_colors)
+    logo_url = resolve_logo_url(logo_path)
+    primary = colors["primary"]
+    safe_org_name = _html.escape(org_name)
 
     subject = f"הוזמנת להצטרף ל-{org_name}"
     html_body = f"""
     <div style="font-family: Arial, sans-serif; direction: rtl; text-align: right;">
-      <h2>הוזמנת להצטרף ל-{org_name}</h2>
+      <img src="{logo_url}" alt="{safe_org_name}" width="160"
+           style="display:block;margin-bottom:16px;" />
+      <h2 style="color:{primary};">הוזמנת להצטרף ל-{safe_org_name}</h2>
       <p>לחץ על הקישור להצטרפות:</p>
-      <a href="{invite_url}" style="background:#3b5bdb;color:#fff;padding:10px 20px;
+      <a href="{invite_url}" style="background:{primary};color:#fff;padding:10px 20px;
          border-radius:4px;text-decoration:none;">הצטרף עכשיו</a>
       <p style="color:#888;font-size:12px;margin-top:20px;">
         הקישור תקף ל-72 שעות.
       </p>
     </div>
     """
-    if smtp_host and smtp_password:
-        await send_html_email_via_smtp(
-            host=smtp_host,
-            port=smtp_port or 587,
-            username=smtp_username or "",
-            password=smtp_password,
-            from_email=smtp_from_email or smtp_username or "",
-            from_name=smtp_from_name or org_name,
-            to_email=to_email,
-            subject=subject,
-            html_body=html_body,
-        )
-    else:
-        await send_html_email(to_email, subject, html_body, from_name=smtp_from_name or org_name)
+    await send_html_email_via_smtp(
+        host=smtp_host,
+        port=smtp_port or 587,
+        username=smtp_username or "",
+        password=smtp_password,
+        from_email=smtp_from_email or smtp_username or "",
+        from_name=smtp_from_name or org_name,
+        to_email=to_email,
+        subject=subject,
+        html_body=html_body,
+    )

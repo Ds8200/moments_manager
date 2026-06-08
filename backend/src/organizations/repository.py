@@ -15,24 +15,18 @@ class OrgRepository:
 
     async def get_by_id(self, org_id: str) -> Organization | None:
         result = await self._db.execute(
-            select(Organization).where(
-                Organization.id == org_id, Organization.is_deleted == False
-            )
+            select(Organization).where(Organization.id == org_id, Organization.is_deleted == False)
         )
         return result.scalar_one_or_none()
 
     async def get_by_slug(self, slug: str) -> Organization | None:
         result = await self._db.execute(
-            select(Organization).where(
-                Organization.slug == slug, Organization.is_deleted == False
-            )
+            select(Organization).where(Organization.slug == slug, Organization.is_deleted == False)
         )
         return result.scalar_one_or_none()
 
     async def slug_exists(self, slug: str) -> bool:
-        result = await self._db.execute(
-            select(Organization.id).where(Organization.slug == slug)
-        )
+        result = await self._db.execute(select(Organization.id).where(Organization.slug == slug))
         return result.scalar_one_or_none() is not None
 
     async def create(
@@ -60,15 +54,49 @@ class OrgRepository:
         for key, value in fields.items():
             setattr(org, key, value)
         await self._db.flush()
+        await self._db.refresh(org)
         return org
+
+    async def soft_delete(self, org: Organization) -> None:
+        org.is_deleted = True
+        org.deleted_at = datetime.now(timezone.utc)
+        await self._db.flush()
+
+    async def list_owners(self) -> list[tuple]:
+        """Return (user_id, email, full_name, org_id, org_name) for all active org owners."""
+        from sqlalchemy import and_
+
+        from src.organizations.enums import OrgRole
+        from src.users.models import User
+
+        result = await self._db.execute(
+            select(
+                OrganizationMembership.user_id,
+                User.email,
+                User.full_name,
+                Organization.id.label("org_id"),
+                Organization.name.label("org_name"),
+            )
+            .join(Organization, Organization.id == OrganizationMembership.organization_id)
+            .join(User, User.id == OrganizationMembership.user_id)
+            .where(
+                and_(
+                    OrganizationMembership.role == OrgRole.owner.value,
+                    OrganizationMembership.is_active == True,
+                    Organization.is_deleted == False,
+                    Organization.is_active == True,
+                    User.is_deleted == False,
+                )
+            )
+            .order_by(Organization.name)
+        )
+        return list(result.all())
 
     async def list_all(self, limit: int, offset: int) -> tuple[list[Organization], int]:
         from sqlalchemy import func
 
         base = select(Organization).where(Organization.is_deleted == False)
-        count_result = await self._db.execute(
-            select(func.count()).select_from(base.subquery())
-        )
+        count_result = await self._db.execute(select(func.count()).select_from(base.subquery()))
         total = count_result.scalar_one()
         result = await self._db.execute(
             base.order_by(Organization.created_at.desc()).limit(limit).offset(offset)

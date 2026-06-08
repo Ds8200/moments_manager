@@ -54,6 +54,15 @@ export const useHeader = (): UseHeaderReturn => {
       icon: '👤',
       onClick: () => router.push(profileRoute),
     },
+    ...(isSysAdmin
+      ? [
+          {
+            label: UI_LABELS.SYSTEM_SETTINGS_MENU,
+            icon: '⚙️',
+            onClick: () => router.push(ROUTES.SUPER_ADMIN_SETTINGS),
+          },
+        ]
+      : []),
     ...(canManageOrg
       ? [
           {

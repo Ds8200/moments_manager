@@ -1,4 +1,5 @@
 @use '@/shared/styles/variables' as *;
+@use 'sass:color';
 
 .backdrop {
   position: fixed;
@@ -87,7 +88,7 @@
   transition: background $transition-fast;
 
   &:hover {
-    background: darken($danger, 8%);
+    background: color.adjust($danger, $lightness: -8%);
   }
 }
 

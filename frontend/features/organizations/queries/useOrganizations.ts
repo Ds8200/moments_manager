@@ -6,6 +6,7 @@ import {
   type UseMutationResult,
   type UseQueryResult,
 } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { organizationsApi } from '../api'
 import { useNotify } from '@/shared/hooks/useNotify'
 import { ONBOARDING_LABELS } from '../constants/onboardingLabels'
@@ -44,11 +45,14 @@ export const useUpdateMyOrg = (): UseMutationResult<OrgResponse, Error, OrgUpdat
 export const useUploadLogo = (): UseMutationResult<OrgBrandingUploadResponse, Error, File> => {
   const queryClient = useQueryClient()
   const notify = useNotify()
+  const router = useRouter()
   return useMutation({
     mutationFn: (file: File) => organizationsApi.uploadLogo(file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organization', 'me'] })
       notify.success(ONBOARDING_LABELS.LOGO_UPLOADED_SUCCESS)
+      // Re-run Server Components so AppLayout picks up the new logo and brand colors immediately.
+      router.refresh()
     },
     onError: () => notify.error(ONBOARDING_LABELS.LOGO_UPLOAD_ERROR),
   })

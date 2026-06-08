@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import httpx
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +18,6 @@ from src.ai.constants import (
 )
 from src.ai.schemas import ChatMessageSchema, SSEEventSchema
 from src.ai.tool_registry import ToolRegistry
-from src.config import settings
 from src.core.constants import log_messages
 
 logger = logging.getLogger(__name__)
@@ -89,14 +89,18 @@ class AgentRunner:
         self._db = db
         self._org_id = org_id
         self._registry = registry
-        self._api_key = openai_api_key or settings.OPENAI_API_KEY
+        self._api_key = openai_api_key or ""
 
     async def run_stream(
         self,
         messages: list[ChatMessageSchema],
         system_prompt: str,
     ) -> AsyncGenerator[SSEEventSchema, None]:
-        client = AsyncOpenAI(api_key=self._api_key)
+        # SSL verification disabled — proxy/antivirus intercepts HTTPS on this machine
+        client = AsyncOpenAI(
+            api_key=self._api_key,
+            http_client=httpx.AsyncClient(verify=False),
+        )
         tools = _build_tools(self._registry)
         conversation = _build_messages(system_prompt, messages)
 

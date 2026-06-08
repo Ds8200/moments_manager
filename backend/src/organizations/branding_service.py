@@ -73,9 +73,7 @@ def extract_brand_colors(image_path: str) -> BrandColorsSchema:
             return _neutral_palette()
 
         # Build (R, G, B) tuples for the first 6 slots
-        colors = [
-            (palette_raw[i], palette_raw[i + 1], palette_raw[i + 2]) for i in range(0, 18, 3)
-        ]
+        colors = [(palette_raw[i], palette_raw[i + 1], palette_raw[i + 2]) for i in range(0, 18, 3)]
         hex_colors = [f"#{r:02x}{g:02x}{b:02x}" for r, g, b in colors]
 
         def _brightness(h: str) -> float:

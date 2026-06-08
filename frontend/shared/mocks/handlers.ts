@@ -74,6 +74,9 @@ export const handlers = [
   http.get(API_ENDPOINTS.PRODUCTS,  () => HttpResponse.json(EMPTY_PAGE)),
   http.get(API_ENDPOINTS.USERS,     () => HttpResponse.json(EMPTY_PAGE)),
   http.post(API_ENDPOINTS.AUTH_LOGOUT, () => new HttpResponse(null, { status: 204 })),
+  http.post(API_ENDPOINTS.AUTH_REFRESH, () =>
+    HttpResponse.json({ detail: 'no valid refresh token' }, { status: 401 })
+  ),
   http.get(API_ENDPOINTS.REPORTS_FINANCIAL, () =>
     HttpResponse.json({
       year: new Date().getFullYear(),
