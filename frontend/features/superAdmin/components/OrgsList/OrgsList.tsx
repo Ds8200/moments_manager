@@ -2,6 +2,8 @@
 import type { ReactElement } from 'react'
 import Link from 'next/link'
 import { useOrgsList } from './useOrgsList'
+import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import styles from './OrgsList.module.scss'
 
 export const OrgsList = (): ReactElement => {
@@ -18,11 +20,11 @@ export const OrgsList = (): ReactElement => {
     colMembers,
     colCreated,
     colActions,
-    toggleActivateLabel,
-    toggleDeactivateLabel,
+    menuState,
     createOrgHref,
     addOrgLabel,
-    onToggleStatus,
+    onRowMenuClick,
+    closeMenu,
   } = useOrgsList()
 
   return (
@@ -62,10 +64,11 @@ export const OrgsList = (): ReactElement => {
                   <td className={styles.td}>
                     <button
                       type="button"
-                      className={org.isActive ? styles.deactivateBtn : styles.activateBtn}
-                      onClick={() => onToggleStatus(org)}
+                      className={styles.menuBtn}
+                      onClick={(e) => onRowMenuClick(org, e)}
+                      aria-label={org.name}
                     >
-                      {org.isActive ? toggleDeactivateLabel : toggleActivateLabel}
+                      {UI_SYMBOLS.MENU}
                     </button>
                   </td>
                 </tr>
@@ -74,6 +77,8 @@ export const OrgsList = (): ReactElement => {
           </table>
         </div>
       )}
+
+      <DropdownMenu state={menuState} onClose={closeMenu} />
     </div>
   )
 }

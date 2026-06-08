@@ -87,29 +87,22 @@
   vertical-align: middle;
 }
 
-.activateBtn,
-.deactivateBtn {
-  padding: v.$space-2 v.$space-4;
-  border: none;
+.menuBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid v.$border-color;
   border-radius: v.$border-radius-sm;
-  font-family: inherit;
-  font-size: v.$font-size-xs;
-  font-weight: v.$font-weight-medium;
+  background: transparent;
+  font-size: v.$font-size-lg;
+  color: v.$text-secondary;
   cursor: pointer;
-  transition: opacity v.$transition-fast;
-  white-space: nowrap;
+  transition: background v.$transition-fast, color v.$transition-fast;
 
   &:hover {
-    opacity: 0.85;
+    background: v.$bg-page;
+    color: v.$text-primary;
   }
-}
-
-.activateBtn {
-  background: v.$success;
-  color: v.$text-inverse;
-}
-
-.deactivateBtn {
-  background: v.$danger;
-  color: v.$text-inverse;
 }
