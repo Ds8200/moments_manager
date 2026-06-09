@@ -101,6 +101,16 @@ async def list_org_users(
     )
 
 
+@router.get("/orgs/users/{user_id}", response_model=OrgOwnerAdminResponseSchema)
+async def get_org_user(
+    user_id: str,
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(require_sys_admin),
+) -> OrgOwnerAdminResponseSchema:
+    svc = SuperAdminUsersService(db)
+    return await svc.get_user(user_id)
+
+
 @router.delete("/orgs/users/{user_id}", response_model=OrgActionResponseSchema)
 async def delete_org_user(
     user_id: str,

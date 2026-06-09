@@ -78,6 +78,9 @@ export const superAdminApi = {
   deleteOrgUser: (id: string): Promise<OrgActionResponse> =>
     apiClient<OrgActionResponse>(API_ENDPOINTS.ADMIN_ORG_USER(id), { method: 'DELETE' }),
 
+  getOrgUser: (id: string): Promise<OrgOwnerAdminResponse> =>
+    apiClient<OrgOwnerAdminResponse>(API_ENDPOINTS.ADMIN_ORG_USER(id)),
+
   searchUsers: (q: string): Promise<UserSearchResult[]> =>
     apiClient<UserSearchResult[]>(`${API_ENDPOINTS.ADMIN_ORG_USERS_SEARCH}?q=${encodeURIComponent(q)}`),
 }

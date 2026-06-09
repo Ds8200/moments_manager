@@ -137,15 +137,28 @@
 }
 
 .listBox {
+  direction: ltr;
   border: 1px solid $border-color;
   border-top: none;
   border-bottom-left-radius: $border-radius;
   border-bottom-right-radius: $border-radius;
   max-height: 240px;
   overflow-y: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary, #{$primary}) transparent;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-primary, #{$primary});
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover { filter: brightness(0.85); }
 }
 
 .headerRow {
+  direction: rtl;
   display: flex;
   align-items: center;
   gap: $space-2;
@@ -169,6 +182,7 @@
 }
 
 .row {
+  direction: rtl;
   display: flex;
   align-items: center;
   gap: $space-3;

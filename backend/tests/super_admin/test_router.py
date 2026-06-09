@@ -2,6 +2,7 @@ import pytest
 from httpx import AsyncClient
 
 from src.organizations.models import Organization
+from src.users.models import User
 
 pytestmark = pytest.mark.asyncio
 
@@ -225,3 +226,23 @@ async def test_reset_owner_password_requires_sys_admin(
 ) -> None:
     response = await client.post(f"/api/v1/admin/orgs/{organization.id}/reset-password")
     assert response.status_code in (401, 403)
+
+
+async def test_get_org_user_by_id_returns_200(
+    sys_admin_client: AsyncClient, test_user: User
+) -> None:
+    response = await sys_admin_client.get(f"/api/v1/admin/orgs/users/{test_user.id}")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == test_user.id
+    assert body["email"] == test_user.email
+    assert "full_name" in body
+    assert "org_count" in body
+
+
+async def test_get_org_user_not_found_returns_404(sys_admin_client: AsyncClient) -> None:
+    response = await sys_admin_client.get(
+        "/api/v1/admin/orgs/users/00000000-0000-0000-0000-000000000000"
+    )
+    assert response.status_code == 404
+    assert response.json()["code"] == "NOT_FOUND"

@@ -43,6 +43,16 @@ async def create_expense(
     return await svc.create_expense(body)
 
 
+@router.get("/{expense_id}", response_model=ExpenseResponseSchema)
+async def get_expense(
+    expense_id: str,
+    db: AsyncSession = Depends(get_db),
+    ctx=Depends(get_org_context),
+):
+    svc = ExpenseService(db, ctx.org_id)
+    return await svc.get_expense(expense_id)
+
+
 @router.put("/{expense_id}", response_model=ExpenseResponseSchema)
 async def update_expense(
     expense_id: str,

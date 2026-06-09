@@ -9,6 +9,9 @@ export const usersApi = {
     return apiClient<UsersResponse>(`${API_ENDPOINTS.USERS}?${params}`)
   },
 
+  get: (id: string): Promise<User> =>
+    apiClient<User>(API_ENDPOINTS.USER(id)),
+
   create: (payload: UserFormValues): Promise<User> =>
     apiClient<User>(API_ENDPOINTS.USERS, {
       method: 'POST',

@@ -132,6 +132,12 @@ class UserService:
 
         return UserResponseSchema.model_validate(user)
 
+    async def get_user(self, user_id: str) -> UserResponseSchema:
+        user = await self._repo.get_by_id(user_id)
+        if not user:
+            raise NotFoundError(RESOURCE_USER, user_id)
+        return UserResponseSchema.model_validate(user)
+
     async def delete_user(self, user_id: str, requesting_admin_id: str) -> None:
         if user_id == requesting_admin_id:
             raise ForbiddenError(CANNOT_DELETE_SELF, code=ErrorCode.CANNOT_DELETE_SELF)

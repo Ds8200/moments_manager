@@ -38,6 +38,20 @@ class SuperAdminUsersService:
         ]
         return items, total
 
+    async def get_user(self, user_id: str) -> OrgOwnerAdminResponseSchema:
+        user = await self._user_repo.get_by_id(user_id)
+        if user is None:
+            raise NotFoundError("User", user_id)
+        org_count = await self._org_repo.count_active_orgs_for_owner(user_id)
+        return OrgOwnerAdminResponseSchema(
+            id=user.id,
+            email=user.email,
+            full_name=user.full_name,
+            phone=user.phone,
+            org_count=org_count,
+            created_at=user.created_at,
+        )
+
     async def delete_user(self, user_id: str) -> None:
         user = await self._user_repo.get_by_id(user_id)
         if user is None:

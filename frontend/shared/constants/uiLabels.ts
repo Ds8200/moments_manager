@@ -34,6 +34,7 @@ export const UI_LABELS = {
   ERROR_LOADING_SUPER_ADMIN_USER_DETAIL: 'שגיאה בטעינת פרטי המשתמש',
   BACK_TO_LIST: 'חזרה לרשימה',
   DETAIL_COMING_SOON: 'הדף בבנייה',
+  NOT_SET: '—',
   EMOJI_PICKER_BTN:  "הוסף אמוג'י",
   ATTACH_FILE:       'צרף קובץ',
   ATTACH_BTN_ARIA:   'בחר קובץ לצירוף',

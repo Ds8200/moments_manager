@@ -70,3 +70,24 @@ async def test_delete_expense(client: AsyncClient) -> None:
 
     response = await client.delete(f"/api/v1/expenses/{expense_id}")
     assert response.status_code == 204
+
+
+async def test_get_expense_by_id_returns_200(client: AsyncClient) -> None:
+    create = await client.post(
+        "/api/v1/expenses",
+        json={"date": str(date.today()), "amount": "42.00", "notes": "detail test"},
+    )
+    expense_id = create.json()["id"]
+
+    response = await client.get(f"/api/v1/expenses/{expense_id}")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == expense_id
+    assert body["amount"] == "42.00"
+    assert body["notes"] == "detail test"
+
+
+async def test_get_expense_not_found_returns_404(client: AsyncClient) -> None:
+    response = await client.get("/api/v1/expenses/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+    assert response.json()["code"] == "NOT_FOUND"

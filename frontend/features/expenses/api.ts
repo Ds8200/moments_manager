@@ -7,6 +7,9 @@ export const expensesApi = {
   list: (page = 1): Promise<ExpensesResponse> =>
     apiClient<ExpensesResponse>(`${API_ENDPOINTS.EXPENSES}?page=${page}&page_size=20`),
 
+  get: (id: string): Promise<Expense> =>
+    apiClient<Expense>(API_ENDPOINTS.EXPENSE(id)),
+
   create: (payload: ExpenseFormValues): Promise<Expense> =>
     apiClient<Expense>(API_ENDPOINTS.EXPENSES, {
       method: 'POST',

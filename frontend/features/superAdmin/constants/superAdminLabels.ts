@@ -122,5 +122,11 @@ export const SUPER_ADMIN_LABELS = {
   EMPTY_ORGS:  'לא נמצאו עסקים',
   EMPTY_USERS: 'לא נמצאו משתמשים',
   ERROR_LOAD:  'שגיאה בטעינת הנתונים',
-  USER_DETAIL_TITLE: 'פרטי משתמש',
+  USER_DETAIL_TITLE:         'פרטי משתמש',
+  DETAIL_USER_FULL_NAME:     'שם מלא',
+  DETAIL_USER_EMAIL:         'אימייל',
+  DETAIL_USER_PHONE:         'טלפון',
+  DETAIL_USER_ORGS:          'עסקים',
+  DETAIL_USER_CREATED_AT:    'תאריך הצטרפות',
+  DETAIL_USER_DELETE_MSG:    'למחוק משתמש זה לצמיתות?',
 } as const

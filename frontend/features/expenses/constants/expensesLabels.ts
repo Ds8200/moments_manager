@@ -44,4 +44,10 @@ export const EXPENSES_LABELS = {
   UPDATED_SUCCESS:          'ההוצאה עודכנה בהצלחה',
   DELETED_SUCCESS:          'ההוצאה נמחקה בהצלחה',
   DETAIL_TITLE:             'פרטי הוצאה',
+  DETAIL_DATE:              'תאריך',
+  DETAIL_CATEGORY:          'קטגוריה',
+  DETAIL_AMOUNT:            'סכום',
+  DETAIL_NOTES:             'הערות',
+  DETAIL_CREATED_AT:        'תאריך הוספה',
+  DETAIL_DELETE_MSG:        'למחוק הוצאה זו לצמיתות?',
 } as const

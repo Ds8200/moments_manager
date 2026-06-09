@@ -56,6 +56,16 @@ async def create_user(
     return await svc.create_user(body, background_tasks, admin.org)
 
 
+@router.get("/{user_id}", response_model=UserResponseSchema)
+async def get_user(
+    user_id: str,
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    svc = UserService(db)
+    return await svc.get_user(user_id)
+
+
 @router.delete("/{user_id}", status_code=204, response_model=None)
 async def delete_user(
     user_id: str,

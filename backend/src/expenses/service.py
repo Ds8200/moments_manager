@@ -60,6 +60,12 @@ class ExpenseService:
         refreshed = await self._repo.get_by_id(expense_id)
         return ExpenseResponseSchema.model_validate(refreshed)
 
+    async def get_expense(self, expense_id: str) -> ExpenseResponseSchema:
+        expense = await self._repo.get_by_id(expense_id)
+        if not expense:
+            raise NotFoundError(RESOURCE_EXPENSE, expense_id)
+        return ExpenseResponseSchema.model_validate(expense)
+
     async def delete_expense(self, expense_id: str) -> None:
         expense = await self._repo.get_by_id(expense_id)
         if not expense:
