@@ -10,7 +10,10 @@ from src.product_categories.models import ProductCategory
 
 class Product(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "products"
-    __table_args__ = (Index("ix_products_organization_id", "organization_id"),)
+    __table_args__ = (
+        Index("ix_products_organization_id", "organization_id"),
+        Index("ix_products_org_deleted_active", "organization_id", "is_deleted", "is_active"),
+    )
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     organization_id: Mapped[str] = mapped_column(

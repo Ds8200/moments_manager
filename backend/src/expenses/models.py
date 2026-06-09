@@ -11,7 +11,10 @@ from src.expense_categories.models import ExpenseCategory
 
 class Expense(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "expenses"
-    __table_args__ = (Index("ix_expenses_organization_id", "organization_id"),)
+    __table_args__ = (
+        Index("ix_expenses_organization_id", "organization_id"),
+        Index("ix_expenses_org_deleted_date", "organization_id", "is_deleted", "date"),
+    )
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     organization_id: Mapped[str] = mapped_column(

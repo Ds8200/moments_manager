@@ -15,6 +15,8 @@ export const useExpenses = (page = 1): UseQueryResult<ExpensesResponse> =>
   useQuery({
     queryKey: ['expenses', page],
     queryFn: () => expensesApi.list(page),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 
 export const useCreateExpense = (): UseMutationResult<

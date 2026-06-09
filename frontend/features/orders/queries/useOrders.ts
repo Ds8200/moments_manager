@@ -24,6 +24,8 @@ export const useOrders = (): UseQueryResult<OrdersResponse> => {
   return useQuery({
     queryKey: ['orders', filters],
     queryFn: () => ordersApi.list(filters),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 }
 

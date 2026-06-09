@@ -66,28 +66,43 @@ def extract_brand_colors(image_path: str) -> BrandColorsSchema:
         img = Image.open(image_path).convert("RGB")
         img = img.resize((120, 120), Image.LANCZOS)
 
-        # Quantize to N dominant colors
-        quantized = img.quantize(colors=6, method=Image.Quantize.MEDIANCUT).convert("RGB")
+        # Quantize to N dominant colors — read palette BEFORE converting to RGB,
+        # because getpalette() returns None on an RGB image.
+        quantized = img.quantize(colors=6, method=Image.Quantize.MEDIANCUT)
         palette_raw = quantized.getpalette()
         if not palette_raw:
             return _neutral_palette()
 
         # Build (R, G, B) tuples for the first 6 slots
-        colors = [(palette_raw[i], palette_raw[i + 1], palette_raw[i + 2]) for i in range(0, 18, 3)]
-        hex_colors = [f"#{r:02x}{g:02x}{b:02x}" for r, g, b in colors]
+        rgb_colors = [(palette_raw[i], palette_raw[i + 1], palette_raw[i + 2]) for i in range(0, 18, 3)]
 
-        def _brightness(h: str) -> float:
-            r, g, b = int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
+        def _brightness(rgb: tuple) -> float:
+            r, g, b = rgb
             return 0.299 * r + 0.587 * g + 0.114 * b
 
-        sorted_by_brightness = sorted(hex_colors, key=_brightness)
+        def _chroma(rgb: tuple) -> float:
+            """Chroma = max(R,G,B) - min(R,G,B). Immune to the near-white HSL saturation quirk."""
+            return max(rgb) - min(rgb)
+
+        def _to_hex(rgb: tuple) -> str:
+            return f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}"
+
+        # Prefer chromatic (non-gray) colors for primary/secondary/accent.
+        # Near-white (brightness > 230) and near-black (brightness < 25) are excluded
+        # from the brand pool because they produce invisible or illegible UI.
+        chromatic = [c for c in rgb_colors if 25 < _brightness(c) < 230]
+        brand_pool = sorted(chromatic, key=_chroma, reverse=True) if chromatic else sorted(rgb_colors, key=_chroma, reverse=True)
+        by_brightness = sorted(rgb_colors, key=_brightness)
+
+        def _pick(idx: int) -> str:
+            return _to_hex(brand_pool[idx]) if idx < len(brand_pool) else _to_hex(brand_pool[0])
 
         return BrandColorsSchema(
-            primary=hex_colors[0],
-            secondary=hex_colors[1] if len(hex_colors) > 1 else hex_colors[0],
-            accent=hex_colors[2] if len(hex_colors) > 2 else hex_colors[0],
-            background=sorted_by_brightness[-1],
-            text=sorted_by_brightness[0],
+            primary=_pick(0),
+            secondary=_pick(1),
+            accent=_pick(2),
+            background=_to_hex(by_brightness[-1]),
+            text=_to_hex(by_brightness[0]),
         )
     except Exception as exc:
         logger.warning("Color extraction failed for %s: %s — neutral palette used", image_path, exc)

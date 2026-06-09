@@ -10,7 +10,7 @@ import styles from './ExpensesPage.module.scss'
 
 export const ExpensesPage = (): ReactElement => {
   const {
-    data, isLoading, isError, totalAmount,
+    data, isLoading, isError,
     onNew, onRowMenuClick, menuState, closeMenu,
     formatAmount, formatExpenseDate, emptyErrorIcon, emptyStateIcon, emptyValue,
   } = useExpensesPage()
@@ -62,10 +62,6 @@ export const ExpensesPage = (): ReactElement => {
                 ))}
               </tbody>
             </table>
-            <div className={styles.totalRow}>
-              <span className={styles.totalLabel}>{EXPENSES_LABELS.TOTAL_LABEL}</span>
-              <span className={styles.totalAmount}>{totalAmount}</span>
-            </div>
           </div>
         )}
         <ExpenseForm />

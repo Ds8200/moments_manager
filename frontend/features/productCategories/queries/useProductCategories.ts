@@ -15,6 +15,7 @@ export const useProductCategories = (): UseQueryResult<ProductCategory[]> =>
   useQuery({
     queryKey: PRODUCT_CATEGORIES_KEY,
     queryFn: () => productCategoriesApi.list(),
+    staleTime: 60 * 60 * 1000,
   })
 
 export const useCreateProductCategory = (): UseMutationResult<ProductCategory, Error, string> => {

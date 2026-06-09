@@ -24,12 +24,16 @@ export const useCustomers = (
   useQuery({
     queryKey: ['customers', page, search, page_size],
     queryFn: () => customersApi.list(page, search, page_size),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 
 export const useAllCustomersWithEmail = (): UseQueryResult<CustomersResponse> =>
   useQuery({
     queryKey: ['customers', 'all-with-email'],
     queryFn: () => customersApi.list(1, '', 100, true),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 
 export const useCustomer = (id: string | null): UseQueryResult<CustomerDetail> =>

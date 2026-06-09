@@ -44,6 +44,17 @@ class CustomerRepository(BaseRepository):
         )
         return result.scalar_one_or_none()
 
+    async def get_by_ids(self, ids: list[str]) -> list[Customer]:
+        await self._apply_org_rls()
+        result = await self._db.execute(
+            select(Customer).where(
+                Customer.is_deleted == False,
+                Customer.organization_id == self._org_id,
+                Customer.id.in_(ids),
+            )
+        )
+        return list(result.scalars().all())
+
     async def create(self, data: dict) -> Customer:
         await self._apply_org_rls()
         data["organization_id"] = self._org_id

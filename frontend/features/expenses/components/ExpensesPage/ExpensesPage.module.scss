@@ -16,12 +16,12 @@
   font-size: v.$font-size-2xl;
   font-weight: v.$font-weight-bold;
   color: v.$text-primary;
-  margin-inline-start: auto;
 }
 
 .newBtn {
   padding: v.$space-2 v.$space-4;
   background: v.$gradient-brand;
+  margin-inline-start: auto;
   color: v.$text-inverse;
   border: none;
   border-radius: v.$border-radius;
@@ -97,20 +97,3 @@
   color: v.$danger;
 }
 
-.totalRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: v.$space-4;
-  border-top: 1px solid v.$border-color;
-  font-weight: v.$font-weight-semibold;
-}
-
-.totalLabel {
-  color: v.$text-secondary;
-}
-
-.totalAmount {
-  color: v.$danger;
-  font-size: v.$font-size-lg;
-}

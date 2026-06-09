@@ -17,7 +17,6 @@ export interface UseExpensesPageReturn {
   isLoading: boolean
   isError: boolean
   page: number
-  totalAmount: string
   onPageNext: () => void
   onNew: () => void
   onEdit: (expense: Expense) => void
@@ -40,10 +39,6 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
   const setEditingExpense = useSetAtom(editingExpenseAtom)
   const confirm = useConfirm()
   const { menuState, openMenu, closeMenu } = useDropdownMenu()
-
-  const totalAmount = formatCurrency(
-    data?.items.reduce((sum, e) => sum + parseFloat(e.amount), 0) ?? 0
-  )
 
   const onNew = (): void => setOpen(true)
 
@@ -72,7 +67,6 @@ export const useExpensesPage = (): UseExpensesPageReturn => {
     isLoading,
     isError,
     page,
-    totalAmount,
     onPageNext: () => setPage((p) => p + 1),
     onNew,
     onEdit,

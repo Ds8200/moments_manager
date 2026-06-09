@@ -8,13 +8,13 @@
 // are the fallback used on the main domain and wherever no org branding applies.
 // DEFAULT_BRAND_COLORS in shared/utils/branding.ts must stay in sync with these fallbacks.
 $primary:       var(--color-primary, #3B5BDB);
-$primary-light: #EEEDFF;
+$primary-light: var(--color-primary-light, #EEEDFF);
 $primary-dark:  var(--color-secondary, #7048E8);
 $accent:        var(--color-accent, #F03E3E);
 $accent-gold:   #FF9F1C;
 
 // גרדיאנט המותג — לכותרות/מותג/מייל
-$gradient-brand: linear-gradient(135deg, var(--color-primary, #3B5BDB) 0%, 35%, var(--color-secondary, #7048E8) 100%);
+$gradient-brand: linear-gradient(135deg, var(--color-primary, #3B5BDB) 0%, var(--color-secondary, #7048E8) 100%);
 
 // Order status colors
 $status-new:              #339AF0;

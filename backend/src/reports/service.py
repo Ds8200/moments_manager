@@ -23,14 +23,15 @@ class ReportService:
 
     async def get_dashboard_kpi(self) -> DashboardKpiSchema:
         today = date.today()
-        open_orders = await self._repo.count_open_orders()
-        ready_orders = await self._repo.count_ready_orders()
-        monthly_revenue = await self._repo.sum_month_paid_revenue(today.year, today.month)
+        (
+            open_orders,
+            ready_orders,
+            monthly_revenue,
+            monthly_profit,
+            unpaid_amount,
+            today_orders,
+        ) = await self._repo.get_dashboard_aggregate(today.year, today.month, today)
         monthly_expenses = await self._repo.sum_month_expenses(today.year, today.month)
-        monthly_profit = await self._repo.sum_month_profit(today.year, today.month)
-        unpaid_amount = await self._repo.sum_unpaid_amount()
-        today_orders = await self._repo.count_orders_on_date(today)
-
         return DashboardKpiSchema(
             open_orders=open_orders,
             ready_orders=ready_orders,
@@ -77,25 +78,52 @@ class ReportService:
         )
 
     async def get_financial_year(self, year: int) -> FinancialYearSchema:
-        monthly_data = []
+        orders_by_month = await self._repo.get_year_orders_by_month(year)
+        expenses_by_month = await self._repo.get_year_expenses_by_month(year)
+
+        zero = Decimal("0")
+        monthly_data: list[MonthlyReportSchema] = []
+
         for month in range(1, 13):
-            monthly_data.append(await self.get_monthly_report(year, month))
+            o = orders_by_month.get(month, {})
+            total_expenses = expenses_by_month.get(month, zero)
 
-        total_revenue = sum((m.total_revenue for m in monthly_data), Decimal("0"))
-        total_expenses = sum((m.total_expenses for m in monthly_data), Decimal("0"))
-        net_profit = sum((m.net_profit for m in monthly_data), Decimal("0"))
-        annual_profit = sum((m.total_profit for m in monthly_data), Decimal("0"))
+            total_revenue = Decimal(str(o.get("paid_revenue", 0)))
+            total_cost = Decimal(str(o.get("total_cost", 0)))
+            total_profit = Decimal(str(o.get("total_profit", 0)))
+            paid_count = int(o.get("paid_count", 0))
+            unpaid_count = int(o.get("unpaid_count", 0))
 
-        annual_unpaid = sum((m.unpaid_amount for m in monthly_data), Decimal("0"))
+            monthly_data.append(
+                MonthlyReportSchema(
+                    year=year,
+                    month=month,
+                    total_revenue=total_revenue,
+                    total_cost=total_cost,
+                    total_profit=total_profit,
+                    total_expenses=total_expenses,
+                    net_profit=total_profit - total_expenses,
+                    paid_count=paid_count,
+                    unpaid_count=unpaid_count,
+                    total_count=paid_count + unpaid_count,
+                    collection_rate=round(paid_count / (paid_count + unpaid_count) * 100, 1)
+                    if (paid_count + unpaid_count) > 0
+                    else 0.0,
+                    cash_revenue=Decimal(str(o.get("cash_revenue", 0))),
+                    transfer_revenue=Decimal(str(o.get("transfer_revenue", 0))),
+                    unpaid_amount=Decimal(str(o.get("unpaid_amount", 0))),
+                    paid_revenue=total_revenue,
+                )
+            )
 
         return FinancialYearSchema(
             year=year,
             months=monthly_data,
-            annual_revenue=total_revenue,
-            annual_profit=annual_profit,
-            annual_expenses=total_expenses,
-            annual_net=net_profit,
-            annual_unpaid=annual_unpaid,
+            annual_revenue=sum((m.total_revenue for m in monthly_data), zero),
+            annual_profit=sum((m.total_profit for m in monthly_data), zero),
+            annual_expenses=sum((m.total_expenses for m in monthly_data), zero),
+            annual_net=sum((m.net_profit for m in monthly_data), zero),
+            annual_unpaid=sum((m.unpaid_amount for m in monthly_data), zero),
         )
 
     # ── Export ──────────────────────────────────────────────────────────────

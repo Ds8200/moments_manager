@@ -8,7 +8,6 @@ export const EXPENSES_LABELS = {
   COL_AMOUNT:               'סכום',
   COL_NOTES:                'הערות',
   COL_ACTIONS:              '',
-  TOTAL_LABEL:              'סה"כ הוצאות:',
   ERROR_LOAD:               'שגיאה בטעינת הוצאות',
   CONFIRM_DELETE:           'למחוק הוצאה זו?',
 

@@ -178,8 +178,11 @@ class CustomerService:
         smtp = _org_smtp_kwargs(org)
         attachments = [a.model_dump() for a in data.attachments] if data.attachments else None
 
+        customers = await self._repo.get_by_ids(data.customer_ids)
+        customer_map = {c.id: c for c in customers}
+
         for customer_id in data.customer_ids:
-            customer = await self._repo.get_by_id(customer_id)
+            customer = customer_map.get(customer_id)
             if not customer:
                 logger.warning(COMPOSE_EMAIL_CUSTOMER_NOT_FOUND, customer_id)
                 continue

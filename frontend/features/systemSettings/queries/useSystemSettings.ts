@@ -21,6 +21,7 @@ export const useSystemSettings = (): UseQueryResult<SystemSettings> =>
   useQuery({
     queryKey: QUERY_KEY,
     queryFn: () => systemSettingsApi.getSettings(),
+    staleTime: 10 * 60 * 1000,
   })
 
 export const useUpdateSystemSmtp = (): UseMutationResult<SystemSettings, Error, SystemSmtpPayload> => {

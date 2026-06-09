@@ -260,7 +260,7 @@ async def test_compose_email_sends_to_all_recipients() -> None:
     c1.email = "alice@example.com"
     c2 = _make_customer("c-2", "Bob")
     c2.email = "bob@example.com"
-    service._repo.get_by_id.side_effect = lambda cid: c1 if cid == "c-1" else c2
+    service._repo.get_by_ids.return_value = [c1, c2]
 
     bg = BackgroundTasks()
     with patch("src.customers.service.send_html_email_via_smtp"):
@@ -285,7 +285,7 @@ async def test_compose_email_skips_customer_without_email() -> None:
     service._repo = AsyncMock()
     customer = _make_customer("c-1", "No Email")
     customer.email = None
-    service._repo.get_by_id.return_value = customer
+    service._repo.get_by_ids.return_value = [customer]
 
     bg = BackgroundTasks()
     with patch("src.customers.service.send_html_email_via_smtp"):
@@ -303,7 +303,7 @@ async def test_compose_email_skips_missing_customer_id() -> None:
     db = AsyncMock()
     service = CustomerService(db, "test-org-id")
     service._repo = AsyncMock()
-    service._repo.get_by_id.return_value = None
+    service._repo.get_by_ids.return_value = []
 
     bg = BackgroundTasks()
     with patch("src.customers.service.send_html_email_via_smtp"):
@@ -316,3 +316,27 @@ async def test_compose_email_skips_missing_customer_id() -> None:
         )
 
     assert result.sent_to == 0
+
+
+async def test_compose_email_fetches_customers_in_batch() -> None:
+    db = AsyncMock()
+    service = CustomerService(db, "test-org-id")
+    service._repo = AsyncMock()
+    c1 = _make_customer("c-1", "Alice")
+    c1.email = "alice@example.com"
+    c2 = _make_customer("c-2", "Bob")
+    c2.email = "bob@example.com"
+    service._repo.get_by_ids.return_value = [c1, c2]
+
+    bg = BackgroundTasks()
+    with patch("src.customers.service.send_html_email_via_smtp"):
+        await service.compose_email(
+            ComposeEmailSchema(
+                customer_ids=["c-1", "c-2"], manual_emails=[], subject="s", body="b"
+            ),
+            bg,
+            _make_org(),
+        )
+
+    service._repo.get_by_ids.assert_awaited_once_with(["c-1", "c-2"])
+    service._repo.get_by_id.assert_not_awaited()

@@ -15,6 +15,7 @@ export const useExpenseCategories = (): UseQueryResult<ExpenseCategory[]> =>
   useQuery({
     queryKey: EXPENSE_CATEGORIES_KEY,
     queryFn: () => expenseCategoriesApi.list(),
+    staleTime: 60 * 60 * 1000,
   })
 
 export const useCreateExpenseCategory = (): UseMutationResult<ExpenseCategory, Error, string> => {

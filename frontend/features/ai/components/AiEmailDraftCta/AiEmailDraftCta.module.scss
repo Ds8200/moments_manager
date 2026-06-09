@@ -14,18 +14,16 @@
   gap: 6px;
   padding: 8px 18px;
   border-radius: 8px;
-  border: 1.5px solid v.$primary;
-  background: v.$bg-card;
-  color: v.$primary;
+  border: none;
+  background: v.$gradient-brand;
+  color: v.$text-inverse;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: filter 0.15s;
 
   &:hover {
-    background: v.$primary-dark;
-    border-color: v.$primary-dark;
-    color: v.$text-inverse;
+    filter: brightness(0.88);
   }
 
   &:active {

@@ -24,12 +24,14 @@ export const useMyOrg = (): UseQueryResult<OrgResponse> =>
   useQuery({
     queryKey: ['organization', 'me'],
     queryFn: () => organizationsApi.getMyOrg(),
+    staleTime: 10 * 60 * 1000,
   })
 
 export const useOrgMembers = (): UseQueryResult<Member[]> =>
   useQuery({
     queryKey: ['organization', 'members'],
     queryFn: () => organizationsApi.listMembers(),
+    staleTime: 10 * 60 * 1000,
   })
 
 export const useUpdateMyOrg = (): UseMutationResult<OrgResponse, Error, OrgUpdatePayload> => {

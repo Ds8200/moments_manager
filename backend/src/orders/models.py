@@ -29,6 +29,10 @@ class Order(Base, TimestampMixin, SoftDeleteMixin):
     __table_args__ = (
         UniqueConstraint("organization_id", "order_number", name="uq_order_org_number"),
         Index("ix_orders_organization_id", "organization_id"),
+        Index("ix_orders_org_deleted", "organization_id", "is_deleted"),
+        Index("ix_orders_org_deleted_date", "organization_id", "is_deleted", "date"),
+        Index("ix_orders_org_deleted_status", "organization_id", "is_deleted", "status"),
+        Index("ix_orders_org_deleted_paid", "organization_id", "is_deleted", "is_paid"),
     )
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))

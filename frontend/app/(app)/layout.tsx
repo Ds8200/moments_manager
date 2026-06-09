@@ -27,8 +27,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const logoUrl = resolveLogoUrl(branding?.logo_path ?? null)
   const logoAlt = branding?.name
 
+  // Inject CSS vars as an inline <style> so they apply before JS hydrates,
+  // eliminating the flash of default colors on first paint.
+  const cssVars = `
+    --color-primary: ${colors.primary};
+    --color-secondary: ${colors.secondary};
+    --color-accent: ${colors.accent};
+    --color-bg: ${colors.background};
+    --color-text: ${colors.text};
+  `.trim()
+
   return (
     <Providers>
+      <style dangerouslySetInnerHTML={{ __html: `:root{${cssVars}}` }} />
       <AuthGuard>
         <BrandThemeApplier initialColors={colors} />
         <div className={styles.root}>
