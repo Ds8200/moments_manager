@@ -66,12 +66,12 @@ async def test_create_user_org_email_not_configured_raises() -> None:
             _make_org(smtp_configured=False),
         )
 
-    svc._repo.get_by_email.assert_not_called()
+    svc._repo.email_exists.assert_not_called()
 
 
 async def test_create_user_duplicate_email_raises() -> None:
     svc, _ = _make_service()
-    svc._repo.get_by_email.return_value = _make_user()
+    svc._repo.email_exists.return_value = True
 
     with pytest.raises(ConflictError):
         await svc.create_user(
@@ -83,7 +83,7 @@ async def test_create_user_duplicate_email_raises() -> None:
 
 async def test_create_user_success_calls_repo_and_commit() -> None:
     svc, db = _make_service()
-    svc._repo.get_by_email.return_value = None
+    svc._repo.email_exists.return_value = False
     new_user = _make_user()
     svc._repo.create.return_value = new_user
     db.refresh = AsyncMock()

@@ -25,7 +25,7 @@ def test_build_welcome_email_contains_logo_and_brand_colors() -> None:
     assert subject
     assert "עסק לדוגמה" in subject
     # default logo path referenced in src attribute
-    assert "default_logo" in html
+    assert "nihulo_logo" in html
     # brand primary color applied to headings/buttons
     assert _BRAND_PRIMARY in html
     # magic quick-login link present

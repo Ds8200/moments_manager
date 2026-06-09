@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.organizations.models import Organization, OrganizationInvite, OrganizationMembership
@@ -26,7 +26,11 @@ class OrgRepository:
         return result.scalar_one_or_none()
 
     async def slug_exists(self, slug: str) -> bool:
-        result = await self._db.execute(select(Organization.id).where(Organization.slug == slug))
+        result = await self._db.execute(
+            select(Organization.id).where(
+                Organization.slug == slug, Organization.is_deleted == False
+            )
+        )
         return result.scalar_one_or_none() is not None
 
     async def create(
@@ -36,6 +40,7 @@ class OrgRepository:
         owner_id: str,
         plan: str,
         max_users: int,
+        org_number: str,
         trial_ends_at: datetime | None = None,
     ) -> Organization:
         org = Organization(
@@ -44,6 +49,7 @@ class OrgRepository:
             owner_id=owner_id,
             plan=plan,
             max_users=max_users,
+            org_number=org_number,
             trial_ends_at=trial_ends_at,
         )
         self._db.add(org)
@@ -92,16 +98,66 @@ class OrgRepository:
         )
         return list(result.all())
 
-    async def list_all(self, limit: int, offset: int) -> tuple[list[Organization], int]:
-        from sqlalchemy import func
-
+    async def list_all(
+        self,
+        limit: int,
+        offset: int,
+        search: str | None = None,
+        plan: str | None = None,
+        is_active: bool | None = None,
+    ) -> tuple[list[Organization], int]:
         base = select(Organization).where(Organization.is_deleted == False)
+        if search:
+            pattern = f"%{search}%"
+            base = base.where(
+                Organization.name.ilike(pattern)
+                | Organization.slug.ilike(pattern)
+                | Organization.org_number.ilike(pattern)
+            )
+        if plan:
+            base = base.where(Organization.plan == plan)
+        if is_active is not None:
+            base = base.where(Organization.is_active == is_active)
         count_result = await self._db.execute(select(func.count()).select_from(base.subquery()))
         total = count_result.scalar_one()
         result = await self._db.execute(
             base.order_by(Organization.created_at.desc()).limit(limit).offset(offset)
         )
         return list(result.scalars().all()), total
+
+    async def get_next_org_number(self) -> str:
+        year = datetime.now().year
+        prefix = f"ORG-{year}-"
+        result = await self._db.execute(
+            select(func.max(Organization.org_number)).where(
+                Organization.org_number.like(f"{prefix}%")
+            )
+        )
+        max_number = result.scalar_one_or_none()
+        last_seq = int(max_number.split("-")[-1]) if max_number else 0
+        return f"{prefix}{last_seq + 1:04d}"
+
+    async def hard_delete(self, org_id: str) -> None:
+        from sqlalchemy import delete
+
+        await self._db.execute(
+            delete(OrganizationInvite).where(OrganizationInvite.organization_id == org_id)
+        )
+        await self._db.execute(
+            delete(OrganizationMembership).where(
+                OrganizationMembership.organization_id == org_id
+            )
+        )
+        await self._db.execute(delete(Organization).where(Organization.id == org_id))
+
+    async def count_active_orgs_for_owner(self, owner_id: str) -> int:
+        result = await self._db.execute(
+            select(func.count()).where(
+                Organization.owner_id == owner_id,
+                Organization.is_deleted == False,
+            )
+        )
+        return result.scalar_one()
 
 
 class MembershipRepository:

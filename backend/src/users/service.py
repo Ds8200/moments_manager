@@ -53,8 +53,7 @@ class UserService:
         if not (org.smtp_host and org.smtp_password):
             raise ConflictError(ORG_EMAIL_NOT_CONFIGURED, code=ErrorCode.ORG_EMAIL_NOT_CONFIGURED)
 
-        existing = await self._repo.get_by_email(data.email)
-        if existing:
+        if await self._repo.email_exists(data.email):
             raise ConflictError(USER_EMAIL_EXISTS, code=ErrorCode.USER_EMAIL_EXISTS)
 
         temp_password = secrets.token_urlsafe(12)

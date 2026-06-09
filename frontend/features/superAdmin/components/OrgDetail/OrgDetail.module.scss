@@ -1,0 +1,100 @@
+﻿@use '../../../../shared/styles/variables' as v;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-4;
+  flex-wrap: wrap;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: v.$space-2 v.$space-5;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius-sm;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter v.$transition-fast;
+
+  &:hover {
+    background: v.$bg-page;
+  }
+}
+
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: v.$space-2 v.$space-5;
+  background: v.$gradient-brand;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius-sm;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  cursor: pointer;
+  transition: filter v.$transition-fast;
+
+  &:hover {
+    filter: brightness(0.88);
+  }
+}
+
+.card {
+  background: v.$bg-card;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  box-shadow: v.$shadow-card;
+  padding: v.$space-6;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: v.$space-5;
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+}
+
+.label {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.value {
+  font-size: v.$font-size-sm;
+  color: v.$text-primary;
+  word-break: break-all;
+}

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, HttpResponse } from 'msw'
 import { server } from '@/shared/mocks/server'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
-import { useCreateOrg } from '../useCreateOrg'
+import { useCreateOrg } from '../useSuperAdminOrgs'
 import { SUPER_ADMIN_LABELS } from '../../constants/superAdminLabels'
 import { ORG_PLAN } from '../../enums/orgPlanEnums'
 import type { OrgCreatePayload } from '../../types'
@@ -27,6 +27,7 @@ const PAYLOAD: OrgCreatePayload = {
 
 const ORG_RESPONSE = {
   id: 'org-new-1',
+  org_number: 'ORG-2026-0001',
   slug: PAYLOAD.slug,
   name: PAYLOAD.business_name,
   logo_path: null,
@@ -35,6 +36,7 @@ const ORG_RESPONSE = {
   is_active: true,
   max_users: 2,
   owner_id: 'owner-1',
+  owner_email: PAYLOAD.owner_email ?? '',
   member_count: 1,
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',

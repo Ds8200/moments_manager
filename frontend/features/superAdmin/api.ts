@@ -5,20 +5,43 @@ import type {
   OrgActionResponse,
   OrgAdminResponse,
   OrgCreatePayload,
+  OrgListFilters,
+  OrgOwnerAdminResponse,
   OrgPlanUpdatePayload,
   OrgStatusUpdatePayload,
+  OrgUpdatePayload,
+  UserListFilters,
+  UserSearchResult,
 } from './types'
 import type { PaginatedResponse } from '@/shared/types/pagination'
 
+function buildOrgListUrl(filters: Partial<OrgListFilters>): string {
+  const params = new URLSearchParams()
+  if (filters.page) params.set('page', String(filters.page))
+  if (filters.page_size) params.set('page_size', String(filters.page_size))
+  if (filters.search) params.set('search', filters.search)
+  if (filters.plan) params.set('plan', filters.plan)
+  if (filters.is_active !== undefined && filters.is_active !== '')
+    params.set('is_active', filters.is_active)
+  return `${API_ENDPOINTS.ADMIN_ORGS}?${params.toString()}`
+}
+
 export const superAdminApi = {
-  listOrgs: (page = 1, pageSize = 20): Promise<PaginatedResponse<OrgAdminResponse>> =>
-    apiClient<PaginatedResponse<OrgAdminResponse>>(
-      `${API_ENDPOINTS.ADMIN_ORGS}?page=${page}&page_size=${pageSize}`,
-    ),
+  listOrgs: (filters: Partial<OrgListFilters> = {}): Promise<PaginatedResponse<OrgAdminResponse>> =>
+    apiClient<PaginatedResponse<OrgAdminResponse>>(buildOrgListUrl(filters)),
+
+  getOrg: (id: string): Promise<OrgAdminResponse> =>
+    apiClient<OrgAdminResponse>(API_ENDPOINTS.ADMIN_ORG(id)),
 
   createOrg: (payload: OrgCreatePayload): Promise<OrgAdminResponse> =>
     apiClient<OrgAdminResponse>(API_ENDPOINTS.ADMIN_ORGS, {
       method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateOrg: (id: string, payload: OrgUpdatePayload): Promise<OrgAdminResponse> =>
+    apiClient<OrgAdminResponse>(API_ENDPOINTS.ADMIN_ORG(id), {
+      method: 'PATCH',
       body: JSON.stringify(payload),
     }),
 
@@ -39,4 +62,22 @@ export const superAdminApi = {
 
   resetOrgOwnerPassword: (id: string): Promise<OrgActionResponse> =>
     apiClient<OrgActionResponse>(API_ENDPOINTS.ADMIN_ORG_RESET_PASSWORD(id), { method: 'POST' }),
+
+  listOrgUsers: (
+    filters: Partial<UserListFilters> = {},
+  ): Promise<PaginatedResponse<OrgOwnerAdminResponse>> => {
+    const params = new URLSearchParams()
+    if (filters.page) params.set('page', String(filters.page))
+    if (filters.page_size) params.set('page_size', String(filters.page_size))
+    if (filters.search) params.set('search', filters.search)
+    return apiClient<PaginatedResponse<OrgOwnerAdminResponse>>(
+      `${API_ENDPOINTS.ADMIN_ORG_USERS}?${params.toString()}`,
+    )
+  },
+
+  deleteOrgUser: (id: string): Promise<OrgActionResponse> =>
+    apiClient<OrgActionResponse>(API_ENDPOINTS.ADMIN_ORG_USER(id), { method: 'DELETE' }),
+
+  searchUsers: (q: string): Promise<UserSearchResult[]> =>
+    apiClient<UserSearchResult[]>(`${API_ENDPOINTS.ADMIN_ORG_USERS_SEARCH}?q=${encodeURIComponent(q)}`),
 }

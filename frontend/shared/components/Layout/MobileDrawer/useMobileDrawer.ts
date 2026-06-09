@@ -8,6 +8,8 @@ import type { NavItem } from '@/shared/constants/routes'
 import { ROUTES } from '@/shared/constants/routes'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import { useAssistantName } from '@/shared/hooks/useAssistantName'
+import { useMyOrg } from '@/features/organizations/queries/useOrganizations'
+import { resolveLogoUrl } from '@/shared/utils/branding'
 
 export interface MobileDrawerProps {
   logoUrl?: string | null
@@ -29,17 +31,20 @@ export const useMobileDrawer = ({ logoUrl, logoAlt }: MobileDrawerProps): UseMob
   const pathname = usePathname()
   const rawNavItems = useAtomValue(navItemsAtom)
   const assistantName = useAssistantName()
+  const { data: org } = useMyOrg()
 
   const visibleNavItems = useMemo(
     () => rawNavItems.map((item) => (item.href === ROUTES.AI ? { ...item, label: assistantName } : item)),
     [rawNavItems, assistantName]
   )
 
+  const clientLogoUrl = resolveLogoUrl(org?.logo_path)
+
   return {
     isOpen,
     pathname,
     visibleNavItems,
-    logoSrc: logoUrl ?? UI_LABELS.GENERIC_LOGO_SRC,
+    logoSrc: clientLogoUrl ?? logoUrl ?? UI_LABELS.GENERIC_LOGO_SRC,
     logoAlt: logoAlt ?? UI_LABELS.APP_NAME,
     onClose: () => setOpen(false),
   }

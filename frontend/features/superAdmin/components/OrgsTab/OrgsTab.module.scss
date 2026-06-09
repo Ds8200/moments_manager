@@ -1,0 +1,73 @@
+@use '../../../../shared/styles/variables' as v;
+
+.row {
+  border-bottom: 1px solid v.$border-color;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-50;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cell {
+  padding: v.$space-3 v.$space-4;
+  color: v.$text-primary;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: v.$font-size-sm;
+}
+
+.bold {
+  font-weight: v.$font-weight-semibold;
+}
+
+.secondary {
+  color: v.$text-secondary;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+}
+
+.badgeActive,
+.badgeInactive {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px v.$space-2;
+  border-radius: 9999px;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+}
+
+.badgeActive {
+  background: rgba(81, 207, 102, 0.15);
+  color: v.$success;
+}
+
+.badgeInactive {
+  background: v.$gray-100;
+  color: v.$text-secondary;
+}
+
+.menuBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$text-secondary;
+  font-size: v.$font-size-lg;
+  padding: v.$space-1 v.$space-2;
+  border-radius: v.$border-radius-sm;
+  line-height: 1;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-100;
+    color: v.$text-primary;
+  }
+}

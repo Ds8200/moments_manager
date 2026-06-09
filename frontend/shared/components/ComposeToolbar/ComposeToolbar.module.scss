@@ -1,4 +1,4 @@
-@use '@/shared/styles/variables' as *;
+﻿@use '@/shared/styles/variables' as *;
 
 .toolbar {
   display: flex;
@@ -25,7 +25,7 @@
   background: none;
   color: $text-secondary;
   cursor: pointer;
-  transition: background $transition-fast, color $transition-fast;
+  transition: filter $transition-fast, color $transition-fast;
 
   &:hover {
     background: $gray-100;
@@ -59,10 +59,10 @@
   font-size: $font-size-base;
   font-weight: $font-weight-semibold;
   cursor: pointer;
-  transition: opacity $transition-fast;
+  transition: filter $transition-fast, opacity $transition-fast;
 
   &:hover:not(:disabled) {
-    opacity: 0.9;
+    filter: brightness(0.88);
   }
 
   &:disabled {

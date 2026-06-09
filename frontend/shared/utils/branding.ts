@@ -2,10 +2,10 @@ import type { BrandColors, OrgBrandingResponse } from '@/features/organizations/
 
 // Must stay in sync with the fallback hex values in shared/styles/_variables.scss
 export const DEFAULT_BRAND_COLORS: BrandColors = {
-  primary:    '#6C63FF',
-  secondary:  '#5650E5',
-  accent:     '#FF6584',
-  background: '#F8F9FA',
+  primary:    '#3B5BDB',
+  secondary:  '#7048E8',
+  accent:     '#F03E3E',
+  background: '#FFFFFF',
   text:       '#212529',
 }
 

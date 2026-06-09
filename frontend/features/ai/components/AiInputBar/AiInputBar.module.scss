@@ -1,4 +1,4 @@
-@use '../../../../shared/styles/variables' as v;
+﻿@use '../../../../shared/styles/variables' as v;
 
 .wrapper {
   padding: 12px 16px 16px;
@@ -66,16 +66,16 @@
   padding: 10px 20px;
   border-radius: 12px;
   border: none;
-  background: v.$primary;
+  background: v.$gradient-brand;
   color: v.$text-inverse;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s, opacity 0.15s;
+  transition: filter 0.15s, opacity 0.15s;
 
   &:hover:not(:disabled) {
-    background: v.$primary-dark;
+    filter: brightness(0.88);
   }
 
   &:disabled {

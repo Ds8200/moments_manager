@@ -1,4 +1,4 @@
-@use '../../../../../shared/styles/variables' as v;
+﻿@use '../../../../../shared/styles/variables' as v;
 
 .section {
   background: v.$bg-card;
@@ -64,7 +64,7 @@
 .submitBtn {
   align-self: flex-start;
   padding: v.$space-3 v.$space-6;
-  background: v.$primary;
+  background: v.$gradient-brand;
   color: v.$text-inverse;
   border: none;
   border-radius: v.$border-radius-sm;
@@ -72,11 +72,11 @@
   font-size: v.$font-size-base;
   font-weight: v.$font-weight-medium;
   cursor: pointer;
-  transition: background v.$transition-fast;
+  transition: filter v.$transition-fast;
   min-height: 44px;
 
   &:hover:not(:disabled) {
-    background: v.$primary-dark;
+    filter: brightness(0.88);
   }
 
   &:disabled {

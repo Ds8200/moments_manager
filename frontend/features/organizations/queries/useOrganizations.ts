@@ -48,7 +48,12 @@ export const useUploadLogo = (): UseMutationResult<OrgBrandingUploadResponse, Er
   const router = useRouter()
   return useMutation({
     mutationFn: (file: File) => organizationsApi.uploadLogo(file),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Patch the cache immediately so BrandThemeApplier applies new colors
+      // before the background refetch completes — avoids a race with router.refresh().
+      queryClient.setQueryData<OrgResponse>(['organization', 'me'], (old) =>
+        old ? { ...old, logo_path: data.logo_path, brand_colors: data.brand_colors } : old
+      )
       queryClient.invalidateQueries({ queryKey: ['organization', 'me'] })
       notify.success(ONBOARDING_LABELS.LOGO_UPLOADED_SUCCESS)
       // Re-run Server Components so AppLayout picks up the new logo and brand colors immediately.

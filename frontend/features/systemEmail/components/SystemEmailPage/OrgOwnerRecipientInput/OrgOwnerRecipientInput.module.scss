@@ -1,4 +1,4 @@
-@use '@/shared/styles/variables' as *;
+﻿@use '@/shared/styles/variables' as *;
 
 .container {
   display: flex;
@@ -81,16 +81,16 @@
   padding: $space-2 $space-4;
   border-radius: $border-radius;
   border: none;
-  background: $primary;
+  background: $gradient-brand;
   color: $text-inverse;
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
   cursor: pointer;
   white-space: nowrap;
-  transition: background $transition-fast;
+  transition: filter $transition-fast;
 
   &:hover {
-    background: $primary-dark;
+    filter: brightness(0.88);
   }
 }
 
@@ -113,7 +113,7 @@
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   cursor: pointer;
-  transition: background $transition-fast;
+  transition: filter $transition-fast;
 
   &:hover {
     background: $gray-100;
@@ -154,6 +154,10 @@
   border-bottom: 1px solid $border-color;
   position: sticky;
   top: 0;
+
+  input[type='checkbox'] {
+    accent-color: $primary;
+  }
 }
 
 .headerLabel {
@@ -179,6 +183,10 @@
 
   &:hover {
     background: $primary-light;
+  }
+
+  input[type='checkbox'] {
+    accent-color: $primary;
   }
 }
 

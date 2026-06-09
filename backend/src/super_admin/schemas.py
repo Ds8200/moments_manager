@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
 
 from src.organizations.enums import OrgPlan
 
@@ -9,6 +9,7 @@ class OrgAdminResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
+    org_number: str
     slug: str
     name: str
     logo_path: str | None
@@ -17,6 +18,7 @@ class OrgAdminResponseSchema(BaseModel):
     is_active: bool
     max_users: int
     owner_id: str
+    owner_email: str
     member_count: int
     created_at: datetime
     updated_at: datetime
@@ -32,15 +34,32 @@ class OrgPlanUpdateSchema(BaseModel):
     trial_ends_at: datetime | None = None
 
 
+class OrgUpdateAdminSchema(BaseModel):
+    name: str | None = None
+    slug: str | None = None
+
+
 class OrgCreateAdminSchema(BaseModel):
-    """Super-admin manually creates an org and its initial owner account."""
+    """Super-admin creates an org — either with an existing user or a brand-new one."""
 
     business_name: str
-    slug: str
-    owner_email: EmailStr
-    owner_full_name: str
-    owner_password: str
     plan: OrgPlan = OrgPlan.trial
+    slug: str | None = None
+    existing_user_id: str | None = None
+    owner_email: EmailStr | None = None
+    owner_full_name: str | None = None
+    owner_password: str | None = None
+    owner_phone: str | None = None
+
+    @model_validator(mode="after")
+    def check_owner(self) -> "OrgCreateAdminSchema":
+        has_existing = bool(self.existing_user_id)
+        has_new = bool(self.owner_email and self.owner_full_name and self.owner_password)
+        if not has_existing and not has_new:
+            raise ValueError(
+                "Provide existing_user_id OR (owner_email + owner_full_name + owner_password)"
+            )
+        return self
 
 
 class OrgOwnerEmailSchema(BaseModel):
@@ -71,6 +90,26 @@ class AdminComposeEmailSchema(BaseModel):
 class AdminComposeEmailResponseSchema(BaseModel):
     message: str
     sent_to: int
+
+
+class OrgOwnerAdminResponseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    email: str
+    full_name: str
+    phone: str | None
+    org_count: int
+    created_at: datetime
+
+
+class UserSearchResponseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    email: str
+    full_name: str
+    phone: str | None
 
 
 class OrgActionResponseSchema(BaseModel):

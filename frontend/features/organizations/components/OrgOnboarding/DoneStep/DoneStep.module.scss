@@ -1,4 +1,4 @@
-@use '../../../../../shared/styles/variables' as v;
+﻿@use '../../../../../shared/styles/variables' as v;
 
 .step {
   display: flex;
@@ -24,16 +24,16 @@
   display: inline-block;
   width: 100%;
   padding: v.$space-3;
-  background: v.$primary;
+  background: v.$gradient-brand;
   color: v.$text-inverse;
   border-radius: v.$border-radius;
   font-size: v.$font-size-base;
   font-weight: v.$font-weight-semibold;
   text-align: center;
   text-decoration: none;
-  transition: background v.$transition-fast;
+  transition: filter v.$transition-fast;
 
   &:hover {
-    background: v.$primary-dark;
+    filter: brightness(0.88);
   }
 }

@@ -31,8 +31,7 @@ class RegistrationService:
         data: RegistrationSchema,
         background_tasks: BackgroundTasks,
     ) -> RegistrationResponseSchema:
-        existing_user = await self._users.get_by_email(data.owner_email)
-        if existing_user:
+        if await self._users.email_exists(data.owner_email):
             from src.core.constants.http_messages import USER_EMAIL_EXISTS
 
             raise ConflictError(USER_EMAIL_EXISTS, code=ErrorCode.USER_EMAIL_EXISTS)
@@ -53,6 +52,7 @@ class RegistrationService:
 
         # Create organization (trial plan)
         trial_ends_at = datetime.now(timezone.utc) + timedelta(days=_TRIAL_DAYS)
+        org_number = await self._orgs.get_next_org_number()
         org = await self._orgs.create(
             slug=data.slug,
             name=data.business_name,
@@ -60,6 +60,7 @@ class RegistrationService:
             plan=OrgPlan.trial.value,
             max_users=_TRIAL_MAX_USERS,
             trial_ends_at=trial_ends_at,
+            org_number=org_number,
         )
 
         # Create owner membership

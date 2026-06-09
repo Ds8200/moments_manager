@@ -1,4 +1,4 @@
-@use '@/shared/styles/variables' as *;
+﻿@use '@/shared/styles/variables' as *;
 
 .page {
   padding: $space-6;
@@ -91,7 +91,7 @@
 
 .sendBtn {
   padding: $space-2 $space-8;
-  background: $primary;
+  background: $gradient-brand;
   color: $text-inverse;
   border: none;
   border-radius: $border-radius;
@@ -99,10 +99,10 @@
   font-weight: $font-weight-semibold;
   font-family: inherit;
   cursor: pointer;
-  transition: background $transition-fast;
+  transition: filter $transition-fast;
 
   &:hover:not(:disabled) {
-    background: $primary-dark;
+    filter: brightness(0.88);
   }
 
   &:disabled {

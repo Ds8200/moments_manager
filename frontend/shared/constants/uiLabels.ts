@@ -8,7 +8,7 @@ export const UI_LABELS = {
   NEXT:                   'הבא',
   APP_NAME:               'ניהולו',
   AI_ASSISTANT_FALLBACK:  'עוזר AI',
-  GENERIC_LOGO_SRC:       '/default_logo.svg',
+  GENERIC_LOGO_SRC:       '/nihulo_logo.png',
   TRY_AGAIN:              'נסה שנית',
   ERROR_TITLE:            'משהו השתבש',
   ERROR_LOADING_HOME: 'שגיאה בטעינת הבית',
@@ -26,6 +26,7 @@ export const UI_LABELS = {
   ERROR_LOADING_SEND_EMAIL: 'שגיאה בדף שליחת מייל',
   ERROR_LOADING_ORDER_DETAIL: 'שגיאה בטעינת פרטי ההזמנה',
   ERROR_LOADING_AI: 'שגיאה בטעינת עוזר ה-AI',
+  ERROR_LOADING_ORG_DETAIL: 'שגיאה בטעינת פרטי העסק',
   EMOJI_PICKER_BTN:  "הוסף אמוג'י",
   ATTACH_FILE:       'צרף קובץ',
   ATTACH_BTN_ARIA:   'בחר קובץ לצירוף',
@@ -86,6 +87,7 @@ export const META_LABELS = {
   SUPER_ADMIN_CREATE_ORG_TITLE: 'עסק חדש | ניהול מערכת',
   SUPER_ADMIN_SETTINGS_TITLE: 'הגדרות מערכת | ניהול מערכת',
   SUPER_ADMIN_EMAIL_TITLE: 'שליחת מייל | ניהול מערכת',
+  SUPER_ADMIN_ORG_DETAIL_TITLE: 'פרטי עסק | ניהול מערכת',
 } as const
 
 export const HOME_LABELS = {

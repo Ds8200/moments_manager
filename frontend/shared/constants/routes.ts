@@ -15,7 +15,6 @@ export const ROUTES = {
   ONBOARDING: '/onboarding',
   SUPER_ADMIN_BASE: '/super-admin',
   SUPER_ADMIN_ORGS: '/super-admin/orgs',
-  SUPER_ADMIN_NEW_ORG: '/super-admin/orgs/new',
   SUPER_ADMIN_PROFILE: '/super-admin/orgs/profile',
   SUPER_ADMIN_SETTINGS: '/super-admin/settings',
   SUPER_ADMIN_EMAIL: '/super-admin/email',

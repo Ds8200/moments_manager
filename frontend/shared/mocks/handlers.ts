@@ -73,6 +73,11 @@ export const handlers = [
   http.get(API_ENDPOINTS.CUSTOMERS, () => HttpResponse.json(EMPTY_PAGE)),
   http.get(API_ENDPOINTS.PRODUCTS,  () => HttpResponse.json(EMPTY_PAGE)),
   http.get(API_ENDPOINTS.USERS,     () => HttpResponse.json(EMPTY_PAGE)),
+  http.get(API_ENDPOINTS.ADMIN_ORGS, () => HttpResponse.json(EMPTY_PAGE)),
+  http.get(API_ENDPOINTS.ADMIN_ORG_USERS, () => HttpResponse.json(EMPTY_PAGE)),
+  http.get(API_ENDPOINTS.ADMIN_ORG_USERS_SEARCH, () => HttpResponse.json([])),
+  http.delete(API_ENDPOINTS.ADMIN_ORG_USER(':id'), () => HttpResponse.json({ message: 'ok' })),
+  http.get(API_ENDPOINTS.ADMIN_ORG(':id'), () => HttpResponse.json({ ...ORG_ADMIN_STUB, org_number: 'ORG-2026-0001', owner_email: 'owner@test.com' })),
   http.post(API_ENDPOINTS.AUTH_LOGOUT, () => new HttpResponse(null, { status: 204 })),
   http.post(API_ENDPOINTS.AUTH_REFRESH, () =>
     HttpResponse.json({ detail: 'no valid refresh token' }, { status: 401 })

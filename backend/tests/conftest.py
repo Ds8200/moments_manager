@@ -99,6 +99,7 @@ async def test_user(db_session: AsyncSession) -> User:
 async def organization(db_session: AsyncSession, test_user: User) -> Organization:
     org = Organization(
         id=str(uuid.uuid4()),
+        org_number=f"ORG-2026-{str(uuid.uuid4().int)[-4:]}",
         slug=f"test-org-{uuid.uuid4().hex[:8]}",
         name="Test Org",
         plan="trial",

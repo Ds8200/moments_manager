@@ -91,6 +91,55 @@ async def test_create_org_via_admin(sys_admin_client: AsyncClient) -> None:
     assert body["plan"] == "professional"
 
 
+async def test_update_org_name_and_slug(
+    sys_admin_client: AsyncClient, organization: Organization
+) -> None:
+    response = await sys_admin_client.patch(
+        f"/api/v1/admin/orgs/{organization.id}",
+        json={"name": "Renamed Org", "slug": "renamed-org"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["name"] == "Renamed Org"
+    assert body["slug"] == "renamed-org"
+    assert "owner_email" in body
+
+
+async def test_update_org_not_found(sys_admin_client: AsyncClient) -> None:
+    response = await sys_admin_client.patch(
+        "/api/v1/admin/orgs/00000000-0000-0000-0000-000000000000",
+        json={"name": "X"},
+    )
+    assert response.status_code == 404
+
+
+async def test_update_org_requires_sys_admin(
+    client: AsyncClient, organization: Organization
+) -> None:
+    response = await client.patch(
+        f"/api/v1/admin/orgs/{organization.id}",
+        json={"name": "X"},
+    )
+    assert response.status_code in (401, 403)
+
+
+async def test_create_org_without_slug_auto_generates(sys_admin_client: AsyncClient) -> None:
+    response = await sys_admin_client.post(
+        "/api/v1/admin/orgs",
+        json={
+            "business_name": "Auto Slug Org",
+            "owner_email": "autoslug@example.com",
+            "owner_full_name": "Auto Owner",
+            "owner_password": "securepass123",
+            "plan": "trial",
+        },
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["slug"] != ""
+    assert "owner_email" in body
+
+
 async def test_get_org_owners_requires_sys_admin(client: AsyncClient) -> None:
     response = await client.get("/api/v1/admin/org-owners")
     assert response.status_code in (401, 403)

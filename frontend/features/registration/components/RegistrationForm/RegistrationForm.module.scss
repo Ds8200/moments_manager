@@ -1,4 +1,4 @@
-@use '../../../../shared/styles/variables' as v;
+﻿@use '../../../../shared/styles/variables' as v;
 
 .wrapper {
   display: flex;
@@ -96,7 +96,7 @@
 .button {
   width: 100%;
   padding: v.$space-3;
-  background: v.$primary;
+  background: v.$gradient-brand;
   color: v.$text-inverse;
   border: none;
   border-radius: v.$border-radius;
@@ -104,11 +104,11 @@
   font-weight: v.$font-weight-semibold;
   font-family: v.$font-family;
   cursor: pointer;
-  transition: background v.$transition-fast;
+  transition: filter v.$transition-fast;
   margin-top: v.$space-2;
 
   &:hover:not(:disabled) {
-    background: v.$primary-dark;
+    filter: brightness(0.88);
   }
 
   &:disabled {

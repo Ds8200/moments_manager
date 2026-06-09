@@ -15,6 +15,7 @@ from src.core.exceptions import (
     ForbiddenError,
     InvalidFileTypeError,
     NotFoundError,
+    ServiceUnavailableError,
     UnauthorizedError,
 )
 
@@ -59,6 +60,12 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(ForbiddenError)
     async def forbidden_handler(request: Request, exc: ForbiddenError) -> JSONResponse:
         return _error_response(403, exc.detail, exc.code)
+
+    @app.exception_handler(ServiceUnavailableError)
+    async def service_unavailable_handler(
+        request: Request, exc: ServiceUnavailableError
+    ) -> JSONResponse:
+        return _error_response(503, exc.detail, exc.code)
 
     @app.exception_handler(InvalidFileTypeError)
     async def invalid_file_type_handler(

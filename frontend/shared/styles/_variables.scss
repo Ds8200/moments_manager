@@ -7,14 +7,14 @@
 // in app/(app)/layout.tsx (AI-extracted org brand colors); the hex values below
 // are the fallback used on the main domain and wherever no org branding applies.
 // DEFAULT_BRAND_COLORS in shared/utils/branding.ts must stay in sync with these fallbacks.
-$primary:       var(--color-primary, #6C63FF);
+$primary:       var(--color-primary, #3B5BDB);
 $primary-light: #EEEDFF;
-$primary-dark:  var(--color-secondary, #5650E5);
-$accent:        var(--color-accent, #FF6584);
+$primary-dark:  var(--color-secondary, #7048E8);
+$accent:        var(--color-accent, #F03E3E);
 $accent-gold:   #FF9F1C;
 
 // גרדיאנט המותג — לכותרות/מותג/מייל
-$gradient-brand: linear-gradient(135deg, var(--color-primary, #6C63FF) 0%, var(--color-accent, #FF6584) 100%);
+$gradient-brand: linear-gradient(135deg, var(--color-primary, #3B5BDB) 0%, 35%, var(--color-secondary, #7048E8) 100%);
 
 // Order status colors
 $status-new:              #339AF0;
@@ -49,12 +49,12 @@ $gray-800: #343A40;
 $gray-900: #212529;
 
 // Background
-$bg-page:    #F8F9FA;
+$bg-page:    var(--color-bg, #F8F9FA);
 $bg-card:    #FFFFFF;
 $bg-sidebar: #FFFFFF;
 
 // Text
-$text-primary:   $gray-900;
+$text-primary:   var(--color-text, #{$gray-900});
 $text-secondary: $gray-600;
 $text-disabled:  $gray-400;
 $text-inverse:   #FFFFFF;

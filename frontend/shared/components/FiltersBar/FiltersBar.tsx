@@ -18,6 +18,7 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
     onDateFromChange,
     onDateToChange,
     newButtonLabel,
+    showNewButton,
     onNew,
   } = useFiltersBar(props)
 
@@ -35,9 +36,11 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <button className={styles.newButton} onClick={onNew}>
-          {newButtonLabel}
-        </button>
+        {showNewButton && (
+          <button className={styles.newButton} onClick={onNew}>
+            {newButtonLabel}
+          </button>
+        )}
       </div>
 
       {/* Row 2: selects — hidden when empty */}

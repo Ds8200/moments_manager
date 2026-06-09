@@ -60,4 +60,70 @@ export const SUPER_ADMIN_LABELS = {
   ORG_DELETE_ERROR:           'מחיקת העסק נכשלה',
   ORG_PASSWORD_RESET_SUCCESS: 'מייל איפוס סיסמה נשלח',
   ORG_PASSWORD_RESET_ERROR:   'שליחת מייל נכשלה',
+
+  // OrgDetail edit form
+  EDIT_ORG_BUTTON:     'ערוך',
+  SAVE_CHANGES:        'שמור שינויים',
+  CANCEL_EDIT:         'ביטול',
+  ORG_UPDATED_SUCCESS: 'פרטי העסק עודכנו',
+  ORG_UPDATE_ERROR:    'עדכון פרטי העסק נכשל',
+  FIELD_ORG_NAME:      'שם העסק',
+
+  // Tab labels
+  TAB_BUSINESSES: 'עסקים',
+  TAB_USERS: 'משתמשים',
+
+  // Table columns
+  TABLE_COL_ORG_NUMBER:      'מספר',
+  TABLE_COL_OWNER_EMAIL:     'בעלים',
+  TABLE_COL_FULL_NAME:       'שם מלא',
+  TABLE_COL_PHONE:           'טלפון',
+  TABLE_COL_NUM_BUSINESSES:  'עסקים',
+
+  // Org form modal
+  MODAL_CREATE_ORG_TITLE:    'יצירת עסק חדש',
+  MODAL_EDIT_ORG_TITLE:      'עריכת עסק',
+  FIELD_OWNER_PICKER:        'בעל העסק',
+  OWNER_PICKER_PLACEHOLDER:  'חפשו לפי שם או אימייל',
+  CREATE_NEW_USER_OPTION:    '+ צור משתמש חדש',
+  ORG_NUMBER_AUTO_ASSIGNED:  'יוקצה אוטומטית',
+  VALIDATION_OWNER_REQUIRED: 'יש לבחור בעל עסק קיים או ליצור משתמש חדש',
+  FIELD_PASSWORD:            'סיסמה ראשונית',
+  SUBMIT_SAVE:               'שמור',
+  CANCEL:                    'ביטול',
+
+  // User form modal
+  MODAL_CREATE_USER_TITLE: 'יצירת משתמש חדש',
+  FIELD_USER_EMAIL:        'אימייל',
+  FIELD_USER_FULL_NAME:    'שם מלא',
+  FIELD_USER_PHONE:        'טלפון (אופציונלי)',
+  FIELD_USER_PASSWORD:     'סיסמה',
+  SUBMIT_CREATE_USER:      'שמור',
+
+  // Users tab actions
+  CANNOT_DELETE_USER_WITH_ORGS: 'לא ניתן למחוק משתמש שמחזיק בעסק פעיל',
+  USER_DELETED_SUCCESS:         'המשתמש נמחק',
+  USER_DELETE_ERROR:            'מחיקת המשתמש נכשלה',
+  CONFIRM_DELETE_USER:          'למחוק את המשתמש לצמיתות?',
+
+  // Filters
+  FILTER_ALL_PLANS:    'כל המנויים',
+  FILTER_ALL_STATUSES: 'כל הסטטוסים',
+  FILTER_ACTIVE:       'פעיל',
+  FILTER_INACTIVE:     'מושבת',
+  FILTER_SEARCH_PLACEHOLDER: 'חיפוש...',
+
+  // Row action menu
+  MENU_EDIT: 'עריכה',
+
+  // Pagination
+  PAGINATION_TOTAL_PREFIX: 'סה"כ',
+  PAGINATION_ORGS_SUFFIX:  'עסקים',
+  PAGINATION_USERS_SUFFIX: 'משתמשים',
+  PAGINATION_PREV:         'הקודם',
+  PAGINATION_NEXT:         'הבא',
+
+  EMPTY_ORGS:  'לא נמצאו עסקים',
+  EMPTY_USERS: 'לא נמצאו משתמשים',
+  ERROR_LOAD:  'שגיאה בטעינת הנתונים',
 } as const

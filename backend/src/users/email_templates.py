@@ -3,7 +3,7 @@ import html as _html
 from src.config import settings
 
 # Fallback branding for organizations that haven't uploaded a logo yet.
-DEFAULT_LOGO_PATH = "/default_logo.svg"
+DEFAULT_LOGO_PATH = "/nihulo_logo.png"
 _DEFAULT_BRAND_COLORS: dict[str, str] = {
     "primary": "#3b5bdb",
     "secondary": "#7048e8",

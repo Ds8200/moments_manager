@@ -1,4 +1,4 @@
-@use '../../../../shared/styles/variables' as v;
+﻿@use '../../../../shared/styles/variables' as v;
 
 .page {
   display: flex;
@@ -20,7 +20,7 @@
 
 .newBtn {
   padding: v.$space-2 v.$space-5;
-  background: v.$primary;
+  background: v.$gradient-brand;
   border: none;
   border-radius: v.$border-radius;
   color: v.$text-inverse;
@@ -28,10 +28,10 @@
   font-size: v.$font-size-sm;
   font-weight: v.$font-weight-semibold;
   font-family: v.$font-family;
-  transition: background v.$transition-fast;
+  transition: filter v.$transition-fast;
 
   &:hover {
-    background: v.$primary-dark;
+    filter: brightness(0.88);
   }
 }
 

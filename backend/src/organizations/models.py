@@ -1,7 +1,18 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.database import Base, SoftDeleteMixin, TimestampMixin
@@ -10,9 +21,18 @@ from src.organizations.enums import OrgPlan, OrgRole
 
 class Organization(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "organizations"
+    __table_args__ = (
+        Index(
+            "ix_organizations_slug_active",
+            "slug",
+            unique=True,
+            postgresql_where=text("is_deleted = false"),
+        ),
+    )
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    org_number: Mapped[str] = mapped_column(String(20), nullable=False, unique=True, index=True)
+    slug: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     logo_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
     brand_colors: Mapped[dict | None] = mapped_column(JSON, nullable=True)

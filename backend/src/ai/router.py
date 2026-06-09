@@ -10,6 +10,8 @@ from src.ai.service import AgentRunner, build_system_prompt
 from src.ai.tool_registry import tool_registry
 from src.core.constants.http_messages import AI_NOT_CONFIGURED
 from src.core.dependencies import get_db, get_org_context
+from src.core.enums.error_codes import ErrorCode
+from src.core.exceptions import ServiceUnavailableError
 from src.core.rate_limit import limiter
 from src.system_settings.repository import SystemSettingsRepository
 
@@ -33,7 +35,7 @@ async def ai_chat(
         effective_key = sys_settings.platform_openai_api_key or None
 
     if not effective_key:
-        raise HTTPException(status_code=503, detail=AI_NOT_CONFIGURED)
+        raise ServiceUnavailableError(AI_NOT_CONFIGURED, code=ErrorCode.AI_NOT_CONFIGURED)
 
     if not body.messages:
         raise HTTPException(status_code=422, detail="messages must not be empty")

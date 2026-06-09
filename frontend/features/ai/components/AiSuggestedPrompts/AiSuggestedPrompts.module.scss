@@ -41,7 +41,8 @@
   transition: background 0.15s, color 0.15s;
 
   &:hover {
-    background: v.$primary;
+    background: v.$primary-dark;
+    border-color: v.$primary-dark;
     color: v.$text-inverse;
   }
 
