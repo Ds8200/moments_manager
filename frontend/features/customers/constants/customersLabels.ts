@@ -33,4 +33,5 @@ export const CUSTOMERS_LABELS = {
   CREATED_SUCCESS:          'הלקוח נוצר בהצלחה',
   UPDATED_SUCCESS:          'הלקוח עודכן בהצלחה',
   DELETED_SUCCESS:          'הלקוח נמחק בהצלחה',
+  DETAIL_TITLE:             'פרטי לקוח',
 } as const

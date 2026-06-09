@@ -1,0 +1,41 @@
+@use '../../../../shared/styles/variables' as v;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.backBtn {
+  padding: v.$space-2 v.$space-5;
+  background: transparent;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  color: v.$text-primary;
+  cursor: pointer;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-100;
+  }
+}
+
+.placeholder {
+  color: v.$text-secondary;
+  font-size: v.$font-size-base;
+}

@@ -1,5 +1,5 @@
 'use client'
-import type { ReactElement } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
 export interface PaginationLabels {
@@ -9,11 +9,17 @@ export interface PaginationLabels {
   next: string
 }
 
+export interface TableColumn<T> {
+  key: string
+  header: string
+  cell: (row: T) => ReactNode
+  cellClassName?: string
+}
+
 export interface DataTableProps<T> {
-  headers: string[]
+  columns: TableColumn<T>[]
   rows: T[]
   keyExtractor: (row: T) => string
-  renderRow: (row: T) => ReactElement
   isLoading: boolean
   isError: boolean
   emptyTitle: string
@@ -26,13 +32,14 @@ export interface DataTableProps<T> {
   total: number
   onPageChange: (page: number) => void
   paginationLabels: PaginationLabels
+  onRowLeftClick?: (row: T) => void
+  onRowRightClick?: (row: T, e: MouseEvent<HTMLTableRowElement>) => void
 }
 
 export interface UseDataTableReturn<T> {
-  headers: string[]
+  columns: TableColumn<T>[]
   rows: T[]
   keyExtractor: (row: T) => string
-  renderRow: (row: T) => ReactElement
   showLoading: boolean
   showError: boolean
   showEmpty: boolean
@@ -50,14 +57,18 @@ export interface UseDataTableReturn<T> {
   emptyIcon: string
   errorTitle: string
   errorIcon: string
+  isInteractive: boolean
+  onRowLeftClick: ((row: T) => void) | undefined
+  onRowRightClick: ((row: T, e: MouseEvent<HTMLTableRowElement>) => void) | undefined
 }
 
 export const useDataTable = <T>(props: DataTableProps<T>): UseDataTableReturn<T> => {
   const {
-    headers, rows, keyExtractor, renderRow,
+    columns, rows, keyExtractor,
     isLoading, isError,
     emptyTitle, emptyDescription, emptyIcon, errorTitle,
     currentPage, totalPages, total, onPageChange, paginationLabels,
+    onRowLeftClick, onRowRightClick,
   } = props
 
   const showLoading = isLoading
@@ -67,10 +78,9 @@ export const useDataTable = <T>(props: DataTableProps<T>): UseDataTableReturn<T>
   const showPagination = showTable && totalPages > 1
 
   return {
-    headers,
+    columns,
     rows,
     keyExtractor,
-    renderRow,
     showLoading,
     showError,
     showEmpty,
@@ -88,5 +98,8 @@ export const useDataTable = <T>(props: DataTableProps<T>): UseDataTableReturn<T>
     emptyIcon,
     errorTitle,
     errorIcon: props.errorIcon ?? UI_SYMBOLS.WARNING,
+    isInteractive: !!(onRowLeftClick || onRowRightClick),
+    onRowLeftClick,
+    onRowRightClick,
   }
 }

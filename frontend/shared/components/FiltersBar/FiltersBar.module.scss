@@ -1,23 +1,17 @@
-﻿@use '../../styles/variables' as v;
+@use '../../styles/variables' as v;
 
-// Outer container — column on all screen sizes for clean row separation
 .bar {
   display: flex;
-  flex-direction: column;
-  gap: v.$space-3;
-}
-
-// ── Row 1: search + new button ──────────────────────────────────────────────
-.primaryRow {
-  display: flex;
+  flex-direction: row;
   align-items: center;
+  flex-wrap: wrap;
   gap: v.$space-3;
 }
 
 .searchWrapper {
   position: relative;
   flex: 1;
-  min-width: 0;
+  min-width: 200px;
 }
 
 .searchIcon {
@@ -49,43 +43,8 @@
   }
 }
 
-.newButton {
-  padding: v.$space-2 v.$space-4;
-  background: v.$gradient-brand;
-  color: v.$text-inverse;
-  border: none;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-weight: v.$font-weight-semibold;
-  font-family: v.$font-family;
-  cursor: pointer;
-  white-space: nowrap;
-  min-height: 38px;
-  flex-shrink: 0;
-  transition: filter v.$transition-fast;
-
-  &:hover {
-    filter: brightness(0.88);
-  }
-}
-
-// ── Row 2: selects ──────────────────────────────────────────────────────────
-.selectsRow {
-  display: flex;
-  align-items: center;
-  gap: v.$space-3;
-  flex-wrap: wrap;
-
-  @media (max-width: #{v.$breakpoint-md - 1}) {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: v.$space-2;
-  }
-}
-
 .select {
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
   padding: v.$space-2 v.$space-3;
   border: 1px solid v.$border-color;
   border-radius: v.$border-radius;
@@ -102,32 +61,20 @@
   }
 }
 
-// ── Row 3: date range ───────────────────────────────────────────────────────
-.datesRow {
-  display: flex;
-  align-items: flex-end;
-  gap: v.$space-3;
-
-  @media (max-width: #{v.$breakpoint-md - 1}) {
-    gap: v.$space-2;
-  }
-}
-
 .dateGroup {
   display: flex;
-  flex-direction: column;
-  gap: v.$space-1;
-  flex: 1;
-  min-width: 0;
+  align-items: center;
+  gap: v.$space-2;
+  flex-shrink: 0;
 }
 
 .dateLabel {
   font-size: v.$font-size-xs;
   color: v.$text-secondary;
+  white-space: nowrap;
 }
 
 .dateInput {
-  width: 100%;
   padding: v.$space-2 v.$space-3;
   border: 1px solid v.$border-color;
   border-radius: v.$border-radius;

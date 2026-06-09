@@ -47,7 +47,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <MobileDrawer logoUrl={logoUrl} logoAlt={logoAlt} />
           <AppContentWrapper>
             <Header />
-            <main className={styles.main}>{children}</main>
+            <main className={styles.main}>
+              <div className={styles.mainContent}>{children}</div>
+            </main>
           </AppContentWrapper>
         </div>
       </AuthGuard>

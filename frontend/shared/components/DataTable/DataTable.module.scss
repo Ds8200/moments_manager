@@ -1,16 +1,21 @@
 @use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
 
 .wrapper {
-  overflow-x: auto;
+  @include m.scrollable-table-wrapper;
 }
 
 .table {
+  direction: rtl;
   width: 100%;
   border-collapse: collapse;
   font-size: v.$font-size-sm;
 }
 
 .thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   padding: v.$space-3 v.$space-4;
   text-align: start;
   font-weight: v.$font-weight-semibold;
@@ -18,6 +23,29 @@
   background: v.$gray-50;
   border-bottom: 1px solid v.$border-color;
   white-space: nowrap;
+}
+
+.row {
+  border-bottom: 1px solid v.$border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.rowInteractive {
+  cursor: pointer;
+  transition: background v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-50;
+  }
+}
+
+.cell {
+  padding: v.$space-3 v.$space-4;
+  color: v.$text-primary;
+  vertical-align: middle;
 }
 
 .pagination {

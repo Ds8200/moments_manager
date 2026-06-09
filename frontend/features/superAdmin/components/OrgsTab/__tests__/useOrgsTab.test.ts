@@ -55,7 +55,7 @@ const PAGINATED = { items: [ORG_ROW], total: 1, page: 1, page_size: 20, pages: 1
 
 function makeMockEvent() {
   const el = document.createElement('tr')
-  return { currentTarget: el } as unknown as React.MouseEvent<Element>
+  return { currentTarget: el } as unknown as React.MouseEvent<HTMLTableRowElement>
 }
 
 describe('useOrgsTab', () => {
@@ -88,13 +88,13 @@ describe('useOrgsTab', () => {
     expect(row.isActive).toBe(true)
   })
 
-  it('onRowMenuClick opens dropdown menu with org name as title', () => {
+  it('onRowRightClick opens dropdown menu with org name as title', () => {
     const { result } = renderHook(() => useOrgsTab(), { wrapper: makeWrapper(store, qc) })
-    const row = { ...result.current.rows[0], id: 'org-1', name: 'Test Org', orgNumber: 'ORG-1',
+    const row = { id: 'org-1', name: 'Test Org', orgNumber: 'ORG-1',
       slug: 'x', ownerEmail: 'e@e.com', planLabel: 'trial', statusLabel: 'פעיל',
       memberCount: 1, createdAt: '01/01/2026', isActive: true }
 
-    act(() => result.current.onRowMenuClick(row, makeMockEvent()))
+    act(() => result.current.onRowRightClick(row, makeMockEvent()))
 
     expect(result.current.menuState.isOpen).toBe(true)
     expect(result.current.menuState.title).toBe('Test Org')
@@ -106,7 +106,7 @@ describe('useOrgsTab', () => {
       slug: 'x', ownerEmail: 'e@e.com', planLabel: 'trial', statusLabel: 'פעיל',
       memberCount: 1, createdAt: '01/01/2026', isActive: true }
 
-    act(() => result.current.onRowMenuClick(row, makeMockEvent()))
+    act(() => result.current.onRowRightClick(row, makeMockEvent()))
     const editItem = result.current.menuState.items.find((i) => i.label === SUPER_ADMIN_LABELS.MENU_EDIT)
     act(() => editItem!.onClick())
 
@@ -120,7 +120,7 @@ describe('useOrgsTab', () => {
       slug: 'x', ownerEmail: 'e@e.com', planLabel: 'trial', statusLabel: 'פעיל',
       memberCount: 1, createdAt: '01/01/2026', isActive: true }
 
-    act(() => result.current.onRowMenuClick(row, makeMockEvent()))
+    act(() => result.current.onRowRightClick(row, makeMockEvent()))
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => deleteItem!.onClick())
 
@@ -135,7 +135,7 @@ describe('useOrgsTab', () => {
       slug: 'x', ownerEmail: 'e@e.com', planLabel: 'trial', statusLabel: 'פעיל',
       memberCount: 1, createdAt: '01/01/2026', isActive: true }
 
-    act(() => result.current.onRowMenuClick(row, makeMockEvent()))
+    act(() => result.current.onRowRightClick(row, makeMockEvent()))
     expect(result.current.menuState.isOpen).toBe(true)
     act(() => result.current.closeMenu())
     expect(result.current.menuState.isOpen).toBe(false)

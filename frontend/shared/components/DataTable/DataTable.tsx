@@ -1,5 +1,5 @@
 'use client'
-import { Fragment, type ReactElement } from 'react'
+import type { MouseEvent, ReactElement } from 'react'
 import { useDataTable } from './useDataTable'
 import type { DataTableProps } from './useDataTable'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
@@ -8,12 +8,13 @@ import styles from './DataTable.module.scss'
 
 export const DataTable = <T,>(props: DataTableProps<T>): ReactElement => {
   const {
-    headers, rows, keyExtractor, renderRow,
+    columns, rows, keyExtractor,
     showLoading, showError, showEmpty, showTable, showPagination,
     isPrevDisabled, isNextDisabled,
     currentPage, totalPages, total,
     onPageChange, paginationLabels,
     emptyTitle, emptyDescription, emptyIcon, errorTitle, errorIcon,
+    isInteractive, onRowLeftClick, onRowRightClick,
   } = useDataTable(props)
 
   if (showLoading) return <PageSkeleton rows={8} />
@@ -29,16 +30,31 @@ export const DataTable = <T,>(props: DataTableProps<T>): ReactElement => {
           <table className={styles.table}>
             <thead className={styles.thead}>
               <tr>
-                {headers.map((h) => (
-                  <th key={h}>{h}</th>
+                {columns.map((col) => (
+                  <th key={col.key}>{col.header}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
-                <Fragment key={keyExtractor(row)}>
-                  {renderRow(row)}
-                </Fragment>
+                <tr
+                  key={keyExtractor(row)}
+                  className={`${styles.row}${isInteractive ? ` ${styles.rowInteractive}` : ''}`}
+                  onClick={() => onRowLeftClick?.(row)}
+                  onContextMenu={(e: MouseEvent<HTMLTableRowElement>) => {
+                    e.preventDefault()
+                    onRowRightClick?.(row, e)
+                  }}
+                >
+                  {columns.map((col) => (
+                    <td
+                      key={col.key}
+                      className={`${styles.cell}${col.cellClassName ? ` ${col.cellClassName}` : ''}`}
+                    >
+                      {col.cell(row)}
+                    </td>
+                  ))}
+                </tr>
               ))}
             </tbody>
           </table>

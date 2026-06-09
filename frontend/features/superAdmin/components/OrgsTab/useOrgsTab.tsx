@@ -17,8 +17,9 @@ import { ROUTE_ICONS, SUPER_ADMIN_ORG_DETAIL_ROUTE } from '@/shared/constants/ro
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import type { OrgAdminResponse } from '../../types'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
+import type { TableColumn, PaginationLabels } from '@/shared/components/DataTable/useDataTable'
 import type { FiltersBarProps } from '@/shared/components/FiltersBar/useFiltersBar'
-import type { PaginationLabels } from '@/shared/components/DataTable/useDataTable'
+import styles from './OrgsTab.module.scss'
 
 export interface OrgRow {
   id: string
@@ -34,8 +35,12 @@ export interface OrgRow {
 }
 
 export interface UseOrgsTabReturn {
+  title: string
+  actionLabel: string
+  onAction: () => void
+  filtersBarProps: FiltersBarProps
+  columns: TableColumn<OrgRow>[]
   rows: OrgRow[]
-  headers: string[]
   isLoading: boolean
   isError: boolean
   emptyTitle: string
@@ -46,10 +51,10 @@ export interface UseOrgsTabReturn {
   total: number
   paginationLabels: PaginationLabels
   onPageChange: (page: number) => void
-  filtersBarProps: FiltersBarProps
+  onRowLeftClick: (org: OrgRow) => void
+  onRowRightClick: (org: OrgRow, e: MouseEvent<HTMLTableRowElement>) => void
   menuState: DropdownMenuState
   closeMenu: () => void
-  onRowMenuClick: (org: OrgRow, e: MouseEvent<Element>) => void
 }
 
 const PLAN_LABEL: Record<string, string> = {
@@ -115,86 +120,89 @@ export const useOrgsTab = (): UseOrgsTabReturn => {
     })
   }
 
-  const onRowMenuClick = (org: OrgRow, e: MouseEvent<Element>): void => {
-    openMenu(org.name, [
-      {
-        label: SUPER_ADMIN_LABELS.MENU_DETAILS,
-        icon: UI_SYMBOLS.DETAILS,
-        onClick: () => router.push(SUPER_ADMIN_ORG_DETAIL_ROUTE(org.id)),
-      },
-      {
-        label: SUPER_ADMIN_LABELS.MENU_EDIT,
-        icon: UI_SYMBOLS.EDIT,
-        onClick: () => {
-          setEditingOrgId(org.id)
-          setIsOrgFormOpen(true)
-        },
-      },
-      {
-        label: org.isActive ? SUPER_ADMIN_LABELS.MENU_DISABLE : SUPER_ADMIN_LABELS.MENU_ENABLE,
-        icon: ROUTE_ICONS.ORGS,
-        onClick: () => handleToggle(org),
-      },
-      {
-        label: SUPER_ADMIN_LABELS.MENU_RESET_PASSWORD,
-        icon: UI_SYMBOLS.KEY,
-        onClick: () => handleResetPassword(org),
-      },
-      {
-        label: SUPER_ADMIN_LABELS.MENU_DELETE,
-        icon: UI_SYMBOLS.DELETE,
-        onClick: () => handleDelete(org),
-        variant: 'danger',
-      },
-    ], e)
-  }
+  const columns: TableColumn<OrgRow>[] = [
+    {
+      key: 'orgNumber',
+      header: SUPER_ADMIN_LABELS.TABLE_COL_ORG_NUMBER,
+      cell: (o) => <span className={styles.mono}>{o.orgNumber}</span>,
+    },
+    {
+      key: 'name',
+      header: SUPER_ADMIN_LABELS.TABLE_COL_NAME,
+      cell: (o) => <span className={styles.bold}>{o.name}</span>,
+    },
+    {
+      key: 'slug',
+      header: SUPER_ADMIN_LABELS.TABLE_COL_SLUG,
+      cell: (o) => <span className={styles.secondary}>{o.slug}</span>,
+    },
+    {
+      key: 'ownerEmail',
+      header: SUPER_ADMIN_LABELS.TABLE_COL_OWNER_EMAIL,
+      cell: (o) => <span className={styles.secondary}>{o.ownerEmail}</span>,
+    },
+    {
+      key: 'plan',
+      header: SUPER_ADMIN_LABELS.TABLE_COL_PLAN,
+      cell: (o) => o.planLabel,
+    },
+    {
+      key: 'status',
+      header: SUPER_ADMIN_LABELS.TABLE_COL_STATUS,
+      cell: (o) => (
+        <span className={o.isActive ? styles.badgeActive : styles.badgeInactive}>
+          {o.statusLabel}
+        </span>
+      ),
+    },
+    {
+      key: 'memberCount',
+      header: SUPER_ADMIN_LABELS.TABLE_COL_MEMBERS,
+      cell: (o) => o.memberCount,
+    },
+    {
+      key: 'createdAt',
+      header: SUPER_ADMIN_LABELS.TABLE_COL_CREATED,
+      cell: (o) => <span className={styles.secondary}>{o.createdAt}</span>,
+    },
+  ]
 
-  const filtersBarProps: FiltersBarProps = {
-    searchValue: filters.search,
-    searchPlaceholder: SUPER_ADMIN_LABELS.FILTER_SEARCH_PLACEHOLDER,
-    onSearchChange: (search) => setFilters((f) => ({ ...f, search, page: 1 })),
-    selects: [
-      {
-        value: filters.plan,
-        options: [
-          { value: '', label: SUPER_ADMIN_LABELS.FILTER_ALL_PLANS },
-          { value: ORG_PLAN.TRIAL, label: SUPER_ADMIN_LABELS.PLAN_TRIAL },
-          { value: ORG_PLAN.BASIC, label: SUPER_ADMIN_LABELS.PLAN_BASIC },
-          { value: ORG_PLAN.PROFESSIONAL, label: SUPER_ADMIN_LABELS.PLAN_PROFESSIONAL },
-          { value: ORG_PLAN.ENTERPRISE, label: SUPER_ADMIN_LABELS.PLAN_ENTERPRISE },
-        ],
-        onChange: (plan) => setFilters((f) => ({ ...f, plan, page: 1 })),
-      },
-      {
-        value: filters.is_active,
-        options: [
-          { value: '', label: SUPER_ADMIN_LABELS.FILTER_ALL_STATUSES },
-          { value: 'true', label: SUPER_ADMIN_LABELS.FILTER_ACTIVE },
-          { value: 'false', label: SUPER_ADMIN_LABELS.FILTER_INACTIVE },
-        ],
-        onChange: (is_active) => setFilters((f) => ({ ...f, is_active, page: 1 })),
-      },
-    ],
-    newButtonLabel: SUPER_ADMIN_LABELS.ADD_ORG_BUTTON,
-    onNew: () => {
+  return {
+    title: SUPER_ADMIN_LABELS.TAB_BUSINESSES,
+    actionLabel: SUPER_ADMIN_LABELS.ADD_ORG_BUTTON,
+    onAction: () => {
       setEditingOrgId(null)
       setIsOrgFormOpen(true)
     },
-  }
-
-  return {
+    filtersBarProps: {
+      searchValue: filters.search,
+      searchPlaceholder: SUPER_ADMIN_LABELS.FILTER_SEARCH_PLACEHOLDER,
+      onSearchChange: (search) => setFilters((f) => ({ ...f, search, page: 1 })),
+      selects: [
+        {
+          value: filters.plan,
+          options: [
+            { value: '', label: SUPER_ADMIN_LABELS.FILTER_ALL_PLANS },
+            { value: ORG_PLAN.TRIAL, label: SUPER_ADMIN_LABELS.PLAN_TRIAL },
+            { value: ORG_PLAN.BASIC, label: SUPER_ADMIN_LABELS.PLAN_BASIC },
+            { value: ORG_PLAN.PROFESSIONAL, label: SUPER_ADMIN_LABELS.PLAN_PROFESSIONAL },
+            { value: ORG_PLAN.ENTERPRISE, label: SUPER_ADMIN_LABELS.PLAN_ENTERPRISE },
+          ],
+          onChange: (plan) => setFilters((f) => ({ ...f, plan, page: 1 })),
+        },
+        {
+          value: filters.is_active,
+          options: [
+            { value: '', label: SUPER_ADMIN_LABELS.FILTER_ALL_STATUSES },
+            { value: 'true', label: SUPER_ADMIN_LABELS.FILTER_ACTIVE },
+            { value: 'false', label: SUPER_ADMIN_LABELS.FILTER_INACTIVE },
+          ],
+          onChange: (is_active) => setFilters((f) => ({ ...f, is_active, page: 1 })),
+        },
+      ],
+    },
+    columns,
     rows: (data?.items ?? []).map(toRow),
-    headers: [
-      SUPER_ADMIN_LABELS.TABLE_COL_ORG_NUMBER,
-      SUPER_ADMIN_LABELS.TABLE_COL_NAME,
-      SUPER_ADMIN_LABELS.TABLE_COL_SLUG,
-      SUPER_ADMIN_LABELS.TABLE_COL_OWNER_EMAIL,
-      SUPER_ADMIN_LABELS.TABLE_COL_PLAN,
-      SUPER_ADMIN_LABELS.TABLE_COL_STATUS,
-      SUPER_ADMIN_LABELS.TABLE_COL_MEMBERS,
-      SUPER_ADMIN_LABELS.TABLE_COL_CREATED,
-      SUPER_ADMIN_LABELS.TABLE_COL_ACTIONS,
-    ],
     isLoading,
     isError,
     emptyTitle: SUPER_ADMIN_LABELS.EMPTY_ORGS,
@@ -210,9 +218,16 @@ export const useOrgsTab = (): UseOrgsTabReturn => {
       next: SUPER_ADMIN_LABELS.PAGINATION_NEXT,
     },
     onPageChange: (page) => setFilters((f) => ({ ...f, page })),
-    filtersBarProps,
+    onRowLeftClick: (org) => router.push(SUPER_ADMIN_ORG_DETAIL_ROUTE(org.id)),
+    onRowRightClick: (org, e) => {
+      openMenu(org.name, [
+        { label: SUPER_ADMIN_LABELS.MENU_EDIT, icon: UI_SYMBOLS.EDIT, onClick: () => { setEditingOrgId(org.id); setIsOrgFormOpen(true) } },
+        { label: org.isActive ? SUPER_ADMIN_LABELS.MENU_DISABLE : SUPER_ADMIN_LABELS.MENU_ENABLE, icon: ROUTE_ICONS.ORGS, onClick: () => handleToggle(org) },
+        { label: SUPER_ADMIN_LABELS.MENU_RESET_PASSWORD, icon: UI_SYMBOLS.KEY, onClick: () => handleResetPassword(org) },
+        { label: SUPER_ADMIN_LABELS.MENU_DELETE, icon: UI_SYMBOLS.DELETE, onClick: () => handleDelete(org), variant: 'danger' },
+      ], e)
+    },
     menuState,
     closeMenu,
-    onRowMenuClick,
   }
 }

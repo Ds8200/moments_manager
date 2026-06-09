@@ -1,86 +1,4 @@
-﻿@use '../../../../shared/styles/variables' as v;
-
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-5;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: v.$space-3;
-}
-
-.title {
-  font-size: v.$font-size-2xl;
-  font-weight: v.$font-weight-bold;
-  color: v.$text-primary;
-}
-
-.newBtn {
-  padding: v.$space-2 v.$space-4;
-  background: v.$gradient-brand;
-  margin-inline-start: auto;
-  color: v.$text-inverse;
-  border: none;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-weight: v.$font-weight-semibold;
-  font-family: v.$font-family;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: filter v.$transition-fast;
-
-  &:hover {
-    filter: brightness(0.88);
-  }
-}
-
-.card {
-  background: v.$bg-card;
-  border-radius: v.$border-radius-lg;
-  box-shadow: v.$shadow-card;
-  border: 1px solid v.$border-color;
-  overflow: hidden;
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: v.$font-size-sm;
-}
-
-.thead th {
-  padding: v.$space-3 v.$space-4;
-  text-align: right;
-  font-weight: v.$font-weight-semibold;
-  color: v.$text-secondary;
-  background: v.$gray-50;
-  border-bottom: 1px solid v.$border-color;
-  white-space: nowrap;
-}
-
-.row {
-  border-bottom: 1px solid v.$border-color;
-  transition: filter v.$transition-fast;
-  cursor: pointer;
-
-  &:hover {
-    background: v.$gray-50;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.cell {
-  padding: v.$space-3 v.$space-4;
-  color: v.$text-primary;
-  vertical-align: middle;
-}
+@use '../../../../shared/styles/variables' as v;
 
 .categoryBadge {
   display: inline-flex;
@@ -95,5 +13,5 @@
 .amount {
   font-weight: v.$font-weight-semibold;
   color: v.$danger;
+  white-space: nowrap;
 }
-

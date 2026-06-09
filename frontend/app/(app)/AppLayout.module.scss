@@ -2,7 +2,8 @@
 
 .root {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: v.$bg-page;
 }
 
@@ -28,10 +29,28 @@
 
 .main {
   flex: 1;
+  min-height: 0;
   padding: v.$space-6;
   width: 100%;
+  overflow-y: auto;
+  direction: ltr;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary, #{v.$primary}) transparent;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-primary, #{v.$primary});
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover { filter: brightness(0.85); }
 
   @media (max-width: #{v.$breakpoint-md - 1}) {
     padding: v.$space-4;
   }
+}
+
+.mainContent {
+  direction: rtl;
 }

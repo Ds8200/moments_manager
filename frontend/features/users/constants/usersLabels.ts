@@ -1,6 +1,7 @@
 export const USERS_LABELS = {
   PAGE_TITLE:               'משתמשים',
   NEW_USER:                 '+ משתמש חדש',
+  SEARCH_PLACEHOLDER:       'חיפוש משתמש...',
   EMPTY_TITLE:              'אין משתמשים',
   EMPTY_DESC:               'הוסף משתמש ראשון',
   CONFIRM_DELETE:           'למחוק את',
@@ -32,6 +33,7 @@ export const USERS_LABELS = {
   CREATED_SUCCESS:          'המשתמש נוצר בהצלחה',
   DELETED_SUCCESS:          'המשתמש נמחק בהצלחה',
   WELCOME_EMAIL_NOTE:       'סיסמה זמנית תישלח לכתובת האימייל שצוינה',
+  DETAIL_TITLE:             'פרטי משתמש',
 } as const
 
 export const USER_ROLE_VALUES = {

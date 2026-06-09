@@ -18,7 +18,6 @@ export const userFiltersAtom = atom<UserListFilters>({
 
 export const isOrgFormOpenAtom = atom<boolean>(false)
 export const editingOrgIdAtom = atom<string | null>(null)
-export const superAdminTabAtom = atom<0 | 1>(0)
 export const isUserFormModalOpenAtom = atom<boolean>(false)
 
 export interface PendingNewUser {

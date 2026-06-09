@@ -15,13 +15,19 @@ export const ROUTES = {
   ONBOARDING: '/onboarding',
   SUPER_ADMIN_BASE: '/super-admin',
   SUPER_ADMIN_ORGS: '/super-admin/orgs',
+  SUPER_ADMIN_USERS_LIST: '/super-admin/users',
   SUPER_ADMIN_PROFILE: '/super-admin/orgs/profile',
   SUPER_ADMIN_SETTINGS: '/super-admin/settings',
   SUPER_ADMIN_EMAIL: '/super-admin/email',
 } as const
 
 export const ORDER_DETAIL_ROUTE = (id: string): string => `/orders/${id}`
+export const CUSTOMER_DETAIL_ROUTE = (id: string): string => `/customers/${id}`
+export const EXPENSE_DETAIL_ROUTE = (id: string): string => `/expenses/${id}`
+export const PRODUCT_DETAIL_ROUTE = (id: string): string => `/products/${id}`
+export const USER_DETAIL_ROUTE = (id: string): string => `/users/${id}`
 export const SUPER_ADMIN_ORG_DETAIL_ROUTE = (id: string): string => `/super-admin/orgs/${id}`
+export const SUPER_ADMIN_USER_DETAIL_ROUTE = (id: string): string => `/super-admin/users/${id}`
 
 export const ROUTE_ICONS = {
   HOME:      '🏠',
@@ -45,8 +51,9 @@ export interface NavItem {
 }
 
 export const SUPER_ADMIN_NAV_ITEMS: NavItem[] = [
-  { href: ROUTES.SUPER_ADMIN_ORGS, label: 'ניהול עסקים', shortLabel: 'עסקים', icon: ROUTE_ICONS.ORGS },
-  { href: ROUTES.SUPER_ADMIN_EMAIL, label: 'שליחת מייל', shortLabel: 'מייל', icon: ROUTE_ICONS.EMAIL },
+  { href: ROUTES.SUPER_ADMIN_ORGS,       label: 'עסקים',        shortLabel: 'עסקים',       icon: ROUTE_ICONS.ORGS },
+  { href: ROUTES.SUPER_ADMIN_USERS_LIST, label: 'משתמשים',      shortLabel: 'משתמשים',     icon: ROUTE_ICONS.USERS },
+  { href: ROUTES.SUPER_ADMIN_EMAIL,      label: 'שליחת מייל',   shortLabel: 'מייל',        icon: ROUTE_ICONS.EMAIL },
 ]
 
 export const NAV_ITEMS: NavItem[] = [

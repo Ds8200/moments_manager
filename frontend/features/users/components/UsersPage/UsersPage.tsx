@@ -1,28 +1,45 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useUsersPage } from './useUsersPage'
-import { UsersTable } from '../UsersTable/UsersTable'
+import { PageLayout } from '@/shared/components/PageLayout/PageLayout'
+import { DataTable } from '@/shared/components/DataTable/DataTable'
 import { UserForm } from '../UserForm/UserForm'
-import { USERS_LABELS } from '../../constants/usersLabels'
-import styles from './UsersPage.module.scss'
+import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
 
 export const UsersPage = (): ReactElement => {
-  const { onAddUser } = useUsersPage()
+  const {
+    title, actionLabel, onAction, filtersBarProps,
+    columns, rows, isLoading, isError,
+    emptyTitle, emptyDescription, emptyIcon, errorTitle,
+    currentPage, totalPages, total, onPageChange, paginationLabels,
+    onRowLeftClick, onRowRightClick,
+    menuState, closeMenu,
+  } = useUsersPage()
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>{USERS_LABELS.PAGE_TITLE}</h1>
-        <button className={styles.newBtn} onClick={onAddUser}>
-          {USERS_LABELS.NEW_USER}
-        </button>
-      </div>
-
-      <div className={styles.card}>
-        <UsersTable />
-      </div>
-
+    <>
+      <PageLayout title={title} actionLabel={actionLabel} onAction={onAction} filtersBarProps={filtersBarProps}>
+        <DataTable
+          columns={columns}
+          rows={rows}
+          keyExtractor={(u) => u.id}
+          isLoading={isLoading}
+          isError={isError}
+          emptyTitle={emptyTitle}
+          emptyDescription={emptyDescription}
+          emptyIcon={emptyIcon}
+          errorTitle={errorTitle}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          total={total}
+          onPageChange={onPageChange}
+          paginationLabels={paginationLabels}
+          onRowLeftClick={onRowLeftClick}
+          onRowRightClick={onRowRightClick}
+        />
+      </PageLayout>
       <UserForm />
-    </div>
+      <DropdownMenu state={menuState} onClose={closeMenu} />
+    </>
   )
 }

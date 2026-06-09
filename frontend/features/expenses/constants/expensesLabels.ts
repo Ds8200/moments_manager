@@ -33,10 +33,15 @@ export const EXPENSES_LABELS = {
 
   TABLE_EDIT_TITLE:         'ערוך הוצאה',
   TABLE_DELETE_TITLE:       'מחק הוצאה',
+  TABLE_TOTAL:              'סה"כ',
+  TABLE_EXPENSES_SUFFIX:    'הוצאות',
+  PAGE_PREV:                '→',
+  PAGE_NEXT:                '←',
 
   VALIDATION_DATE:          'נדרש תאריך',
   VALIDATION_AMOUNT:        'נדרש סכום',
   CREATED_SUCCESS:          'ההוצאה נוספה בהצלחה',
   UPDATED_SUCCESS:          'ההוצאה עודכנה בהצלחה',
   DELETED_SUCCESS:          'ההוצאה נמחקה בהצלחה',
+  DETAIL_TITLE:             'פרטי הוצאה',
 } as const

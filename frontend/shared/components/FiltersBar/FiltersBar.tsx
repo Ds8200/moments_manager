@@ -17,53 +17,36 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
     dateToLabel,
     onDateFromChange,
     onDateToChange,
-    newButtonLabel,
-    showNewButton,
-    onNew,
   } = useFiltersBar(props)
 
   return (
     <div className={styles.bar}>
-      {/* Row 1: search + new button — always visible */}
-      <div className={styles.primaryRow}>
-        <div className={styles.searchWrapper}>
-          <i className={styles.searchIcon}>🔍</i>
-          <input
-            type="search"
-            className={styles.searchInput}
-            placeholder={searchPlaceholder}
-            value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
-        </div>
-        {showNewButton && (
-          <button className={styles.newButton} onClick={onNew}>
-            {newButtonLabel}
-          </button>
-        )}
+      <div className={styles.searchWrapper}>
+        <i className={styles.searchIcon}>🔍</i>
+        <input
+          type="search"
+          className={styles.searchInput}
+          placeholder={searchPlaceholder}
+          value={searchValue}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
       </div>
 
-      {/* Row 2: selects — hidden when empty */}
-      {selects.length > 0 && (
-        <div className={styles.selectsRow}>
-          {selects.map((sel, idx) => (
-            <select
-              key={idx}
-              className={styles.select}
-              value={sel.value}
-              onChange={(e) => sel.onChange(e.target.value)}
-            >
-              {sel.options.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+      {selects.map((sel, idx) => (
+        <select
+          key={idx}
+          className={styles.select}
+          value={sel.value}
+          onChange={(e) => sel.onChange(e.target.value)}
+        >
+          {sel.options.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
-        </div>
-      )}
+        </select>
+      ))}
 
-      {/* Row 3: date inputs — hidden when not applicable */}
       {showDates && (
-        <div className={styles.datesRow}>
+        <>
           <label className={styles.dateGroup}>
             {dateFromLabel && <span className={styles.dateLabel}>{dateFromLabel}</span>}
             <input
@@ -82,7 +65,7 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
               onChange={(e) => onDateToChange(e.target.value)}
             />
           </label>
-        </div>
+        </>
       )}
     </div>
   )

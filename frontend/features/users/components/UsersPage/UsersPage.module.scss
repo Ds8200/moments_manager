@@ -1,44 +1,41 @@
-﻿@use '../../../../shared/styles/variables' as v;
+@use '../../../../shared/styles/variables' as v;
 
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-5;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.title {
-  font-size: v.$font-size-2xl;
-  font-weight: v.$font-weight-bold;
-  color: v.$text-primary;
-}
-
-.newBtn {
-  padding: v.$space-2 v.$space-5;
-  background: v.$gradient-brand;
-  border: none;
-  border-radius: v.$border-radius;
-  color: v.$text-inverse;
-  cursor: pointer;
-  font-size: v.$font-size-sm;
+.name {
   font-weight: v.$font-weight-semibold;
-  font-family: v.$font-family;
-  transition: filter v.$transition-fast;
-
-  &:hover {
-    filter: brightness(0.88);
-  }
 }
 
-.card {
-  background: v.$bg-card;
-  border-radius: v.$border-radius-lg;
-  box-shadow: v.$shadow-card;
-  border: 1px solid v.$border-color;
-  overflow: hidden;
+.secondary {
+  color: v.$text-secondary;
+  font-size: v.$font-size-sm;
+}
+
+.roleAdmin {
+  display: inline-block;
+  padding: 2px v.$space-2;
+  border-radius: v.$border-radius-sm;
+  background: rgba(108, 99, 255, 0.12);
+  color: v.$primary;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+}
+
+.roleUser {
+  display: inline-block;
+  padding: 2px v.$space-2;
+  border-radius: v.$border-radius-sm;
+  background: v.$gray-100;
+  color: v.$text-secondary;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+}
+
+.statusActive {
+  color: v.$success;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+}
+
+.statusInactive {
+  color: v.$text-secondary;
+  font-size: v.$font-size-sm;
 }

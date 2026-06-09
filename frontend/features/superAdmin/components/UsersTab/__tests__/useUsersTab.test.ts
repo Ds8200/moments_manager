@@ -46,7 +46,7 @@ const PAGINATED = { items: [USER_RECORD], total: 1, page: 1, page_size: 20, page
 
 function makeMockEvent() {
   const el = document.createElement('tr')
-  return { currentTarget: el } as unknown as React.MouseEvent<Element>
+  return { currentTarget: el } as unknown as React.MouseEvent<HTMLTableRowElement>
 }
 
 describe('useUsersTab', () => {
@@ -85,7 +85,7 @@ describe('useUsersTab', () => {
     const row = { id: 'user-1', fullName: 'Alice', email: 'alice@test.com',
       phone: null, orgCount: 1, createdAt: '01/01/2026' }
 
-    act(() => result.current.onRowMenuClick(row, makeMockEvent()))
+    act(() => result.current.onRowRightClick(row, makeMockEvent()))
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => deleteItem!.onClick())
 
@@ -98,7 +98,7 @@ describe('useUsersTab', () => {
     const row = { id: 'user-1', fullName: 'Bob', email: 'bob@test.com',
       phone: null, orgCount: 0, createdAt: '01/01/2026' }
 
-    act(() => result.current.onRowMenuClick(row, makeMockEvent()))
+    act(() => result.current.onRowRightClick(row, makeMockEvent()))
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => deleteItem!.onClick())
 
@@ -125,12 +125,6 @@ describe('useUsersTab', () => {
     expect(filters.page).toBe(1)
   })
 
-  it('filtersBarProps has no newButtonLabel (no add-user button in this tab)', () => {
-    const { result } = renderHook(() => useUsersTab(), { wrapper: makeWrapper(store, qc) })
-    expect(result.current.filtersBarProps.newButtonLabel).toBeUndefined()
-    expect(result.current.filtersBarProps.onNew).toBeUndefined()
-  })
-
   it('delete mutation success invalidates query and notifies', async () => {
     server.use(
       http.delete(API_ENDPOINTS.ADMIN_ORG_USER(':id'), () => HttpResponse.json({ message: 'ok' }))
@@ -139,7 +133,7 @@ describe('useUsersTab', () => {
     const row = { id: 'user-del', fullName: 'Carol', email: 'carol@test.com',
       phone: null, orgCount: 0, createdAt: '01/01/2026' }
 
-    act(() => result.current.onRowMenuClick(row, makeMockEvent()))
+    act(() => result.current.onRowRightClick(row, makeMockEvent()))
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => deleteItem!.onClick())
 

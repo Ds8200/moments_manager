@@ -57,4 +57,5 @@ export const PRODUCTS_LABELS = {
   CREATED_SUCCESS:          'המוצר נוצר בהצלחה',
   UPDATED_SUCCESS:          'המוצר עודכן בהצלחה',
   DELETED_SUCCESS:          'המוצר נמחק בהצלחה',
+  DETAIL_TITLE:             'פרטי מוצר',
 } as const

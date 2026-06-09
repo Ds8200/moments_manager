@@ -7,8 +7,6 @@ const buildProps = (overrides: Partial<FiltersBarProps> = {}): FiltersBarProps =
   searchValue: '',
   searchPlaceholder: 'חיפוש...',
   onSearchChange: vi.fn(),
-  newButtonLabel: '+ חדש',
-  onNew: vi.fn(),
   ...overrides,
 })
 
@@ -57,12 +55,5 @@ describe('useFiltersBar', () => {
     )
     expect(result.current.dateFrom).toBe('2025-01-01')
     expect(result.current.dateTo).toBe('2025-12-31')
-  })
-
-  it('passes through newButtonLabel and onNew', () => {
-    const onNew = vi.fn()
-    const { result } = renderHook(() => useFiltersBar(buildProps({ newButtonLabel: '+ חדש', onNew })))
-    expect(result.current.newButtonLabel).toBe('+ חדש')
-    expect(result.current.onNew).toBe(onNew)
   })
 })

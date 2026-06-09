@@ -69,10 +69,6 @@ export const SUPER_ADMIN_LABELS = {
   ORG_UPDATE_ERROR:    'עדכון פרטי העסק נכשל',
   FIELD_ORG_NAME:      'שם העסק',
 
-  // Tab labels
-  TAB_BUSINESSES: 'עסקים',
-  TAB_USERS: 'משתמשים',
-
   // Table columns
   TABLE_COL_ORG_NUMBER:      'מספר',
   TABLE_COL_OWNER_EMAIL:     'בעלים',
@@ -126,4 +122,5 @@ export const SUPER_ADMIN_LABELS = {
   EMPTY_ORGS:  'לא נמצאו עסקים',
   EMPTY_USERS: 'לא נמצאו משתמשים',
   ERROR_LOAD:  'שגיאה בטעינת הנתונים',
+  USER_DETAIL_TITLE: 'פרטי משתמש',
 } as const

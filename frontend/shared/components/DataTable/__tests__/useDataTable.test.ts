@@ -8,10 +8,9 @@ type Row = { id: string; name: string }
 const LABELS = { totalPrefix: 'סה"כ', totalSuffix: 'פריטים', prev: 'הקודם', next: 'הבא' }
 
 const buildProps = (overrides: Partial<DataTableProps<Row>> = {}): DataTableProps<Row> => ({
-  headers: ['שם'],
+  columns: [{ key: 'name', header: 'שם', cell: (r) => r.name }],
   rows: [],
   keyExtractor: (r) => r.id,
-  renderRow: vi.fn(),
   isLoading: false,
   isError: false,
   emptyTitle: 'ריק',
@@ -92,5 +91,15 @@ describe('useDataTable', () => {
   it('passes through paginationLabels', () => {
     const { result } = renderHook(() => useDataTable(buildProps()))
     expect(result.current.paginationLabels).toEqual(LABELS)
+  })
+
+  it('isInteractive=true when onRowLeftClick is provided', () => {
+    const { result } = renderHook(() => useDataTable(buildProps({ onRowLeftClick: vi.fn() })))
+    expect(result.current.isInteractive).toBe(true)
+  })
+
+  it('isInteractive=false when no click handlers provided', () => {
+    const { result } = renderHook(() => useDataTable(buildProps()))
+    expect(result.current.isInteractive).toBe(false)
   })
 })

@@ -1,27 +1,37 @@
 @use '../../../../shared/styles/variables' as v;
 
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-5;
+.name {
+  font-weight: v.$font-weight-semibold;
 }
 
-.header {
-  display: flex;
+.secondary {
+  color: v.$text-secondary;
+  font-size: v.$font-size-sm;
+}
+
+.price {
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
+}
+
+.activeBadge {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  background: color-mix(in srgb, v.$success 15%, transparent);
+  color: v.$success-dark;
 }
 
-.title {
-  font-size: v.$font-size-2xl;
-  font-weight: v.$font-weight-bold;
-  color: v.$text-primary;
-}
-
-.card {
-  background: v.$bg-card;
-  border-radius: v.$border-radius-lg;
-  box-shadow: v.$shadow-card;
-  border: 1px solid v.$border-color;
-  overflow: hidden;
+.inactiveBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  background: v.$gray-100;
+  color: v.$text-secondary;
 }
