@@ -24,7 +24,23 @@ const ORDER_STUB = {
   updated_at: '2025-01-01T00:00:00Z',
 }
 
+const ORG_ADMIN_STUB = {
+  id: 'org-new-1',
+  slug: 'new-org',
+  name: 'New Org',
+  logo_path: null,
+  plan: 'trial',
+  trial_ends_at: null,
+  is_active: true,
+  max_users: 2,
+  owner_id: 'owner-1',
+  member_count: 1,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+}
+
 export const handlers = [
+  http.post(API_ENDPOINTS.ADMIN_ORGS, () => HttpResponse.json(ORG_ADMIN_STUB, { status: 201 })),
   http.get(API_ENDPOINTS.PRODUCT_CATEGORIES, () => HttpResponse.json([])),
   http.post(API_ENDPOINTS.PRODUCT_CATEGORIES, async ({ request }) => {
     const body = await request.json() as { name: string }
@@ -57,7 +73,15 @@ export const handlers = [
   http.get(API_ENDPOINTS.CUSTOMERS, () => HttpResponse.json(EMPTY_PAGE)),
   http.get(API_ENDPOINTS.PRODUCTS,  () => HttpResponse.json(EMPTY_PAGE)),
   http.get(API_ENDPOINTS.USERS,     () => HttpResponse.json(EMPTY_PAGE)),
+  http.get(API_ENDPOINTS.ADMIN_ORGS, () => HttpResponse.json(EMPTY_PAGE)),
+  http.get(API_ENDPOINTS.ADMIN_ORG_USERS, () => HttpResponse.json(EMPTY_PAGE)),
+  http.get(API_ENDPOINTS.ADMIN_ORG_USERS_SEARCH, () => HttpResponse.json([])),
+  http.delete(API_ENDPOINTS.ADMIN_ORG_USER(':id'), () => HttpResponse.json({ message: 'ok' })),
+  http.get(API_ENDPOINTS.ADMIN_ORG(':id'), () => HttpResponse.json({ ...ORG_ADMIN_STUB, org_number: 'ORG-2026-0001', owner_email: 'owner@test.com' })),
   http.post(API_ENDPOINTS.AUTH_LOGOUT, () => new HttpResponse(null, { status: 204 })),
+  http.post(API_ENDPOINTS.AUTH_REFRESH, () =>
+    HttpResponse.json({ detail: 'no valid refresh token' }, { status: 401 })
+  ),
   http.get(API_ENDPOINTS.REPORTS_FINANCIAL, () =>
     HttpResponse.json({
       year: new Date().getFullYear(),

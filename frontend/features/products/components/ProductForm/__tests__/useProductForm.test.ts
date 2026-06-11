@@ -16,6 +16,8 @@ vi.mock('../../../queries/useProducts', () => ({
 
 vi.mock('@/features/productCategories', () => ({
   useProductCategories: () => ({ data: [] }),
+  useCreateProductCategory: () => ({ mutate: vi.fn(), isPending: false }),
+  useDeleteProductCategory: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
 const wrapper = ({ children }: { children: ReactNode }) => {

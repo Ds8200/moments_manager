@@ -32,11 +32,12 @@ logger = logging.getLogger(__name__)
 )
 async def get_top_customers(
     db: AsyncSession,
+    org_id: str,
     limit: int = 5,
     **_: object,
 ) -> dict:
     capped = min(max(limit, 1), 20)
-    svc = ReportService(db)
+    svc = ReportService(db, org_id)
     customers = await svc.get_top_customers(capped)
     return {
         "customers": [
@@ -75,12 +76,13 @@ async def get_top_customers(
 )
 async def get_customer_detail(
     db: AsyncSession,
+    org_id: str,
     customer_name: str,
     **_: object,
 ) -> dict:
     from src.ai.repository import AiRepository
 
-    repo = AiRepository(db)
+    repo = AiRepository(db, org_id)
     profile = await repo.get_customer_profile(customer_name)
     if profile is None:
         candidates = await repo.get_all_customer_names()
@@ -118,13 +120,14 @@ async def get_customer_detail(
 )
 async def get_inactive_customers(
     db: AsyncSession,
+    org_id: str,
     days_since_last_order: int = 90,
     limit: int = 10,
     **_: object,
 ) -> dict:
     from src.ai.repository import AiRepository
 
-    repo = AiRepository(db)
+    repo = AiRepository(db, org_id)
     days = max(1, days_since_last_order)
     capped = min(max(limit, 1), 50)
     customers = await repo.get_inactive_customers(days, capped)

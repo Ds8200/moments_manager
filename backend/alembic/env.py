@@ -16,10 +16,12 @@ import src.customers.models  # noqa: F401
 import src.expense_categories.models  # noqa: F401
 import src.expenses.models  # noqa: F401
 import src.orders.models  # noqa: F401
+import src.organizations.models  # noqa: F401
 import src.product_categories.models  # noqa: F401
 import src.products.models  # noqa: F401
 
 # Import all models so Alembic can detect them
+import src.system_settings.models  # noqa: F401
 import src.users.models  # noqa: F401
 from src.config import settings
 from src.database import Base
@@ -47,7 +49,11 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        transaction_per_migration=True,
+    )
     with context.begin_transaction():
         context.run_migrations()
 

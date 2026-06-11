@@ -1,11 +1,13 @@
 'use client'
 
-import { useAtom } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { isSidebarOpenAtom } from '@/shared/store/globalAtoms'
 import { useProfileQuery } from '@/features/profile/queries/useProfileQuery'
 import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
 import { useLogout } from '@/shared/hooks/useLogout'
+import { currentOrgRoleAtom, isSysAdminAtom } from '@/features/auth/store/authAtoms'
+import { ORG_ROLE } from '@/features/organizations/enums/orgRoleEnums'
 import { ROUTES } from '@/shared/constants/routes'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import type { DropdownMenuItem } from '@/shared/components/DropdownMenu/useDropdownMenu'
@@ -35,17 +37,41 @@ export const useHeader = (): UseHeaderReturn => {
   const router = useRouter()
   const { logout } = useLogout()
   const profileMenu = useDropdownMenu()
+  const orgRole = useAtomValue(currentOrgRoleAtom)
+  const isSysAdmin = useAtomValue(isSysAdminAtom)
 
   const toggleSidebar = (): void => setIsSidebarOpen((prev) => !prev)
 
   const userName = profile?.full_name ?? UI_LABELS.GREETING_FALLBACK
 
+  const canManageOrg = !isSysAdmin && (orgRole === ORG_ROLE.OWNER || orgRole === ORG_ROLE.ADMIN)
+
+  const profileRoute = isSysAdmin ? ROUTES.SUPER_ADMIN_PROFILE : ROUTES.PROFILE
+
   const profileItems: DropdownMenuItem[] = [
     {
       label: UI_LABELS.EDIT_PROFILE,
       icon: '👤',
-      onClick: () => router.push(ROUTES.PROFILE),
+      onClick: () => router.push(profileRoute),
     },
+    ...(isSysAdmin
+      ? [
+          {
+            label: UI_LABELS.SYSTEM_SETTINGS_MENU,
+            icon: '⚙️',
+            onClick: () => router.push(ROUTES.SUPER_ADMIN_SETTINGS),
+          },
+        ]
+      : []),
+    ...(canManageOrg
+      ? [
+          {
+            label: UI_LABELS.ORG_SETTINGS_MENU,
+            icon: '🏢',
+            onClick: () => router.push(ROUTES.SETTINGS),
+          },
+        ]
+      : []),
     {
       label: UI_LABELS.LOGOUT,
       icon: '🚪',

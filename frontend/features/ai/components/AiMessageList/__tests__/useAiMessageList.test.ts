@@ -4,7 +4,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { createStore, Provider } from 'jotai'
 import {
   appendMessageAtom,
-  conversationAtom,
   isStreamingAtom,
 } from '@/features/ai/store/aiAtoms'
 import type { ChatMessage } from '@/features/ai/types'

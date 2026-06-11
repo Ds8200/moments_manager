@@ -19,9 +19,12 @@ def test_compute_item_fields_calculates_total_and_profit() -> None:
     assert str(result["profit"]) == "18"
 
 
+_ORG_ID = "00000000-0000-0000-0000-000000000000"
+
+
 async def test_get_order_not_found() -> None:
     db = AsyncMock()
-    service = OrderService(db)
+    service = OrderService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -31,7 +34,7 @@ async def test_get_order_not_found() -> None:
 
 async def test_update_order_not_found() -> None:
     db = AsyncMock()
-    service = OrderService(db)
+    service = OrderService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -41,7 +44,7 @@ async def test_update_order_not_found() -> None:
 
 async def test_update_status_not_found() -> None:
     db = AsyncMock()
-    service = OrderService(db)
+    service = OrderService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -51,7 +54,7 @@ async def test_update_status_not_found() -> None:
 
 async def test_update_urgency_not_found() -> None:
     db = AsyncMock()
-    service = OrderService(db)
+    service = OrderService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -63,7 +66,7 @@ async def test_update_urgency_not_found() -> None:
 
 async def test_delete_order_not_found() -> None:
     db = AsyncMock()
-    service = OrderService(db)
+    service = OrderService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 

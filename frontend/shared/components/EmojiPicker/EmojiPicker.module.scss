@@ -1,6 +1,7 @@
 @use '@/shared/styles/variables' as *;
 
 .panel {
+  direction: ltr;
   position: fixed;
   // top and left are set dynamically by useEmojiPicker via element.style.setProperty
   z-index: $z-dropdown;
@@ -13,9 +14,21 @@
   max-height: 300px;
   overflow-y: auto;
   animation: fadeIn $transition-fast;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary, #{$primary}) transparent;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-primary, #{$primary});
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover { filter: brightness(0.85); }
 }
 
 .category {
+  direction: rtl;
   margin-block-end: $space-3;
 
   &:last-child {

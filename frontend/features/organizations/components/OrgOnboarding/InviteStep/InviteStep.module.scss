@@ -1,0 +1,114 @@
+﻿@use '../../../../../shared/styles/variables' as v;
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  text-align: center;
+}
+
+.title {
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.subtitle {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  margin-bottom: v.$space-2;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+  text-align: start;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-2;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.input {
+  width: 100%;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+  }
+
+  &.inputError {
+    border-color: v.$danger;
+  }
+}
+
+.errorText {
+  font-size: v.$font-size-xs;
+  color: v.$danger;
+}
+
+.actions {
+  display: flex;
+  gap: v.$space-2;
+  margin-top: v.$space-2;
+}
+
+.backButton,
+.skipButton {
+  flex: 1;
+  padding: v.$space-3;
+  background: transparent;
+  color: v.$text-secondary;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  font-family: v.$font-family;
+  cursor: pointer;
+  transition: filter v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-50;
+  }
+}
+
+.submitButton {
+  flex: 2;
+  padding: v.$space-3;
+  background: v.$gradient-brand;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  cursor: pointer;
+  transition: filter v.$transition-fast;
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.88);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

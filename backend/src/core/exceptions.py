@@ -63,3 +63,13 @@ class ForbiddenError(AppError):
         self.detail = detail
         self.code = code
         super().__init__(detail)
+
+
+class ServiceUnavailableError(AppError):
+    status_code = 503
+    code = ErrorCode.INTERNAL_ERROR
+
+    def __init__(self, detail: str, code: str = ErrorCode.INTERNAL_ERROR) -> None:
+        self.detail = detail
+        self.code = code
+        super().__init__(detail)

@@ -1,25 +1,45 @@
 'use client'
 import type { ReactElement } from 'react'
-import { ProductsFiltersBar } from '../ProductsFiltersBar/ProductsFiltersBar'
-import { ProductsTable } from '../ProductsTable/ProductsTable'
+import { useProductsPage } from './useProductsPage'
+import { PageLayout } from '@/shared/components/PageLayout/PageLayout'
+import { DataTable } from '@/shared/components/DataTable/DataTable'
 import { ProductForm } from '../ProductForm/ProductForm'
-import { PRODUCTS_LABELS } from '../../constants/productsLabels'
-import styles from './ProductsPage.module.scss'
+import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
 
 export const ProductsPage = (): ReactElement => {
+  const {
+    title, actionLabel, onAction, filtersBarProps,
+    columns, rows, isLoading, isError,
+    emptyTitle, emptyDescription, emptyIcon, errorTitle,
+    currentPage, totalPages, total, onPageChange, paginationLabels,
+    onRowLeftClick, onRowRightClick,
+    menuState, closeMenu,
+  } = useProductsPage()
+
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>{PRODUCTS_LABELS.PAGE_TITLE}</h1>
-      </div>
-
-      <ProductsFiltersBar />
-
-      <div className={styles.card}>
-        <ProductsTable />
-      </div>
-
+    <>
+      <PageLayout title={title} actionLabel={actionLabel} onAction={onAction} filtersBarProps={filtersBarProps}>
+        <DataTable
+          columns={columns}
+          rows={rows}
+          keyExtractor={(p) => p.id}
+          isLoading={isLoading}
+          isError={isError}
+          emptyTitle={emptyTitle}
+          emptyDescription={emptyDescription}
+          emptyIcon={emptyIcon}
+          errorTitle={errorTitle}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          total={total}
+          onPageChange={onPageChange}
+          paginationLabels={paginationLabels}
+          onRowLeftClick={onRowLeftClick}
+          onRowRightClick={onRowRightClick}
+        />
+      </PageLayout>
       <ProductForm />
-    </div>
+      <DropdownMenu state={menuState} onClose={closeMenu} />
+    </>
   )
 }

@@ -8,7 +8,6 @@ export const EXPENSES_LABELS = {
   COL_AMOUNT:               'סכום',
   COL_NOTES:                'הערות',
   COL_ACTIONS:              '',
-  TOTAL_LABEL:              'סה"כ הוצאות:',
   ERROR_LOAD:               'שגיאה בטעינת הוצאות',
   CONFIRM_DELETE:           'למחוק הוצאה זו?',
 
@@ -34,10 +33,21 @@ export const EXPENSES_LABELS = {
 
   TABLE_EDIT_TITLE:         'ערוך הוצאה',
   TABLE_DELETE_TITLE:       'מחק הוצאה',
+  TABLE_TOTAL:              'סה"כ',
+  TABLE_EXPENSES_SUFFIX:    'הוצאות',
+  PAGE_PREV:                '→',
+  PAGE_NEXT:                '←',
 
   VALIDATION_DATE:          'נדרש תאריך',
   VALIDATION_AMOUNT:        'נדרש סכום',
   CREATED_SUCCESS:          'ההוצאה נוספה בהצלחה',
   UPDATED_SUCCESS:          'ההוצאה עודכנה בהצלחה',
   DELETED_SUCCESS:          'ההוצאה נמחקה בהצלחה',
+  DETAIL_TITLE:             'פרטי הוצאה',
+  DETAIL_DATE:              'תאריך',
+  DETAIL_CATEGORY:          'קטגוריה',
+  DETAIL_AMOUNT:            'סכום',
+  DETAIL_NOTES:             'הערות',
+  DETAIL_CREATED_AT:        'תאריך הוספה',
+  DETAIL_DELETE_MSG:        'למחוק הוצאה זו לצמיתות?',
 } as const

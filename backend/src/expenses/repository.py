@@ -5,14 +5,15 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from src.database import BaseRepository
 from src.expenses.models import Expense
 
 logger = logging.getLogger(__name__)
 
 
-class ExpenseRepository:
-    def __init__(self, db: AsyncSession) -> None:
-        self._db = db
+class ExpenseRepository(BaseRepository):
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
+        super().__init__(db, org_id)
 
     async def get_all(
         self,
@@ -22,7 +23,11 @@ class ExpenseRepository:
         limit: int,
         offset: int,
     ) -> tuple[list[Expense], int]:
-        base = select(Expense).where(Expense.is_deleted.is_(False))
+        await self._apply_org_rls()
+        base = select(Expense).where(
+            Expense.is_deleted.is_(False),
+            Expense.organization_id == self._org_id,
+        )
         if date_from:
             base = base.where(Expense.date >= date_from)
         if date_to:
@@ -43,14 +48,21 @@ class ExpenseRepository:
         return list(result.scalars().all()), total
 
     async def get_by_id(self, expense_id: str) -> Expense | None:
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(Expense)
             .options(selectinload(Expense.category))
-            .where(Expense.id == expense_id, Expense.is_deleted.is_(False))
+            .where(
+                Expense.id == expense_id,
+                Expense.is_deleted.is_(False),
+                Expense.organization_id == self._org_id,
+            )
         )
         return result.scalar_one_or_none()
 
     async def create(self, data: dict) -> Expense:
+        await self._apply_org_rls()
+        data["organization_id"] = self._org_id
         expense = Expense(**data)
         self._db.add(expense)
         await self._db.flush()

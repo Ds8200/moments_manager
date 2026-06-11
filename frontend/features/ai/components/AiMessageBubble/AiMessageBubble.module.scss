@@ -1,3 +1,5 @@
+@use '../../../../shared/styles/variables' as v;
+
 .bubble {
   display: flex;
   max-width: 80%;
@@ -8,8 +10,8 @@
   margin-inline-start: auto;
 
   .content {
-    background: #9c27b0;
-    color: #fff;
+    background: v.$gradient-brand;
+    color: v.$text-inverse;
     border-radius: 18px 18px 4px 18px;
   }
 }
@@ -18,8 +20,8 @@
   margin-inline-end: auto;
 
   .content {
-    background: #f3e5f5;
-    color: #1a1a1a;
+    background: v.$primary-light;
+    color: v.$text-primary;
     border-radius: 18px 18px 18px 4px;
   }
 }
@@ -70,22 +72,22 @@
 
   th,
   td {
-    border: 1px solid #c084d4;
+    border: 1px solid v.$primary-light;
     padding: 6px 12px;
     text-align: start;
   }
 
   th {
-    background: #e1bee7;
+    background: v.$primary-light;
     font-weight: 600;
   }
 
   tr:nth-child(even) td {
-    background: #f8eefa;
+    background: v.$bg-page;
   }
 
   code {
-    background: #e1bee7;
+    background: v.$primary-light;
     border-radius: 4px;
     padding: 2px 5px;
     font-family: monospace;

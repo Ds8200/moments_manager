@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from src.config import settings
 from src.core.constants.http_messages import INTERNAL_ERROR, VALIDATION_FAILED
 from src.core.constants.log_messages import UNHANDLED_EXCEPTION
 from src.core.enums.error_codes import ErrorCode
@@ -14,6 +15,7 @@ from src.core.exceptions import (
     ForbiddenError,
     InvalidFileTypeError,
     NotFoundError,
+    ServiceUnavailableError,
     UnauthorizedError,
 )
 
@@ -22,6 +24,20 @@ logger = logging.getLogger(__name__)
 
 def _error_response(status_code: int, detail: str, code: str) -> JSONResponse:
     return JSONResponse(status_code=status_code, content={"detail": detail, "code": code})
+
+
+def _with_cors(response: JSONResponse, request: Request) -> JSONResponse:
+    """Add CORS headers for known origins.
+
+    The catch-all exception handler runs inside ServerErrorMiddleware, which is
+    outside CORSMiddleware in the stack. This helper ensures error responses still
+    reach the browser when the request comes from an allowed origin.
+    """
+    origin = request.headers.get("origin", "")
+    if origin in settings.CORS_ORIGINS:
+        response.headers["access-control-allow-origin"] = origin
+        response.headers["access-control-allow-credentials"] = "true"
+    return response
 
 
 def register_exception_handlers(app: FastAPI) -> None:
@@ -45,6 +61,12 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def forbidden_handler(request: Request, exc: ForbiddenError) -> JSONResponse:
         return _error_response(403, exc.detail, exc.code)
 
+    @app.exception_handler(ServiceUnavailableError)
+    async def service_unavailable_handler(
+        request: Request, exc: ServiceUnavailableError
+    ) -> JSONResponse:
+        return _error_response(503, exc.detail, exc.code)
+
     @app.exception_handler(InvalidFileTypeError)
     async def invalid_file_type_handler(
         request: Request, exc: InvalidFileTypeError
@@ -62,4 +84,4 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.error(UNHANDLED_EXCEPTION, request.method, request.url.path, exc)
-        return _error_response(500, INTERNAL_ERROR, ErrorCode.INTERNAL_ERROR)
+        return _with_cors(_error_response(500, INTERNAL_ERROR, ErrorCode.INTERNAL_ERROR), request)

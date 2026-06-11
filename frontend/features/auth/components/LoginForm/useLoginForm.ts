@@ -6,15 +6,27 @@ import { z } from 'zod'
 import { useSetAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { authApi } from '../../api'
-import { setTokensAtom } from '../../store/authAtoms'
+import { setTokensAtom, decodePayload } from '../../store/authAtoms'
 import { ROUTES } from '@/shared/constants/routes'
 import { AUTH_LABELS } from '../../constants/authLabels'
 import type { LoginFormValues } from '../../types'
+
+function resolvePostLoginRoute(accessToken: string): string {
+  const payload = decodePayload(accessToken)
+  if (payload?.sys_admin) return ROUTES.SUPER_ADMIN_ORGS
+  if (!payload?.org_id) return ROUTES.ONBOARDING
+  return ROUTES.HOME
+}
 
 const schema = z.object({
   email: z.string().min(1, AUTH_LABELS.EMAIL_REQUIRED).email(AUTH_LABELS.EMAIL_INVALID),
   password: z.string().min(1, AUTH_LABELS.PASSWORD_REQUIRED),
 })
+
+export interface LoginFormProps {
+  logoSrc: string
+  logoAlt: string
+}
 
 export interface UseLoginFormReturn {
   register: ReturnType<typeof useForm<LoginFormValues>>['register']
@@ -24,9 +36,11 @@ export interface UseLoginFormReturn {
   submitError: string | null
   isSubmitting: boolean
   isMagicLoggingIn: boolean
+  logoSrc: string
+  logoAlt: string
 }
 
-export const useLoginForm = (): UseLoginFormReturn => {
+export const useLoginForm = ({ logoSrc, logoAlt }: LoginFormProps): UseLoginFormReturn => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const magicToken = searchParams.get('token')
@@ -53,8 +67,8 @@ export const useLoginForm = (): UseLoginFormReturn => {
     const runMagicLogin = async (): Promise<void> => {
       try {
         const tokens = await authApi.magicLogin(magicToken)
-        setTokens({ access: tokens.access_token, refresh: tokens.refresh_token })
-        router.push(ROUTES.HOME)
+        setTokens({ access: tokens.access_token })
+        router.push(resolvePostLoginRoute(tokens.access_token))
       } catch {
         setError('root', { message: AUTH_LABELS.MAGIC_LOGIN_FAILED })
         setIsMagicLoggingIn(false)
@@ -67,8 +81,8 @@ export const useLoginForm = (): UseLoginFormReturn => {
   const onSubmit = async (values: LoginFormValues): Promise<void> => {
     try {
       const tokens = await authApi.login(values.email, values.password)
-      setTokens({ access: tokens.access_token, refresh: tokens.refresh_token })
-      router.push(ROUTES.HOME)
+      setTokens({ access: tokens.access_token })
+      router.push(resolvePostLoginRoute(tokens.access_token))
     } catch {
       setError('root', { message: AUTH_LABELS.LOGIN_FAILED })
     }
@@ -82,5 +96,7 @@ export const useLoginForm = (): UseLoginFormReturn => {
     submitError: errors.root?.message ?? null,
     isSubmitting,
     isMagicLoggingIn,
+    logoSrc,
+    logoAlt,
   }
 }

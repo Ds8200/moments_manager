@@ -1,0 +1,45 @@
+@use '../../styles/variables' as v;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: v.$font-size-2xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+}
+
+.actionBtn {
+  padding: v.$space-2 v.$space-5;
+  background: v.$gradient-brand;
+  border: none;
+  border-radius: v.$border-radius;
+  color: v.$text-inverse;
+  cursor: pointer;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  white-space: nowrap;
+  transition: filter v.$transition-fast;
+
+  &:hover {
+    filter: brightness(0.88);
+  }
+}
+
+.card {
+  background: v.$bg-card;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-card;
+  border: 1px solid v.$border-color;
+  overflow: clip;
+}

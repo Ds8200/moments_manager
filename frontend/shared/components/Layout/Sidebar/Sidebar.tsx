@@ -3,24 +3,17 @@
 import type { ReactElement } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useSidebar } from './useSidebar'
-import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { useSidebar, type SidebarProps } from './useSidebar'
 import { ROUTES } from '@/shared/constants/routes'
 import styles from './Sidebar.module.scss'
 
-export const Sidebar = (): ReactElement => {
-  const { pathname, visibleNavItems, isOpen } = useSidebar()
+export const Sidebar = (props: SidebarProps): ReactElement => {
+  const { pathname, visibleNavItems, isOpen, logoSrc, logoAlt } = useSidebar(props)
 
   return (
     <aside className={`${styles.sidebar} ${!isOpen ? styles.collapsed : ''}`}>
       <Link href={ROUTES.HOME} className={styles.logo}>
-        <Image
-          src="/moments_logo.png"
-          alt={UI_LABELS.APP_NAME}
-          width={160}
-          height={60}
-          priority
-        />
+        <Image src={logoSrc} alt={logoAlt} width={160} height={60} priority />
       </Link>
       <nav className={styles.nav}>
         {visibleNavItems.map((item) => (

@@ -26,6 +26,8 @@ export const useProducts = (
   useQuery({
     queryKey: ['products', page, search, isActive],
     queryFn: () => productsApi.list(page, search, isActive),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 
 export const useCreateProduct = (): UseMutationResult<

@@ -1,6 +1,7 @@
 'use client'
 import { atom } from 'jotai'
 import type { NotificationType } from '../enums/notificationEnums'
+import { NAV_ITEMS, type NavItem } from '../constants/routes'
 
 export interface Toast {
   id: string
@@ -56,3 +57,7 @@ export const confirmDialogAtom = atom<ConfirmDialogState>(CLOSED_STATE)
 // Controls sidebar visibility on desktop (collapse/expand) and drawer on mobile.
 // Defaults to false; AppContentWrapper sets true on desktop after mount.
 export const isSidebarOpenAtom = atom<boolean>(false)
+
+// Holds the nav items for the current layout context.
+// AppContentWrapper sets filtered NAV_ITEMS; SuperAdminContentWrapper sets SUPER_ADMIN_NAV_ITEMS.
+export const navItemsAtom = atom<NavItem[]>(NAV_ITEMS)

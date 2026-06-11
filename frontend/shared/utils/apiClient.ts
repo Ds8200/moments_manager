@@ -12,104 +12,91 @@ export class ApiError extends Error {
   }
 }
 
-let isRefreshing = false
-let refreshQueue: Array<(token: string | null) => void> = []
+let _moduleToken: string | null = null
 
-function getAuthHeader(): Record<string, string> {
-  if (typeof window === 'undefined') return {}
-  const token = localStorage.getItem('access_token')
-  return token ? { Authorization: `Bearer ${token}` } : {}
+export const setModuleToken = (t: string | null): void => {
+  _moduleToken = t
 }
 
-function clearLocalTokens(): void {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
-  window.dispatchEvent(new CustomEvent('auth:expired'))
+export const getModuleToken = (): string | null => _moduleToken
+
+function clearModuleToken(): void {
+  _moduleToken = null
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('auth:expired'))
+  }
 }
 
 async function attemptTokenRefresh(): Promise<string | null> {
-  const refreshToken = localStorage.getItem('refresh_token')
-  if (!refreshToken) {
-    clearLocalTokens()
-    return null
-  }
-
   try {
     const res = await fetch(API_ENDPOINTS.AUTH_REFRESH, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token: refreshToken }),
+      credentials: 'include',
     })
 
     if (!res.ok) {
-      clearLocalTokens()
+      clearModuleToken()
       return null
     }
 
-    const data = (await res.json()) as { access_token: string; refresh_token: string }
-    localStorage.setItem('access_token', data.access_token)
-    localStorage.setItem('refresh_token', data.refresh_token)
+    const data = (await res.json()) as { access_token: string }
+    setModuleToken(data.access_token)
     return data.access_token
   } catch {
-    clearLocalTokens()
+    clearModuleToken()
     return null
   }
 }
 
-async function retryRequest<T>(
-  url: string,
-  options: RequestInit,
-  token: string
-): Promise<T> {
-  const retryHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-    ...(options.headers as Record<string, string>),
-  }
-  const res = await fetch(url, { ...options, headers: retryHeaders })
-  if (!res.ok) throw new ApiError(res.status, ERROR_MESSAGES.GENERIC)
-  if (res.status === 204) return undefined as unknown as T
-  return res.json() as Promise<T>
+// Shared across apiClient and apiStream — only one HTTP refresh request is ever
+// in flight at a time. Any concurrent 401 (from either caller) awaits this same
+// promise rather than firing its own /auth/refresh call, which would race with
+// token rotation and cause the second caller to get a 401 on an already-revoked token.
+let refreshPromise: Promise<string | null> | null = null
+
+export function getOrRefreshToken(): Promise<string | null> {
+  if (refreshPromise) return refreshPromise
+  refreshPromise = attemptTokenRefresh().finally(() => {
+    refreshPromise = null
+  })
+  return refreshPromise
 }
 
-export async function apiClient<T>(
+/**
+ * Wraps a fetch call with automatic access-token refresh on 401.
+ *
+ * `makeRequest` receives the current token (or null) and returns a raw Response.
+ * On 401, the refresh dance executes once; all concurrent callers (including
+ * those in apiStream) share the same in-flight promise via getOrRefreshToken.
+ * Auth endpoints bypass the retry.
+ * Throws ApiError(401) when authentication cannot be recovered.
+ */
+async function fetchWithRefresh(
   url: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...getAuthHeader(),
-    ...(options.headers as Record<string, string>),
+  makeRequest: (token: string | null) => Promise<Response>
+): Promise<Response> {
+  const response = await makeRequest(getModuleToken())
+
+  if (response.status !== 401) return response
+
+  if (url.includes('/auth/refresh') || url.includes('/auth/login')) {
+    throw new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED)
   }
 
-  const response = await fetch(url, { ...options, headers })
+  const newToken = await getOrRefreshToken()
+  if (!newToken) throw new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED)
+  return makeRequest(newToken)
+}
 
-  if (response.status === 401) {
-    const isAuthEndpoint = url.includes('/auth/refresh') || url.includes('/auth/login')
-    if (isAuthEndpoint) {
-      throw new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED)
+export async function apiClient<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const response = await fetchWithRefresh(url, (token) => {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string>),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     }
-
-    if (isRefreshing) {
-      return new Promise<T>((resolve, reject) => {
-        refreshQueue.push((newToken) => {
-          if (!newToken) return reject(new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED))
-          retryRequest<T>(url, options, newToken).then(resolve).catch(reject)
-        })
-      })
-    }
-
-    isRefreshing = true
-    const newToken = await attemptTokenRefresh()
-    isRefreshing = false
-
-    const pending = refreshQueue
-    refreshQueue = []
-    pending.forEach((cb) => cb(newToken))
-
-    if (!newToken) throw new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED)
-    return retryRequest<T>(url, options, newToken)
-  }
+    return fetch(url, { ...options, headers, credentials: options.credentials ?? 'same-origin' })
+  })
 
   if (!response.ok) {
     const isNotFound = response.status === 404
@@ -117,66 +104,33 @@ export async function apiClient<T>(
     let code: string | undefined
     try {
       const body = await response.json()
-      // 404 keeps the friendly NOT_FOUND message; other statuses surface the server detail.
       if (!isNotFound) detail = body.detail ?? detail
       code = body.code ?? undefined
     } catch {}
     throw new ApiError(response.status, detail, code)
   }
 
-  if (response.status === 204) {
-    return undefined as unknown as T
-  }
-
+  if (response.status === 204) return undefined as unknown as T
   return response.json() as Promise<T>
 }
 
 export async function apiDownload(url: string): Promise<Blob> {
-  const response = await fetch(url, { headers: getAuthHeader() })
-
-  if (response.status === 401) {
-    if (isRefreshing) {
-      return new Promise<Blob>((resolve, reject) => {
-        refreshQueue.push((newToken) => {
-          if (!newToken) return reject(new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED))
-          fetch(url, { headers: { Authorization: `Bearer ${newToken}` } })
-            .then((res) => (res.ok ? res.blob() : Promise.reject(new ApiError(res.status, ERROR_MESSAGES.GENERIC))))
-            .then(resolve)
-            .catch(reject)
-        })
-      })
-    }
-
-    isRefreshing = true
-    const newToken = await attemptTokenRefresh()
-    isRefreshing = false
-
-    const pending = refreshQueue
-    refreshQueue = []
-    pending.forEach((cb) => cb(newToken))
-
-    if (!newToken) throw new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED)
-    const retried = await fetch(url, { headers: { Authorization: `Bearer ${newToken}` } })
-    if (!retried.ok) throw new ApiError(retried.status, ERROR_MESSAGES.GENERIC)
-    return retried.blob()
-  }
+  const response = await fetchWithRefresh(url, (token) =>
+    fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} })
+  )
 
   if (!response.ok) throw new ApiError(response.status, ERROR_MESSAGES.GENERIC)
   return response.blob()
 }
 
 export async function apiUpload<T>(url: string, formData: FormData): Promise<T> {
-  const headers = getAuthHeader()
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: formData,
-  })
-
-  if (response.status === 401) {
-    clearLocalTokens()
-    throw new ApiError(401, ERROR_MESSAGES.UNAUTHORIZED)
-  }
+  const response = await fetchWithRefresh(url, (token) =>
+    fetch(url, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    })
+  )
 
   if (!response.ok) {
     let detail = ERROR_MESSAGES.GENERIC

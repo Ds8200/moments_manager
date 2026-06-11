@@ -67,3 +67,25 @@
     border-radius: 3px;
   }
 }
+
+// Scrollable table container.
+// direction: ltr puts the vertical scrollbar on the right even in RTL layouts.
+// Inner .table elements must set direction: rtl to restore content alignment.
+// max-height default = viewport minus app header (60px) + main padding (48px) + pagination (48px).
+@mixin scrollable-table-wrapper($max-height: calc(100vh - 156px)) {
+  direction: ltr;
+  overflow-y: auto;
+  overflow-x: auto;
+  max-height: $max-height;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary, #{v.$primary}) transparent;
+
+  &::-webkit-scrollbar { width: 6px; height: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-primary, #{v.$primary});
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover { filter: brightness(0.85); }
+}

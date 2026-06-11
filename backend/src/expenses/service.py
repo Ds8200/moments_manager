@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 class ExpenseService:
-    def __init__(self, db: AsyncSession) -> None:
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
         self._db = db
-        self._repo = ExpenseRepository(db)
+        self._repo = ExpenseRepository(db, org_id)
 
     async def list_expenses(
         self,
@@ -59,6 +59,12 @@ class ExpenseService:
         await self._db.commit()
         refreshed = await self._repo.get_by_id(expense_id)
         return ExpenseResponseSchema.model_validate(refreshed)
+
+    async def get_expense(self, expense_id: str) -> ExpenseResponseSchema:
+        expense = await self._repo.get_by_id(expense_id)
+        if not expense:
+            raise NotFoundError(RESOURCE_EXPENSE, expense_id)
+        return ExpenseResponseSchema.model_validate(expense)
 
     async def delete_expense(self, expense_id: str) -> None:
         expense = await self._repo.get_by_id(expense_id)

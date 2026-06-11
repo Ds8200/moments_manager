@@ -6,6 +6,7 @@ import { http, HttpResponse } from 'msw'
 import { server } from '@/shared/mocks/server'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { ROUTES } from '@/shared/constants/routes'
+import { setModuleToken, getModuleToken } from '@/shared/utils/apiClient'
 import { useLogout } from '../useLogout'
 import { accessTokenAtom } from '@/features/auth/store/authAtoms'
 
@@ -28,12 +29,11 @@ describe('useLogout', () => {
   beforeEach(() => {
     store = createStore()
     replaceMock.mockClear()
-    localStorage.clear()
+    setModuleToken(null)
   })
 
   it('clears tokens, calls the logout API and redirects to login', async () => {
-    localStorage.setItem('access_token', 'a-token')
-    localStorage.setItem('refresh_token', 'r-token')
+    setModuleToken('a-token')
     store.set(accessTokenAtom, 'a-token')
 
     let logoutCalled = false
@@ -51,15 +51,13 @@ describe('useLogout', () => {
     })
 
     expect(logoutCalled).toBe(true)
-    expect(localStorage.getItem('access_token')).toBeNull()
-    expect(localStorage.getItem('refresh_token')).toBeNull()
+    expect(getModuleToken()).toBeNull()
     expect(store.get(accessTokenAtom)).toBeNull()
     expect(replaceMock).toHaveBeenCalledWith(ROUTES.LOGIN)
   })
 
   it('still clears tokens and redirects when the logout API fails', async () => {
-    localStorage.setItem('access_token', 'a-token')
-    localStorage.setItem('refresh_token', 'r-token')
+    setModuleToken('a-token')
     store.set(accessTokenAtom, 'a-token')
 
     server.use(
@@ -74,12 +72,12 @@ describe('useLogout', () => {
       await result.current.logout()
     })
 
-    expect(localStorage.getItem('access_token')).toBeNull()
+    expect(getModuleToken()).toBeNull()
     expect(store.get(accessTokenAtom)).toBeNull()
     expect(replaceMock).toHaveBeenCalledWith(ROUTES.LOGIN)
   })
 
-  it('skips the API call when there is no refresh token but still redirects', async () => {
+  it('still calls the API and redirects when there is no module token', async () => {
     const { result } = renderHook(() => useLogout(), { wrapper: makeWrapper(store) })
 
     await act(async () => {

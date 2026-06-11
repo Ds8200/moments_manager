@@ -16,11 +16,12 @@ logger = logging.getLogger(__name__)
 @tool_registry.register(
     name="draft_email",
     description=(
-        "Generates a professional email draft using the Moments email template. "
+        "Generates a professional email draft using the organization's branded email template. "
         "Returns the subject line, body text, and routing data for the send button. "
         "IMPORTANT: this only creates a draft — it does NOT send any email. "
         "Always tell the user the result is a draft they can review and send via the button. "
-        "Use is_bulk=true when the user wants to send to ALL customers (announcements, updates, promotions)."
+        "Use is_bulk=true when the user wants to send to ALL customers "
+        "(announcements, updates, promotions)."
     ),
     parameters={
         "type": "object",
@@ -47,7 +48,8 @@ logger = logging.getLogger(__name__)
             "is_bulk": {
                 "type": "boolean",
                 "description": (
-                    "Set to true when sending to ALL customers (announcements, updates, promotions). "
+                    "Set to true when sending to ALL customers "
+                    "(announcements, updates, promotions). "
                     "Set to false (default) when sending to a single specific customer."
                 ),
             },
@@ -57,6 +59,7 @@ logger = logging.getLogger(__name__)
 )
 async def draft_email(
     db: AsyncSession,
+    org_id: str,
     customer_name: str,
     subject: str,
     body: str,
@@ -64,10 +67,11 @@ async def draft_email(
     **_: object,
 ) -> dict:
     from src.ai.repository import AiRepository
+    from src.organizations.repository import OrgRepository
 
     customer_id: str | None = None
     if not is_bulk:
-        repo = AiRepository(db)
+        repo = AiRepository(db, org_id)
         customer_id = await repo.find_customer_id_by_name(customer_name)
         if customer_id is None:
             candidates = await repo.get_all_customer_names()
@@ -77,7 +81,14 @@ async def draft_email(
                 "candidates": candidates,
             }
 
-    final_subject, html_body = build_customer_email(customer_name, subject, body)
+    org = await OrgRepository(db).get_by_id(org_id)
+    org_name = org.name if org else ""
+    logo_path = org.logo_path if org else None
+    brand_colors = org.brand_colors if org else None
+
+    final_subject, html_body = build_customer_email(
+        customer_name, subject, body, org_name, logo_path, brand_colors
+    )
     return {
         "subject": final_subject,
         "body_text": body,

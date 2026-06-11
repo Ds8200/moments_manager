@@ -1,27 +1,66 @@
 @use '../../../../shared/styles/variables' as v;
 
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-5;
+.orderNumber {
+  font-weight: v.$font-weight-semibold;
+  color: v.$primary;
+  font-size: v.$font-size-xs;
 }
 
-.header {
-  display: flex;
+.customerName {
+  font-weight: v.$font-weight-medium;
+}
+
+.amount {
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
+}
+
+.target {
+  color: v.$text-secondary;
+  font-size: v.$font-size-xs;
+  white-space: nowrap;
+}
+
+.urgencyBadge {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
 }
 
-.title {
-  font-size: v.$font-size-2xl;
-  font-weight: v.$font-weight-bold;
-  color: v.$text-primary;
+.urgencyVeryUrgent {
+  background: color-mix(in srgb, v.$danger 18%, transparent);
+  color: v.$danger-dark;
 }
 
-.card {
-  background: v.$bg-card;
-  border-radius: v.$border-radius-lg;
-  box-shadow: v.$shadow-card;
-  border: 1px solid v.$border-color;
-  overflow: hidden;
+.urgencyUrgent {
+  background: color-mix(in srgb, v.$warning 18%, transparent);
+  color: v.$warning-dark;
+}
+
+.urgencyNormal {
+  background: color-mix(in srgb, v.$success 18%, transparent);
+  color: v.$success-dark;
+}
+
+.paidBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+
+  &.paid {
+    background: color-mix(in srgb, v.$success 15%, transparent);
+    color: v.$success-dark;
+  }
+
+  &.unpaid {
+    background: v.$gray-100;
+    color: v.$text-secondary;
+  }
 }

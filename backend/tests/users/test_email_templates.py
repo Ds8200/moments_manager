@@ -1,31 +1,44 @@
-from unittest.mock import AsyncMock, MagicMock, patch
+from src.config import settings
+from src.users.email_templates import (
+    _DEFAULT_BRAND_COLORS,
+    DEFAULT_LOGO_PATH,
+    build_welcome_email,
+    resolve_brand_colors,
+    resolve_logo_url,
+)
 
-import pytest
-
-from src.core import email as email_module
-from src.core.email import send_html_email
-from src.users.email_templates import BRAND_PURPLE, LOGO_URL, build_welcome_email
-
-pytestmark = pytest.mark.asyncio  # applies only to async test functions
+_BRAND_PRIMARY = _DEFAULT_BRAND_COLORS["primary"]
+_ORG_BRAND_COLORS = {
+    "primary": "#3B5BDB",
+    "secondary": "#7048E8",
+    "accent": "#F03E3E",
+    "background": "#FFFFFF",
+    "text": "#212529",
+}
 
 
 def test_build_welcome_email_contains_logo_and_brand_colors() -> None:
-    subject, html = build_welcome_email("new@example.com", "temp-pass-123", "magic-token-abc")
+    subject, html = build_welcome_email(
+        "new@example.com", "temp-pass-123", "magic-token-abc", "עסק לדוגמה", None, None
+    )
 
     assert subject
-    # logo referenced via hosted URL
-    assert LOGO_URL in html
-    # brand purple applied to headings/buttons
-    assert BRAND_PURPLE in html
+    assert "עסק לדוגמה" in subject
+    # default logo path referenced in src attribute
+    assert "nihulo_logo" in html
+    # brand primary color applied to headings/buttons
+    assert _BRAND_PRIMARY in html
     # magic quick-login link present
     assert "magic-token-abc" in html
     # credential values interpolated
     assert "new@example.com" in html
     assert "temp-pass-123" in html
+    # org name interpolated into body and footer
+    assert "עסק לדוגמה" in html
 
 
 def test_build_welcome_email_returns_two_tuple() -> None:
-    result = build_welcome_email("a@b.com", "pw", "tok")
+    result = build_welcome_email("a@b.com", "pw", "tok", "עסק לדוגמה", None, None)
     assert isinstance(result, tuple)
     assert len(result) == 2
     subject, html = result
@@ -33,60 +46,31 @@ def test_build_welcome_email_returns_two_tuple() -> None:
     assert isinstance(html, str)
 
 
-async def test_send_html_email_posts_to_brevo(monkeypatch) -> None:
-    monkeypatch.setattr(email_module.settings, "BREVO_API_KEY", "test-brevo-key")
-
-    captured: dict = {}
-    response = MagicMock()
-    response.is_success = True
-    client = AsyncMock()
-
-    async def fake_post(url, json, headers):
-        captured["url"] = url
-        captured["payload"] = json
-        captured["headers"] = headers
-        return response
-
-    client.post = fake_post
-    cm = MagicMock()
-    cm.__aenter__ = AsyncMock(return_value=client)
-    cm.__aexit__ = AsyncMock(return_value=False)
-
-    with patch.object(email_module.httpx, "AsyncClient", return_value=cm):
-        await send_html_email("to@example.com", "subject", "<p>body</p>")
-
-    assert "brevo.com" in captured["url"]
-    payload = captured["payload"]
-    assert payload["to"] == [{"email": "to@example.com"}]
-    assert payload["subject"] == "subject"
-    assert payload["htmlContent"] == "<p>body</p>"
-    assert captured["headers"]["api-key"] == "test-brevo-key"
+def test_build_welcome_email_uses_org_logo_when_provided() -> None:
+    logo_path = "./uploads/logos/org1/logo.png"
+    _, html = build_welcome_email("a@b.com", "pw", "tok", "עסק", logo_path, None)
+    assert resolve_logo_url(logo_path) in html
 
 
-async def test_send_html_email_skips_when_no_api_key(monkeypatch) -> None:
-    monkeypatch.setattr(email_module.settings, "BREVO_API_KEY", "")
-
-    with patch.object(email_module.httpx, "AsyncClient") as mock_client:
-        await send_html_email("to@example.com", "subject", "<p>body</p>")
-
-    mock_client.assert_not_called()
+def test_build_welcome_email_uses_org_brand_colors_when_provided() -> None:
+    _, html = build_welcome_email("a@b.com", "pw", "tok", "עסק", None, _ORG_BRAND_COLORS)
+    assert _ORG_BRAND_COLORS["primary"] in html
 
 
-async def test_send_html_email_logs_error_on_non_success(monkeypatch) -> None:
-    monkeypatch.setattr(email_module.settings, "BREVO_API_KEY", "test-key")
+def test_resolve_logo_url_strips_leading_dot() -> None:
+    url = resolve_logo_url("./uploads/logos/org1/logo.png")
+    assert url == f"{settings.APP_URL}/uploads/logos/org1/logo.png"
 
-    response = MagicMock()
-    response.is_success = False
-    response.status_code = 400
-    response.text = "Bad Request"
-    client = AsyncMock()
-    client.post = AsyncMock(return_value=response)
-    cm = MagicMock()
-    cm.__aenter__ = AsyncMock(return_value=client)
-    cm.__aexit__ = AsyncMock(return_value=False)
 
-    with patch.object(email_module.httpx, "AsyncClient", return_value=cm):
-        with patch.object(email_module.logger, "error") as mock_error:
-            await send_html_email("to@example.com", "subject", "<p>body</p>")
+def test_resolve_logo_url_falls_back_to_default_logo() -> None:
+    url = resolve_logo_url(None)
+    assert url == f"{settings.APP_URL}{DEFAULT_LOGO_PATH}"
 
-    mock_error.assert_called_once()
+
+def test_resolve_brand_colors_returns_default_when_none() -> None:
+    colors = resolve_brand_colors(None)
+    assert set(colors) == {"primary", "secondary", "accent", "background", "text"}
+
+
+def test_resolve_brand_colors_returns_org_palette_unchanged() -> None:
+    assert resolve_brand_colors(_ORG_BRAND_COLORS) is _ORG_BRAND_COLORS

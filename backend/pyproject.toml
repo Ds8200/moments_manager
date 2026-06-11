@@ -22,6 +22,7 @@ dependencies = [
     "weasyprint>=69.0",
     "openai>=2.41.0",
     "tzdata>=2026.2",
+    "pillow>=11.0.0",
 ]
 
 [project.optional-dependencies]
@@ -36,12 +37,18 @@ dev = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 testpaths = ["tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
 # E712: SQLAlchemy intentionally uses == True/False to generate SQL boolean comparisons
 ignore = ["E712"]
+
+[tool.ruff.lint.per-file-ignores]
+# HTML template strings contain long CSS/inline content that cannot be meaningfully split
+"src/customers/email_templates.py" = ["E501"]
 
 [dependency-groups]
 dev = [
@@ -55,3 +62,4 @@ dev = [
 
 [tool.ruff]
 line-length = 100
+exclude = ["alembic/versions/"]

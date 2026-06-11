@@ -25,4 +25,5 @@ export const ERROR_CODE_MESSAGES: Record<string, string> = {
   [ERROR_CODES.TOKEN_INVALID]: ERROR_MESSAGES.UNAUTHORIZED,
   [ERROR_CODES.REFRESH_TOKEN_INVALID]: ERROR_MESSAGES.UNAUTHORIZED,
   [ERROR_CODES.MAGIC_LINK_INVALID]: 'קישור הכניסה אינו תקין או שפג תוקפו.',
+  [ERROR_CODES.AI_NOT_CONFIGURED]: 'שירות הבינה המלאכותית אינו מוגדר. פנה למנהל המערכת להגדרת מפתח API.',
 }

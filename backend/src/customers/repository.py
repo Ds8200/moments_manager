@@ -5,18 +5,23 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.customers.models import Customer
+from src.database import BaseRepository
 
 logger = logging.getLogger(__name__)
 
 
-class CustomerRepository:
-    def __init__(self, db: AsyncSession) -> None:
-        self._db = db
+class CustomerRepository(BaseRepository):
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
+        super().__init__(db, org_id)
 
     async def get_all(
         self, search: str | None, limit: int, offset: int, has_email: bool | None = None
     ) -> tuple[list[Customer], int]:
-        query = select(Customer).where(Customer.is_deleted == False)
+        await self._apply_org_rls()
+        query = select(Customer).where(
+            Customer.is_deleted == False,
+            Customer.organization_id == self._org_id,
+        )
         if search:
             query = query.where(Customer.name.ilike(f"%{search}%"))
         if has_email:
@@ -29,12 +34,30 @@ class CustomerRepository:
         return result.scalars().all(), total
 
     async def get_by_id(self, customer_id: str) -> Customer | None:
+        await self._apply_org_rls()
         result = await self._db.execute(
-            select(Customer).where(Customer.id == customer_id, Customer.is_deleted == False)
+            select(Customer).where(
+                Customer.id == customer_id,
+                Customer.is_deleted == False,
+                Customer.organization_id == self._org_id,
+            )
         )
         return result.scalar_one_or_none()
 
+    async def get_by_ids(self, ids: list[str]) -> list[Customer]:
+        await self._apply_org_rls()
+        result = await self._db.execute(
+            select(Customer).where(
+                Customer.is_deleted == False,
+                Customer.organization_id == self._org_id,
+                Customer.id.in_(ids),
+            )
+        )
+        return list(result.scalars().all())
+
     async def create(self, data: dict) -> Customer:
+        await self._apply_org_rls()
+        data["organization_id"] = self._org_id
         customer = Customer(**data)
         self._db.add(customer)
         await self._db.flush()

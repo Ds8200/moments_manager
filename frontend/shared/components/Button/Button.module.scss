@@ -1,4 +1,4 @@
-@use '../../../shared/styles/variables' as v;
+﻿@use '../../../shared/styles/variables' as v;
 
 .btn {
   display: inline-flex;
@@ -10,7 +10,7 @@
   font-family: v.$font-family;
   font-weight: v.$font-weight-medium;
   cursor: pointer;
-  transition: background v.$transition-fast, opacity v.$transition-fast, transform v.$transition-fast;
+  transition: filter v.$transition-fast, opacity v.$transition-fast, transform v.$transition-fast;
   white-space: nowrap;
 
   &:active:not(:disabled) { transform: scale(0.98); }
@@ -25,9 +25,9 @@
 
 // Variants
 .primary {
-  background: v.$primary;
+  background: v.$gradient-brand;
   color: v.$text-inverse;
-  &:hover:not(:disabled) { background: v.$primary-dark; }
+  &:hover:not(:disabled) { filter: brightness(0.88); }
 }
 
 .secondary {

@@ -1,0 +1,9 @@
+@use '../../../../shared/styles/variables' as v;
+
+.bold {
+  font-weight: v.$font-weight-semibold;
+}
+
+.secondary {
+  color: v.$text-secondary;
+}

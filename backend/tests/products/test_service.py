@@ -11,6 +11,8 @@ from src.products.service import ProductService
 
 pytestmark = pytest.mark.asyncio
 
+_ORG_ID = "00000000-0000-0000-0000-000000000000"
+
 
 def _make_product(name: str = "P1") -> MagicMock:
     product = MagicMock()
@@ -29,7 +31,7 @@ def _make_product(name: str = "P1") -> MagicMock:
 
 async def test_get_product_not_found() -> None:
     db = AsyncMock()
-    service = ProductService(db)
+    service = ProductService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -39,7 +41,7 @@ async def test_get_product_not_found() -> None:
 
 async def test_update_product_not_found() -> None:
     db = AsyncMock()
-    service = ProductService(db)
+    service = ProductService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -49,7 +51,7 @@ async def test_update_product_not_found() -> None:
 
 async def test_delete_product_not_found() -> None:
     db = AsyncMock()
-    service = ProductService(db)
+    service = ProductService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_by_id.return_value = None
 
@@ -59,7 +61,7 @@ async def test_delete_product_not_found() -> None:
 
 async def test_create_product_returns_response() -> None:
     db = AsyncMock()
-    service = ProductService(db)
+    service = ProductService(db, _ORG_ID)
     service._repo = AsyncMock()
     product = _make_product("New")
     service._repo.create.return_value = product
@@ -73,7 +75,7 @@ async def test_create_product_returns_response() -> None:
 
 async def test_list_products_pagination() -> None:
     db = AsyncMock()
-    service = ProductService(db)
+    service = ProductService(db, _ORG_ID)
     service._repo = AsyncMock()
     service._repo.get_all.return_value = ([_make_product() for _ in range(2)], 10)
 

@@ -37,13 +37,14 @@ logger = logging.getLogger(__name__)
 )
 async def search_orders(
     db: AsyncSession,
+    org_id: str,
     query: str,
     limit: int = 10,
     **_: object,
 ) -> dict:
     from src.ai.repository import AiRepository
 
-    repo = AiRepository(db)
+    repo = AiRepository(db, org_id)
     capped = min(max(limit, 1), 20)
     return await repo.search_orders(query.strip(), capped)
 
@@ -72,12 +73,13 @@ async def search_orders(
 )
 async def get_unpaid_invoices(
     db: AsyncSession,
+    org_id: str,
     min_days_old: int = 0,
     **_: object,
 ) -> dict:
     from src.ai.repository import AiRepository
 
-    repo = AiRepository(db)
+    repo = AiRepository(db, org_id)
     days = max(0, min_days_old)
     invoices = await repo.get_unpaid_invoices(days)
     total = sum(Decimal(i["total_amount"]) for i in invoices)
@@ -112,12 +114,13 @@ async def get_unpaid_invoices(
 )
 async def get_order_items(
     db: AsyncSession,
+    org_id: str,
     order_number: str,
     **_: object,
 ) -> dict:
     from src.ai.repository import AiRepository
 
-    repo = AiRepository(db)
+    repo = AiRepository(db, org_id)
     result = await repo.get_order_items_by_number(order_number.strip())
     if result is None:
         candidates = await repo.search_order_numbers(order_number.strip())

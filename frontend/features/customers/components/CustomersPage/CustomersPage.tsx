@@ -1,25 +1,45 @@
 'use client'
 import type { ReactElement } from 'react'
-import { CustomersFiltersBar } from '../CustomersFiltersBar/CustomersFiltersBar'
-import { CustomersTable } from '../CustomersTable/CustomersTable'
+import { useCustomersPage } from './useCustomersPage'
+import { PageLayout } from '@/shared/components/PageLayout/PageLayout'
+import { DataTable } from '@/shared/components/DataTable/DataTable'
 import { CustomerForm } from '../CustomerForm/CustomerForm'
-import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
-import styles from './CustomersPage.module.scss'
+import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
 
 export const CustomersPage = (): ReactElement => {
+  const {
+    title, actionLabel, onAction, filtersBarProps,
+    columns, rows, isLoading, isError,
+    emptyTitle, emptyDescription, emptyIcon, errorTitle,
+    currentPage, totalPages, total, onPageChange, paginationLabels,
+    onRowLeftClick, onRowRightClick,
+    menuState, closeMenu,
+  } = useCustomersPage()
+
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>{CUSTOMERS_LABELS.PAGE_TITLE}</h1>
-      </div>
-
-      <CustomersFiltersBar />
-
-      <div className={styles.card}>
-        <CustomersTable />
-      </div>
-
+    <>
+      <PageLayout title={title} actionLabel={actionLabel} onAction={onAction} filtersBarProps={filtersBarProps}>
+        <DataTable
+          columns={columns}
+          rows={rows}
+          keyExtractor={(c) => c.id}
+          isLoading={isLoading}
+          isError={isError}
+          emptyTitle={emptyTitle}
+          emptyDescription={emptyDescription}
+          emptyIcon={emptyIcon}
+          errorTitle={errorTitle}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          total={total}
+          onPageChange={onPageChange}
+          paginationLabels={paginationLabels}
+          onRowLeftClick={onRowLeftClick}
+          onRowRightClick={onRowRightClick}
+        />
+      </PageLayout>
       <CustomerForm />
-    </div>
+      <DropdownMenu state={menuState} onClose={closeMenu} />
+    </>
   )
 }

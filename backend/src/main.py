@@ -22,9 +22,13 @@ from src.database import engine
 from src.expense_categories.router import router as expense_categories_router
 from src.expenses.router import router as expenses_router
 from src.orders.router import router as orders_router
+from src.organizations.router import router as organizations_router
 from src.product_categories.router import router as product_categories_router
 from src.products.router import router as products_router
+from src.registration.router import router as registration_router
 from src.reports.router import router as reports_router
+from src.super_admin.router import router as super_admin_router
+from src.system_settings.router import router as system_settings_router
 from src.users.router import router as users_router
 
 logger = logging.getLogger(__name__)
@@ -56,7 +60,7 @@ async def lifespan(app: FastAPI):
     logger.info(log_messages.APP_STOP)
 
 
-app = FastAPI(title="Moments API", lifespan=lifespan)
+app = FastAPI(title="Management API", lifespan=lifespan)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -64,7 +68,9 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 register_middleware(app)
 register_exception_handlers(app)
 
+app.include_router(registration_router)
 app.include_router(auth_router)
+app.include_router(organizations_router)
 app.include_router(users_router)
 app.include_router(customers_router)
 app.include_router(product_categories_router)
@@ -73,6 +79,8 @@ app.include_router(orders_router)
 app.include_router(expense_categories_router)
 app.include_router(expenses_router)
 app.include_router(reports_router)
+app.include_router(super_admin_router)
+app.include_router(system_settings_router)
 app.include_router(ai_router)
 
 app.mount("/uploads", StaticFiles(directory=settings.UPLOADS_DIR), name="uploads")

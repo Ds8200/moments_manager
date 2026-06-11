@@ -1,0 +1,35 @@
+@use '../../../../shared/styles/variables' as v;
+
+.bold {
+  font-weight: v.$font-weight-semibold;
+}
+
+.secondary {
+  color: v.$text-secondary;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+}
+
+.badgeActive,
+.badgeInactive {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px v.$space-2;
+  border-radius: 9999px;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+}
+
+.badgeActive {
+  background: rgba(81, 207, 102, 0.15);
+  color: v.$success;
+}
+
+.badgeInactive {
+  background: v.$gray-100;
+  color: v.$text-secondary;
+}

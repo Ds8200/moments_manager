@@ -1,4 +1,4 @@
-@use '../../../../shared/styles/variables' as v;
+﻿@use '../../../../shared/styles/variables' as v;
 
 .overlay {
   position: fixed;
@@ -43,7 +43,7 @@
   font-size: v.$font-size-xl;
   padding: v.$space-1;
   border-radius: v.$border-radius-sm;
-  transition: background v.$transition-fast;
+  transition: filter v.$transition-fast;
 
   &:hover {
     background: v.$gray-100;
@@ -77,7 +77,7 @@
   color: v.$text-secondary;
   font-family: v.$font-family;
   white-space: nowrap;
-  transition: background v.$transition-fast, color v.$transition-fast;
+  transition: filter v.$transition-fast, color v.$transition-fast;
   flex-shrink: 0;
 
   &:hover {
@@ -153,7 +153,7 @@
   font-size: v.$font-size-sm;
   color: v.$text-primary;
   font-family: v.$font-family;
-  transition: background v.$transition-fast;
+  transition: filter v.$transition-fast;
 
   &:hover {
     background: v.$gray-100;
@@ -162,7 +162,7 @@
 
 .submitBtn {
   padding: v.$space-2 v.$space-5;
-  background: v.$primary;
+  background: v.$gradient-brand;
   border: none;
   border-radius: v.$border-radius;
   color: v.$text-inverse;
@@ -170,10 +170,10 @@
   font-size: v.$font-size-sm;
   font-weight: v.$font-weight-semibold;
   font-family: v.$font-family;
-  transition: background v.$transition-fast;
+  transition: filter v.$transition-fast;
 
   &:hover:not(:disabled) {
-    background: v.$primary-dark;
+    filter: brightness(0.88);
   }
 
   &:disabled {

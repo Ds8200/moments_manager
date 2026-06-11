@@ -1,25 +1,19 @@
 'use client'
 import type { ReactElement } from 'react'
 import Image from 'next/image'
-import { useLoginForm } from './useLoginForm'
+import { useLoginForm, type LoginFormProps } from './useLoginForm'
 import { AUTH_LABELS } from '../../constants/authLabels'
 import styles from './LoginForm.module.scss'
 
-export const LoginForm = (): ReactElement => {
-  const { register, handleSubmit, onSubmit, errors, submitError, isSubmitting, isMagicLoggingIn } =
-    useLoginForm()
+export const LoginForm = (props: LoginFormProps): ReactElement => {
+  const { logoSrc, logoAlt, register, handleSubmit, onSubmit, errors, submitError, isSubmitting, isMagicLoggingIn } =
+    useLoginForm(props)
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
         <div className={styles.logo}>
-          <Image
-            src="/moments_logo.png"
-            alt={AUTH_LABELS.TITLE}
-            width={200}
-            height={75}
-            priority
-          />
+          <Image src={logoSrc} alt={logoAlt} width={200} height={75} priority />
         </div>
         <div className={styles.subtitle}>{AUTH_LABELS.SUBTITLE}</div>
 

@@ -39,13 +39,13 @@ async def test_create_user_as_admin_returns_201(admin_client: AsyncClient) -> No
     assert "hashed_password" not in body
 
 
-async def test_create_admin_user_via_role_field(admin_client: AsyncClient) -> None:
+async def test_create_system_admin_user_via_role_field(admin_client: AsyncClient) -> None:
     response = await admin_client.post(
         "/api/v1/users",
-        json={"email": "newadmin@example.com", "full_name": "New Admin", "role": "admin"},
+        json={"email": "newadmin@example.com", "full_name": "New Admin", "role": "system_admin"},
     )
     assert response.status_code == 201
-    assert response.json()["role"] == "admin"
+    assert response.json()["role"] == "system_admin"
 
 
 async def test_create_user_invalid_role_returns_422(admin_client: AsyncClient) -> None:
@@ -109,4 +109,28 @@ async def test_delete_nonexistent_user_returns_404(admin_client: AsyncClient) ->
 
 async def test_delete_user_non_admin_returns_403(client: AsyncClient, test_user: User) -> None:
     response = await client.delete(f"/api/v1/users/{test_user.id}")
+    assert response.status_code == 403
+
+
+async def test_get_user_by_id_as_admin_returns_200(
+    admin_client: AsyncClient, test_user: User
+) -> None:
+    response = await admin_client.get(f"/api/v1/users/{test_user.id}")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == test_user.id
+    assert body["email"] == test_user.email
+    assert "full_name" in body
+    assert "role" in body
+    assert "hashed_password" not in body
+
+
+async def test_get_user_not_found_returns_404(admin_client: AsyncClient) -> None:
+    response = await admin_client.get("/api/v1/users/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+    assert response.json()["code"] == "NOT_FOUND"
+
+
+async def test_get_user_non_admin_returns_403(client: AsyncClient, test_user: User) -> None:
+    response = await client.get(f"/api/v1/users/{test_user.id}")
     assert response.status_code == 403

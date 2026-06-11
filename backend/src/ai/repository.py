@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.customers.models import Customer
+from src.database import BaseRepository
 from src.orders.enums import OrderStatus
 from src.orders.models import Order, OrderItem
 from src.products.models import Product
@@ -35,15 +36,17 @@ def _search_terms(query: str) -> list[str]:
     return list(terms)
 
 
-class AiRepository:
-    def __init__(self, db: AsyncSession) -> None:
-        self._db = db
+class AiRepository(BaseRepository):
+    def __init__(self, db: AsyncSession, org_id: str) -> None:
+        super().__init__(db, org_id)
 
     async def get_customer_profile(self, customer_name: str) -> dict | None:
         """Returns full customer profile including recent orders and stats."""
+        await self._apply_org_rls()
         cust_result = await self._db.execute(
             select(Customer)
             .where(
+                Customer.organization_id == self._org_id,
                 Customer.name.ilike(f"%{customer_name}%"),
                 Customer.is_deleted.is_(False),
             )
@@ -61,6 +64,7 @@ class AiRepository:
                 func.max(Order.date),
             ).where(
                 Order.customer_id == customer.id,
+                Order.organization_id == self._org_id,
                 Order.is_deleted.is_(False),
             )
         )
@@ -68,7 +72,11 @@ class AiRepository:
 
         recent_result = await self._db.execute(
             select(Order)
-            .where(Order.customer_id == customer.id, Order.is_deleted.is_(False))
+            .where(
+                Order.customer_id == customer.id,
+                Order.organization_id == self._org_id,
+                Order.is_deleted.is_(False),
+            )
             .order_by(Order.created_at.desc())
             .limit(3)
         )
@@ -96,12 +104,14 @@ class AiRepository:
 
     async def get_unpaid_invoices(self, min_days_old: int = 0) -> list[dict]:
         """Returns unpaid orders older than min_days_old days, sorted by amount."""
+        await self._apply_org_rls()
         cutoff = date.today() - timedelta(days=min_days_old)
         result = await self._db.execute(
             select(Order)
             .options(selectinload(Order.customer))
             .where(
                 and_(
+                    Order.organization_id == self._org_id,
                     Order.is_deleted.is_(False),
                     Order.is_paid.is_(False),
                     Order.status != OrderStatus.cancelled.value,
@@ -125,6 +135,7 @@ class AiRepository:
 
     async def get_pipeline_by_status(self) -> dict:
         """Returns value and count of active orders grouped by status."""
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(
                 Order.status,
@@ -132,6 +143,7 @@ class AiRepository:
                 func.coalesce(func.sum(Order.total_amount), Decimal("0")),
             )
             .where(
+                Order.organization_id == self._org_id,
                 Order.is_deleted.is_(False),
                 Order.status.in_(_ACTIVE_STATUSES),
             )
@@ -153,7 +165,9 @@ class AiRepository:
 
     async def get_product_performance(self, year: int, month: int | None, limit: int) -> list[dict]:
         """Returns revenue and profit per product name for a given period."""
+        await self._apply_org_rls()
         filters = [
+            Order.organization_id == self._org_id,
             Order.is_deleted.is_(False),
             extract("year", Order.date) == year,
         ]
@@ -188,9 +202,11 @@ class AiRepository:
 
     async def search_orders(self, query: str, limit: int) -> dict:
         """Free-text search across order numbers, customer names, notes, and product names."""
+        await self._apply_org_rls()
         terms = [f"%{t}%" for t in _search_terms(query)]
         customer_ids = select(Customer.id).where(
-            or_(*[Customer.name.ilike(t) for t in terms])
+            Customer.organization_id == self._org_id,
+            or_(*[Customer.name.ilike(t) for t in terms]),
         )
         order_ids_by_product = select(OrderItem.order_id).where(
             or_(*[OrderItem.product_name.ilike(t) for t in terms])
@@ -199,6 +215,7 @@ class AiRepository:
             select(Order)
             .options(selectinload(Order.customer))
             .where(
+                Order.organization_id == self._org_id,
                 Order.is_deleted.is_(False),
                 or_(
                     *[Order.order_number.ilike(t) for t in terms],
@@ -231,6 +248,7 @@ class AiRepository:
 
     async def get_inactive_customers(self, days_since: int, limit: int) -> list[dict]:
         """Returns customers with no order in the last days_since days."""
+        await self._apply_org_rls()
         cutoff = date.today() - timedelta(days=days_since)
         result = await self._db.execute(
             select(
@@ -242,10 +260,14 @@ class AiRepository:
                 Order,
                 and_(
                     Order.customer_id == Customer.id,
+                    Order.organization_id == self._org_id,
                     Order.is_deleted.is_(False),
                 ),
             )
-            .where(Customer.is_deleted.is_(False))
+            .where(
+                Customer.organization_id == self._org_id,
+                Customer.is_deleted.is_(False),
+            )
             .group_by(Customer.id, Customer.name)
             .having(
                 or_(
@@ -271,6 +293,7 @@ class AiRepository:
 
     async def get_order_items_by_number(self, order_number: str) -> dict | None:
         """Returns full item breakdown of an order identified by order_number."""
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(Order)
             .options(
@@ -278,6 +301,7 @@ class AiRepository:
                 selectinload(Order.customer),
             )
             .where(
+                Order.organization_id == self._org_id,
                 Order.order_number == order_number,
                 Order.is_deleted.is_(False),
             )
@@ -311,10 +335,14 @@ class AiRepository:
         self, search: str | None, active_only: bool, limit: int
     ) -> list[dict]:
         """Returns products from the catalog with category and pricing."""
+        await self._apply_org_rls()
         query = (
             select(Product)
             .options(selectinload(Product.category))
-            .where(Product.is_deleted.is_(False))
+            .where(
+                Product.organization_id == self._org_id,
+                Product.is_deleted.is_(False),
+            )
         )
         if search:
             search_filters = [Product.name.ilike(f"%{t}%") for t in _search_terms(search)]
@@ -338,9 +366,11 @@ class AiRepository:
 
     async def find_customer_id_by_name(self, customer_name: str) -> str | None:
         """Returns the ID of the first customer whose name contains customer_name."""
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(Customer.id)
             .where(
+                Customer.organization_id == self._org_id,
                 Customer.name.ilike(f"%{customer_name}%"),
                 Customer.is_deleted.is_(False),
             )
@@ -351,9 +381,11 @@ class AiRepository:
 
     async def search_order_numbers(self, partial: str, limit: int = 10) -> list[str]:
         """Returns order numbers matching a partial string — for order disambiguation."""
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(Order.order_number)
             .where(
+                Order.organization_id == self._org_id,
                 Order.is_deleted.is_(False),
                 Order.order_number.ilike(f"%{partial.strip()}%"),
             )
@@ -364,9 +396,13 @@ class AiRepository:
 
     async def get_all_customer_names(self, limit: int = 50) -> list[str]:
         """Returns all active customer names — passed to the LLM for disambiguation."""
+        await self._apply_org_rls()
         result = await self._db.execute(
             select(Customer.name)
-            .where(Customer.is_deleted.is_(False))
+            .where(
+                Customer.organization_id == self._org_id,
+                Customer.is_deleted.is_(False),
+            )
             .order_by(Customer.name)
             .limit(limit)
         )
@@ -374,7 +410,11 @@ class AiRepository:
 
     async def get_all_product_names(self, active_only: bool = True, limit: int = 50) -> list[str]:
         """Returns all product names — passed to the LLM for disambiguation."""
-        query = select(Product.name).where(Product.is_deleted.is_(False))
+        await self._apply_org_rls()
+        query = select(Product.name).where(
+            Product.organization_id == self._org_id,
+            Product.is_deleted.is_(False),
+        )
         if active_only:
             query = query.where(Product.is_active.is_(True))
         result = await self._db.execute(query.order_by(Product.name).limit(limit))

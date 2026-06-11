@@ -6,6 +6,7 @@ from decimal import Decimal
 
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import text
 
 from src.ai.tool_registry import tool_registry
 from src.expense_categories.models import ExpenseCategory
@@ -41,6 +42,7 @@ logger = logging.getLogger(__name__)
 )
 async def get_monthly_report(
     db: AsyncSession,
+    org_id: str,
     year: int | None = None,
     month: int | None = None,
     **_: object,
@@ -48,7 +50,7 @@ async def get_monthly_report(
     today = date.today()
     y = year if year is not None else today.year
     m = month if month is not None else today.month
-    svc = ReportService(db)
+    svc = ReportService(db, org_id)
     r = await svc.get_monthly_report(y, m)
     return {
         "year": r.year,
@@ -89,11 +91,12 @@ async def get_monthly_report(
 )
 async def get_financial_year(
     db: AsyncSession,
+    org_id: str,
     year: int | None = None,
     **_: object,
 ) -> dict:
     y = year if year is not None else date.today().year
-    svc = ReportService(db)
+    svc = ReportService(db, org_id)
     data = await svc.get_financial_year(y)
     return {
         "year": data.year,
@@ -127,9 +130,9 @@ async def get_financial_year(
     ),
     parameters={"type": "object", "properties": {}},
 )
-async def get_monthly_comparison(db: AsyncSession, **_: object) -> dict:
+async def get_monthly_comparison(db: AsyncSession, org_id: str, **_: object) -> dict:
     today = date.today()
-    svc = ReportService(db)
+    svc = ReportService(db, org_id)
 
     current = await svc.get_monthly_report(today.year, today.month)
     prev_month = today.month - 1 if today.month > 1 else 12
@@ -198,6 +201,7 @@ async def get_monthly_comparison(db: AsyncSession, **_: object) -> dict:
 )
 async def get_expense_breakdown(
     db: AsyncSession,
+    org_id: str,
     year: int | None = None,
     month: int | None = None,
     **_: object,
@@ -210,6 +214,9 @@ async def get_expense_breakdown(
     last_year = y if m < 12 else y + 1
     last_day = date(last_year, last_month, 1)
 
+    # Raw SQL required: PostgreSQL SET LOCAL has no SQLAlchemy ORM equivalent.
+    await db.execute(text("SET LOCAL app.current_org_id = :org_id"), {"org_id": org_id})
+
     result = await db.execute(
         select(
             ExpenseCategory.name,
@@ -219,11 +226,13 @@ async def get_expense_breakdown(
             Expense,
             and_(
                 Expense.category_id == ExpenseCategory.id,
+                Expense.organization_id == org_id,
                 Expense.is_deleted.is_(False),
                 Expense.date >= first_day,
                 Expense.date < last_day,
             ),
         )
+        .where(ExpenseCategory.organization_id == org_id)
         .group_by(ExpenseCategory.name)
         .order_by(func.sum(Expense.amount).desc().nullslast())
     )
@@ -232,6 +241,7 @@ async def get_expense_breakdown(
     uncat_result = await db.execute(
         select(func.coalesce(func.sum(Expense.amount), Decimal("0"))).where(
             and_(
+                Expense.organization_id == org_id,
                 Expense.is_deleted.is_(False),
                 Expense.category_id.is_(None),
                 Expense.date >= first_day,
@@ -283,6 +293,7 @@ async def get_expense_breakdown(
 )
 async def get_product_performance(
     db: AsyncSession,
+    org_id: str,
     year: int | None = None,
     month: int | None = None,
     limit: int = 10,
@@ -290,7 +301,7 @@ async def get_product_performance(
 ) -> dict:
     from src.ai.repository import AiRepository
 
-    repo = AiRepository(db)
+    repo = AiRepository(db, org_id)
     y = year if year is not None else date.today().year
     capped = min(max(limit, 1), 20)
     products = await repo.get_product_performance(y, month, capped)

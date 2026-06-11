@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.dependencies import get_current_user, get_db
+from src.core.dependencies import get_db, get_org_context
 from src.core.schemas import PaginatedResponse, PaginationParams
 from src.products.schemas import (
     ProductCreateSchema,
@@ -24,9 +24,9 @@ async def list_products(
     category_id: str | None = Query(default=None),
     is_active: bool | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ProductService(db)
+    svc = ProductService(db, ctx.org_id)
     return await svc.list_products(
         PaginationParams(page=page, page_size=page_size), search, category_id, is_active
     )
@@ -36,9 +36,9 @@ async def list_products(
 async def create_product(
     body: ProductCreateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ProductService(db)
+    svc = ProductService(db, ctx.org_id)
     return await svc.create_product(body)
 
 
@@ -46,9 +46,9 @@ async def create_product(
 async def get_product(
     product_id: str,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ProductService(db)
+    svc = ProductService(db, ctx.org_id)
     return await svc.get_product(product_id)
 
 
@@ -57,9 +57,9 @@ async def update_product(
     product_id: str,
     body: ProductUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ProductService(db)
+    svc = ProductService(db, ctx.org_id)
     return await svc.update_product(product_id, body)
 
 
@@ -67,7 +67,7 @@ async def update_product(
 async def delete_product(
     product_id: str,
     db: AsyncSession = Depends(get_db),
-    _user=Depends(get_current_user),
+    ctx=Depends(get_org_context),
 ):
-    svc = ProductService(db)
+    svc = ProductService(db, ctx.org_id)
     await svc.delete_product(product_id)

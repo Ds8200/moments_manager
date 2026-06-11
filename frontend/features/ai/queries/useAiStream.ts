@@ -17,6 +17,7 @@ import {
 import type { ChatMessage, SSEEvent } from '@/features/ai/types'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { apiStream } from '@/shared/utils/apiStream'
+import { resolveErrorMessage } from '@/shared/utils/resolveErrorMessage'
 
 let _idCounter = 0
 function nextId(): string {
@@ -86,8 +87,7 @@ export const useAiStream = (): UseAiStreamReturn => {
           }
         }
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : AI_LABELS.ERROR_GENERIC
-        setStreamError(msg)
+        setStreamError(resolveErrorMessage(err))
         finalizeStream()
       } finally {
         setIsStreaming(false)

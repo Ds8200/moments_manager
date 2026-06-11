@@ -109,7 +109,7 @@ async def test_text_streams_character_by_character(registry, messages) -> None:
     """Each character from OpenAI yields a separate token event immediately."""
     text = "שלום!"
     with _patch_openai(_text_stream(text)):
-        runner = AgentRunner(db=None, registry=registry)
+        runner = AgentRunner(db=None, org_id="test-org-id", registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     token_events = [e for e in events if e.type == "token"]
@@ -121,7 +121,7 @@ async def test_text_streams_character_by_character(registry, messages) -> None:
 async def test_event_order_is_tokens_then_done(registry, messages) -> None:
     """Tokens must all arrive before the done event."""
     with _patch_openai(_text_stream("אבג")):
-        runner = AgentRunner(db=None, registry=registry)
+        runner = AgentRunner(db=None, org_id="test-org-id", registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     done_index = next(i for i, e in enumerate(events) if e.type == "done")
@@ -137,7 +137,7 @@ async def test_tool_call_then_text(registry, messages) -> None:
         _tool_stream("echo", {"value": "test"}),
         _text_stream("The echo says test"),
     ):
-        runner = AgentRunner(db=None, registry=registry)
+        runner = AgentRunner(db=None, org_id="test-org-id", registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     types = [e.type for e in events]
@@ -159,7 +159,7 @@ async def test_tool_result_precedes_tokens(registry, messages) -> None:
         _tool_stream("echo", {}),
         _text_stream("done"),
     ):
-        runner = AgentRunner(db=None, registry=registry)
+        runner = AgentRunner(db=None, org_id="test-org-id", registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     first_token_idx = next(i for i, e in enumerate(events) if e.type == "token")
@@ -186,7 +186,7 @@ async def test_tool_error_wraps_and_continues(messages) -> None:
         _tool_stream("fail", {}),
         _text_stream("Despite the error, here is the answer"),
     ):
-        runner = AgentRunner(db=None, registry=error_registry)
+        runner = AgentRunner(db=None, org_id="test-org-id", registry=error_registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     result_events = [e for e in events if e.type == "tool_result"]
@@ -202,7 +202,7 @@ async def test_api_error_yields_single_error_event(registry, messages) -> None:
     client_mock = MagicMock()
     client_mock.chat.completions.create = AsyncMock(side_effect=Exception("API error"))
     with patch("src.ai.service.AsyncOpenAI", return_value=client_mock):
-        runner = AgentRunner(db=None, registry=registry)
+        runner = AgentRunner(db=None, org_id="test-org-id", registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     assert len(events) == 1
@@ -228,7 +228,7 @@ async def test_friendly_error_messages(
     client_mock = MagicMock()
     client_mock.chat.completions.create = AsyncMock(side_effect=Exception(exc_msg))
     with patch("src.ai.service.AsyncOpenAI", return_value=client_mock):
-        runner = AgentRunner(db=None, registry=registry)
+        runner = AgentRunner(db=None, org_id="test-org-id", registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     assert events[0].type == "error"
@@ -245,7 +245,7 @@ async def test_max_tool_rounds_terminates_with_done(registry, messages) -> None:
     streams = [_tool_stream("echo", {"value": "loop"}) for _ in range(MAX_TOOL_ROUNDS)]
 
     with _patch_openai(*streams):
-        runner = AgentRunner(db=None, registry=registry)
+        runner = AgentRunner(db=None, org_id="test-org-id", registry=registry)
         events = await _collect(runner.run_stream(messages, "sys"))
 
     assert events[-1].type == "done"
@@ -258,16 +258,16 @@ async def test_max_tool_rounds_terminates_with_done(registry, messages) -> None:
 def test_build_system_prompt_contains_current_year() -> None:
     from datetime import date
 
-    prompt = build_system_prompt()
+    prompt = build_system_prompt("Acme")
     assert str(date.today().year) in prompt
 
 
 def test_build_system_prompt_contains_hebrew_date_header() -> None:
-    prompt = build_system_prompt()
+    prompt = build_system_prompt("Acme")
     assert "תאריך ושעה נוכחיים" in prompt
 
 
 def test_build_system_prompt_includes_base_content() -> None:
-    prompt = build_system_prompt()
-    # The base prompt always contains the role section
-    assert "Moments AI" in prompt
+    prompt = build_system_prompt("Acme")
+    # The base prompt always contains the role section, templated with the org name
+    assert "Acme AI" in prompt

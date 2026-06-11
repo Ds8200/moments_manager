@@ -1,25 +1,45 @@
 'use client'
 import type { ReactElement } from 'react'
-import { OrderFiltersBar } from '../OrderFiltersBar/OrderFiltersBar'
-import { OrdersTable } from '../OrdersTable/OrdersTable'
+import { useOrdersPage } from './useOrdersPage'
+import { PageLayout } from '@/shared/components/PageLayout/PageLayout'
+import { DataTable } from '@/shared/components/DataTable/DataTable'
 import { OrderForm } from '../OrderForm/OrderForm'
-import { ORDERS_LABELS } from '../../constants/ordersLabels'
-import styles from './OrdersPage.module.scss'
+import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
 
 export const OrdersPage = (): ReactElement => {
+  const {
+    title, actionLabel, onAction, filtersBarProps,
+    columns, rows, isLoading, isError,
+    emptyTitle, emptyDescription, emptyIcon, errorTitle,
+    currentPage, totalPages, total, onPageChange, paginationLabels,
+    onRowLeftClick, onRowRightClick,
+    menuState, closeMenu,
+  } = useOrdersPage()
+
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>{ORDERS_LABELS.PAGE_TITLE}</h1>
-      </div>
-
-      <OrderFiltersBar />
-
-      <div className={styles.card}>
-        <OrdersTable />
-      </div>
-
+    <>
+      <PageLayout title={title} actionLabel={actionLabel} onAction={onAction} filtersBarProps={filtersBarProps}>
+        <DataTable
+          columns={columns}
+          rows={rows}
+          keyExtractor={(o) => o.id}
+          isLoading={isLoading}
+          isError={isError}
+          emptyTitle={emptyTitle}
+          emptyDescription={emptyDescription}
+          emptyIcon={emptyIcon}
+          errorTitle={errorTitle}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          total={total}
+          onPageChange={onPageChange}
+          paginationLabels={paginationLabels}
+          onRowLeftClick={onRowLeftClick}
+          onRowRightClick={onRowRightClick}
+        />
+      </PageLayout>
       <OrderForm />
-    </div>
+      <DropdownMenu state={menuState} onClose={closeMenu} />
+    </>
   )
 }

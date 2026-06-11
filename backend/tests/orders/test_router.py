@@ -136,7 +136,7 @@ async def test_list_orders_sort_by_created_at_newest_first(client: AsyncClient) 
 async def test_list_orders_sort_by_urgency_most_urgent_first(client: AsyncClient) -> None:
     customer = await client.post("/api/v1/customers", json={"name": "Urgency Customer"})
     today = str(date.today())
-    order_normal = await client.post(
+    _order_normal = await client.post(
         "/api/v1/orders",
         json={"customer_id": customer.json()["id"], "date": today, "items": []},
     )

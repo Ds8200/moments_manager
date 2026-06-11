@@ -1,4 +1,5 @@
 @use '../../../../../shared/styles/variables' as v;
+@use '../../../../../shared/styles/mixins' as m;
 
 .section {
   background: v.$bg-card;
@@ -18,16 +19,21 @@
 }
 
 .tableWrapper {
-  overflow-x: auto;
+  @include m.scrollable-table-wrapper(calc(100vh - 240px));
 }
 
 .table {
+  direction: rtl;
   width: 100%;
   border-collapse: collapse;
   font-size: v.$font-size-base;
 }
 
 .th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: v.$bg-card;
   padding: v.$space-3 v.$space-4;
   text-align: start;
   font-size: v.$font-size-xs;

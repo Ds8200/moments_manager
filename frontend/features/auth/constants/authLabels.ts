@@ -1,8 +1,8 @@
 export const AUTH_LABELS = {
-  TITLE:            'Moments',
-  SUBTITLE:         'ניהול עסק גרפיקה ויצירה',
+  TITLE:            'Nihulo',
+  SUBTITLE:         'מערכת לניהול עסקים',
   EMAIL_LABEL:      'אימייל',
-  EMAIL_PLACEHOLDER:'admin@moments.co.il',
+  EMAIL_PLACEHOLDER:'admin@example.com',
   EMAIL_REQUIRED:   'נדרשת כתובת אימייל',
   EMAIL_INVALID:    'כתובת אימייל לא תקינה',
   PASSWORD_LABEL:   'סיסמה',

@@ -1,0 +1,142 @@
+﻿@use '../../../../../shared/styles/variables' as v;
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+}
+
+.title {
+  font-size: v.$font-size-xl;
+  font-weight: v.$font-weight-bold;
+  color: v.$text-primary;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  text-align: center;
+  margin-block-end: v.$space-2;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  padding: v.$space-4;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  background: v.$bg-page;
+}
+
+.cardTitle {
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-primary;
+  margin: 0;
+}
+
+.statusBadge {
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  gap: v.$space-3;
+  align-items: flex-end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  flex: 1;
+}
+
+.fieldNarrow {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  flex: 0 0 90px;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}
+
+.input {
+  width: 100%;
+  padding: v.$space-3 v.$space-4;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  box-sizing: border-box;
+  transition: border-color v.$transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: v.$space-2;
+  margin-block-start: v.$space-2;
+}
+
+.backButton,
+.skipButton {
+  flex: 1;
+  padding: v.$space-3;
+  background: transparent;
+  color: v.$text-secondary;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  font-family: v.$font-family;
+  cursor: pointer;
+  transition: filter v.$transition-fast;
+
+  &:hover {
+    background: v.$gray-50;
+  }
+}
+
+.submitButton {
+  flex: 2;
+  padding: v.$space-3;
+  background: v.$gradient-brand;
+  color: v.$text-inverse;
+  border: none;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-semibold;
+  font-family: v.$font-family;
+  cursor: pointer;
+  transition: filter v.$transition-fast;
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.88);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
