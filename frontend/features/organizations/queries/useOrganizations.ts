@@ -6,7 +6,9 @@ import {
   type UseMutationResult,
   type UseQueryResult,
 } from '@tanstack/react-query'
+import { useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
+import { isSysAdminAtom } from '@/features/auth/store/authAtoms'
 import { organizationsApi } from '../api'
 import { useNotify } from '@/shared/hooks/useNotify'
 import { ONBOARDING_LABELS } from '../constants/onboardingLabels'
@@ -20,12 +22,15 @@ import type {
   OrgUpdatePayload,
 } from '../types'
 
-export const useMyOrg = (): UseQueryResult<OrgResponse> =>
-  useQuery({
+export const useMyOrg = (): UseQueryResult<OrgResponse> => {
+  const isSysAdmin = useAtomValue(isSysAdminAtom)
+  return useQuery({
     queryKey: ['organization', 'me'],
     queryFn: () => organizationsApi.getMyOrg(),
     staleTime: 10 * 60 * 1000,
+    enabled: !isSysAdmin,
   })
+}
 
 export const useOrgMembers = (): UseQueryResult<Member[]> =>
   useQuery({
