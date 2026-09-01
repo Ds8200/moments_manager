@@ -1,27 +1,11 @@
 @use '../../../../shared/styles/variables' as v;
 
+// Nested inside PageLayout's (scrollable) content area — just spaces out the KPI row and
+// report tables underneath the pinned title/year/export header.
 .page {
   display: flex;
   flex-direction: column;
   gap: v.$space-6;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.title {
-  font-size: v.$font-size-2xl;
-  font-weight: v.$font-weight-bold;
-  color: v.$text-primary;
-}
-
-.toolbarActions {
-  display: flex;
-  align-items: center;
-  gap: v.$space-3;
 }
 
 .yearSelect {

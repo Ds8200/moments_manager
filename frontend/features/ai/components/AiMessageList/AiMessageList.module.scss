@@ -1,6 +1,9 @@
+@use '../../../../shared/styles/mixins' as m;
+
 .list {
   flex: 1;
   overflow-y: auto;
+  @include m.scrollbar-right;
   padding: 20px 16px;
   display: flex;
   flex-direction: column;

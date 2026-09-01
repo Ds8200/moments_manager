@@ -1,8 +1,14 @@
 @use '@/shared/styles/variables' as *;
+@use '@/shared/styles/mixins' as *;
 
+// `main` no longer scrolls the document — this page fills it and scrolls its own content.
 .page {
   padding: $space-6;
   max-width: 760px;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  @include scrollbar-right;
 
   @media (max-width: #{$breakpoint-sm - 1}) {
     padding: $space-2;

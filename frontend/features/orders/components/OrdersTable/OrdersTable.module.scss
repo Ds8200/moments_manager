@@ -86,6 +86,7 @@
   max-height: 200px;
   overflow-y: auto;
   @include m.custom-scrollbar;
+  @include m.scrollbar-right;
 }
 
 .productsListItem {

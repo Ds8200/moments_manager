@@ -1,4 +1,5 @@
 @use '@/shared/styles/variables' as *;
+@use '@/shared/styles/mixins' as *;
 
 .panel {
   position: fixed;
@@ -13,6 +14,7 @@
   max-height: 300px;
   overflow-y: auto;
   animation: fadeIn $transition-fast;
+  @include scrollbar-right;
 }
 
 .category {
