@@ -15,7 +15,6 @@ dependencies = [
     "python-jose[cryptography]>=3.3.0",
     "bcrypt>=4.0.0",
     "slowapi>=0.1.9",
-    "pino>=0.1.0",
     "aiosmtplib>=5.1.1",
     "httpx>=0.28.1",
     "openpyxl>=3.1.5",
@@ -36,6 +35,11 @@ dev = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+# conftest.py's session-scoped `engine`/`db_session` fixtures need every async fixture and test
+# to share one event loop — without this, pytest-asyncio 1.x gives each test its own loop and the
+# session-scoped async engine ends up used from a different loop than it was created on.
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 testpaths = ["tests"]
 
 [tool.ruff.lint]

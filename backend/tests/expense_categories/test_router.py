@@ -4,11 +4,20 @@ from httpx import AsyncClient
 pytestmark = pytest.mark.asyncio
 
 
-async def test_list_categories_includes_seeded(client: AsyncClient) -> None:
+async def test_list_categories_includes_created(client: AsyncClient) -> None:
+    # Not "includes the migration's seeded defaults": tests/conftest.py's db_session fixture
+    # deletes every row from every table after each test for isolation, so migration-seeded
+    # reference data can't reliably survive to a later test regardless of run order. Assert
+    # against categories this test creates itself instead.
+    names = ["קטגוריה א", "קטגוריה ב", "קטגוריה ג"]
+    for name in names:
+        await client.post("/api/v1/expense-categories", json={"name": name})
+
     response = await client.get("/api/v1/expense-categories")
     assert response.status_code == 200
-    # Migration seeded 6 default categories
-    assert len(response.json()) >= 6
+    listed_names = [c["name"] for c in response.json()]
+    for name in names:
+        assert name in listed_names
 
 
 async def test_create_category(client: AsyncClient) -> None:

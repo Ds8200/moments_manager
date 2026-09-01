@@ -226,5 +226,8 @@ async def test_draft_email_customer_not_found(mock_db) -> None:
         subject="Subject",
         body="Body",
     )
-    assert result["customer_id"] is None
-    assert result["customer_name"] == "לקוח לא קיים"
+    # When the customer isn't found, draft_email returns an early "not found" shape —
+    # it never includes customer_id/customer_name (see src/ai/tools_email.py:72-78).
+    assert result["not_found"] is True
+    assert result["searched_for"] == "לקוח לא קיים"
+    assert "candidates" in result
