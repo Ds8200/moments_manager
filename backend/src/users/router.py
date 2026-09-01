@@ -5,7 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.dependencies import get_current_user, get_db, require_admin
 from src.core.schemas import PaginatedResponse, PaginationParams
-from src.users.schemas import UserCreateSchema, UserResponseSchema, UserUpdateMeSchema
+from src.users.schemas import (
+    UserCreateSchema,
+    UserResponseSchema,
+    UserRoleUpdateSchema,
+    UserUpdateMeSchema,
+)
 from src.users.service import UserService
 
 logger = logging.getLogger(__name__)
@@ -51,6 +56,27 @@ async def create_user(
 ):
     svc = UserService(db)
     return await svc.create_user(body, background_tasks)
+
+
+@router.get("/{user_id}", response_model=UserResponseSchema)
+async def get_user(
+    user_id: str,
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    svc = UserService(db)
+    return await svc.get_user(user_id)
+
+
+@router.patch("/{user_id}/role", response_model=UserResponseSchema)
+async def update_user_role(
+    user_id: str,
+    body: UserRoleUpdateSchema,
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(require_admin),
+):
+    svc = UserService(db)
+    return await svc.update_role(user_id, body, admin.id)
 
 
 @router.delete("/{user_id}", status_code=204, response_model=None)

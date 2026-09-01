@@ -110,3 +110,73 @@ async def test_delete_nonexistent_user_returns_404(admin_client: AsyncClient) ->
 async def test_delete_user_non_admin_returns_403(client: AsyncClient, test_user: User) -> None:
     response = await client.delete(f"/api/v1/users/{test_user.id}")
     assert response.status_code == 403
+
+
+async def test_get_user_as_admin_returns_200(admin_client: AsyncClient, test_user: User) -> None:
+    response = await admin_client.get(f"/api/v1/users/{test_user.id}")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == test_user.id
+    assert body["email"] == test_user.email
+    assert "hashed_password" not in body
+
+
+async def test_get_user_non_admin_returns_403(client: AsyncClient, test_user: User) -> None:
+    response = await client.get(f"/api/v1/users/{test_user.id}")
+    assert response.status_code == 403
+
+
+async def test_get_nonexistent_user_returns_404(admin_client: AsyncClient) -> None:
+    response = await admin_client.get("/api/v1/users/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+    assert response.json()["code"] == "NOT_FOUND"
+
+
+async def test_update_user_role_as_admin_returns_200(
+    admin_client: AsyncClient, test_user: User
+) -> None:
+    response = await admin_client.patch(
+        f"/api/v1/users/{test_user.id}/role", json={"role": "admin"}
+    )
+    assert response.status_code == 200
+    assert response.json()["role"] == "admin"
+
+
+async def test_update_user_role_non_admin_returns_403(
+    client: AsyncClient, test_user: User
+) -> None:
+    response = await client.patch(
+        f"/api/v1/users/{test_user.id}/role", json={"role": "admin"}
+    )
+    assert response.status_code == 403
+
+
+async def test_update_user_role_nonexistent_user_returns_404(admin_client: AsyncClient) -> None:
+    response = await admin_client.patch(
+        "/api/v1/users/00000000-0000-0000-0000-000000000000/role", json={"role": "admin"}
+    )
+    assert response.status_code == 404
+
+
+async def test_update_user_role_invalid_role_returns_422(
+    admin_client: AsyncClient, test_user: User
+) -> None:
+    response = await admin_client.patch(
+        f"/api/v1/users/{test_user.id}/role", json={"role": "superuser"}
+    )
+    assert response.status_code == 422
+
+
+async def test_update_user_role_ignores_stray_email_and_name_fields(
+    admin_client: AsyncClient, test_user: User
+) -> None:
+    # The schema declares only `role` — extra keys like email/full_name must have no effect,
+    # structurally enforcing that this endpoint can never rename or re-email a user.
+    response = await admin_client.patch(
+        f"/api/v1/users/{test_user.id}/role",
+        json={"role": "admin", "email": "hacked@example.com", "full_name": "Hacked"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["email"] == test_user.email
+    assert body["full_name"] == test_user.full_name
