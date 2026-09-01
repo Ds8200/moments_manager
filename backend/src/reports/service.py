@@ -149,7 +149,7 @@ class ReportService:
                 self._fmt(m.unpaid_amount),
                 self._fmt(m.paid_revenue),
                 self._fmt(m.total_expenses),
-                self._fmt(m.total_profit),
+                self._fmt(m.net_profit),
             ]
             for m in data.months
         ]

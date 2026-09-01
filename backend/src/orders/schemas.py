@@ -31,6 +31,14 @@ class OrderItemResponseSchema(BaseModel):
     design_notes: Optional[str]
 
 
+class OrderItemSummarySchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    product_name: str
+    quantity: int
+
+
 class OrderFileResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -113,4 +121,4 @@ class OrderListResponseSchema(BaseModel):
     total_profit: Decimal
     notes: Optional[str]
     created_at: datetime
-    item_count: int = 0
+    items: list[OrderItemSummarySchema] = []

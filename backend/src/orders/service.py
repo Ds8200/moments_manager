@@ -65,11 +65,7 @@ class OrderService:
             sort_by,
         )
         pages = params.compute_pages(total)
-        items = []
-        for o in orders:
-            schema = OrderListResponseSchema.model_validate(o)
-            schema = schema.model_copy(update={"item_count": len(o.items)})
-            items.append(schema)
+        items = [OrderListResponseSchema.model_validate(o) for o in orders]
         return PaginatedResponse(
             items=items, total=total, page=params.page, page_size=params.page_size, pages=pages
         )
@@ -82,12 +78,7 @@ class OrderService:
 
     async def get_customer_orders(self, customer_id: str) -> list[OrderListResponseSchema]:
         orders = await self._repo.get_by_customer(customer_id)
-        result = []
-        for o in orders:
-            schema = OrderListResponseSchema.model_validate(o)
-            schema = schema.model_copy(update={"item_count": len(o.items)})
-            result.append(schema)
-        return result
+        return [OrderListResponseSchema.model_validate(o) for o in orders]
 
     async def create_order(self, data: OrderCreateSchema) -> OrderResponseSchema:
         order_number = await self._repo.get_next_order_number()
