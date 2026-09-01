@@ -2,11 +2,7 @@ import React from 'react'
 import { renderHook } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createStore, Provider } from 'jotai'
-import {
-  appendMessageAtom,
-  conversationAtom,
-  isStreamingAtom,
-} from '@/features/ai/store/aiAtoms'
+import { appendMessageAtom, isStreamingAtom } from '@/features/ai/store/aiAtoms'
 import type { ChatMessage } from '@/features/ai/types'
 import { useAiMessageList } from '../useAiMessageList'
 

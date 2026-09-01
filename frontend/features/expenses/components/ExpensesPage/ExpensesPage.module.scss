@@ -43,58 +43,6 @@
   box-shadow: v.$shadow-card;
   border: 1px solid v.$border-color;
   overflow: hidden;
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: v.$font-size-sm;
-}
-
-.thead th {
-  padding: v.$space-3 v.$space-4;
-  text-align: right;
-  font-weight: v.$font-weight-semibold;
-  color: v.$text-secondary;
-  background: v.$gray-50;
-  border-bottom: 1px solid v.$border-color;
-  white-space: nowrap;
-}
-
-.row {
-  border-bottom: 1px solid v.$border-color;
-  transition: background v.$transition-fast;
-  cursor: pointer;
-
-  &:hover {
-    background: v.$gray-50;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.cell {
-  padding: v.$space-3 v.$space-4;
-  color: v.$text-primary;
-  vertical-align: middle;
-}
-
-.categoryBadge {
-  display: inline-flex;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: v.$font-size-xs;
-  font-weight: v.$font-weight-medium;
-  background: v.$gray-100;
-  color: v.$text-secondary;
-}
-
-.amount {
-  font-weight: v.$font-weight-semibold;
-  color: v.$danger;
 }
 
 .totalRow {

@@ -13,6 +13,9 @@ export const ROUTES = {
 } as const
 
 export const ORDER_DETAIL_ROUTE = (id: string): string => `/orders/${id}`
+export const CUSTOMER_DETAIL_ROUTE = (id: string): string => `/customers/${id}`
+export const PRODUCT_DETAIL_ROUTE = (id: string): string => `/products/${id}`
+export const USER_DETAIL_ROUTE = (id: string): string => `/users/${id}`
 
 export const ROUTE_ICONS = {
   HOME:      '🏠',

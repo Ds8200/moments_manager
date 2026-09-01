@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { createStore, Provider } from 'jotai'
 import { useCustomersFiltersBar } from '../useCustomersFiltersBar'
-import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../../store/customersAtoms'
+import { customerFiltersAtom, isCustomerFormOpenAtom } from '../../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../../constants/customersLabels'
 
 function makeWrapper(store: ReturnType<typeof createStore>) {
@@ -32,7 +32,7 @@ describe('useCustomersFiltersBar', () => {
     expect(store.get(customerFiltersAtom).page).toBe(1)
   })
 
-  it('onNew opens the form and clears editingId', () => {
+  it('onNew opens the form', () => {
     const store = createStore()
     const { result } = renderHook(() => useCustomersFiltersBar(), { wrapper: makeWrapper(store) })
 
@@ -41,7 +41,6 @@ describe('useCustomersFiltersBar', () => {
     })
 
     expect(store.get(isCustomerFormOpenAtom)).toBe(true)
-    expect(store.get(editingCustomerIdAtom)).toBeNull()
   })
 
   it('exposes the new button label from constants', () => {

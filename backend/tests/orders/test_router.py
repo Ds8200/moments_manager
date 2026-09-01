@@ -37,6 +37,39 @@ async def test_create_order(client: AsyncClient) -> None:
     assert len(body["items"]) == 1
 
 
+async def test_list_orders_includes_item_summaries(client: AsyncClient) -> None:
+    customer = await client.post("/api/v1/customers", json={"name": "Customer Items"})
+    await client.post(
+        "/api/v1/orders",
+        json={
+            "customer_id": customer.json()["id"],
+            "date": str(date.today()),
+            "items": [
+                {
+                    "product_name": "Sticker",
+                    "quantity": 10,
+                    "unit_price": "2.00",
+                    "unit_cost": "0.50",
+                },
+                {
+                    "product_name": "Poster",
+                    "quantity": 2,
+                    "unit_price": "15.00",
+                    "unit_cost": "5.00",
+                },
+            ],
+        },
+    )
+
+    response = await client.get("/api/v1/orders")
+    assert response.status_code == 200
+    order = response.json()["items"][0]
+    assert "item_count" not in order
+    assert [item["product_name"] for item in order["items"]] == ["Sticker", "Poster"]
+    assert [item["quantity"] for item in order["items"]] == [10, 2]
+    assert set(order["items"][0].keys()) == {"id", "product_name", "quantity"}
+
+
 async def test_get_order_not_found(client: AsyncClient) -> None:
     response = await client.get("/api/v1/orders/missing-id")
     assert response.status_code == 404
@@ -136,7 +169,8 @@ async def test_list_orders_sort_by_created_at_newest_first(client: AsyncClient) 
 async def test_list_orders_sort_by_urgency_most_urgent_first(client: AsyncClient) -> None:
     customer = await client.post("/api/v1/customers", json={"name": "Urgency Customer"})
     today = str(date.today())
-    order_normal = await client.post(
+    # normal-urgency order — needed only as a DB fixture, its id is never asserted on
+    await client.post(
         "/api/v1/orders",
         json={"customer_id": customer.json()["id"], "date": today, "items": []},
     )

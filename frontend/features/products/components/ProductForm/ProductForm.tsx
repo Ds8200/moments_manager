@@ -7,7 +7,7 @@ import styles from './ProductForm.module.scss'
 
 export const ProductForm = (): ReactElement | null => {
   const {
-    isOpen, isEditing, register, handleSubmit, onSubmit, errors, isSubmitting, onClose,
+    isOpen, register, handleSubmit, onSubmit, errors, isSubmitting, onClose,
     categories, isCategoryManagerOpen, openCategoryManager,
     categoryManagerOptions, closeSymbol, currencySymbol,
   } = useProductForm()
@@ -16,7 +16,7 @@ export const ProductForm = (): ReactElement | null => {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>{isEditing ? PRODUCTS_LABELS.FORM_EDIT_TITLE : PRODUCTS_LABELS.FORM_NEW_TITLE}</h2>
+          <h2 className={styles.title}>{PRODUCTS_LABELS.FORM_NEW_TITLE}</h2>
           <button className={styles.closeBtn} onClick={onClose}>{closeSymbol}</button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>

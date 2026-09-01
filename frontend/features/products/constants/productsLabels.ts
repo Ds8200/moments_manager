@@ -57,4 +57,14 @@ export const PRODUCTS_LABELS = {
   CREATED_SUCCESS:          'המוצר נוצר בהצלחה',
   UPDATED_SUCCESS:          'המוצר עודכן בהצלחה',
   DELETED_SUCCESS:          'המוצר נמחק בהצלחה',
+
+  DETAIL_PAGE_BACK:         '← חזרה למוצרים',
+  DETAIL_SECTION_INFO:      'פרטי מוצר',
+  DETAIL_LABEL_NAME:        'שם מוצר',
+  DETAIL_LABEL_CATEGORY:    'קטגוריה',
+  DETAIL_LABEL_PRICE:       'מחיר בסיס',
+  DETAIL_LABEL_COST:        'עלות בסיס',
+  DETAIL_LABEL_PROD_DAYS:   'ימי ייצור ממוצע',
+  DETAIL_LABEL_STATUS:      'סטטוס',
+  DETAIL_NO_CATEGORY:       '-- ללא קטגוריה --',
 } as const

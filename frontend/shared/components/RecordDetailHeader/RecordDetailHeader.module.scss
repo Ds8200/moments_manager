@@ -1,4 +1,4 @@
-@use '../../../../../shared/styles/variables' as v;
+@use '@/shared/styles/variables' as v;
 
 .header {
   display: flex;
@@ -45,7 +45,7 @@
   }
 }
 
-.customer {
+.subtitle {
   font-size: v.$font-size-base;
   color: v.$text-secondary;
 }

@@ -5,8 +5,8 @@ import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAtom } from 'jotai'
-import { isProductFormOpenAtom, editingProductIdAtom } from '../../store/productsAtoms'
-import { useProduct, useCreateProduct, useUpdateProduct } from '../../queries/useProducts'
+import { isProductFormOpenAtom } from '../../store/productsAtoms'
+import { useCreateProduct } from '../../queries/useProducts'
 import {
   useProductCategories,
   useCreateProductCategory,
@@ -41,9 +41,9 @@ const DEFAULT_VALUES: ProductFormValues = {
   is_active:           true,
 }
 
+// Creates new products only — editing an existing product happens inline on its detail page.
 export interface UseProductFormReturn {
   isOpen: boolean
-  isEditing: boolean
   register: ReturnType<typeof useForm<ProductFormValues>>['register']
   handleSubmit: ReturnType<typeof useForm<ProductFormValues>>['handleSubmit']
   onSubmit: (values: ProductFormValues) => Promise<void>
@@ -61,10 +61,7 @@ export interface UseProductFormReturn {
 
 export const useProductForm = (): UseProductFormReturn => {
   const [isOpen, setOpen]           = useAtom(isProductFormOpenAtom)
-  const [editingId, setEditingId]   = useAtom(editingProductIdAtom)
-  const { data: existingProduct }   = useProduct(editingId)
   const createProduct               = useCreateProduct()
-  const updateProduct               = useUpdateProduct()
   const { data: categories = [], isLoading: categoriesLoading } = useProductCategories()
   const createCategory              = useCreateProductCategory()
   const deleteCategory              = useDeleteProductCategory()
@@ -82,33 +79,17 @@ export const useProductForm = (): UseProductFormReturn => {
   })
 
   useEffect(() => {
-    if (isOpen && existingProduct) {
-      reset({
-        name:                existingProduct.name,
-        category_id:         existingProduct.category_id ?? '',
-        base_price:          existingProduct.base_price,
-        base_cost:           existingProduct.base_cost,
-        avg_production_days: existingProduct.avg_production_days,
-        is_active:           existingProduct.is_active,
-      })
-    } else if (isOpen && !editingId) {
-      reset(DEFAULT_VALUES)
-    }
-  }, [isOpen, existingProduct, editingId, reset])
+    if (isOpen) reset(DEFAULT_VALUES)
+  }, [isOpen, reset])
 
   const onClose = (): void => {
     setOpen(false)
-    setEditingId(null)
     setCategoryManagerOpen(false)
   }
 
   const onSubmit = async (values: ProductFormValues): Promise<void> => {
     const payload = { ...values, category_id: values.category_id || undefined }
-    if (editingId) {
-      await updateProduct.mutateAsync({ id: editingId, payload })
-    } else {
-      await createProduct.mutateAsync(payload as ProductFormValues)
-    }
+    await createProduct.mutateAsync(payload as ProductFormValues)
     onClose()
   }
 
@@ -132,7 +113,6 @@ export const useProductForm = (): UseProductFormReturn => {
 
   return {
     isOpen,
-    isEditing: !!editingId,
     register,
     handleSubmit,
     onSubmit,

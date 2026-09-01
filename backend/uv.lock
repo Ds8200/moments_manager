@@ -1045,7 +1045,6 @@ dependencies = [
     { name = "httpx" },
     { name = "openai" },
     { name = "openpyxl" },
-    { name = "pino" },
     { name = "pydantic", extra = ["email"] },
     { name = "pydantic-settings" },
     { name = "python-jose", extra = ["cryptography"] },
@@ -1089,7 +1088,6 @@ requires-dist = [
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
     { name = "openai", specifier = ">=2.41.0" },
     { name = "openpyxl", specifier = ">=3.1.5" },
-    { name = "pino", specifier = ">=0.1.0" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.0.0" },
     { name = "pydantic-settings", specifier = ">=2.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
@@ -1242,18 +1240,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c3/28/ec0fc38107fc32536908034e990c47914c57cd7c5a3ece4d8d8f7ffd7e27/pillow-12.2.0-pp311-pypy311_pp73-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:4a6c9fa44005fa37a91ebfc95d081e8079757d2e904b27103f4f5fa6f0bf78c0", size = 5355404, upload-time = "2026-04-01T14:46:06.33Z" },
     { url = "https://files.pythonhosted.org/packages/5e/8b/51b0eddcfa2180d60e41f06bd6d0a62202b20b59c68f5a132e615b75aecf/pillow-12.2.0-pp311-pypy311_pp73-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:25373b66e0dd5905ed63fa3cae13c82fbddf3079f2c8bf15c6fb6a35586324c1", size = 6002215, upload-time = "2026-04-01T14:46:08.83Z" },
     { url = "https://files.pythonhosted.org/packages/bc/60/5382c03e1970de634027cee8e1b7d39776b778b81812aaf45b694dfe9e28/pillow-12.2.0-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:bfa9c230d2fe991bed5318a5f119bd6780cda2915cca595393649fc118ab895e", size = 7080946, upload-time = "2026-04-01T14:46:11.734Z" },
-]
-
-[[package]]
-name = "pino"
-version = "0.6.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "style" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/88/7c/68bc956e96fdc1e76a3bc0b89deb0ab3fcb2ced2af76fd588ed6ac48e4bb/pino-0.6.0.tar.gz", hash = "sha256:fa60dcf8a087cd6f191c730744dcc96be9f371aef8b3320c48cbf0ffd1415afd", size = 5916, upload-time = "2020-11-30T16:52:41.89Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b0/a5/e1191ec5d6761f83cc0f91f4f6a446bdd6771a9c0a22a2e96b34fee4cc06/pino-0.6.0-py3-none-any.whl", hash = "sha256:b6ef45cd03ca082e89f728212c2fa664fb4888a01ae2fd644a83faf17a536c4b", size = 6109, upload-time = "2020-11-30T16:52:40.536Z" },
 ]
 
 [[package]]
@@ -1729,15 +1715,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/81/69/17425771797c36cded50b7fe44e850315d039f28b15901ab44839e70b593/starlette-1.0.0.tar.gz", hash = "sha256:6a4beaf1f81bb472fd19ea9b918b50dc3a77a6f2e190a12954b25e6ed5eea149", size = 2655289, upload-time = "2026-03-22T18:29:46.779Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0b/c9/584bc9651441b4ba60cc4d557d8a547b5aff901af35bda3a4ee30c819b82/starlette-1.0.0-py3-none-any.whl", hash = "sha256:d3ec55e0bb321692d275455ddfd3df75fff145d009685eb40dc91fc66b03d38b", size = 72651, upload-time = "2026-03-22T18:29:45.111Z" },
-]
-
-[[package]]
-name = "style"
-version = "1.1.6"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c0/37/6e922b8b02286383d01ca8535bf615adc7ba32120f06e8c4e48f149b6b2a/style-1.1.6.tar.gz", hash = "sha256:d0ad01f3688b83e7fcbb305123df26f7018adf41babe2c12e4b9a68d4e598eb5", size = 3557, upload-time = "2019-03-08T14:52:36.999Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/06/ba0ecadb5d0d7b25505dc650c5c454c5448165b01e04ac4f207816623b8c/style-1.1.6-py2.py3-none-any.whl", hash = "sha256:48deb552717e4a38e607e5c667b89f07f4eca5bce94dbaabb66707bf395a2eb6", size = 5180, upload-time = "2019-03-08T14:52:35.873Z" },
 ]
 
 [[package]]

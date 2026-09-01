@@ -20,6 +20,8 @@ export const ORDERS_LABELS = {
   COL_STATUS:           'סטטוס',
   COL_PAYMENT:          'תשלום',
   COL_ACTIONS:          '',
+  PRODUCTS_EMPTY:       'אין מוצרים בהזמנה זו',
+  PRODUCTS_QTY_PREFIX:  'כמות:',
   LOADING:              'טוען הזמנות...',
   ERROR:                'שגיאה בטעינת הזמנות',
   CONFIRM_DELETE:       'האם למחוק הזמנה זו?',

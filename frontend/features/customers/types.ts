@@ -1,5 +1,3 @@
-import type { OrderSummary } from '@/features/orders/types'
-
 export interface Customer {
   id: string
   name: string
@@ -10,11 +8,11 @@ export interface Customer {
   updated_at: string
 }
 
+// Mirrors the backend's CustomerWithStatsSchema (backend/src/customers/schemas.py) exactly —
+// it only adds total_orders/total_spent on top of Customer, there is no embedded orders list.
 export interface CustomerDetail extends Customer {
-  orders: OrderSummary[]
   total_orders: number
-  total_revenue: string
-  total_profit: string
+  total_spent: number
 }
 
 export interface CustomersResponse {

@@ -99,7 +99,7 @@ export const ReportsPage = (): ReactElement => {
                     <td className={`${styles.cell} ${styles.kpiNegative}`}>{formatAmount(m.unpaid_amount)}</td>
                     <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.paid_revenue)}</td>
                     <td className={styles.cell}>{formatAmount(m.total_expenses)}</td>
-                    <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.total_profit)}</td>
+                    <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.net_profit)}</td>
                   </tr>
                 ))}
               </tbody>

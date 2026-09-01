@@ -15,6 +15,6 @@ export const DEFAULT_FILTERS: OrderFilters = {
 
 export const orderFiltersAtom = atom<OrderFilters>({ ...DEFAULT_FILTERS })
 
+// Editing an existing order happens inline on the order's own detail page — this atom only ever
+// drives the "+ New" creation flow now.
 export const isOrderFormOpenAtom = atom<boolean>(false)
-
-export const editingOrderIdAtom = atom<string | null>(null)

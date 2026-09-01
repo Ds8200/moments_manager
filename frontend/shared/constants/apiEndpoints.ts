@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
 
   USERS: `${BASE}/api/v1/users`,
   USER: (id: string) => `${BASE}/api/v1/users/${id}`,
+  USER_ROLE: (id: string) => `${BASE}/api/v1/users/${id}/role`,
   ME: `${BASE}/api/v1/users/me`,
 
   AI_CHAT: `${BASE}/api/v1/ai/chat`,

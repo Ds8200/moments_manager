@@ -6,6 +6,7 @@ import pytest
 from src.core.exceptions import ConflictError, ForbiddenError, NotFoundError
 from src.core.schemas import PaginationParams
 from src.users.enums import UserRole
+from src.users.schemas import UserRoleUpdateSchema
 from src.users.service import UserService
 
 pytestmark = pytest.mark.asyncio
@@ -86,6 +87,48 @@ async def test_delete_user_success_calls_soft_delete_and_commit() -> None:
     await svc.delete_user(target.id, admin_id)
 
     svc._repo.soft_delete.assert_called_once_with(target)
+    db.commit.assert_called_once()
+
+
+async def test_get_user_not_found_raises() -> None:
+    svc, _ = _make_service()
+    svc._repo.get_by_id.return_value = None
+
+    with pytest.raises(NotFoundError):
+        await svc.get_user(str(uuid.uuid4()))
+
+
+async def test_get_user_success_returns_schema() -> None:
+    svc, _ = _make_service()
+    target = _make_user()
+    svc._repo.get_by_id.return_value = target
+
+    with patch("src.users.service.UserResponseSchema.model_validate", side_effect=lambda u: u):
+        result = await svc.get_user(target.id)
+
+    assert result is target
+
+
+async def test_update_role_not_found_raises() -> None:
+    svc, _ = _make_service()
+    svc._repo.get_by_id.return_value = None
+
+    with pytest.raises(NotFoundError):
+        await svc.update_role(
+            str(uuid.uuid4()), UserRoleUpdateSchema(role=UserRole.admin), str(uuid.uuid4())
+        )
+
+
+async def test_update_role_success_calls_repo_and_commit() -> None:
+    svc, db = _make_service()
+    target = _make_user()
+    svc._repo.get_by_id.return_value = target
+    db.refresh = AsyncMock()
+    admin_id = str(uuid.uuid4())
+
+    await svc.update_role(target.id, UserRoleUpdateSchema(role=UserRole.admin), admin_id)
+
+    svc._repo.update_role.assert_called_once_with(target, UserRole.admin.value)
     db.commit.assert_called_once()
 
 

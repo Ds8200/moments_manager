@@ -12,7 +12,12 @@ from src.core.constants.http_messages import (
     USER_EMAIL_EXISTS,
     WRONG_CURRENT_PASSWORD,
 )
-from src.core.constants.log_messages import USER_CREATED, USER_DELETED, USER_PROFILE_UPDATED
+from src.core.constants.log_messages import (
+    USER_CREATED,
+    USER_DELETED,
+    USER_PROFILE_UPDATED,
+    USER_ROLE_UPDATED,
+)
 from src.core.email import send_html_email
 from src.core.enums.error_codes import ErrorCode
 from src.core.exceptions import ConflictError, ForbiddenError, NotFoundError, UnauthorizedError
@@ -22,7 +27,12 @@ from src.users.email_templates import build_welcome_email
 from src.users.enums import UserRole
 from src.users.models import User
 from src.users.repository import UserRepository
-from src.users.schemas import UserCreateSchema, UserResponseSchema, UserUpdateMeSchema
+from src.users.schemas import (
+    UserCreateSchema,
+    UserResponseSchema,
+    UserRoleUpdateSchema,
+    UserUpdateMeSchema,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +85,27 @@ class UserService:
 
     async def get_me(self, current_user: User) -> UserResponseSchema:
         return UserResponseSchema.model_validate(current_user)
+
+    async def get_user(self, user_id: str) -> UserResponseSchema:
+        user = await self._repo.get_by_id(user_id)
+        if not user:
+            raise NotFoundError(RESOURCE_USER, user_id)
+        return UserResponseSchema.model_validate(user)
+
+    async def update_role(
+        self,
+        user_id: str,
+        data: UserRoleUpdateSchema,
+        requesting_admin_id: str,
+    ) -> UserResponseSchema:
+        user = await self._repo.get_by_id(user_id)
+        if not user:
+            raise NotFoundError(RESOURCE_USER, user_id)
+        await self._repo.update_role(user, data.role.value)
+        await self._db.commit()
+        await self._db.refresh(user)
+        logger.info(USER_ROLE_UPDATED, user_id, data.role.value, requesting_admin_id)
+        return UserResponseSchema.model_validate(user)
 
     async def update_me(
         self,

@@ -1,6 +1,12 @@
 'use client'
 
-import { useState, type MouseEvent } from 'react'
+import { useState } from 'react'
+
+// Structural type so both React MouseEvent and TouchEvent (long-press on touch devices) can
+// anchor the menu — both carry a `currentTarget` that is a real DOM Element.
+export interface AnchorEvent {
+  currentTarget: Element
+}
 
 export interface DropdownMenuItem {
   label: string
@@ -31,7 +37,7 @@ const CLOSED: DropdownMenuState = {
 
 export interface UseDropdownMenuReturn {
   menuState: DropdownMenuState
-  openMenu: (title: string, items: DropdownMenuItem[], e: MouseEvent<Element>) => void
+  openMenu: (title: string, items: DropdownMenuItem[], e: AnchorEvent) => void
   closeMenu: () => void
 }
 
@@ -41,7 +47,7 @@ export const useDropdownMenu = (): UseDropdownMenuReturn => {
   const openMenu = (
     title: string,
     items: DropdownMenuItem[],
-    e: MouseEvent<Element>
+    e: AnchorEvent
   ): void => {
     const rect = e.currentTarget.getBoundingClientRect()
     setMenuState({

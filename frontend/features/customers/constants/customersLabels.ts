@@ -33,4 +33,14 @@ export const CUSTOMERS_LABELS = {
   CREATED_SUCCESS:          'הלקוח נוצר בהצלחה',
   UPDATED_SUCCESS:          'הלקוח עודכן בהצלחה',
   DELETED_SUCCESS:          'הלקוח נמחק בהצלחה',
+
+  DETAIL_PAGE_BACK:         '← חזרה ללקוחות',
+  DETAIL_SECTION_INFO:      'פרטי לקוח',
+  DETAIL_LABEL_NAME:        'שם',
+  DETAIL_LABEL_PHONE:       'טלפון',
+  DETAIL_LABEL_EMAIL:       'אימייל',
+  DETAIL_LABEL_NOTES:       'הערות',
+  DETAIL_SECTION_STATS:     'סטטיסטיקה',
+  DETAIL_LABEL_TOTAL_ORDERS: 'סה"כ הזמנות',
+  DETAIL_LABEL_TOTAL_SPENT:  'סה"כ הוצאה',
 } as const

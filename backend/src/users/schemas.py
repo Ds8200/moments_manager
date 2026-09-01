@@ -24,6 +24,10 @@ class UserResponseSchema(BaseModel):
     updated_at: datetime
 
 
+class UserRoleUpdateSchema(BaseModel):
+    role: UserRole
+
+
 class UserUpdateMeSchema(BaseModel):
     full_name: Optional[str] = None
     current_password: Optional[str] = None

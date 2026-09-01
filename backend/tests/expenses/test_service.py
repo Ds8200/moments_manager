@@ -16,7 +16,8 @@ def _make_expense() -> MagicMock:
     expense = MagicMock()
     expense.id = "e-1"
     expense.date = date.today()
-    expense.category = "ink"
+    expense.category_id = None
+    expense.category = None
     expense.amount = Decimal("10")
     expense.notes = None
     expense.created_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
@@ -53,7 +54,7 @@ async def test_create_expense_commits() -> None:
     service._repo.get_by_id.return_value = expense
 
     await service.create_expense(
-        ExpenseCreateSchema(date=date.today(), category="ink", amount=Decimal("10"))
+        ExpenseCreateSchema(date=date.today(), category_id=None, amount=Decimal("10"))
     )
 
     db.commit.assert_awaited_once()

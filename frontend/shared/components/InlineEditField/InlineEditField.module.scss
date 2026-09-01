@@ -1,0 +1,55 @@
+@use '@/shared/styles/variables' as *;
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  font-size: $font-size-sm;
+  padding-block: $space-1;
+}
+
+.label {
+  color: $text-secondary;
+  flex-shrink: 0;
+}
+
+.value {
+  color: $text-primary;
+  font-weight: $font-weight-medium;
+  text-align: end;
+}
+
+.editable {
+  cursor: text;
+  border-radius: $border-radius-sm;
+  padding-inline: $space-1;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $gray-100;
+  }
+}
+
+.input,
+.textarea {
+  border: 1px solid $primary;
+  border-radius: $border-radius-sm;
+  padding: $space-1 $space-2;
+  font-size: $font-size-sm;
+  font-family: $font-family;
+  color: $text-primary;
+  background: $bg-card;
+  text-align: end;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.textarea {
+  width: 100%;
+  min-height: 60px;
+  resize: vertical;
+  text-align: start;
+}

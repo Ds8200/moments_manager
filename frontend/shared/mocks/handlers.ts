@@ -85,6 +85,7 @@ export const handlers = [
       })),
     })
   ),
+  http.get(API_ENDPOINTS.REPORTS_TOP_CUSTOMERS, () => HttpResponse.json([])),
   http.patch(API_ENDPOINTS.ORDER_URGENCY(':id'), async ({ request, params }) => {
     const body = await request.json() as { urgency: string }
     return HttpResponse.json({ ...ORDER_STUB, id: params['id'] as string, urgency: body.urgency })

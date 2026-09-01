@@ -1,0 +1,17 @@
+@use '../../../../shared/styles/mixins' as m;
+
+.page {
+  @include m.record-detail-page;
+}
+
+.body {
+  @include m.record-detail-body;
+}
+
+.section {
+  @include m.record-detail-section;
+}
+
+.sectionTitle {
+  @include m.record-detail-section-title;
+}

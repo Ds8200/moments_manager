@@ -4,6 +4,12 @@ export type UrgencyLevel = 'normal' | 'urgent' | 'very_urgent'
 
 export type OrderSortField = 'created_at' | 'customer_name' | 'due_datetime' | 'urgency'
 
+export interface OrderItemSummary {
+  id: string
+  product_name: string
+  quantity: number
+}
+
 export interface OrderFile {
   id: string
   original_name: string
@@ -60,6 +66,7 @@ export interface OrderSummary {
   total_amount: string
   total_profit: string
   created_at: string
+  items: OrderItemSummary[]
 }
 
 export interface OrderFilters {

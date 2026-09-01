@@ -62,6 +62,11 @@ class UserRepository:
         await self._db.flush()
         return user
 
+    async def update_role(self, user: User, role: str) -> User:
+        user.role = role
+        await self._db.flush()
+        return user
+
     async def soft_delete(self, user: User) -> None:
         user.is_deleted = True
         user.deleted_at = datetime.now(timezone.utc)

@@ -5,8 +5,8 @@ import type { Resolver, UseFormSetValue } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAtom } from 'jotai'
-import { isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
-import { useOrder, useCreateOrder, useUpdateOrder } from '../../queries/useOrder'
+import { isOrderFormOpenAtom } from '../../store/ordersAtoms'
+import { useCreateOrder } from '../../queries/useOrder'
 import { useCustomers, useCreateCustomer } from '@/features/customers/queries/useCustomers'
 import type { AutocompleteOption } from '@/shared/components/Autocomplete/useAutocomplete'
 import type { Customer } from '@/features/customers/types'
@@ -53,9 +53,9 @@ const DEFAULT_VALUES: OrderFormValues = {
   items:         [DEFAULT_ITEM],
 }
 
+// Creates new orders only — editing an existing order happens inline on its detail page.
 export interface UseOrderFormReturn {
   isOpen: boolean
-  isEditing: boolean
   register: ReturnType<typeof useForm<OrderFormValues>>['register']
   control: ReturnType<typeof useForm<OrderFormValues>>['control']
   setValue: UseFormSetValue<OrderFormValues>
@@ -77,12 +77,9 @@ export interface UseOrderFormReturn {
 
 export const useOrderForm = (): UseOrderFormReturn => {
   const [isOpen, setOpen] = useAtom(isOrderFormOpenAtom)
-  const [editingId, setEditingId] = useAtom(editingOrderIdAtom)
-  const { data: existingOrder } = useOrder(editingId)
   const [customerSearch, setCustomerSearch] = useState('')
   const { data: customersData, isPending: customersLoading } = useCustomers(1, customerSearch, 20)
   const createOrder = useCreateOrder()
-  const updateOrder = useUpdateOrder()
   const createCustomer = useCreateCustomer()
 
   const {
@@ -105,31 +102,10 @@ export const useOrderForm = (): UseOrderFormReturn => {
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 
   useEffect(() => {
-    if (isOpen && existingOrder) {
-      reset({
-        customer_id:   existingOrder.customer_id,
-        customer_name: '',
-        date:          existingOrder.date,
-        due_datetime:  existingOrder.due_datetime ? existingOrder.due_datetime.slice(0, 16) : '',
-        notes:         existingOrder.notes ?? '',
-        items: existingOrder.items.map((it) => ({
-          product_id:   it.product_id,
-          product_name: it.product_name,
-          quantity:     it.quantity,
-          unit_price:   it.unit_price,
-          unit_cost:    it.unit_cost,
-          design_notes: it.design_notes ?? '',
-        })),
-      })
-    } else if (isOpen && !editingId) {
-      reset(DEFAULT_VALUES)
-    }
-  }, [isOpen, existingOrder, editingId, reset])
+    if (isOpen) reset(DEFAULT_VALUES)
+  }, [isOpen, reset])
 
-  const onClose = (): void => {
-    setOpen(false)
-    setEditingId(null)
-  }
+  const onClose = (): void => setOpen(false)
 
   // Called on every keystroke (not debounced) so customer_name is always current
   // before the form submits — even if the user clicks Save immediately after typing.
@@ -151,11 +127,7 @@ export const useOrderForm = (): UseOrderFormReturn => {
       notes:        values.notes,
       items:        values.items,
     }
-    if (editingId) {
-      await updateOrder.mutateAsync({ id: editingId, payload })
-    } else {
-      await createOrder.mutateAsync(payload)
-    }
+    await createOrder.mutateAsync(payload)
     onClose()
   }
 
@@ -165,7 +137,6 @@ export const useOrderForm = (): UseOrderFormReturn => {
 
   return {
     isOpen,
-    isEditing: !!editingId,
     register,
     control,
     setValue,
@@ -180,9 +151,8 @@ export const useOrderForm = (): UseOrderFormReturn => {
     customerOptions,
     customersLoading,
     setCustomerSearch,
-    // In edit mode: show the existing customer name as fallback.
-    // In free-text mode: show the typed name so the input stays populated after blur.
-    customerDefaultLabel: existingOrder?.customer_name ?? watchedCustomerName,
+    // Free-text mode: show the typed name so the input stays populated after blur.
+    customerDefaultLabel: watchedCustomerName,
     onRawInput,
     closeSymbol: UI_SYMBOLS.CLOSE,
   }

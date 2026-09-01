@@ -1,4 +1,3 @@
-import asyncio
 import uuid
 from typing import AsyncGenerator
 
@@ -18,13 +17,6 @@ from src.database import Base
 from src.main import app
 from src.users.enums import UserRole
 from src.users.models import User
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest_asyncio.fixture(scope="session")
