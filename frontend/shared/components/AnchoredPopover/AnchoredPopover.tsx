@@ -7,17 +7,21 @@ import type { AnchoredPopoverState } from './useAnchoredPopover'
 import styles from './AnchoredPopover.module.scss'
 
 const DEFAULT_WIDTH = 320
-// Content height is variable (a product list can be short or long) — .popoverBody caps its own
-// height with overflow scroll, so this is only an estimate used to decide whether the popover
-// should flip above the anchor, mirroring DropdownMenu's calcPosition approach.
-const ESTIMATED_HEIGHT = 320
 const VIEWPORT_PADDING = 8
 
-function calcPosition(anchorEl: Element, width: number): { top: number; left: number } {
+// `height` is the popover's own real rendered height (read from the already-mounted DOM node,
+// not a guessed constant) — using a generic estimate here previously made the vertical flip
+// trigger for rows that actually had plenty of room below, and the clamp then converged several
+// different rows onto the same ceiling position.
+function calcPosition(
+  anchorEl: Element,
+  height: number,
+  width: number
+): { top: number; left: number } {
   const rect = anchorEl.getBoundingClientRect()
 
   const spaceBelow = window.innerHeight - rect.bottom
-  const top = spaceBelow >= ESTIMATED_HEIGHT ? rect.bottom + 4 : rect.top - ESTIMATED_HEIGHT - 4
+  const top = spaceBelow >= height ? rect.bottom + 4 : rect.top - height - 4
 
   // Prefer aligning the popover's trailing (right) edge with the anchor's — natural for RTL,
   // where content anchored to a control tends to extend backward/leftward from it. But the
@@ -32,7 +36,7 @@ function calcPosition(anchorEl: Element, width: number): { top: number; left: nu
       : Math.max(VIEWPORT_PADDING, Math.min(rect.left, window.innerWidth - width - VIEWPORT_PADDING))
 
   return {
-    top: Math.max(VIEWPORT_PADDING, Math.min(top, window.innerHeight - ESTIMATED_HEIGHT - VIEWPORT_PADDING)),
+    top: Math.max(VIEWPORT_PADDING, Math.min(top, window.innerHeight - height - VIEWPORT_PADDING)),
     left,
   }
 }
@@ -62,7 +66,7 @@ export const AnchoredPopover = <T,>({
     if (!anchorEl || !popoverEl) return
 
     const recompute = (): void => {
-      const { top, left } = calcPosition(anchorEl, width)
+      const { top, left } = calcPosition(anchorEl, popoverEl.offsetHeight, width)
       popoverEl.style.setProperty('--ap-top', `${top}px`)
       popoverEl.style.setProperty('--ap-left', `${left}px`)
     }
