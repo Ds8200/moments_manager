@@ -38,10 +38,10 @@ export const CustomersTable = (): ReactElement => {
         <span className={styles.name}>{customer.name}</span>
       </td>
       <td className={styles.cell}>
-        <span className={styles.secondary}>{customer.phone ?? emptyValue}</span>
+        <span className={styles.secondary}>{customer.phone || emptyValue}</span>
       </td>
       <td className={styles.cell}>
-        <span className={styles.secondary}>{customer.email ?? emptyValue}</span>
+        <span className={styles.secondary}>{customer.email || emptyValue}</span>
       </td>
     </tr>
   )

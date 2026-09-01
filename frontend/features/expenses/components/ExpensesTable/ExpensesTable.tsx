@@ -40,13 +40,13 @@ export const ExpensesTable = (): ReactElement => {
       <td className={styles.cell}>{formatExpenseDate(expense.date)}</td>
       <td className={styles.cell}>
         <span className={styles.categoryBadge}>
-          {expense.category?.name ?? emptyValue}
+          {expense.category?.name || emptyValue}
         </span>
       </td>
       <td className={styles.cell}>
         <span className={styles.amount}>{formatAmount(expense.amount)}</span>
       </td>
-      <td className={styles.cell}>{expense.notes ?? emptyValue}</td>
+      <td className={styles.cell}>{expense.notes || emptyValue}</td>
     </tr>
   )
 
