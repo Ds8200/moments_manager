@@ -1,6 +1,7 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useUsersPage } from './useUsersPage'
+import { PageLayout } from '@/shared/components/PageLayout/PageLayout'
 import { UsersTable } from '../UsersTable/UsersTable'
 import { UserForm } from '../UserForm/UserForm'
 import { USERS_LABELS } from '../../constants/usersLabels'
@@ -10,19 +11,18 @@ export const UsersPage = (): ReactElement => {
   const { onAddUser } = useUsersPage()
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>{USERS_LABELS.PAGE_TITLE}</h1>
-        <button className={styles.newBtn} onClick={onAddUser}>
-          {USERS_LABELS.NEW_USER}
-        </button>
-      </div>
-
-      <div className={styles.card}>
-        <UsersTable />
-      </div>
+    <>
+      <PageLayout
+        title={USERS_LABELS.PAGE_TITLE}
+        actionLabel={USERS_LABELS.NEW_USER}
+        onAction={onAddUser}
+      >
+        <div className={styles.card}>
+          <UsersTable />
+        </div>
+      </PageLayout>
 
       <UserForm />
-    </div>
+    </>
   )
 }

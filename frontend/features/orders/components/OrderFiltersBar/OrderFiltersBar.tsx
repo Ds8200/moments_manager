@@ -13,7 +13,6 @@ export const OrderFiltersBar = (): ReactElement => {
     onSearchChange,
     onDateFromChange,
     onDateToChange,
-    onNewOrder,
   } = useOrderFiltersBar()
 
   return (
@@ -28,8 +27,6 @@ export const OrderFiltersBar = (): ReactElement => {
       dateToLabel={ORDERS_LABELS.DATE_TO}
       onDateFromChange={onDateFromChange}
       onDateToChange={onDateToChange}
-      newButtonLabel={ORDERS_LABELS.NEW_ORDER}
-      onNew={onNewOrder}
     />
   )
 }

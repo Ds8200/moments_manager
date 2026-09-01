@@ -1,7 +1,7 @@
 'use client'
-import { useAtom, useSetAtom } from 'jotai'
+import { useAtom } from 'jotai'
 import { useCallback } from 'react'
-import { orderFiltersAtom, isOrderFormOpenAtom } from '../../store/ordersAtoms'
+import { orderFiltersAtom } from '../../store/ordersAtoms'
 import { STATUS_ORDER, STATUS_LABELS, PAYMENT_STATE_ORDER, PAYMENT_STATE_LABELS } from '@/shared/enums/statusEnums'
 import type { OrderStatus, PaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
@@ -16,12 +16,10 @@ export interface UseOrderFiltersBarReturn {
   onSearchChange: (value: string) => void
   onDateFromChange: (value: string) => void
   onDateToChange: (value: string) => void
-  onNewOrder: () => void
 }
 
 export const useOrderFiltersBar = (): UseOrderFiltersBarReturn => {
   const [filters, setFilters] = useAtom(orderFiltersAtom)
-  const setFormOpen = useSetAtom(isOrderFormOpenAtom)
 
   const patch = useCallback(
     (p: Partial<OrderFilters>) => setFilters((prev) => ({ ...prev, ...p, page: 1 })),
@@ -67,6 +65,5 @@ export const useOrderFiltersBar = (): UseOrderFiltersBarReturn => {
     onSearchChange:   (v) => patch({ search: v }),
     onDateFromChange: (v) => patch({ date_from: v }),
     onDateToChange:   (v) => patch({ date_to: v }),
-    onNewOrder: () => setFormOpen(true),
   }
 }

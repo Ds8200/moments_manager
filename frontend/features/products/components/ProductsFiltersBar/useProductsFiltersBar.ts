@@ -1,7 +1,7 @@
 'use client'
-import { useAtom, useSetAtom } from 'jotai'
+import { useAtom } from 'jotai'
 import { useCallback } from 'react'
-import { productFiltersAtom, isProductFormOpenAtom } from '../../store/productsAtoms'
+import { productFiltersAtom } from '../../store/productsAtoms'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 import type { ProductFilters } from '../../types'
 import type { FiltersBarSelectConfig } from '@/shared/components/FiltersBar/useFiltersBar'
@@ -10,13 +10,10 @@ export interface UseProductsFiltersBarReturn {
   searchValue: string
   onSearchChange: (value: string) => void
   isActiveSelect: FiltersBarSelectConfig
-  newButtonLabel: string
-  onNew: () => void
 }
 
 export const useProductsFiltersBar = (): UseProductsFiltersBarReturn => {
   const [filters, setFilters] = useAtom(productFiltersAtom)
-  const setFormOpen = useSetAtom(isProductFormOpenAtom)
 
   const patch = useCallback(
     (p: Partial<ProductFilters>) => setFilters((prev) => ({ ...prev, ...p, page: 1 })),
@@ -43,7 +40,5 @@ export const useProductsFiltersBar = (): UseProductsFiltersBarReturn => {
     searchValue: filters.search,
     onSearchChange: (v) => patch({ search: v }),
     isActiveSelect,
-    newButtonLabel: PRODUCTS_LABELS.NEW_PRODUCT,
-    onNew: () => setFormOpen(true),
   }
 }

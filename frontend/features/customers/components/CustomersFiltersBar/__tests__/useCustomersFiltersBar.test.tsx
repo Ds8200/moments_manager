@@ -3,8 +3,7 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { createStore, Provider } from 'jotai'
 import { useCustomersFiltersBar } from '../useCustomersFiltersBar'
-import { customerFiltersAtom, isCustomerFormOpenAtom } from '../../../store/customersAtoms'
-import { CUSTOMERS_LABELS } from '../../../constants/customersLabels'
+import { customerFiltersAtom } from '../../../store/customersAtoms'
 
 function makeWrapper(store: ReturnType<typeof createStore>) {
   function TestWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
@@ -30,22 +29,5 @@ describe('useCustomersFiltersBar', () => {
 
     expect(result.current.searchValue).toBe('דניאל')
     expect(store.get(customerFiltersAtom).page).toBe(1)
-  })
-
-  it('onNew opens the form', () => {
-    const store = createStore()
-    const { result } = renderHook(() => useCustomersFiltersBar(), { wrapper: makeWrapper(store) })
-
-    act(() => {
-      result.current.onNew()
-    })
-
-    expect(store.get(isCustomerFormOpenAtom)).toBe(true)
-  })
-
-  it('exposes the new button label from constants', () => {
-    const store = createStore()
-    const { result } = renderHook(() => useCustomersFiltersBar(), { wrapper: makeWrapper(store) })
-    expect(result.current.newButtonLabel).toBe(CUSTOMERS_LABELS.NEW_CUSTOMER)
   })
 })

@@ -23,7 +23,7 @@ export const DataTable = <T,>(props: DataTableProps<T>): ReactElement => {
   if (showEmpty) return <EmptyState title={emptyTitle} description={emptyDescription} icon={emptyIcon} />
 
   return (
-    <div>
+    <div className={styles.root}>
       {showTable && (
         <div className={styles.wrapper}>
           <table className={styles.table}>

@@ -2,12 +2,15 @@
 
 .root {
   display: flex;
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   background: v.$bg-page;
 }
 
 .content {
   flex: 1;
+  height: 100%;
+  min-height: 0;
   margin-right: v.$sidebar-width;
   display: flex;
   flex-direction: column;
@@ -26,8 +29,15 @@
   }
 }
 
+// No longer scrolls itself — each page fills this box and manages its own internal
+// scroll region (see shared/components/PageLayout), so its pinned header/filters/table
+// header/pagination stay in view while only the table rows scroll.
 .main {
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   padding: v.$space-6;
   width: 100%;
 

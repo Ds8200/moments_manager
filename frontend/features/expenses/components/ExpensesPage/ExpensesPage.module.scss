@@ -1,43 +1,10 @@
 @use '../../../../shared/styles/variables' as v;
 
-.page {
+.card {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: v.$space-5;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: v.$space-3;
-}
-
-.title {
-  font-size: v.$font-size-2xl;
-  font-weight: v.$font-weight-bold;
-  color: v.$text-primary;
-  margin-inline-start: auto;
-}
-
-.newBtn {
-  padding: v.$space-2 v.$space-4;
-  background: v.$primary;
-  color: v.$text-inverse;
-  border: none;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-weight: v.$font-weight-semibold;
-  font-family: v.$font-family;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background v.$transition-fast;
-
-  &:hover {
-    background: v.$primary-dark;
-  }
-}
-
-.card {
   background: v.$bg-card;
   border-radius: v.$border-radius-lg;
   box-shadow: v.$shadow-card;
@@ -46,6 +13,7 @@
 }
 
 .totalRow {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;

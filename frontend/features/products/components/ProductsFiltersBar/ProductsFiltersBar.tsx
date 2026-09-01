@@ -5,7 +5,7 @@ import { FiltersBar } from '@/shared/components/FiltersBar/FiltersBar'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 
 export const ProductsFiltersBar = (): ReactElement => {
-  const { searchValue, onSearchChange, isActiveSelect, newButtonLabel, onNew } = useProductsFiltersBar()
+  const { searchValue, onSearchChange, isActiveSelect } = useProductsFiltersBar()
 
   return (
     <FiltersBar
@@ -13,8 +13,6 @@ export const ProductsFiltersBar = (): ReactElement => {
       searchPlaceholder={PRODUCTS_LABELS.SEARCH_PLACEHOLDER}
       onSearchChange={onSearchChange}
       selects={[isActiveSelect]}
-      newButtonLabel={newButtonLabel}
-      onNew={onNew}
     />
   )
 }
