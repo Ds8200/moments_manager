@@ -5,7 +5,8 @@ Usage (from backend/ directory):
     uv run python scripts/create_user.py <email> <password> <full_name> [--role admin|user]
 
 Usage (exec from host via Docker):
-    docker compose exec -e PYTHONPATH=/app backend uv run python scripts/create_user.py <email> <password> <full_name> [--role admin]
+    docker compose exec -e PYTHONPATH=/app backend uv run python scripts/create_user.py \
+        <email> <password> <full_name> [--role admin]
 """
 
 import argparse

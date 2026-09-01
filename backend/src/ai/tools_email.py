@@ -20,7 +20,8 @@ logger = logging.getLogger(__name__)
         "Returns the subject line, body text, and routing data for the send button. "
         "IMPORTANT: this only creates a draft — it does NOT send any email. "
         "Always tell the user the result is a draft they can review and send via the button. "
-        "Use is_bulk=true when the user wants to send to ALL customers (announcements, updates, promotions)."
+        "Use is_bulk=true when the user wants to send to ALL customers "
+        "(announcements, updates, promotions)."
     ),
     parameters={
         "type": "object",
@@ -47,7 +48,8 @@ logger = logging.getLogger(__name__)
             "is_bulk": {
                 "type": "boolean",
                 "description": (
-                    "Set to true when sending to ALL customers (announcements, updates, promotions). "
+                    "Set to true when sending to ALL customers "
+                    "(announcements, updates, promotions). "
                     "Set to false (default) when sending to a single specific customer."
                 ),
             },
