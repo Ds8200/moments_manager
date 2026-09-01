@@ -40,21 +40,17 @@ export const OrderDetailInfo = (props: OrderDetailInfoProps): ReactElement => {
   return (
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>{sectionTitle}</h2>
-      <div className={styles.grid}>
-        <div className={styles.card}>
-          <span className={styles.cardLabel}>{labelCustomer}</span>
-          <span className={styles.cardValue}>{customerName}</span>
+      <div className={styles.fieldsGrid}>
+        <div className={styles.readOnlyCard}>
+          <span className={styles.readOnlyLabel}>{labelCustomer}</span>
+          <span className={styles.readOnlyValue}>{customerName}</span>
         </div>
-        <div className={styles.card}>
-          <InlineEditField label={labelDate} value={rawDate} displayValue={formattedDate} type="date" editable onSave={onSaveDate} />
-          <InlineEditField label={labelDue} value={rawDueDatetime} displayValue={formattedDue} type="datetime-local" editable onSave={onSaveDueDatetime} />
+        <InlineEditField label={labelDate} value={rawDate} displayValue={formattedDate} type="date" editable onSave={onSaveDate} />
+        <InlineEditField label={labelDue} value={rawDueDatetime} displayValue={formattedDue} type="datetime-local" editable onSave={onSaveDueDatetime} />
+        <div className={styles.readOnlyCard}>
+          <span className={styles.readOnlyLabel}>{labelAmount}</span>
+          <span className={styles.readOnlyValueLarge}>{formattedAmount}</span>
         </div>
-        <div className={styles.card}>
-          <span className={styles.cardLabel}>{labelAmount}</span>
-          <span className={styles.cardValueLarge}>{formattedAmount}</span>
-        </div>
-      </div>
-      <div className={styles.selects}>
         <InlineSelectField
           label={labelStatus}
           value={currentStatus}

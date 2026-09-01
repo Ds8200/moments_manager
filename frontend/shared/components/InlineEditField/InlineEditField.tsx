@@ -11,8 +11,8 @@ export const InlineEditField = (props: InlineEditFieldProps): ReactElement => {
   } = useInlineEditField(props)
 
   return (
-    <div className={styles.row}>
-      <span className={styles.label}>{label}</span>
+    <div className={`${styles.row} ${type === 'textarea' ? styles.full : ''}`}>
+      {label && <span className={styles.label}>{label}</span>}
       {isEditing ? (
         type === 'textarea' ? (
           <textarea

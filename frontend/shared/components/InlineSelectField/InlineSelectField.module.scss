@@ -1,21 +1,25 @@
 @use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
 
 .row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: v.$font-size-sm;
+  @include m.record-detail-field-card;
 }
 
 .label {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
   color: v.$text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .select {
-  padding: v.$space-2 v.$space-3;
+  width: 100%;
+  padding: v.$space-1 v.$space-2;
   border: 1px solid v.$border-color;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
+  border-radius: v.$border-radius-sm;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
   font-family: v.$font-family;
   background: v.$bg-card;
   color: v.$text-primary;

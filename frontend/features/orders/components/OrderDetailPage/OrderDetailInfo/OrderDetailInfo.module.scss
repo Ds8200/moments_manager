@@ -1,45 +1,23 @@
 @use '../../../../../shared/styles/variables' as v;
+@use '../../../../../shared/styles/mixins' as m;
 
 .section {
-  background: v.$bg-card;
-  border-radius: v.$border-radius-lg;
-  box-shadow: v.$shadow-card;
-  border: 1px solid v.$border-color;
-  padding: v.$space-5 v.$space-6;
+  @include m.record-detail-section;
 }
 
 .sectionTitle {
-  font-size: v.$font-size-lg;
-  font-weight: v.$font-weight-semibold;
-  color: v.$text-primary;
-  margin-block-end: v.$space-4;
-  padding-block-end: v.$space-3;
-  border-block-end: 1px solid v.$border-color;
+  @include m.record-detail-section-title;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: v.$space-4;
-  margin-block-end: v.$space-5;
-
-  @media (max-width: v.$breakpoint-md) {
-    grid-template-columns: 1fr;
-  }
+.fieldsGrid {
+  @include m.record-detail-field-grid;
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-2;
-  justify-content: center;
-  padding: v.$space-4;
-  background: v.$gray-50;
-  border-radius: v.$border-radius;
-  border: 1px solid v.$gray-200;
+.readOnlyCard {
+  @include m.record-detail-field-card;
 }
 
-.cardLabel {
+.readOnlyLabel {
   font-size: v.$font-size-xs;
   font-weight: v.$font-weight-medium;
   color: v.$text-secondary;
@@ -47,22 +25,14 @@
   letter-spacing: 0.05em;
 }
 
-.cardValue {
+.readOnlyValue {
   font-size: v.$font-size-base;
   font-weight: v.$font-weight-medium;
   color: v.$text-primary;
 }
 
-.cardValueLarge {
+.readOnlyValueLarge {
   font-size: v.$font-size-xl;
   font-weight: v.$font-weight-bold;
   color: v.$primary;
-}
-
-.selects {
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-1;
-  padding-block-start: v.$space-4;
-  border-block-start: 1px solid v.$border-color;
 }

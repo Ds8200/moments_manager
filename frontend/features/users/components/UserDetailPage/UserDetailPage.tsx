@@ -39,20 +39,22 @@ export const UserDetailPage = (props: UserDetailPageProps): ReactElement => {
       <div className={styles.body}>
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>{sectionInfoLabel}</h2>
-          <InlineEditField label={labelName} value={user.full_name} type="text" editable={isOwnRow} onSave={onSaveName} />
-          {/* email is the account identity — never editable by anyone, including admins */}
-          <InlineEditField label={labelEmail} value={user.email} type="text" editable={false} onSave={noop} />
-          {isAdmin ? (
-            <InlineSelectField label={labelRole} value={currentRole} options={roleOptions} onChange={onRoleChange} />
-          ) : (
-            <div className={styles.readOnlyRow}>
-              <span className={styles.readOnlyLabel}>{labelRole}</span>
-              <span className={styles.readOnlyValue}>{currentRoleLabel}</span>
+          <div className={styles.fieldsGrid}>
+            <InlineEditField label={labelName} value={user.full_name} type="text" editable={isOwnRow} onSave={onSaveName} />
+            {/* email is the account identity — never editable by anyone, including admins */}
+            <InlineEditField label={labelEmail} value={user.email} type="text" editable={false} onSave={noop} />
+            {isAdmin ? (
+              <InlineSelectField label={labelRole} value={currentRole} options={roleOptions} onChange={onRoleChange} />
+            ) : (
+              <div className={styles.readOnlyCard}>
+                <span className={styles.readOnlyLabel}>{labelRole}</span>
+                <span className={styles.readOnlyValue}>{currentRoleLabel}</span>
+              </div>
+            )}
+            <div className={styles.readOnlyCard}>
+              <span className={styles.readOnlyLabel}>{labelStatus}</span>
+              <span className={styles.readOnlyValue}>{formattedStatus}</span>
             </div>
-          )}
-          <div className={styles.readOnlyRow}>
-            <span className={styles.readOnlyLabel}>{labelStatus}</span>
-            <span className={styles.readOnlyValue}>{formattedStatus}</span>
           </div>
         </section>
       </div>

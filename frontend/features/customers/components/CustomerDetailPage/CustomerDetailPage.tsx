@@ -39,20 +39,24 @@ export const CustomerDetailPage = (props: CustomerDetailPageProps): ReactElement
       <div className={styles.body}>
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>{sectionInfoLabel}</h2>
-          <InlineEditField label={labelName} value={customer.name} type="text" editable onSave={onSaveName} />
-          <InlineEditField label={labelPhone} value={customer.phone ?? ''} type="text" editable onSave={onSavePhone} />
-          <InlineEditField label={labelEmail} value={customer.email ?? ''} type="text" editable onSave={onSaveEmail} />
-          <InlineEditField label={labelNotes} value={customer.notes ?? ''} type="textarea" editable onSave={onSaveNotes} />
+          <div className={styles.fieldsGrid}>
+            <InlineEditField label={labelName} value={customer.name} type="text" editable onSave={onSaveName} />
+            <InlineEditField label={labelPhone} value={customer.phone ?? ''} type="text" editable onSave={onSavePhone} />
+            <InlineEditField label={labelEmail} value={customer.email ?? ''} type="text" editable onSave={onSaveEmail} />
+            <InlineEditField label={labelNotes} value={customer.notes ?? ''} type="textarea" editable onSave={onSaveNotes} />
+          </div>
         </section>
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>{sectionStatsLabel}</h2>
-          <div className={styles.statsRow}>
-            <span className={styles.statsLabel}>{labelTotalOrders}</span>
-            <span className={styles.statsValue}>{customer.total_orders}</span>
-          </div>
-          <div className={styles.statsRow}>
-            <span className={styles.statsLabel}>{labelTotalSpent}</span>
-            <span className={styles.statsValue}>{formattedTotalSpent}</span>
+          <div className={styles.fieldsGrid}>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>{labelTotalOrders}</span>
+              <span className={styles.statValue}>{customer.total_orders}</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>{labelTotalSpent}</span>
+              <span className={styles.statValue}>{formattedTotalSpent}</span>
+            </div>
           </div>
         </section>
       </div>

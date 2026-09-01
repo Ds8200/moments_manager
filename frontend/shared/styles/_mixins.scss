@@ -97,6 +97,29 @@
   border-block-end: 1px solid v.$border-color;
 }
 
+// One field's box — label on top, value/control below. Used by InlineEditField,
+// InlineSelectField, and any plain read-only field so every field on every detail page
+// looks the same regardless of whether it happens to be editable right now.
+@mixin record-detail-field-card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  padding: v.$space-3;
+  background: v.$gray-50;
+  border-radius: v.$border-radius;
+  border: 1px solid v.$gray-200;
+  min-width: 0; // lets grid children shrink instead of overflowing
+}
+
+// Wraps a set of field cards so they flow into a responsive grid instead of stacking as
+// full-width rows — this is what stops a label and its value from landing at opposite
+// edges of a wide section.
+@mixin record-detail-field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: v.$space-3;
+}
+
 // Scrollbar styling
 @mixin custom-scrollbar {
   &::-webkit-scrollbar {

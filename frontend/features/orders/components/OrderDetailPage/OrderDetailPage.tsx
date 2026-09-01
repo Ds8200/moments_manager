@@ -52,46 +52,55 @@ export const OrderDetailPage = (props: OrderDetailPageProps): ReactElement => {
         menuTitle={menuTitle}
         menuItems={menuItems}
       />
-      <div className={styles.body}>
-        <OrderDetailInfo order={order} />
-        <OrderDetailItems orderId={order.id} items={order.items} />
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>{sectionSummaryLabel}</h2>
-          <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>{labelTotal}</span>
-            <span className={styles.summaryValue}>{formattedTotal}</span>
-          </div>
-          <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>{labelCost}</span>
-            <span className={styles.summaryValue}>{formattedCost}</span>
-          </div>
-          <div className={`${styles.summaryRow} ${styles.summaryProfit}`}>
-            <span className={styles.summaryLabel}>{labelProfit}</span>
-            <span className={styles.summaryValue}>{formattedProfit}</span>
-          </div>
-        </section>
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>{sectionNotesLabel}</h2>
-          <InlineEditField label={labelNotes} value={order.notes ?? ''} type="textarea" editable onSave={onSaveNotes} />
-        </section>
-        {order.files.length > 0 && (
+      <div className={styles.layout}>
+        {/* sidebar comes first so its info/status/totals show above the items table on
+            mobile, where the grid collapses to one column */}
+        <div className={styles.sidebar}>
+          <OrderDetailInfo order={order} />
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>{sectionFilesLabel}</h2>
-            <div className={styles.fileList}>
-              {order.files.map((f) => (
-                <a
-                  key={f.id}
-                  className={styles.fileChip}
-                  href={getFileDownloadUrl(f.id)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {attachmentSymbol} {f.original_name}
-                </a>
-              ))}
+            <h2 className={styles.sectionTitle}>{sectionSummaryLabel}</h2>
+            <div className={styles.fieldsGrid}>
+              <div className={styles.summaryCard}>
+                <span className={styles.summaryLabel}>{labelTotal}</span>
+                <span className={styles.summaryValue}>{formattedTotal}</span>
+              </div>
+              <div className={styles.summaryCard}>
+                <span className={styles.summaryLabel}>{labelCost}</span>
+                <span className={styles.summaryValue}>{formattedCost}</span>
+              </div>
+              <div className={`${styles.summaryCard} ${styles.summaryProfit}`}>
+                <span className={styles.summaryLabel}>{labelProfit}</span>
+                <span className={styles.summaryValue}>{formattedProfit}</span>
+              </div>
             </div>
           </section>
-        )}
+        </div>
+
+        <div className={styles.main}>
+          <OrderDetailItems orderId={order.id} items={order.items} />
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>{sectionNotesLabel}</h2>
+            <InlineEditField label={labelNotes} value={order.notes ?? ''} type="textarea" editable onSave={onSaveNotes} />
+          </section>
+          {order.files.length > 0 && (
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>{sectionFilesLabel}</h2>
+              <div className={styles.fileList}>
+                {order.files.map((f) => (
+                  <a
+                    key={f.id}
+                    className={styles.fileChip}
+                    href={getFileDownloadUrl(f.id)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {attachmentSymbol} {f.original_name}
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
       </div>
       <OrderForm />
     </div>

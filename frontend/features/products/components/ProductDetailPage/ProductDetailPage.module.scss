@@ -15,3 +15,7 @@
 .sectionTitle {
   @include m.record-detail-section-title;
 }
+
+.fieldsGrid {
+  @include m.record-detail-field-grid;
+}

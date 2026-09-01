@@ -1,55 +1,72 @@
 @use '../../../../shared/styles/variables' as v;
 @use '../../../../shared/styles/mixins' as m;
 
-// `main` no longer scrolls the document — this page fills it and scrolls its own content.
 .page {
-  display: flex;
-  flex-direction: column;
-  gap: v.$space-6;
-  height: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  @include m.scrollbar-right;
+  @include m.record-detail-page;
 }
 
-.body {
-  display: flex;
-  flex-direction: column;
+// Main content (items/notes/files) first and wider, sidebar (info/status/summary) second and
+// narrower — collapses to one column on mobile, sidebar first so the key facts show above the
+// items table instead of after it.
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 320px);
   gap: v.$space-5;
-}
+  align-items: start;
 
-.section {
-  background: v.$bg-card;
-  border-radius: v.$border-radius-lg;
-  box-shadow: v.$shadow-card;
-  border: 1px solid v.$border-color;
-  padding: v.$space-5 v.$space-6;
-}
-
-.sectionTitle {
-  font-size: v.$font-size-lg;
-  font-weight: v.$font-weight-semibold;
-  color: v.$text-primary;
-  margin-block-end: v.$space-4;
-  padding-block-end: v.$space-3;
-  border-block-end: 1px solid v.$border-color;
-}
-
-.summaryRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-block: v.$space-2;
-  border-block-end: 1px solid v.$gray-100;
-
-  &:last-child {
-    border-block-end: none;
+  @include m.mobile {
+    grid-template-columns: 1fr;
   }
 }
 
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+  grid-column: 2;
+  grid-row: 1;
+
+  @include m.mobile {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+  grid-column: 1;
+  grid-row: 1;
+
+  @include m.mobile {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+.section {
+  @include m.record-detail-section;
+}
+
+.sectionTitle {
+  @include m.record-detail-section-title;
+}
+
+.fieldsGrid {
+  @include m.record-detail-field-grid;
+}
+
+.summaryCard {
+  @include m.record-detail-field-card;
+}
+
 .summaryLabel {
-  font-size: v.$font-size-base;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
   color: v.$text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .summaryValue {

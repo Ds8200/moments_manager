@@ -17,20 +17,24 @@
   @include m.record-detail-section-title;
 }
 
-.readOnlyRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: v.$space-3;
-  font-size: v.$font-size-sm;
-  padding-block: v.$space-1;
+.fieldsGrid {
+  @include m.record-detail-field-grid;
+}
+
+.readOnlyCard {
+  @include m.record-detail-field-card;
 }
 
 .readOnlyLabel {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
   color: v.$text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .readOnlyValue {
+  font-size: v.$font-size-base;
   color: v.$text-primary;
   font-weight: v.$font-weight-medium;
 }
