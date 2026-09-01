@@ -9,17 +9,11 @@ export interface AnchorEvent {
 }
 
 // Tagged union instead of `data: T | null` — lets consumers read `state.data` after
-// narrowing on `state.isOpen` without a non-null assertion.
+// narrowing on `state.isOpen` without a non-null assertion. Stores the anchor *element*
+// (not a one-shot rect) so AnchoredPopover can re-measure it live on scroll/resize.
 export type AnchoredPopoverState<T> =
   | { isOpen: false }
-  | {
-      isOpen: true
-      data: T
-      anchorX: number
-      anchorY: number
-      anchorWidth: number
-      anchorHeight: number
-    }
+  | { isOpen: true; data: T; anchorEl: Element }
 
 const CLOSED: AnchoredPopoverState<never> = { isOpen: false }
 
@@ -33,15 +27,7 @@ export const useAnchoredPopover = <T,>(): UseAnchoredPopoverReturn<T> => {
   const [state, setState] = useState<AnchoredPopoverState<T>>(CLOSED)
 
   const open = (data: T, e: AnchorEvent): void => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    setState({
-      isOpen: true,
-      data,
-      anchorX: rect.left,
-      anchorY: rect.top,
-      anchorWidth: rect.width,
-      anchorHeight: rect.height,
-    })
+    setState({ isOpen: true, data, anchorEl: e.currentTarget })
   }
 
   const close = (): void => setState(CLOSED)
