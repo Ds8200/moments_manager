@@ -25,7 +25,7 @@
 
 .kpiRow {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: v.$space-4;
 
   @media (max-width: #{v.$breakpoint-lg - 1}) {
