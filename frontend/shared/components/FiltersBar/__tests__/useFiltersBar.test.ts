@@ -1,7 +1,18 @@
-import { renderHook } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { useFiltersBar } from '../useFiltersBar'
-import type { FiltersBarProps } from '../useFiltersBar'
+import type { FiltersBarProps, FiltersBarSelectConfig } from '../useFiltersBar'
+import { UI_LABELS } from '@/shared/constants/uiLabels'
+
+const buildSelect = (overrides: Partial<FiltersBarSelectConfig> = {}): FiltersBarSelectConfig => ({
+  value: '',
+  options: [
+    { value: '', label: 'הכל' },
+    { value: 'open', label: 'פתוח' },
+  ],
+  onChange: vi.fn(),
+  ...overrides,
+})
 
 const buildProps = (overrides: Partial<FiltersBarProps> = {}): FiltersBarProps => ({
   searchValue: '',
@@ -55,5 +66,66 @@ describe('useFiltersBar', () => {
     )
     expect(result.current.dateFrom).toBe('2025-01-01')
     expect(result.current.dateTo).toBe('2025-12-31')
+  })
+
+  it('isExpanded defaults to false and toggleExpanded flips it', () => {
+    const { result } = renderHook(() => useFiltersBar(buildProps({ selects: [buildSelect()] })))
+    expect(result.current.isExpanded).toBe(false)
+
+    act(() => result.current.toggleExpanded())
+    expect(result.current.isExpanded).toBe(true)
+
+    act(() => result.current.toggleExpanded())
+    expect(result.current.isExpanded).toBe(false)
+  })
+
+  it('hasCollapsibleControls is false for a search-only bar', () => {
+    const { result } = renderHook(() => useFiltersBar(buildProps()))
+    expect(result.current.hasCollapsibleControls).toBe(false)
+  })
+
+  it('hasCollapsibleControls is true when selects are provided', () => {
+    const { result } = renderHook(() => useFiltersBar(buildProps({ selects: [buildSelect()] })))
+    expect(result.current.hasCollapsibleControls).toBe(true)
+  })
+
+  it('hasCollapsibleControls is true when a date handler is provided', () => {
+    const { result } = renderHook(() =>
+      useFiltersBar(buildProps({ onDateFromChange: vi.fn() }))
+    )
+    expect(result.current.hasCollapsibleControls).toBe(true)
+  })
+
+  it('activeCount is 0 when every select sits on its first option and no dates are set', () => {
+    const { result } = renderHook(() =>
+      useFiltersBar(buildProps({ selects: [buildSelect(), buildSelect()] }))
+    )
+    expect(result.current.activeCount).toBe(0)
+  })
+
+  it('activeCount counts a select whose value differs from its first option', () => {
+    const { result } = renderHook(() =>
+      useFiltersBar(buildProps({ selects: [buildSelect({ value: 'open' }), buildSelect()] }))
+    )
+    expect(result.current.activeCount).toBe(1)
+  })
+
+  it('activeCount adds one for each non-empty date bound', () => {
+    const { result } = renderHook(() =>
+      useFiltersBar(
+        buildProps({
+          selects: [buildSelect({ value: 'open' })],
+          dateFrom: '2025-01-01',
+          dateTo: '2025-12-31',
+          onDateFromChange: vi.fn(),
+        })
+      )
+    )
+    expect(result.current.activeCount).toBe(3)
+  })
+
+  it('exposes the shared filters toggle label', () => {
+    const { result } = renderHook(() => useFiltersBar(buildProps()))
+    expect(result.current.filtersToggleLabel).toBe(UI_LABELS.FILTERS_TOGGLE)
   })
 })
