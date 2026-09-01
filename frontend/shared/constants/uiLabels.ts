@@ -32,6 +32,8 @@ export const UI_LABELS = {
   MORE:                   'עוד',
   LOGOUT:                 'התנתקות',
   MENU_TITLE:             'תפריט',
+  // Filters
+  FILTERS_TOGGLE:         'כל המסננים',
   // Header greetings
   GOOD_MORNING:           'בוקר טוב',
   GOOD_AFTERNOON:         'צהריים טובים',

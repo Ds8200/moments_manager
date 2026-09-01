@@ -1,0 +1,65 @@
+@use '../../../styles/variables' as v;
+
+// The collapsible portion of the filter bar: selects + optional date range. Wraps onto
+// additional rows on narrow screens instead of hiding or horizontally scrolling controls.
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$space-3;
+}
+
+.select {
+  flex: 1 1 140px;
+  min-width: 120px;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  cursor: pointer;
+  min-height: 38px;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}
+
+.datesGroup {
+  display: flex;
+  align-items: flex-end;
+  gap: v.$space-2;
+  flex: 0 1 auto;
+}
+
+.dateField {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  min-width: 130px;
+}
+
+.dateLabel {
+  font-size: v.$font-size-xs;
+  color: v.$text-secondary;
+}
+
+.dateInput {
+  width: 100%;
+  padding: v.$space-2 v.$space-3;
+  border: 1px solid v.$border-color;
+  border-radius: v.$border-radius;
+  font-size: v.$font-size-sm;
+  font-family: v.$font-family;
+  background: v.$bg-card;
+  color: v.$text-primary;
+  min-height: 38px;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+  }
+}

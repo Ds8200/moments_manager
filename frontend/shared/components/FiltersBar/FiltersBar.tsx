@@ -2,6 +2,7 @@
 import type { ReactElement } from 'react'
 import { useFiltersBar } from './useFiltersBar'
 import type { FiltersBarProps } from './useFiltersBar'
+import { FiltersBarControls } from './FiltersBarControls/FiltersBarControls'
 import styles from './FiltersBar.module.scss'
 
 export const FiltersBar = (props: FiltersBarProps): ReactElement => {
@@ -17,10 +18,15 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
     dateToLabel,
     onDateFromChange,
     onDateToChange,
+    hasCollapsibleControls,
+    isExpanded,
+    toggleExpanded,
+    activeCount,
+    filtersToggleLabel,
   } = useFiltersBar(props)
 
   return (
-    <div className={styles.bar}>
+    <div className={styles.wrap}>
       <div className={styles.searchWrapper}>
         <i className={styles.searchIcon}>🔍</i>
         <input
@@ -32,40 +38,43 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
         />
       </div>
 
-      {selects.map((sel, idx) => (
-        <select
-          key={idx}
-          className={styles.select}
-          value={sel.value}
-          onChange={(e) => sel.onChange(e.target.value)}
+      {hasCollapsibleControls && (
+        <button
+          type="button"
+          className={styles.toggle}
+          aria-expanded={isExpanded}
+          onClick={toggleExpanded}
         >
-          {sel.options.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-      ))}
+          <span>{filtersToggleLabel}</span>
+          {activeCount > 0 && <span className={styles.badge}>{activeCount}</span>}
+          <svg
+            className={styles.chevron}
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+      )}
 
-      {showDates && (
-        <div className={styles.datesGroup}>
-          <label className={styles.dateField}>
-            {dateFromLabel && <span className={styles.dateLabel}>{dateFromLabel}</span>}
-            <input
-              type="date"
-              className={styles.dateInput}
-              value={dateFrom}
-              onChange={(e) => onDateFromChange(e.target.value)}
-            />
-          </label>
-          <label className={styles.dateField}>
-            {dateToLabel && <span className={styles.dateLabel}>{dateToLabel}</span>}
-            <input
-              type="date"
-              className={styles.dateInput}
-              value={dateTo}
-              onChange={(e) => onDateToChange(e.target.value)}
-            />
-          </label>
-        </div>
+      {hasCollapsibleControls && isExpanded && (
+        <FiltersBarControls
+          selects={selects}
+          showDates={showDates}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          dateFromLabel={dateFromLabel}
+          dateToLabel={dateToLabel}
+          onDateFromChange={onDateFromChange}
+          onDateToChange={onDateToChange}
+        />
       )}
     </div>
   )
