@@ -53,6 +53,34 @@
   outline-offset: 2px;
 }
 
+// Record detail pages (Customer/Product/Order/User detail views) — shared layout vocabulary so
+// every domain's detail page looks like one family even though their fields differ.
+@mixin record-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-6;
+}
+
+@mixin record-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+}
+
+@mixin record-detail-section {
+  @include card;
+  padding: v.$space-5 v.$space-6;
+}
+
+@mixin record-detail-section-title {
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-semibold;
+  color: v.$text-primary;
+  margin-block-end: v.$space-4;
+  padding-block-end: v.$space-3;
+  border-block-end: 1px solid v.$border-color;
+}
+
 // Scrollbar styling
 @mixin custom-scrollbar {
   &::-webkit-scrollbar {

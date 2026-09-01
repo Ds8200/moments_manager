@@ -9,7 +9,7 @@ import styles from './OrderForm.module.scss'
 
 export const OrderForm = (): ReactElement | null => {
   const {
-    isOpen, isEditing, register, control, setValue, handleSubmit, onSubmit,
+    isOpen, register, control, setValue, handleSubmit, onSubmit,
     errors, isSubmitting, fields, appendItem, removeItem, onClose,
     customerOptions, customersLoading, setCustomerSearch, customerDefaultLabel, onRawInput,
     closeSymbol,
@@ -19,7 +19,7 @@ export const OrderForm = (): ReactElement | null => {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>{isEditing ? ORDERS_LABELS.FORM_EDIT_TITLE : ORDERS_LABELS.FORM_NEW_TITLE}</h2>
+          <h2 className={styles.title}>{ORDERS_LABELS.FORM_NEW_TITLE}</h2>
           <button className={styles.closeBtn} onClick={onClose}>{closeSymbol}</button>
         </div>
 

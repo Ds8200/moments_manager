@@ -6,16 +6,15 @@ import { createElement } from 'react'
 import { useProductForm } from '../useProductForm'
 
 const createMutateAsync = vi.fn().mockResolvedValue({ id: 'new' })
-const updateMutateAsync = vi.fn().mockResolvedValue({ id: 'existing' })
 
 vi.mock('../../../queries/useProducts', () => ({
-  useProduct: () => ({ data: undefined }),
   useCreateProduct: () => ({ mutateAsync: createMutateAsync }),
-  useUpdateProduct: () => ({ mutateAsync: updateMutateAsync }),
 }))
 
 vi.mock('@/features/productCategories', () => ({
   useProductCategories: () => ({ data: [] }),
+  useCreateProductCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useDeleteProductCategory: () => ({ mutateAsync: vi.fn() }),
 }))
 
 const wrapper = ({ children }: { children: ReactNode }) => {
@@ -26,13 +25,11 @@ const wrapper = ({ children }: { children: ReactNode }) => {
 describe('useProductForm', () => {
   beforeEach(() => {
     createMutateAsync.mockClear()
-    updateMutateAsync.mockClear()
   })
 
-  it('isOpen and isEditing are false initially', () => {
+  it('isOpen is false initially', () => {
     const { result } = renderHook(() => useProductForm(), { wrapper })
     expect(result.current.isOpen).toBe(false)
-    expect(result.current.isEditing).toBe(false)
   })
 
   it('isCategoryManagerOpen is false initially', () => {
@@ -46,7 +43,7 @@ describe('useProductForm', () => {
     expect(result.current.isCategoryManagerOpen).toBe(true)
   })
 
-  it('onSubmit calls createProduct when not editing', async () => {
+  it('onSubmit calls createProduct', async () => {
     const { result } = renderHook(() => useProductForm(), { wrapper })
 
     await act(async () => {
@@ -63,7 +60,6 @@ describe('useProductForm', () => {
     await waitFor(() => {
       expect(createMutateAsync).toHaveBeenCalledOnce()
     })
-    expect(updateMutateAsync).not.toHaveBeenCalled()
   })
 
   it('onSubmit converts empty category_id to undefined', async () => {

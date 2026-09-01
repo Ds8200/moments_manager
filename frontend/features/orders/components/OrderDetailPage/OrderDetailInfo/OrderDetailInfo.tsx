@@ -1,6 +1,7 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useOrderDetailInfo } from './useOrderDetailInfo'
+import { InlineEditField } from '@/shared/components/InlineEditField/InlineEditField'
 import { InlineSelectField } from '@/shared/components/InlineSelectField/InlineSelectField'
 import styles from './OrderDetailInfo.module.scss'
 import type { OrderDetailInfoProps } from './useOrderDetailInfo'
@@ -10,7 +11,9 @@ import type { UrgencyLevel } from '../../../types'
 export const OrderDetailInfo = (props: OrderDetailInfoProps): ReactElement => {
   const {
     customerName,
+    rawDate,
     formattedDate,
+    rawDueDatetime,
     formattedDue,
     formattedAmount,
     currentStatus,
@@ -19,6 +22,8 @@ export const OrderDetailInfo = (props: OrderDetailInfoProps): ReactElement => {
     statusOptions,
     paymentOptions,
     urgencyOptions,
+    onSaveDate,
+    onSaveDueDatetime,
     onStatusChange,
     onPaymentChange,
     onUrgencyChange,
@@ -41,14 +46,8 @@ export const OrderDetailInfo = (props: OrderDetailInfoProps): ReactElement => {
           <span className={styles.cardValue}>{customerName}</span>
         </div>
         <div className={styles.card}>
-          <div className={styles.metaRow}>
-            <span className={styles.metaLabel}>{labelDate}</span>
-            <span className={styles.metaValue}>{formattedDate}</span>
-          </div>
-          <div className={styles.metaRow}>
-            <span className={styles.metaLabel}>{labelDue}</span>
-            <span className={styles.metaValue}>{formattedDue}</span>
-          </div>
+          <InlineEditField label={labelDate} value={rawDate} displayValue={formattedDate} type="date" editable onSave={onSaveDate} />
+          <InlineEditField label={labelDue} value={rawDueDatetime} displayValue={formattedDue} type="datetime-local" editable onSave={onSaveDueDatetime} />
         </div>
         <div className={styles.card}>
           <span className={styles.cardLabel}>{labelAmount}</span>

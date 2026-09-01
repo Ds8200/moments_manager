@@ -1,13 +1,15 @@
 'use client'
 import type { ReactElement } from 'react'
 import { useOrderDetailPage } from './useOrderDetailPage'
-import { OrderDetailHeader } from './OrderDetailHeader/OrderDetailHeader'
+import { RecordDetailHeader } from '@/shared/components/RecordDetailHeader/RecordDetailHeader'
 import { OrderDetailInfo } from './OrderDetailInfo/OrderDetailInfo'
 import { OrderDetailItems } from './OrderDetailItems/OrderDetailItems'
+import { InlineEditField } from '@/shared/components/InlineEditField/InlineEditField'
 import { OrderForm } from '../OrderForm/OrderForm'
 import { PageSkeleton } from '@/shared/components/PageSkeleton/PageSkeleton'
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary/ErrorBoundary'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
+import { ROUTES } from '@/shared/constants/routes'
 import styles from './OrderDetailPage.module.scss'
 import type { OrderDetailPageProps } from './useOrderDetailPage'
 
@@ -19,6 +21,9 @@ export const OrderDetailPage = (props: OrderDetailPageProps): ReactElement => {
     isLoading,
     isError,
     refetch,
+    backLabel,
+    menuTitle,
+    menuItems,
     formattedTotal,
     formattedCost,
     formattedProfit,
@@ -28,6 +33,8 @@ export const OrderDetailPage = (props: OrderDetailPageProps): ReactElement => {
     labelCost,
     labelProfit,
     sectionNotesLabel,
+    labelNotes,
+    onSaveNotes,
     sectionFilesLabel,
     attachmentSymbol,
   } = useOrderDetailPage(props)
@@ -37,10 +44,17 @@ export const OrderDetailPage = (props: OrderDetailPageProps): ReactElement => {
 
   return (
     <div className={styles.page}>
-      <OrderDetailHeader order={order} />
+      <RecordDetailHeader
+        title={order.order_number}
+        subtitle={order.customer_name}
+        backLabel={backLabel}
+        backHref={ROUTES.ORDERS}
+        menuTitle={menuTitle}
+        menuItems={menuItems}
+      />
       <div className={styles.body}>
         <OrderDetailInfo order={order} />
-        <OrderDetailItems items={order.items} />
+        <OrderDetailItems orderId={order.id} items={order.items} />
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>{sectionSummaryLabel}</h2>
           <div className={styles.summaryRow}>
@@ -56,12 +70,10 @@ export const OrderDetailPage = (props: OrderDetailPageProps): ReactElement => {
             <span className={styles.summaryValue}>{formattedProfit}</span>
           </div>
         </section>
-        {order.notes && (
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>{sectionNotesLabel}</h2>
-            <p className={styles.notes}>{order.notes}</p>
-          </section>
-        )}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>{sectionNotesLabel}</h2>
+          <InlineEditField label={labelNotes} value={order.notes ?? ''} type="textarea" editable onSave={onSaveNotes} />
+        </section>
         {order.files.length > 0 && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>{sectionFilesLabel}</h2>

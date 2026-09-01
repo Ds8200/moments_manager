@@ -2,8 +2,9 @@
 import { atom } from 'jotai'
 import type { CustomerFilters } from '../types'
 
+// Editing an existing customer happens inline on the customer's own detail page — this atom only
+// ever drives the "+ New" creation flow now.
 export const isCustomerFormOpenAtom = atom<boolean>(false)
-export const editingCustomerIdAtom = atom<string | null>(null)
 
 export const DEFAULT_CUSTOMER_FILTERS: CustomerFilters = {
   search: '',

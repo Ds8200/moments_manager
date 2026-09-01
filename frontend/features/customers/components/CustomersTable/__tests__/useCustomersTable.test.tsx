@@ -7,9 +7,9 @@ import { server } from '@/shared/mocks/server'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { useCustomersTable } from '../useCustomersTable'
-import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../../store/customersAtoms'
+import { customerFiltersAtom } from '../../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../../constants/customersLabels'
-import { ROUTES } from '@/shared/constants/routes'
+import { ROUTES, CUSTOMER_DETAIL_ROUTE } from '@/shared/constants/routes'
 import type { ConfirmDialogOptions } from '@/shared/store/globalAtoms'
 
 const confirmFn = vi.fn()
@@ -49,11 +49,6 @@ const CUSTOMER_NO_EMAIL = {
   updated_at: '2025-01-01T00:00:00Z',
 }
 
-function makeMockEvent() {
-  const el = document.createElement('tr')
-  return { currentTarget: el } as unknown as React.MouseEvent<Element>
-}
-
 describe('useCustomersTable', () => {
   let store: ReturnType<typeof createStore>
   let qc: QueryClient
@@ -83,38 +78,40 @@ describe('useCustomersTable', () => {
     expect(result.current.customers[0].name).toBe('דניאל')
   })
 
-  it('onRowClick opens menu with customer name as title', () => {
+  it('row onClick navigates to the customer detail page', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
-    expect(result.current.menuState.isOpen).toBe(false)
 
-    act(() => {
-      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
-    })
+    act(() => { result.current.getRowProps(CUSTOMER_ROW).onClick() })
+
+    expect(pushFn).toHaveBeenCalledWith(CUSTOMER_DETAIL_ROUTE('c1'))
+  })
+
+  it('right-click opens the menu with the customer name as title', () => {
+    const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
+    const rowProps = result.current.getRowProps(CUSTOMER_ROW)
+    const event = { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
+
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     expect(result.current.menuState.isOpen).toBe(true)
     expect(result.current.menuState.title).toBe('דניאל')
   })
 
-  it('edit menu item sets editing atom and opens form', () => {
+  it('menu has no edit item — editing happens on the detail page now', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
-    })
+    const rowProps = result.current.getRowProps(CUSTOMER_ROW)
+    const event = { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     const editItem = result.current.menuState.items.find((i) => i.label === CUSTOMERS_LABELS.TABLE_EDIT_TITLE)
-    act(() => { editItem!.onClick() })
-
-    expect(store.get(editingCustomerIdAtom)).toBe('c1')
-    expect(store.get(isCustomerFormOpenAtom)).toBe(true)
+    expect(editItem).toBeUndefined()
   })
 
   it('delete menu item opens confirm dialog with customer name', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
-    })
+    const rowProps = result.current.getRowProps(CUSTOMER_ROW)
+    const event = { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => { deleteItem!.onClick() })
@@ -130,10 +127,10 @@ describe('useCustomersTable', () => {
   it('delete menu item calls mutate when onConfirm callback is invoked', () => {
     confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
+    const rowProps = result.current.getRowProps(CUSTOMER_ROW)
+    const event = { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
-    act(() => {
-      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
-    })
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => { deleteItem!.onClick() })
 
@@ -142,10 +139,9 @@ describe('useCustomersTable', () => {
 
   it('email menu item navigates to send-email with customerId', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
-    })
+    const rowProps = result.current.getRowProps(CUSTOMER_ROW)
+    const event = { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     const emailItem = result.current.menuState.items[0]
     act(() => { emailItem.onClick() })
@@ -155,21 +151,19 @@ describe('useCustomersTable', () => {
 
   it('email menu item is absent for customer with no email', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
+    const rowProps = result.current.getRowProps(CUSTOMER_NO_EMAIL)
+    const event = { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
-    act(() => {
-      result.current.onRowClick(CUSTOMER_NO_EMAIL, makeMockEvent())
-    })
-
-    // customer with no email → only edit + delete (2 items, not 3)
-    expect(result.current.menuState.items).toHaveLength(2)
+    // customer with no email → only delete (1 item, not 2)
+    expect(result.current.menuState.items).toHaveLength(1)
   })
 
   it('closeMenu closes the menu', () => {
     const { result } = renderHook(() => useCustomersTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onRowClick(CUSTOMER_ROW, makeMockEvent())
-    })
+    const rowProps = result.current.getRowProps(CUSTOMER_ROW)
+    const event = { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
     expect(result.current.menuState.isOpen).toBe(true)
 
     act(() => { result.current.closeMenu() })

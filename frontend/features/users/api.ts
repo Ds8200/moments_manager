@@ -9,10 +9,19 @@ export const usersApi = {
     return apiClient<UsersResponse>(`${API_ENDPOINTS.USERS}?${params}`)
   },
 
+  get: (id: string): Promise<User> =>
+    apiClient<User>(API_ENDPOINTS.USER(id)),
+
   create: (payload: UserFormValues): Promise<User> =>
     apiClient<User>(API_ENDPOINTS.USERS, {
       method: 'POST',
       body: JSON.stringify(payload),
+    }),
+
+  updateRole: (id: string, role: UserFormValues['role']): Promise<User> =>
+    apiClient<User>(API_ENDPOINTS.USER_ROLE(id), {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
     }),
 
   delete: (id: string): Promise<void> =>

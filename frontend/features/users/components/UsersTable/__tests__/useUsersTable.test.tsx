@@ -10,10 +10,14 @@ import { useUsersTable } from '../useUsersTable'
 import { usersPageAtom } from '../../../store/usersAtoms'
 import { accessTokenAtom } from '@/features/auth/store/authAtoms'
 import { USERS_LABELS } from '../../../constants/usersLabels'
+import { USER_DETAIL_ROUTE } from '@/shared/constants/routes'
 import type { ConfirmDialogOptions } from '@/shared/store/globalAtoms'
 
 const confirmFn = vi.fn()
 vi.mock('@/shared/hooks/useConfirm', () => ({ useConfirm: () => confirmFn }))
+
+const pushFn = vi.fn()
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: pushFn }) }))
 
 function makeWrapper(store: ReturnType<typeof createStore>, qc: QueryClient) {
   function TestWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
@@ -36,9 +40,8 @@ const USER_ROW = {
   updated_at: '2025-01-01T00:00:00Z',
 }
 
-function makeMockEvent() {
-  const el = document.createElement('tr')
-  return { currentTarget: el } as unknown as React.MouseEvent<Element>
+function makeContextMenuEvent() {
+  return { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
 }
 
 describe('useUsersTable', () => {
@@ -49,6 +52,7 @@ describe('useUsersTable', () => {
     store = createStore()
     qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     confirmFn.mockClear()
+    pushFn.mockClear()
   })
 
   it('returns empty users by default', () => {
@@ -69,13 +73,22 @@ describe('useUsersTable', () => {
     expect(result.current.users[0].full_name).toBe('דניאל')
   })
 
-  it('onRowClick opens menu with user name as title', () => {
+  it('row onClick navigates to the user detail page, even for your own row', () => {
+    const token = 'x.' + btoa(JSON.stringify({ sub: 'u1', role: 'admin' })) + '.y'
+    store.set(accessTokenAtom, token)
     const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
-    expect(result.current.menuState.isOpen).toBe(false)
 
-    act(() => {
-      result.current.onRowClick(USER_ROW, makeMockEvent())
-    })
+    act(() => { result.current.getRowProps(USER_ROW).onClick() })
+
+    expect(pushFn).toHaveBeenCalledWith(USER_DETAIL_ROUTE('u1'))
+  })
+
+  it('right-click opens menu with user name as title', () => {
+    const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
+    const rowProps = result.current.getRowProps(USER_ROW)
+    const event = makeContextMenuEvent()
+
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     expect(result.current.menuState.isOpen).toBe(true)
     expect(result.current.menuState.title).toBe('דניאל')
@@ -83,10 +96,9 @@ describe('useUsersTable', () => {
 
   it('delete menu item opens confirm dialog with user name', () => {
     const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onRowClick(USER_ROW, makeMockEvent())
-    })
+    const rowProps = result.current.getRowProps(USER_ROW)
+    const event = makeContextMenuEvent()
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => { deleteItem!.onClick() })
@@ -102,25 +114,24 @@ describe('useUsersTable', () => {
   it('delete menu item calls mutate when onConfirm is invoked', () => {
     confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
     const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
+    const rowProps = result.current.getRowProps(USER_ROW)
+    const event = makeContextMenuEvent()
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
-    act(() => {
-      result.current.onRowClick(USER_ROW, makeMockEvent())
-    })
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => { deleteItem!.onClick() })
 
     expect(confirmFn).toHaveBeenCalled()
   })
 
-  it('onRowClick does nothing when user is the current user', () => {
+  it('right-click on your own row has no menu items (no self-delete)', () => {
     const token = 'x.' + btoa(JSON.stringify({ sub: 'u1', role: 'admin' })) + '.y'
     store.set(accessTokenAtom, token)
-
     const { result } = renderHook(() => useUsersTable(), { wrapper: makeWrapper(store, qc) })
+    const rowProps = result.current.getRowProps(USER_ROW)
+    const event = makeContextMenuEvent()
 
-    act(() => {
-      result.current.onRowClick(USER_ROW, makeMockEvent())
-    })
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     expect(result.current.menuState.isOpen).toBe(false)
   })

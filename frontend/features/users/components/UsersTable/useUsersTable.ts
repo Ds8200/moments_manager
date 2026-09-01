@@ -1,14 +1,15 @@
 'use client'
-import { type MouseEvent } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
+import { useRouter } from 'next/navigation'
 import { useUsers, useDeleteUser } from '../../queries/useUsers'
 import { usersPageAtom } from '../../store/usersAtoms'
 import { USERS_LABELS } from '../../constants/usersLabels'
 import { useConfirm } from '@/shared/hooks/useConfirm'
-import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
+import { useTableRowInteraction } from '@/shared/hooks/useTableRowInteraction'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
-import { ROUTE_ICONS } from '@/shared/constants/routes'
+import { ROUTE_ICONS, USER_DETAIL_ROUTE } from '@/shared/constants/routes'
 import { currentUserIdAtom } from '@/features/auth/store/authAtoms'
+import type { RowInteractionHandlers } from '@/shared/hooks/useTableRowInteraction'
 import type { User } from '../../types'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
@@ -20,7 +21,7 @@ export interface UseUsersTableReturn {
   isLoading: boolean
   isError: boolean
   menuState: DropdownMenuState
-  onRowClick: (user: User, e: MouseEvent<Element>) => void
+  getRowProps: (user: User) => RowInteractionHandlers
   closeMenu: () => void
   onPageChange: (page: number) => void
   emptyIcon: string
@@ -29,9 +30,10 @@ export interface UseUsersTableReturn {
 export const useUsersTable = (): UseUsersTableReturn => {
   const [page, setPage] = useAtom(usersPageAtom)
   const currentUserId = useAtomValue(currentUserIdAtom)
+  const router = useRouter()
   const deleteUser = useDeleteUser()
   const confirm = useConfirm()
-  const { menuState, openMenu, closeMenu } = useDropdownMenu()
+  const { menuState, closeMenu, getRowProps } = useTableRowInteraction()
 
   const { data, isLoading, isError } = useUsers(page)
 
@@ -43,13 +45,6 @@ export const useUsersTable = (): UseUsersTableReturn => {
     })
   }
 
-  const onRowClick = (user: User, e: MouseEvent<Element>): void => {
-    if (user.id === currentUserId) return
-    openMenu(user.full_name, [
-      { label: USERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(user.id, user.full_name), variant: 'danger' },
-    ], e)
-  }
-
   return {
     users: data?.items ?? [],
     total: data?.total ?? 0,
@@ -58,8 +53,17 @@ export const useUsersTable = (): UseUsersTableReturn => {
     isLoading,
     isError,
     menuState,
-    onRowClick,
     closeMenu,
+
+    getRowProps: (user) => getRowProps({
+      onActivate: () => router.push(USER_DETAIL_ROUTE(user.id)),
+      menuTitle: user.full_name,
+      // no delete action on your own row
+      items: user.id === currentUserId ? [] : [
+        { label: USERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(user.id, user.full_name), variant: 'danger' as const },
+      ],
+    }),
+
     onPageChange: (next) => setPage(next),
     emptyIcon: ROUTE_ICONS.USERS,
   }

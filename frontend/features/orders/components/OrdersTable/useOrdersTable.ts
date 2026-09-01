@@ -1,12 +1,13 @@
 'use client'
-import { type MouseEvent } from 'react'
+import { useState, type MouseEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSetAtom } from 'jotai'
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/useOrders'
-import { orderFiltersAtom, isOrderFormOpenAtom, editingOrderIdAtom } from '../../store/ordersAtoms'
+import { orderFiltersAtom } from '../../store/ordersAtoms'
 import { formatCurrency, formatDateTime } from '@/shared/utils/formatters'
 import { useConfirm } from '@/shared/hooks/useConfirm'
-import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
+import { useTableRowInteraction } from '@/shared/hooks/useTableRowInteraction'
+import type { RowInteractionHandlers } from '@/shared/hooks/useTableRowInteraction'
 import type { OrderSummary, UrgencyLevel } from '../../types'
 import type { OrderStatus } from '@/shared/enums/statusEnums'
 import { PAYMENT_STATE_LABELS, getPaymentState } from '@/shared/enums/statusEnums'
@@ -23,13 +24,14 @@ export interface UseOrdersTableReturn {
   isLoading: boolean
   isError: boolean
   menuState: DropdownMenuState
-  onRowMenuClick: (order: OrderSummary, e: MouseEvent<Element>) => void
+  getRowProps: (order: OrderSummary) => RowInteractionHandlers
   closeMenu: () => void
   onStatusChange: (id: string, status: OrderStatus) => void
   onPageChange: (page: number) => void
+  expandedOrderId: string | null
+  toggleExpanded: (orderId: string, e: MouseEvent<Element>) => void
   formatAmount: (amount: string) => string
   formatDate: (date: string) => string
-  formatDueDateTime: (value: string | null) => string
   getUrgencyLabel: (urgency: UrgencyLevel) => string
   getUrgencyClass: (urgency: UrgencyLevel) => string
   getPaymentLabel: (isPaid: boolean, method: string | null) => string
@@ -48,30 +50,15 @@ const URGENCY_CLASS_MAP: Record<UrgencyLevel, string> = {
   very_urgent: 'urgencyVeryUrgent',
 }
 
-const dueDateTimeFormatter = new Intl.DateTimeFormat('he-IL', {
-  day:   '2-digit',
-  month: '2-digit',
-  hour:  '2-digit',
-  minute:'2-digit',
-})
-
 export const useOrdersTable = (): UseOrdersTableReturn => {
   const router = useRouter()
   const { data, isLoading, isError } = useOrders()
   const setFilters = useSetAtom(orderFiltersAtom)
-  const setFormOpen = useSetAtom(isOrderFormOpenAtom)
-  const setEditingId = useSetAtom(editingOrderIdAtom)
   const updateStatus = useUpdateOrderStatus()
   const deleteOrder = useDeleteOrder()
   const confirm = useConfirm()
-  const { menuState, openMenu, closeMenu } = useDropdownMenu()
-
-  const onViewOrder = (id: string): void => router.push(ORDER_DETAIL_ROUTE(id))
-
-  const onEditOrder = (id: string): void => {
-    setEditingId(id)
-    setFormOpen(true)
-  }
+  const { menuState, closeMenu, getRowProps } = useTableRowInteraction()
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
 
   const onDeleteOrder = (id: string): void => {
     confirm({
@@ -81,12 +68,9 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     })
   }
 
-  const onRowMenuClick = (order: OrderSummary, e: MouseEvent<Element>): void => {
-    openMenu(`#${order.order_number}`, [
-      { label: ORDERS_LABELS.TABLE_VIEW_TITLE, icon: ROUTE_ICONS.ORDERS, onClick: () => onViewOrder(order.id) },
-      { label: ORDERS_LABELS.TABLE_EDIT_TITLE, icon: UI_SYMBOLS.EDIT, onClick: () => onEditOrder(order.id) },
-      { label: ORDERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDeleteOrder(order.id), variant: 'danger' },
-    ], e)
+  const toggleExpanded = (orderId: string, e: MouseEvent<Element>): void => {
+    e.stopPropagation()
+    setExpandedOrderId((prev) => (prev === orderId ? null : orderId))
   }
 
   return {
@@ -97,24 +81,29 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     isLoading,
     isError,
     menuState,
-    onRowMenuClick,
     closeMenu,
+    expandedOrderId,
+    toggleExpanded,
+
+    getRowProps: (order) => getRowProps({
+      onActivate: () => router.push(ORDER_DETAIL_ROUTE(order.id)),
+      menuTitle: `#${order.order_number}`,
+      items: [
+        { label: ORDERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDeleteOrder(order.id), variant: 'danger' as const },
+      ],
+    }),
 
     onStatusChange: (id, status) => {
       updateStatus.mutate({ id, payload: { status } })
     },
 
-    onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
+    onPageChange: (page) => {
+      setExpandedOrderId(null)
+      setFilters((prev) => ({ ...prev, page }))
+    },
 
     formatAmount: formatCurrency,
     formatDate: formatDateTime,
-
-    formatDueDateTime: (value) => {
-      if (!value) return ORDERS_LABELS.URGENCY_NONE
-      const parsed = new Date(value)
-      if (Number.isNaN(parsed.getTime())) return ORDERS_LABELS.URGENCY_NONE
-      return dueDateTimeFormatter.format(parsed)
-    },
 
     getUrgencyLabel: (urgency) => URGENCY_LABEL_MAP[urgency],
     getUrgencyClass: (urgency) => URGENCY_CLASS_MAP[urgency],

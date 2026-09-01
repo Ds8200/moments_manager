@@ -30,8 +30,16 @@ export const USERS_LABELS = {
   FORM_EMAIL_INVALID:       'כתובת אימייל לא תקינה',
   FORM_NAME_REQUIRED:       'נדרש שם מלא',
   CREATED_SUCCESS:          'המשתמש נוצר בהצלחה',
+  UPDATED_SUCCESS:          'המשתמש עודכן בהצלחה',
   DELETED_SUCCESS:          'המשתמש נמחק בהצלחה',
   WELCOME_EMAIL_NOTE:       'סיסמה זמנית תישלח לכתובת האימייל שצוינה',
+
+  DETAIL_PAGE_BACK:         '← חזרה למשתמשים',
+  DETAIL_SECTION_INFO:      'פרטי משתמש',
+  DETAIL_LABEL_NAME:        'שם מלא',
+  DETAIL_LABEL_EMAIL:       'אימייל',
+  DETAIL_LABEL_ROLE:        'תפקיד',
+  DETAIL_LABEL_STATUS:      'סטטוס',
 } as const
 
 export const USER_ROLE_VALUES = {

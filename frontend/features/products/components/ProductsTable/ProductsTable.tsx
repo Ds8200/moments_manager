@@ -1,5 +1,5 @@
 'use client'
-import type { ReactElement, MouseEvent } from 'react'
+import type { ReactElement } from 'react'
 import { useProductsTable } from './useProductsTable'
 import { DataTable } from '@/shared/components/DataTable/DataTable'
 import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
@@ -24,7 +24,7 @@ export const ProductsTable = (): ReactElement => {
     isLoading,
     isError,
     menuState,
-    onRowClick,
+    getRowProps,
     closeMenu,
     onPageChange,
     formatAmount,
@@ -35,7 +35,7 @@ export const ProductsTable = (): ReactElement => {
   const renderRow = (product: Product): ReactElement => (
     <tr
       className={styles.row}
-      onClick={(e: MouseEvent<HTMLTableRowElement>) => onRowClick(product, e)}
+      {...getRowProps(product)}
     >
       <td className={styles.cell}>
         <span className={styles.name}>{product.name}</span>

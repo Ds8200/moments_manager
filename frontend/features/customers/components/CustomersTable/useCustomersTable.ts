@@ -1,15 +1,15 @@
 'use client'
-import { type MouseEvent } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { useCustomers, useDeleteCustomer } from '../../queries/useCustomers'
-import { customerFiltersAtom, isCustomerFormOpenAtom, editingCustomerIdAtom } from '../../store/customersAtoms'
+import { customerFiltersAtom } from '../../store/customersAtoms'
 import { CUSTOMERS_LABELS } from '../../constants/customersLabels'
-import { ROUTES, ROUTE_ICONS } from '@/shared/constants/routes'
+import { ROUTES, ROUTE_ICONS, CUSTOMER_DETAIL_ROUTE } from '@/shared/constants/routes'
 import { useConfirm } from '@/shared/hooks/useConfirm'
-import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
+import { useTableRowInteraction } from '@/shared/hooks/useTableRowInteraction'
 import { UI_LABELS } from '@/shared/constants/uiLabels'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
+import type { RowInteractionHandlers } from '@/shared/hooks/useTableRowInteraction'
 import type { Customer } from '../../types'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
@@ -21,7 +21,7 @@ export interface UseCustomersTableReturn {
   isLoading: boolean
   isError: boolean
   menuState: DropdownMenuState
-  onRowClick: (customer: Customer, e: MouseEvent<Element>) => void
+  getRowProps: (customer: Customer) => RowInteractionHandlers
   closeMenu: () => void
   onPageChange: (page: number) => void
   emptyIcon: string
@@ -31,19 +31,12 @@ export interface UseCustomersTableReturn {
 export const useCustomersTable = (): UseCustomersTableReturn => {
   const filters = useAtomValue(customerFiltersAtom)
   const setFilters = useSetAtom(customerFiltersAtom)
-  const setFormOpen = useSetAtom(isCustomerFormOpenAtom)
-  const setEditingId = useSetAtom(editingCustomerIdAtom)
   const router = useRouter()
   const deleteCustomer = useDeleteCustomer()
   const confirm = useConfirm()
-  const { menuState, openMenu, closeMenu } = useDropdownMenu()
+  const { menuState, closeMenu, getRowProps } = useTableRowInteraction()
 
   const { data, isLoading, isError } = useCustomers(filters.page, filters.search, filters.page_size)
-
-  const onEdit = (id: string): void => {
-    setEditingId(id)
-    setFormOpen(true)
-  }
 
   const onDelete = (id: string, name: string): void => {
     confirm({
@@ -57,14 +50,6 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
     router.push(ROUTES.SEND_EMAIL + '?customerId=' + id)
   }
 
-  const onRowClick = (customer: Customer, e: MouseEvent<Element>): void => {
-    openMenu(customer.name, [
-      ...(customer.email ? [{ label: UI_LABELS.EMAIL_ACTION, icon: ROUTE_ICONS.EMAIL, onClick: () => onEmail(customer.id) }] : []),
-      { label: CUSTOMERS_LABELS.TABLE_EDIT_TITLE, icon: UI_SYMBOLS.EDIT, onClick: () => onEdit(customer.id) },
-      { label: CUSTOMERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(customer.id, customer.name), variant: 'danger' },
-    ], e)
-  }
-
   return {
     customers: data?.items ?? [],
     total: data?.total ?? 0,
@@ -73,8 +58,17 @@ export const useCustomersTable = (): UseCustomersTableReturn => {
     isLoading,
     isError,
     menuState,
-    onRowClick,
     closeMenu,
+
+    getRowProps: (customer) => getRowProps({
+      onActivate: () => router.push(CUSTOMER_DETAIL_ROUTE(customer.id)),
+      menuTitle: customer.name,
+      items: [
+        ...(customer.email ? [{ label: UI_LABELS.EMAIL_ACTION, icon: ROUTE_ICONS.EMAIL, onClick: () => onEmail(customer.id) }] : []),
+        { label: CUSTOMERS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(customer.id, customer.name), variant: 'danger' as const },
+      ],
+    }),
+
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
     emptyIcon: ROUTE_ICONS.CUSTOMERS,
     emptyValue: UI_SYMBOLS.EM_DASH,

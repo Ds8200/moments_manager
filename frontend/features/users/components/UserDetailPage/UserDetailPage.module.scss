@@ -1,0 +1,36 @@
+@use '../../../../shared/styles/mixins' as m;
+@use '../../../../shared/styles/variables' as v;
+
+.page {
+  @include m.record-detail-page;
+}
+
+.body {
+  @include m.record-detail-body;
+}
+
+.section {
+  @include m.record-detail-section;
+}
+
+.sectionTitle {
+  @include m.record-detail-section-title;
+}
+
+.readOnlyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+  font-size: v.$font-size-sm;
+  padding-block: v.$space-1;
+}
+
+.readOnlyLabel {
+  color: v.$text-secondary;
+}
+
+.readOnlyValue {
+  color: v.$text-primary;
+  font-weight: v.$font-weight-medium;
+}

@@ -7,12 +7,16 @@ import { server } from '@/shared/mocks/server'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { API_ENDPOINTS } from '@/shared/constants/apiEndpoints'
 import { useProductsTable } from '../useProductsTable'
-import { productFiltersAtom, isProductFormOpenAtom, editingProductIdAtom } from '../../../store/productsAtoms'
+import { productFiltersAtom } from '../../../store/productsAtoms'
 import { PRODUCTS_LABELS } from '../../../constants/productsLabels'
+import { PRODUCT_DETAIL_ROUTE } from '@/shared/constants/routes'
 import type { ConfirmDialogOptions } from '@/shared/store/globalAtoms'
 
 const confirmFn = vi.fn()
 vi.mock('@/shared/hooks/useConfirm', () => ({ useConfirm: () => confirmFn }))
+
+const pushFn = vi.fn()
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: pushFn }) }))
 
 function makeWrapper(store: ReturnType<typeof createStore>, qc: QueryClient) {
   function TestWrapper({ children }: { children: React.ReactNode }): React.ReactElement {
@@ -38,9 +42,8 @@ const PRODUCT_ROW = {
   updated_at: '2025-01-01T00:00:00Z',
 }
 
-function makeMockEvent() {
-  const el = document.createElement('tr')
-  return { currentTarget: el } as unknown as React.MouseEvent<Element>
+function makeContextMenuEvent() {
+  return { preventDefault: vi.fn(), currentTarget: document.createElement('tr') }
 }
 
 describe('useProductsTable', () => {
@@ -51,6 +54,7 @@ describe('useProductsTable', () => {
     store = createStore()
     qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     confirmFn.mockClear()
+    pushFn.mockClear()
   })
 
   it('returns empty products by default', () => {
@@ -71,38 +75,41 @@ describe('useProductsTable', () => {
     expect(result.current.products[0].name).toBe('חולצה')
   })
 
-  it('onRowClick opens menu with product name as title', () => {
+  it('row onClick navigates to the product detail page', () => {
     const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
-    expect(result.current.menuState.isOpen).toBe(false)
 
-    act(() => {
-      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
-    })
+    act(() => { result.current.getRowProps(PRODUCT_ROW).onClick() })
+
+    expect(pushFn).toHaveBeenCalledWith(PRODUCT_DETAIL_ROUTE('p1'))
+  })
+
+  it('right-click opens menu with product name as title', () => {
+    const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
+    const rowProps = result.current.getRowProps(PRODUCT_ROW)
+    const event = makeContextMenuEvent()
+
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     expect(result.current.menuState.isOpen).toBe(true)
     expect(result.current.menuState.title).toBe('חולצה')
   })
 
-  it('edit menu item sets editing atom and opens form', () => {
+  it('menu has no edit item — editing happens on the detail page now', () => {
     const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
-    })
+    const rowProps = result.current.getRowProps(PRODUCT_ROW)
+    const event = makeContextMenuEvent()
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     const editItem = result.current.menuState.items.find((i) => i.label === PRODUCTS_LABELS.TABLE_EDIT_TITLE)
-    act(() => { editItem!.onClick() })
-
-    expect(store.get(editingProductIdAtom)).toBe('p1')
-    expect(store.get(isProductFormOpenAtom)).toBe(true)
+    expect(editItem).toBeUndefined()
+    expect(result.current.menuState.items).toHaveLength(1)
   })
 
   it('delete menu item opens confirm dialog with product name', () => {
     const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
-    })
+    const rowProps = result.current.getRowProps(PRODUCT_ROW)
+    const event = makeContextMenuEvent()
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => { deleteItem!.onClick() })
@@ -118,22 +125,10 @@ describe('useProductsTable', () => {
   it('delete menu item calls onConfirm when confirmed', () => {
     confirmFn.mockImplementationOnce(({ onConfirm }: ConfirmDialogOptions) => onConfirm())
     const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
+    const rowProps = result.current.getRowProps(PRODUCT_ROW)
+    const event = makeContextMenuEvent()
+    act(() => { rowProps.onContextMenu(event as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
 
-    act(() => {
-      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
-    })
-    const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
-    act(() => { deleteItem!.onClick() })
-
-    expect(confirmFn).toHaveBeenCalled()
-  })
-
-  it('delete does not mutate when confirm dialog is dismissed', () => {
-    const { result } = renderHook(() => useProductsTable(), { wrapper: makeWrapper(store, qc) })
-
-    act(() => {
-      result.current.onRowClick(PRODUCT_ROW, makeMockEvent())
-    })
     const deleteItem = result.current.menuState.items.find((i) => i.variant === 'danger')
     act(() => { deleteItem!.onClick() })
 

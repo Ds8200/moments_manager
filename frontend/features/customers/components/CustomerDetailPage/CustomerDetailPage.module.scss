@@ -1,0 +1,41 @@
+@use '../../../../shared/styles/mixins' as m;
+@use '../../../../shared/styles/variables' as v;
+
+.page {
+  @include m.record-detail-page;
+}
+
+.body {
+  @include m.record-detail-body;
+}
+
+.section {
+  @include m.record-detail-section;
+}
+
+.sectionTitle {
+  @include m.record-detail-section-title;
+}
+
+.statsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: v.$space-2;
+  border-block-end: 1px solid v.$gray-100;
+
+  &:last-child {
+    border-block-end: none;
+  }
+}
+
+.statsLabel {
+  font-size: v.$font-size-base;
+  color: v.$text-secondary;
+}
+
+.statsValue {
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-primary;
+}

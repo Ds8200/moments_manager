@@ -9,10 +9,9 @@ import styles from './OrdersTable.module.scss'
 import type { OrderSummary } from '../../types'
 
 const HEADERS = [
-  ORDERS_LABELS.COL_NUMBER,
   ORDERS_LABELS.COL_CUSTOMER,
+  ORDERS_LABELS.COL_PRODUCTS,
   ORDERS_LABELS.COL_DATE,
-  ORDERS_LABELS.COL_TARGET,
   ORDERS_LABELS.COL_URGENCY,
   ORDERS_LABELS.COL_AMOUNT,
   ORDERS_LABELS.COL_STATUS,
@@ -28,51 +27,96 @@ export const OrdersTable = (): ReactElement => {
     isLoading,
     isError,
     menuState,
-    onRowMenuClick,
+    getRowProps,
     closeMenu,
     onPageChange,
+    expandedOrderId,
+    toggleExpanded,
     formatAmount,
     formatDate,
-    formatDueDateTime,
     getUrgencyLabel,
     getUrgencyClass,
     getPaymentLabel,
     emptyIcon,
   } = useOrdersTable()
 
-  const renderRow = (order: OrderSummary): ReactElement => (
-    <tr
-      className={styles.row}
-      onClick={(e: MouseEvent<HTMLTableRowElement>) => onRowMenuClick(order, e)}
-    >
-      <td className={styles.cell}>
-        <span className={styles.orderNumber}>{order.order_number}</span>
-      </td>
-      <td className={styles.cell}>
-        <span className={styles.customerName}>{order.customer_name}</span>
-      </td>
-      <td className={styles.cell}>{formatDate(order.created_at)}</td>
-      <td className={styles.cell}>
-        <span className={styles.target}>{formatDueDateTime(order.due_datetime)}</span>
-      </td>
-      <td className={styles.cell}>
-        <span className={`${styles.urgencyBadge} ${styles[getUrgencyClass(order.urgency)]}`}>
-          {getUrgencyLabel(order.urgency)}
-        </span>
-      </td>
-      <td className={styles.cell}>
-        <span className={styles.amount}>{formatAmount(order.total_amount)}</span>
-      </td>
-      <td className={styles.cell}>
-        <StatusBadge status={order.status} />
-      </td>
-      <td className={styles.cell}>
-        <span className={`${styles.paidBadge} ${order.is_paid ? styles.paid : styles.unpaid}`}>
-          {getPaymentLabel(order.is_paid, order.payment_method)}
-        </span>
-      </td>
-    </tr>
-  )
+  const renderRow = (order: OrderSummary): ReactElement => {
+    const isExpanded = expandedOrderId === order.id
+
+    return (
+      <>
+        <tr
+          className={styles.row}
+          {...getRowProps(order)}
+        >
+          <td className={styles.cell}>
+            <span className={styles.customerName}>{order.customer_name}</span>
+          </td>
+          <td className={styles.cell}>
+            <button
+              type="button"
+              className={styles.productsToggle}
+              aria-expanded={isExpanded}
+              onClick={(e: MouseEvent<HTMLButtonElement>) => toggleExpanded(order.id, e)}
+            >
+              <span className={styles.productsCount}>{order.items.length}</span>
+              <svg
+                className={styles.chevron}
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+          </td>
+          <td className={styles.cell}>{formatDate(order.created_at)}</td>
+          <td className={styles.cell}>
+            <span className={`${styles.urgencyBadge} ${styles[getUrgencyClass(order.urgency)]}`}>
+              {getUrgencyLabel(order.urgency)}
+            </span>
+          </td>
+          <td className={styles.cell}>
+            <span className={styles.amount}>{formatAmount(order.total_amount)}</span>
+          </td>
+          <td className={styles.cell}>
+            <StatusBadge status={order.status} />
+          </td>
+          <td className={styles.cell}>
+            <span className={`${styles.paidBadge} ${order.is_paid ? styles.paid : styles.unpaid}`}>
+              {getPaymentLabel(order.is_paid, order.payment_method)}
+            </span>
+          </td>
+        </tr>
+        {isExpanded && (
+          <tr className={styles.subRow}>
+            <td className={styles.subCell} colSpan={HEADERS.length}>
+              {order.items.length === 0 ? (
+                <span className={styles.subEmpty}>{ORDERS_LABELS.PRODUCTS_EMPTY}</span>
+              ) : (
+                <ul className={styles.productsList}>
+                  {order.items.map((item) => (
+                    <li key={item.id} className={styles.productsListItem}>
+                      <span className={styles.productsListName}>{item.product_name}</span>
+                      <span className={styles.productsListQty}>
+                        {ORDERS_LABELS.PRODUCTS_QTY_PREFIX} {item.quantity}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </td>
+          </tr>
+        )}
+      </>
+    )
+  }
 
   return (
     <>

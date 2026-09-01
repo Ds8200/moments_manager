@@ -1,6 +1,7 @@
 'use client'
 import { useUpdateOrderStatus, useUpdateOrderPayment, useUpdateOrderUrgency } from '../../../queries/useOrders'
-import { formatCurrency, formatDate } from '@/shared/utils/formatters'
+import { useUpdateOrder } from '../../../queries/useOrder'
+import { formatCurrency, formatDate, formatDateTime } from '@/shared/utils/formatters'
 import {
   STATUS_LABELS, STATUS_ORDER,
   PAYMENT_STATE_LABELS, PAYMENT_STATE_ORDER,
@@ -18,18 +19,15 @@ const URGENCY_LABEL_MAP: Record<UrgencyLevel, string> = {
   very_urgent: ORDERS_LABELS.URGENCY_VERY_URGENT,
 }
 
-const detailDueFormatter = new Intl.DateTimeFormat('he-IL', {
-  day: '2-digit', month: '2-digit', year: 'numeric',
-  hour: '2-digit', minute: '2-digit',
-})
-
 export interface OrderDetailInfoProps {
   order: Order
 }
 
 export interface UseOrderDetailInfoReturn {
   customerName: string
+  rawDate: string
   formattedDate: string
+  rawDueDatetime: string
   formattedDue: string
   formattedAmount: string
   currentStatus: OrderStatus
@@ -38,6 +36,8 @@ export interface UseOrderDetailInfoReturn {
   statusOptions: Array<{ value: string; label: string }>
   paymentOptions: Array<{ value: string; label: string }>
   urgencyOptions: Array<{ value: string; label: string }>
+  onSaveDate: (v: string) => void
+  onSaveDueDatetime: (v: string) => void
   onStatusChange: (v: OrderStatus) => void
   onPaymentChange: (v: PaymentState) => void
   onUrgencyChange: (v: UrgencyLevel) => void
@@ -53,6 +53,7 @@ export interface UseOrderDetailInfoReturn {
 
 export const useOrderDetailInfo = (props: OrderDetailInfoProps): UseOrderDetailInfoReturn => {
   const { order } = props
+  const updateOrder   = useUpdateOrder()
   const updateStatus  = useUpdateOrderStatus()
   const updatePayment = useUpdateOrderPayment()
   const updateUrgency = useUpdateOrderUrgency()
@@ -67,13 +68,16 @@ export const useOrderDetailInfo = (props: OrderDetailInfoProps): UseOrderDetailI
     if (!value) return ORDERS_LABELS.URGENCY_NONE
     const parsed = new Date(value)
     if (Number.isNaN(parsed.getTime())) return ORDERS_LABELS.URGENCY_NONE
-    return detailDueFormatter.format(parsed)
+    return formatDateTime(parsed)
   }
 
   return {
-    customerName:        order.customer_name ?? '',
-    formattedDate:       formatDate(order.date),
-    formattedDue:        formatDue(order.due_datetime),
+    customerName:   order.customer_name ?? '',
+    rawDate:        order.date,
+    formattedDate:  formatDate(order.date),
+    // datetime-local inputs need "YYYY-MM-DDTHH:mm" — trim the seconds/timezone the API sends
+    rawDueDatetime: order.due_datetime ? order.due_datetime.slice(0, 16) : '',
+    formattedDue:   formatDue(order.due_datetime),
     formattedAmount:     formatCurrency(order.total_amount),
     currentStatus:       order.status as OrderStatus,
     currentPaymentState,
@@ -82,6 +86,11 @@ export const useOrderDetailInfo = (props: OrderDetailInfoProps): UseOrderDetailI
     statusOptions,
     paymentOptions,
     urgencyOptions,
+
+    onSaveDate: (value) => updateOrder.mutate({ id: order.id, payload: { date: value } }),
+
+    onSaveDueDatetime: (value) =>
+      updateOrder.mutate({ id: order.id, payload: { due_datetime: value || null } }),
 
     onStatusChange: (status) =>
       updateStatus.mutate({ id: order.id, payload: { status } }),

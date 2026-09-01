@@ -1,5 +1,5 @@
 'use client'
-import type { ReactElement, MouseEvent } from 'react'
+import type { ReactElement } from 'react'
 import { useUsersTable } from './useUsersTable'
 import { DataTable } from '@/shared/components/DataTable/DataTable'
 import { DropdownMenu } from '@/shared/components/DropdownMenu/DropdownMenu'
@@ -23,7 +23,7 @@ export const UsersTable = (): ReactElement => {
     isLoading,
     isError,
     menuState,
-    onRowClick,
+    getRowProps,
     closeMenu,
     onPageChange,
     emptyIcon,
@@ -32,7 +32,7 @@ export const UsersTable = (): ReactElement => {
   const renderRow = (user: User): ReactElement => (
     <tr
       className={styles.row}
-      onClick={(e: MouseEvent<HTMLTableRowElement>) => onRowClick(user, e)}
+      {...getRowProps(user)}
     >
       <td className={styles.cell}>
         <span className={styles.name}>{user.full_name}</span>

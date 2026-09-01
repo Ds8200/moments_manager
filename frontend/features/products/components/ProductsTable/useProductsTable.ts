@@ -1,14 +1,15 @@
 'use client'
-import { type MouseEvent } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
+import { useRouter } from 'next/navigation'
 import { useProducts, useDeleteProduct } from '../../queries/useProducts'
-import { productFiltersAtom, isProductFormOpenAtom, editingProductIdAtom } from '../../store/productsAtoms'
+import { productFiltersAtom } from '../../store/productsAtoms'
 import { formatCurrency } from '@/shared/utils/formatters'
 import { PRODUCTS_LABELS } from '../../constants/productsLabels'
 import { useConfirm } from '@/shared/hooks/useConfirm'
-import { useDropdownMenu } from '@/shared/components/DropdownMenu/useDropdownMenu'
+import { useTableRowInteraction } from '@/shared/hooks/useTableRowInteraction'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
-import { ROUTE_ICONS } from '@/shared/constants/routes'
+import { ROUTE_ICONS, PRODUCT_DETAIL_ROUTE } from '@/shared/constants/routes'
+import type { RowInteractionHandlers } from '@/shared/hooks/useTableRowInteraction'
 import type { Product } from '../../types'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
 
@@ -20,7 +21,7 @@ export interface UseProductsTableReturn {
   isLoading: boolean
   isError: boolean
   menuState: DropdownMenuState
-  onRowClick: (product: Product, e: MouseEvent<Element>) => void
+  getRowProps: (product: Product) => RowInteractionHandlers
   closeMenu: () => void
   onPageChange: (page: number) => void
   formatAmount: (value: string | number) => string
@@ -31,18 +32,12 @@ export interface UseProductsTableReturn {
 export const useProductsTable = (): UseProductsTableReturn => {
   const filters = useAtomValue(productFiltersAtom)
   const setFilters = useSetAtom(productFiltersAtom)
-  const setFormOpen = useSetAtom(isProductFormOpenAtom)
-  const setEditingId = useSetAtom(editingProductIdAtom)
+  const router = useRouter()
   const deleteProduct = useDeleteProduct()
   const confirm = useConfirm()
-  const { menuState, openMenu, closeMenu } = useDropdownMenu()
+  const { menuState, closeMenu, getRowProps } = useTableRowInteraction()
 
   const { data, isLoading, isError } = useProducts(filters.page, filters.search, filters.is_active)
-
-  const onEdit = (id: string): void => {
-    setEditingId(id)
-    setFormOpen(true)
-  }
 
   const onDelete = (id: string, name: string): void => {
     confirm({
@@ -50,13 +45,6 @@ export const useProductsTable = (): UseProductsTableReturn => {
       isDangerous: true,
       onConfirm: () => deleteProduct.mutate(id),
     })
-  }
-
-  const onRowClick = (product: Product, e: MouseEvent<Element>): void => {
-    openMenu(product.name, [
-      { label: PRODUCTS_LABELS.TABLE_EDIT_TITLE, icon: UI_SYMBOLS.EDIT, onClick: () => onEdit(product.id) },
-      { label: PRODUCTS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(product.id, product.name), variant: 'danger' },
-    ], e)
   }
 
   return {
@@ -67,8 +55,16 @@ export const useProductsTable = (): UseProductsTableReturn => {
     isLoading,
     isError,
     menuState,
-    onRowClick,
     closeMenu,
+
+    getRowProps: (product) => getRowProps({
+      onActivate: () => router.push(PRODUCT_DETAIL_ROUTE(product.id)),
+      menuTitle: product.name,
+      items: [
+        { label: PRODUCTS_LABELS.TABLE_DELETE_TITLE, icon: UI_SYMBOLS.DELETE, onClick: () => onDelete(product.id, product.name), variant: 'danger' as const },
+      ],
+    }),
+
     onPageChange: (page) => setFilters((prev) => ({ ...prev, page })),
     formatAmount: formatCurrency,
     emptyIcon: ROUTE_ICONS.PRODUCTS,

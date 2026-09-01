@@ -78,3 +78,41 @@
 .profitCol {
   color: v.$success-dark;
 }
+
+.removeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: v.$danger;
+  font-size: v.$font-size-base;
+  padding: v.$space-1;
+  opacity: 0.6;
+  transition: opacity v.$transition-fast;
+
+  &:hover:not(:disabled) {
+    opacity: 1;
+  }
+
+  &:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
+}
+
+.addItemBtn {
+  margin-block-start: v.$space-3;
+  background: none;
+  border: 1px dashed v.$border-color;
+  border-radius: v.$border-radius;
+  padding: v.$space-2 v.$space-4;
+  cursor: pointer;
+  font-size: v.$font-size-sm;
+  color: v.$text-secondary;
+  width: 100%;
+  transition: border-color v.$transition-fast, color v.$transition-fast;
+
+  &:hover {
+    border-color: v.$primary;
+    color: v.$primary;
+  }
+}
