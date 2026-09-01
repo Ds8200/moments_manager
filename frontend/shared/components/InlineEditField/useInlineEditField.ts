@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import type { ChangeEvent, KeyboardEvent } from 'react'
+import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
 export type InlineEditFieldType = 'text' | 'number' | 'date' | 'datetime-local' | 'textarea'
 
@@ -62,9 +63,15 @@ export const useInlineEditField = (props: InlineEditFieldProps): UseInlineEditFi
 
   const onBlur = (): void => setIsEditing(false)
 
+  // An empty value would render as a blank, zero-width span — nothing to see and nothing to
+  // double-click to start editing. Show a placeholder instead so an empty editable field is
+  // always visible and reachable.
+  const resolvedDisplayValue = displayValue ?? value
+  const shownValue = resolvedDisplayValue === '' ? UI_SYMBOLS.EM_DASH : resolvedDisplayValue
+
   return {
     label,
-    displayValue: displayValue ?? value,
+    displayValue: shownValue,
     type,
     editable,
     isEditing,
