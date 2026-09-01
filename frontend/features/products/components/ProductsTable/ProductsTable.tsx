@@ -41,7 +41,7 @@ export const ProductsTable = (): ReactElement => {
         <span className={styles.name}>{product.name}</span>
       </td>
       <td className={styles.cell}>
-        <span className={styles.secondary}>{product.category?.name ?? emptyValue}</span>
+        <span className={styles.secondary}>{product.category?.name || emptyValue}</span>
       </td>
       <td className={styles.cell}>
         <span className={styles.price}>{formatAmount(product.base_price)}</span>
