@@ -93,10 +93,7 @@ describe('OrdersTable', () => {
         productsPopover: {
           isOpen: true,
           data: { orderId: 'order-1', items: ORDER.items },
-          anchorX: 0,
-          anchorY: 0,
-          anchorWidth: 0,
-          anchorHeight: 0,
+          anchorEl: document.createElement('button'),
         },
       })
     )
@@ -111,10 +108,7 @@ describe('OrdersTable', () => {
         productsPopover: {
           isOpen: true,
           data: { orderId: 'order-1', items: [] },
-          anchorX: 0,
-          anchorY: 0,
-          anchorWidth: 0,
-          anchorHeight: 0,
+          anchorEl: document.createElement('button'),
         },
       })
     )

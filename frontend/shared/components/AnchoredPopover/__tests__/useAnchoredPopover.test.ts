@@ -3,22 +3,8 @@ import { describe, it, expect } from 'vitest'
 import { useAnchoredPopover } from '../useAnchoredPopover'
 import type { AnchorEvent } from '../useAnchoredPopover'
 
-function makeAnchorEvent(rect: Partial<DOMRect> = {}): AnchorEvent {
-  const el = document.createElement('button')
-  el.getBoundingClientRect = () =>
-    ({
-      left: 10,
-      top: 20,
-      width: 30,
-      height: 40,
-      right: 0,
-      bottom: 0,
-      x: 0,
-      y: 0,
-      toJSON: () => ({}),
-      ...rect,
-    }) as DOMRect
-  return { currentTarget: el }
+function makeAnchorEvent(): AnchorEvent {
+  return { currentTarget: document.createElement('button') }
 }
 
 describe('useAnchoredPopover', () => {
@@ -27,20 +13,18 @@ describe('useAnchoredPopover', () => {
     expect(result.current.state.isOpen).toBe(false)
   })
 
-  it('open sets isOpen, data, and anchor coordinates from getBoundingClientRect', () => {
+  it('open sets isOpen, data, and the anchor element', () => {
     const { result } = renderHook(() => useAnchoredPopover<{ id: string }>())
+    const event = makeAnchorEvent()
 
     act(() => {
-      result.current.open({ id: 'order-1' }, makeAnchorEvent())
+      result.current.open({ id: 'order-1' }, event)
     })
 
     expect(result.current.state).toEqual({
       isOpen: true,
       data: { id: 'order-1' },
-      anchorX: 10,
-      anchorY: 20,
-      anchorWidth: 30,
-      anchorHeight: 40,
+      anchorEl: event.currentTarget,
     })
   })
 
@@ -57,23 +41,21 @@ describe('useAnchoredPopover', () => {
     expect(result.current.state).toEqual({ isOpen: false })
   })
 
-  it('open again with a different anchor replaces the previous data and coordinates', () => {
+  it('open again with a different anchor replaces the previous data and anchor element', () => {
     const { result } = renderHook(() => useAnchoredPopover<string>())
+    const secondEvent = makeAnchorEvent()
 
     act(() => {
-      result.current.open('first', makeAnchorEvent({ left: 10, top: 20 }))
+      result.current.open('first', makeAnchorEvent())
     })
     act(() => {
-      result.current.open('second', makeAnchorEvent({ left: 100, top: 200 }))
+      result.current.open('second', secondEvent)
     })
 
     expect(result.current.state).toEqual({
       isOpen: true,
       data: 'second',
-      anchorX: 100,
-      anchorY: 200,
-      anchorWidth: 30,
-      anchorHeight: 40,
+      anchorEl: secondEvent.currentTarget,
     })
   })
 })

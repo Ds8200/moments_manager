@@ -4,13 +4,12 @@ import { describe, it, expect, vi } from 'vitest'
 import { AnchoredPopover } from '../AnchoredPopover'
 import type { AnchoredPopoverState } from '../useAnchoredPopover'
 
+const ANCHOR_EL = document.createElement('button')
+
 const OPEN_STATE: AnchoredPopoverState<string> = {
   isOpen: true,
   data: 'hello popover',
-  anchorX: 10,
-  anchorY: 20,
-  anchorWidth: 30,
-  anchorHeight: 40,
+  anchorEl: ANCHOR_EL,
 }
 
 const CLOSED_STATE: AnchoredPopoverState<string> = { isOpen: false }
@@ -63,5 +62,23 @@ describe('AnchoredPopover', () => {
     await userEvent.keyboard('{Escape}')
 
     expect(onClose).toHaveBeenCalled()
+  })
+
+  it('recomputes position on scroll while open', () => {
+    const rectSpy = vi
+      .spyOn(ANCHOR_EL, 'getBoundingClientRect')
+      .mockReturnValue({ top: 10, bottom: 30, left: 10, right: 60, width: 50, height: 20, x: 10, y: 10, toJSON: () => ({}) })
+
+    render(
+      <AnchoredPopover state={OPEN_STATE} onClose={vi.fn()}>
+        {(data) => <span>{data}</span>}
+      </AnchoredPopover>
+    )
+    const callsAfterMount = rectSpy.mock.calls.length
+
+    window.dispatchEvent(new Event('scroll'))
+
+    expect(rectSpy.mock.calls.length).toBeGreaterThan(callsAfterMount)
+    rectSpy.mockRestore()
   })
 })
