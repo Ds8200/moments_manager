@@ -93,4 +93,10 @@ describe('useDataTable', () => {
     const { result } = renderHook(() => useDataTable(buildProps()))
     expect(result.current.paginationLabels).toEqual(LABELS)
   })
+
+  it('returns a wrapperRef ref object defaulting to null', () => {
+    const { result } = renderHook(() => useDataTable(buildProps()))
+    expect(result.current.wrapperRef).toHaveProperty('current')
+    expect(result.current.wrapperRef.current).toBeNull()
+  })
 })

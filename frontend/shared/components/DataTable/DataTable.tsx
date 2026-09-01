@@ -14,6 +14,7 @@ export const DataTable = <T,>(props: DataTableProps<T>): ReactElement => {
     currentPage, totalPages, total,
     onPageChange, paginationLabels,
     emptyTitle, emptyDescription, emptyIcon, errorTitle, errorIcon,
+    wrapperRef,
   } = useDataTable(props)
 
   if (showLoading) return <PageSkeleton rows={8} />
@@ -25,7 +26,7 @@ export const DataTable = <T,>(props: DataTableProps<T>): ReactElement => {
   return (
     <div className={styles.root}>
       {showTable && (
-        <div className={styles.wrapper}>
+        <div className={styles.wrapper} ref={wrapperRef}>
           <table className={styles.table}>
             <thead className={styles.thead}>
               <tr>

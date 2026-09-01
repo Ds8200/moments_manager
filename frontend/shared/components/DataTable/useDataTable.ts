@@ -1,6 +1,7 @@
 'use client'
-import type { ReactElement } from 'react'
+import { type ReactElement, type RefObject, useEffect, useRef } from 'react'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
+import { getRtlStartScrollLeft } from '@/shared/utils/scroll'
 
 export interface PaginationLabels {
   totalPrefix: string
@@ -50,6 +51,7 @@ export interface UseDataTableReturn<T> {
   emptyIcon: string
   errorTitle: string
   errorIcon: string
+  wrapperRef: RefObject<HTMLDivElement | null>
 }
 
 export const useDataTable = <T>(props: DataTableProps<T>): UseDataTableReturn<T> => {
@@ -65,6 +67,16 @@ export const useDataTable = <T>(props: DataTableProps<T>): UseDataTableReturn<T>
   const showEmpty = !isLoading && !isError && rows.length === 0
   const showTable = !isLoading && !isError && rows.length > 0
   const showPagination = showTable && totalPages > 1
+
+  // The scroll box is `direction: ltr` (scrollbar-right mixin), which anchors horizontal
+  // scroll to the left. In this RTL app the table's first column is on the right, so open
+  // it there — on first render and whenever a new page loads.
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+    el.scrollLeft = getRtlStartScrollLeft(el.scrollWidth, el.clientWidth)
+  }, [showTable, currentPage])
 
   return {
     headers,
@@ -88,5 +100,6 @@ export const useDataTable = <T>(props: DataTableProps<T>): UseDataTableReturn<T>
     emptyIcon,
     errorTitle,
     errorIcon: props.errorIcon ?? UI_SYMBOLS.WARNING,
+    wrapperRef,
   }
 }
