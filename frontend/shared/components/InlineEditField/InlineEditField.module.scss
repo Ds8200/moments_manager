@@ -1,46 +1,54 @@
-@use '@/shared/styles/variables' as *;
+@use '@/shared/styles/variables' as v;
+@use '@/shared/styles/mixins' as m;
 
 .row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-3;
-  font-size: $font-size-sm;
-  padding-block: $space-1;
+  @include m.record-detail-field-card;
+}
+
+// Multi-line fields (notes, etc.) span the full grid row instead of sitting in one cell.
+.full {
+  grid-column: 1 / -1;
 }
 
 .label {
-  color: $text-secondary;
-  flex-shrink: 0;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  color: v.$text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .value {
-  color: $text-primary;
-  font-weight: $font-weight-medium;
-  text-align: end;
+  font-size: v.$font-size-base;
+  color: v.$text-primary;
+  font-weight: v.$font-weight-medium;
+  text-align: start;
+  overflow-wrap: break-word;
 }
 
 .editable {
   cursor: text;
-  border-radius: $border-radius-sm;
-  padding-inline: $space-1;
-  transition: background $transition-fast;
+  border-radius: v.$border-radius-sm;
+  margin-inline: calc(v.$space-1 * -1);
+  padding-inline: v.$space-1;
+  transition: background v.$transition-fast;
 
   &:hover {
-    background: $gray-100;
+    background: v.$gray-100;
   }
 }
 
 .input,
 .textarea {
-  border: 1px solid $primary;
-  border-radius: $border-radius-sm;
-  padding: $space-1 $space-2;
-  font-size: $font-size-sm;
-  font-family: $font-family;
-  color: $text-primary;
-  background: $bg-card;
-  text-align: end;
+  width: 100%;
+  border: 1px solid v.$primary;
+  border-radius: v.$border-radius-sm;
+  padding: v.$space-1 v.$space-2;
+  font-size: v.$font-size-base;
+  font-family: v.$font-family;
+  color: v.$text-primary;
+  background: v.$bg-card;
+  text-align: start;
 
   &:focus {
     outline: none;
@@ -48,8 +56,6 @@
 }
 
 .textarea {
-  width: 100%;
   min-height: 60px;
   resize: vertical;
-  text-align: start;
 }

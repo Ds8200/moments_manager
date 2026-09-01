@@ -17,24 +17,23 @@
   @include m.record-detail-section-title;
 }
 
-.statsRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-block: v.$space-2;
-  border-block-end: 1px solid v.$gray-100;
-
-  &:last-child {
-    border-block-end: none;
-  }
+.fieldsGrid {
+  @include m.record-detail-field-grid;
 }
 
-.statsLabel {
-  font-size: v.$font-size-base;
+.statCard {
+  @include m.record-detail-field-card;
+}
+
+.statLabel {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
   color: v.$text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.statsValue {
+.statValue {
   font-size: v.$font-size-base;
   font-weight: v.$font-weight-medium;
   color: v.$text-primary;

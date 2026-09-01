@@ -39,18 +39,20 @@ export const ProductDetailPage = (props: ProductDetailPageProps): ReactElement =
       <div className={styles.body}>
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>{sectionInfoLabel}</h2>
-          <InlineEditField label={labelName} value={product.name} type="text" editable onSave={onSaveName} />
-          <InlineEditField label={labelPrice} value={product.base_price} type="number" editable onSave={onSavePrice} />
-          <InlineEditField label={labelCost} value={product.base_cost} type="number" editable onSave={onSaveCost} />
-          <InlineEditField
-            label={labelProdDays}
-            value={product.avg_production_days === null ? '' : String(product.avg_production_days)}
-            type="number"
-            editable
-            onSave={onSaveProdDays}
-          />
-          <InlineSelectField label={labelCategory} value={currentCategoryId} options={categoryOptions} onChange={onCategoryChange} />
-          <InlineSelectField label={labelStatus} value={currentStatus} options={statusOptions} onChange={onStatusChange} />
+          <div className={styles.fieldsGrid}>
+            <InlineEditField label={labelName} value={product.name} type="text" editable onSave={onSaveName} />
+            <InlineEditField label={labelPrice} value={product.base_price} type="number" editable onSave={onSavePrice} />
+            <InlineEditField label={labelCost} value={product.base_cost} type="number" editable onSave={onSaveCost} />
+            <InlineEditField
+              label={labelProdDays}
+              value={product.avg_production_days === null ? '' : String(product.avg_production_days)}
+              type="number"
+              editable
+              onSave={onSaveProdDays}
+            />
+            <InlineSelectField label={labelCategory} value={currentCategoryId} options={categoryOptions} onChange={onCategoryChange} />
+            <InlineSelectField label={labelStatus} value={currentStatus} options={statusOptions} onChange={onStatusChange} />
+          </div>
         </section>
       </div>
     </div>
