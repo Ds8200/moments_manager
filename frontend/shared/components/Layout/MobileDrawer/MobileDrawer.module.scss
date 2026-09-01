@@ -25,16 +25,17 @@
   }
 }
 
-// inset-inline-start: 0 = physical RIGHT in RTL browsers.
-// translateX(100%) slides off-screen to the right (inline-start direction).
+// Physical right/left, not inset-inline-start/border-inline-end: scrollbar-right below sets
+// this element's own `direction` to ltr (to move its scrollbar to the right), which would
+// silently flip logical inset/border properties to the wrong physical side if used here.
 .drawer {
   position: fixed;
   top: v.$header-height;
-  inset-inline-start: 0;
+  right: 0;
   height: calc(100vh - #{v.$header-height});
   width: min(280px, 85vw);
   background: v.$bg-sidebar;
-  border-inline-end: 1px solid v.$border-color;
+  border-left: 1px solid v.$border-color;
   z-index: calc(#{v.$z-header} + 2);
   display: flex;
   flex-direction: column;
