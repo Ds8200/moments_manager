@@ -114,6 +114,7 @@ async def test_get_financial_year(mock_db, monkeypatch) -> None:
         annual_revenue=Decimal("12000"),
         annual_profit=Decimal("9600"),
         annual_expenses=Decimal("2400"),
+        annual_cost=Decimal("2400"),
         annual_net=Decimal("9600"),
         annual_unpaid=Decimal("500"),
         months=[month_mock] * 12,
@@ -126,6 +127,7 @@ async def test_get_financial_year(mock_db, monkeypatch) -> None:
 
     assert result["year"] == 2025
     assert result["annual_revenue"] == "12000"
+    assert result["annual_cost"] == "2400"
     assert len(result["months"]) == 12
 
 

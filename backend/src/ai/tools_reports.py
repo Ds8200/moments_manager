@@ -100,6 +100,7 @@ async def get_financial_year(
         "annual_revenue": str(data.annual_revenue),
         "annual_profit": str(data.annual_profit),
         "annual_expenses": str(data.annual_expenses),
+        "annual_cost": str(data.annual_cost),
         "annual_net": str(data.annual_net),
         "annual_unpaid": str(data.annual_unpaid),
         "months": [

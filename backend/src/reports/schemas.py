@@ -37,6 +37,7 @@ class FinancialYearSchema(BaseModel):
     annual_revenue: Decimal
     annual_profit: Decimal
     annual_expenses: Decimal
+    annual_cost: Decimal
     annual_net: Decimal
     annual_unpaid: Decimal
 

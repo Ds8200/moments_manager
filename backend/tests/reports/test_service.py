@@ -85,6 +85,7 @@ async def test_build_export_config_uses_net_profit_not_gross() -> None:
         annual_revenue=month.total_revenue,
         annual_profit=month.total_profit,
         annual_expenses=month.total_expenses,
+        annual_cost=month.total_cost,
         annual_net=month.net_profit,
         annual_unpaid=month.unpaid_amount,
     )
@@ -96,6 +97,36 @@ async def test_build_export_config_uses_net_profit_not_gross() -> None:
     assert profit_cell == service._fmt(month.net_profit)
     assert profit_cell != service._fmt(month.total_profit)
     assert material_cost_cell == service._fmt(month.total_cost)
+
+
+async def test_get_financial_year_aggregates_annual_cost() -> None:
+    db = AsyncMock()
+    service = ReportService(db)
+    month_template = MonthlyReportSchema(
+        year=2025,
+        month=1,
+        total_revenue=Decimal("500"),
+        total_cost=Decimal("100"),
+        total_profit=Decimal("400"),
+        total_expenses=Decimal("50"),
+        net_profit=Decimal("350"),
+        paid_count=1,
+        unpaid_count=0,
+        total_count=1,
+        collection_rate=100.0,
+        cash_revenue=Decimal("500"),
+        transfer_revenue=Decimal("0"),
+        unpaid_amount=Decimal("0"),
+        paid_revenue=Decimal("500"),
+    )
+    service.get_monthly_report = AsyncMock(return_value=month_template)
+
+    result = await service.get_financial_year(2025)
+
+    assert result.annual_cost == Decimal("1200")  # 100 * 12 months
+    assert result.annual_revenue == Decimal("6000")  # 500 * 12
+    assert result.annual_profit == Decimal("4800")  # 400 * 12
+    assert result.annual_net == Decimal("4200")  # 350 * 12
 
 
 async def test_get_top_customers_maps_repo_rows() -> None:

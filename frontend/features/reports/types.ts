@@ -22,6 +22,7 @@ export interface FinancialReport {
   annual_revenue: string
   annual_profit: string
   annual_expenses: string
+  annual_cost: string
   annual_net: string
   annual_unpaid: string
 }

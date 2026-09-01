@@ -83,6 +83,7 @@ class ReportService:
 
         total_revenue = sum((m.total_revenue for m in monthly_data), Decimal("0"))
         total_expenses = sum((m.total_expenses for m in monthly_data), Decimal("0"))
+        total_cost = sum((m.total_cost for m in monthly_data), Decimal("0"))
         net_profit = sum((m.net_profit for m in monthly_data), Decimal("0"))
         annual_profit = sum((m.total_profit for m in monthly_data), Decimal("0"))
 
@@ -94,6 +95,7 @@ class ReportService:
             annual_revenue=total_revenue,
             annual_profit=annual_profit,
             annual_expenses=total_expenses,
+            annual_cost=total_cost,
             annual_net=net_profit,
             annual_unpaid=annual_unpaid,
         )
