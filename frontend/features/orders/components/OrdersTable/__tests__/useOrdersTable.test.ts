@@ -51,9 +51,19 @@ const MOCK_ORDER = {
   items: [{ id: 'item-1', product_name: 'עוגה', quantity: 2 }],
 }
 
+const MOCK_ORDER_2 = {
+  ...MOCK_ORDER,
+  id: 'order-2',
+  order_number: 43,
+  items: [{ id: 'item-2', product_name: 'פוסטר', quantity: 1 }],
+}
+
 function makeMockButtonEvent() {
   const stopPropagation = vi.fn()
-  return { stopPropagation } as unknown as React.MouseEvent<Element> & {
+  const el = document.createElement('button')
+  el.getBoundingClientRect = () =>
+    ({ left: 0, top: 0, width: 0, height: 0, right: 0, bottom: 0, x: 0, y: 0, toJSON: () => ({}) }) as DOMRect
+  return { stopPropagation, currentTarget: el } as unknown as React.MouseEvent<Element> & {
     stopPropagation: ReturnType<typeof vi.fn>
   }
 }
@@ -187,61 +197,83 @@ describe('useOrdersTable', () => {
     expect(result.current.getUrgencyClass('very_urgent')).toBe('urgencyVeryUrgent')
   })
 
-  it('expandedOrderId is null by default', () => {
+  it('productsPopover is closed by default', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
-    expect(result.current.expandedOrderId).toBeNull()
+    expect(result.current.productsPopover.isOpen).toBe(false)
   })
 
-  it('toggleExpanded sets expandedOrderId and stops propagation', () => {
+  it('toggleProductsPopover opens the popover with the order items and stops propagation', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
     const event = makeMockButtonEvent()
 
     act(() => {
-      result.current.toggleExpanded('order-1', event)
+      result.current.toggleProductsPopover(MOCK_ORDER, event)
     })
 
-    expect(result.current.expandedOrderId).toBe('order-1')
+    expect(result.current.productsPopover.isOpen).toBe(true)
+    if (result.current.productsPopover.isOpen) {
+      expect(result.current.productsPopover.data).toEqual({
+        orderId: 'order-1',
+        items: MOCK_ORDER.items,
+      })
+    }
     expect(event.stopPropagation).toHaveBeenCalled()
   })
 
-  it('toggleExpanded collapses when the same order id is toggled again', () => {
+  it('toggleProductsPopover closes the popover when the same order is toggled again', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
 
     act(() => {
-      result.current.toggleExpanded('order-1', makeMockButtonEvent())
+      result.current.toggleProductsPopover(MOCK_ORDER, makeMockButtonEvent())
     })
     act(() => {
-      result.current.toggleExpanded('order-1', makeMockButtonEvent())
+      result.current.toggleProductsPopover(MOCK_ORDER, makeMockButtonEvent())
     })
 
-    expect(result.current.expandedOrderId).toBeNull()
+    expect(result.current.productsPopover.isOpen).toBe(false)
   })
 
-  it('toggleExpanded switches to a different order, closing the previous one (accordion)', () => {
+  it('toggleProductsPopover switches to a different order, closing the previous one (accordion)', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
 
     act(() => {
-      result.current.toggleExpanded('order-1', makeMockButtonEvent())
+      result.current.toggleProductsPopover(MOCK_ORDER, makeMockButtonEvent())
     })
     act(() => {
-      result.current.toggleExpanded('order-2', makeMockButtonEvent())
+      result.current.toggleProductsPopover(MOCK_ORDER_2, makeMockButtonEvent())
     })
 
-    expect(result.current.expandedOrderId).toBe('order-2')
+    expect(result.current.productsPopover.isOpen).toBe(true)
+    if (result.current.productsPopover.isOpen) {
+      expect(result.current.productsPopover.data.orderId).toBe('order-2')
+    }
   })
 
-  it('onPageChange resets expandedOrderId to null', () => {
+  it('toggleProductsPopover closes the row action menu to avoid overlapping overlays', () => {
+    const { result } = renderHook(() => useOrdersTable(), { wrapper })
+    const rowProps = result.current.getRowProps(MOCK_ORDER)
+    act(() => { rowProps.onContextMenu(makeContextMenuEvent() as unknown as Parameters<typeof rowProps.onContextMenu>[0]) })
+    expect(result.current.menuState.isOpen).toBe(true)
+
+    act(() => {
+      result.current.toggleProductsPopover(MOCK_ORDER, makeMockButtonEvent())
+    })
+
+    expect(result.current.menuState.isOpen).toBe(false)
+  })
+
+  it('onPageChange closes the products popover', () => {
     const { result } = renderHook(() => useOrdersTable(), { wrapper })
 
     act(() => {
-      result.current.toggleExpanded('order-1', makeMockButtonEvent())
+      result.current.toggleProductsPopover(MOCK_ORDER, makeMockButtonEvent())
     })
-    expect(result.current.expandedOrderId).toBe('order-1')
+    expect(result.current.productsPopover.isOpen).toBe(true)
 
     act(() => {
       result.current.onPageChange(2)
     })
 
-    expect(result.current.expandedOrderId).toBeNull()
+    expect(result.current.productsPopover.isOpen).toBe(false)
   })
 })

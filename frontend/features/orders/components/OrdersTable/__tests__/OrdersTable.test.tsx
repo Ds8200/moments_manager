@@ -5,7 +5,8 @@ import { OrdersTable } from '../OrdersTable'
 import { useOrdersTable } from '../useOrdersTable'
 import { ORDERS_LABELS } from '../../../constants/ordersLabels'
 import type { OrderSummary } from '../../../types'
-import type { UseOrdersTableReturn } from '../useOrdersTable'
+import type { UseOrdersTableReturn, ProductsPopoverData } from '../useOrdersTable'
+import type { AnchoredPopoverState } from '@/shared/components/AnchoredPopover/useAnchoredPopover'
 
 vi.mock('../useOrdersTable')
 
@@ -26,10 +27,12 @@ const ORDER: OrderSummary = {
   items: [{ id: 'item-1', product_name: 'עוגה', quantity: 2 }],
 }
 
+const CLOSED_POPOVER: AnchoredPopoverState<ProductsPopoverData> = { isOpen: false }
+
 // Mirrors the real useOrdersTable behavior of stopping propagation, so this test
 // can verify the component wiring (button click must not also reach the row's
 // onClick) without re-testing the hook's own stopPropagation logic (see useOrdersTable.test.ts).
-const toggleExpanded = vi.fn((_orderId: string, e: { stopPropagation: () => void }) => {
+const toggleProductsPopover = vi.fn((_order: OrderSummary, e: { stopPropagation: () => void }) => {
   e.stopPropagation()
 })
 const rowOnClick = vi.fn()
@@ -55,8 +58,9 @@ const buildHookReturn = (overrides: Partial<UseOrdersTableReturn> = {}): UseOrde
   closeMenu: vi.fn(),
   onStatusChange: vi.fn(),
   onPageChange: vi.fn(),
-  expandedOrderId: null,
-  toggleExpanded,
+  productsPopover: CLOSED_POPOVER,
+  toggleProductsPopover,
+  closeProductsPopover: vi.fn(),
   formatAmount: (a: string) => a,
   formatDate: (d: string) => d,
   getUrgencyLabel: () => 'רגיל',
@@ -76,25 +80,42 @@ describe('OrdersTable', () => {
     expect(screen.queryByText(ORDERS_LABELS.COL_TARGET)).not.toBeInTheDocument()
   })
 
-  it('does not render the products sub-row when the order is not expanded', () => {
-    vi.mocked(useOrdersTable).mockReturnValue(buildHookReturn({ expandedOrderId: null }))
+  it('does not render the products popover when it is closed', () => {
+    vi.mocked(useOrdersTable).mockReturnValue(buildHookReturn({ productsPopover: CLOSED_POPOVER }))
     render(<OrdersTable />)
 
     expect(screen.queryByText('עוגה')).not.toBeInTheDocument()
   })
 
-  it('renders product name and quantity in the sub-row when the order is expanded', () => {
-    vi.mocked(useOrdersTable).mockReturnValue(buildHookReturn({ expandedOrderId: 'order-1' }))
+  it('renders product name and quantity in the popover when it is open for that order', () => {
+    vi.mocked(useOrdersTable).mockReturnValue(
+      buildHookReturn({
+        productsPopover: {
+          isOpen: true,
+          data: { orderId: 'order-1', items: ORDER.items },
+          anchorX: 0,
+          anchorY: 0,
+          anchorWidth: 0,
+          anchorHeight: 0,
+        },
+      })
+    )
     render(<OrdersTable />)
 
     expect(screen.getByText('עוגה')).toBeInTheDocument()
   })
 
-  it('shows the empty-products message when an expanded order has no items', () => {
+  it('shows the empty-products message when the open popover has no items', () => {
     vi.mocked(useOrdersTable).mockReturnValue(
       buildHookReturn({
-        expandedOrderId: 'order-1',
-        orders: [{ ...ORDER, items: [] }],
+        productsPopover: {
+          isOpen: true,
+          data: { orderId: 'order-1', items: [] },
+          anchorX: 0,
+          anchorY: 0,
+          anchorWidth: 0,
+          anchorHeight: 0,
+        },
       })
     )
     render(<OrdersTable />)
@@ -102,13 +123,13 @@ describe('OrdersTable', () => {
     expect(screen.getByText(ORDERS_LABELS.PRODUCTS_EMPTY)).toBeInTheDocument()
   })
 
-  it('clicking the products toggle calls toggleExpanded and not the row click handler', async () => {
+  it('clicking the products toggle calls toggleProductsPopover and not the row click handler', async () => {
     vi.mocked(useOrdersTable).mockReturnValue(buildHookReturn())
     render(<OrdersTable />)
 
     await userEvent.click(screen.getByRole('button', { name: /1/ }))
 
-    expect(toggleExpanded).toHaveBeenCalledWith('order-1', expect.anything())
+    expect(toggleProductsPopover).toHaveBeenCalledWith(ORDER, expect.anything())
     expect(rowOnClick).not.toHaveBeenCalled()
   })
 })
