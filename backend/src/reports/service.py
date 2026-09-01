@@ -123,7 +123,7 @@ class ReportService:
         column_groups = [
             ColumnGroup("הזמנות", 4),
             ColumnGroup("תשלומים", 4),
-            ColumnGroup("רווחיות", 2),
+            ColumnGroup("רווחיות", 3),
         ]
         sub_headers = [
             "שולם",
@@ -135,6 +135,7 @@ class ReportService:
             "לא שולם (₪)",
             'סה"כ הכנסות',
             "הוצאות",
+            "עלות חומר",
             "רווח",
         ]
         rows: list[list[str | int | float]] = [
@@ -149,6 +150,7 @@ class ReportService:
                 self._fmt(m.unpaid_amount),
                 self._fmt(m.paid_revenue),
                 self._fmt(m.total_expenses),
+                self._fmt(m.total_cost),
                 self._fmt(m.net_profit),
             ]
             for m in data.months

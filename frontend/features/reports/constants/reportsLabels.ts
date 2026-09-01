@@ -12,6 +12,7 @@ export const REPORTS_LABELS = {
   GROUP_PROFIT:    'רווחיות',
   COL_REVENUE:     'הכנסות',
   COL_EXPENSES:    'הוצאות',
+  COL_MATERIAL_COST: 'עלות חומר',
   COL_PROFIT:      'רווח',
   COL_PAID_ORDERS:     'שולם',
   COL_UNPAID_ORDERS:   'לא שולם',
