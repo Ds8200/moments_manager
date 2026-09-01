@@ -64,6 +64,7 @@ export const handlers = [
       annual_revenue: '60000',
       annual_profit: '24000',
       annual_expenses: '12000',
+      annual_cost: '14400',
       annual_net: '24000',
       annual_unpaid: '3000',
       months: Array.from({ length: 12 }, (_, i) => ({

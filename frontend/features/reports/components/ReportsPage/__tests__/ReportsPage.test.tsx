@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReportsPage } from '../ReportsPage'
 import { formatCurrency } from '@/shared/utils/formatters'
+import { REPORTS_LABELS } from '../../../constants/reportsLabels'
 
 function renderWithProviders(): ReturnType<typeof render> {
   const queryClient = new QueryClient({
@@ -44,5 +45,16 @@ describe('ReportsPage', () => {
     const materialCostCell = cells[cells.length - 2]
 
     expect(materialCostCell.textContent).toBe(formatCurrency('1200'))
+  })
+
+  it('renders an annual material cost KPI card', async () => {
+    renderWithProviders()
+
+    const labelEl = await waitFor(() => screen.getByText(REPORTS_LABELS.ANNUAL_MATERIAL_COST))
+    const card = labelEl.closest('div')
+    if (!card) throw new Error('KPI card not found')
+    const valueEl = card.querySelector('span:last-child')
+
+    expect(valueEl?.textContent).toBe(formatCurrency('14400'))
   })
 })

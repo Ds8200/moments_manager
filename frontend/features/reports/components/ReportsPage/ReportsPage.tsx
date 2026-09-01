@@ -47,6 +47,10 @@ export const ReportsPage = (): ReactElement => {
                 <span className={styles.kpiValue}>{formatAmount(financial.annual_revenue)}</span>
               </div>
               <div className={styles.kpiCard}>
+                <span className={styles.kpiLabel}>{REPORTS_LABELS.ANNUAL_MATERIAL_COST}</span>
+                <span className={`${styles.kpiValue} ${styles.kpiNegative}`}>{formatAmount(financial.annual_cost)}</span>
+              </div>
+              <div className={styles.kpiCard}>
                 <span className={styles.kpiLabel}>{REPORTS_LABELS.ANNUAL_PROFIT}</span>
                 <span className={`${styles.kpiValue} ${styles.kpiPositive}`}>{formatAmount(financial.annual_profit)}</span>
               </div>

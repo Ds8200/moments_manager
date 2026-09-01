@@ -3,6 +3,7 @@ export const REPORTS_LABELS = {
   ANNUAL_REVENUE:  'הכנסות שנתיות',
   ANNUAL_PROFIT:   'רווח גולמי שנתי',
   ANNUAL_EXPENSES: 'הוצאות שנתיות',
+  ANNUAL_MATERIAL_COST: 'עלות חומר שנתית',
   ANNUAL_NET:      'רווח נקי שנתי',
   ANNUAL_UNPAID:   'סה"כ לא שולם',
   MONTHLY_TITLE:   'סיכום חודשי',
