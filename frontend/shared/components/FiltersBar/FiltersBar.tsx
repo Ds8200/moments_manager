@@ -64,8 +64,9 @@ export const FiltersBar = (props: FiltersBarProps): ReactElement => {
         </button>
       )}
 
-      {hasCollapsibleControls && isExpanded && (
+      {hasCollapsibleControls && (
         <FiltersBarControls
+          isExpanded={isExpanded}
           selects={selects}
           showDates={showDates}
           dateFrom={dateFrom}

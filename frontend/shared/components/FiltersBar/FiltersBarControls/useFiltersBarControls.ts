@@ -2,6 +2,7 @@
 import type { FiltersBarSelectConfig } from '../useFiltersBar'
 
 export interface FiltersBarControlsProps {
+  isExpanded: boolean
   selects: FiltersBarSelectConfig[]
   showDates: boolean
   dateFrom: string
