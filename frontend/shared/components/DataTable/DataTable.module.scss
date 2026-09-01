@@ -1,13 +1,35 @@
 @use '../../styles/variables' as v;
 
+// flex: 1 (not height: 100%) so this behaves correctly whether it's the only child of its
+// flex-column parent (fills the parent) or shares that parent with another pinned sibling,
+// e.g. ExpensesPage's total-amount row below the table.
+.root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+// The one scrolling region — horizontal for wide tables, vertical for long row lists. The
+// header row is pinned inside it (see .thead below) and the pagination footer lives outside
+// it entirely, so only the body rows actually scroll.
 .wrapper {
-  overflow-x: auto;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   font-size: v.$font-size-sm;
+}
+
+.thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: v.$gray-50;
 }
 
 .thead th {
@@ -21,6 +43,7 @@
 }
 
 .pagination {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;

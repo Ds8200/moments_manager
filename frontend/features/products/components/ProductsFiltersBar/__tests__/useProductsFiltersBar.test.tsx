@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { createStore, Provider } from 'jotai'
 import { useProductsFiltersBar } from '../useProductsFiltersBar'
-import { productFiltersAtom, isProductFormOpenAtom } from '../../../store/productsAtoms'
+import { productFiltersAtom } from '../../../store/productsAtoms'
 import { PRODUCTS_LABELS } from '../../../constants/productsLabels'
 
 function makeWrapper(store: ReturnType<typeof createStore>) {
@@ -78,16 +78,5 @@ describe('useProductsFiltersBar', () => {
     })
 
     expect(store.get(productFiltersAtom).is_active).toBeNull()
-  })
-
-  it('onNew opens the form', () => {
-    const store = createStore()
-    const { result } = renderHook(() => useProductsFiltersBar(), { wrapper: makeWrapper(store) })
-
-    act(() => {
-      result.current.onNew()
-    })
-
-    expect(store.get(isProductFormOpenAtom)).toBe(true)
   })
 })

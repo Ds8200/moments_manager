@@ -1,23 +1,18 @@
 @use '../../styles/variables' as v;
 
-// Outer container — column on all screen sizes for clean row separation
+// One row of filters, wrapping onto additional rows on narrow/mobile screens instead of
+// hiding or horizontally scrolling controls.
 .bar {
   display: flex;
-  flex-direction: column;
-  gap: v.$space-3;
-}
-
-// ── Row 1: search + new button ──────────────────────────────────────────────
-.primaryRow {
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: v.$space-3;
 }
 
 .searchWrapper {
   position: relative;
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 220px;
+  min-width: 160px;
 }
 
 .searchIcon {
@@ -49,43 +44,9 @@
   }
 }
 
-.newButton {
-  padding: v.$space-2 v.$space-4;
-  background: v.$primary;
-  color: v.$text-inverse;
-  border: none;
-  border-radius: v.$border-radius;
-  font-size: v.$font-size-sm;
-  font-weight: v.$font-weight-semibold;
-  font-family: v.$font-family;
-  cursor: pointer;
-  white-space: nowrap;
-  min-height: 38px;
-  flex-shrink: 0;
-  transition: background v.$transition-fast;
-
-  &:hover {
-    background: v.$primary-dark;
-  }
-}
-
-// ── Row 2: selects ──────────────────────────────────────────────────────────
-.selectsRow {
-  display: flex;
-  align-items: center;
-  gap: v.$space-3;
-  flex-wrap: wrap;
-
-  @media (max-width: #{v.$breakpoint-md - 1}) {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: v.$space-2;
-  }
-}
-
 .select {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 140px;
+  min-width: 120px;
   padding: v.$space-2 v.$space-3;
   border: 1px solid v.$border-color;
   border-radius: v.$border-radius;
@@ -102,23 +63,18 @@
   }
 }
 
-// ── Row 3: date range ───────────────────────────────────────────────────────
-.datesRow {
+.datesGroup {
   display: flex;
   align-items: flex-end;
-  gap: v.$space-3;
-
-  @media (max-width: #{v.$breakpoint-md - 1}) {
-    gap: v.$space-2;
-  }
+  gap: v.$space-2;
+  flex: 0 1 auto;
 }
 
-.dateGroup {
+.dateField {
   display: flex;
   flex-direction: column;
   gap: v.$space-1;
-  flex: 1;
-  min-width: 0;
+  min-width: 130px;
 }
 
 .dateLabel {

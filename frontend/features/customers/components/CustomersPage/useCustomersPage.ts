@@ -1,7 +1,15 @@
 'use client'
+import { useSetAtom } from 'jotai'
+import { isCustomerFormOpenAtom } from '../../store/customersAtoms'
 
 export interface UseCustomersPageReturn {
-  _: undefined
+  onAdd: () => void
 }
 
-export const useCustomersPage = (): UseCustomersPageReturn => ({ _: undefined })
+export const useCustomersPage = (): UseCustomersPageReturn => {
+  const setFormOpen = useSetAtom(isCustomerFormOpenAtom)
+
+  return {
+    onAdd: () => setFormOpen(true),
+  }
+}
