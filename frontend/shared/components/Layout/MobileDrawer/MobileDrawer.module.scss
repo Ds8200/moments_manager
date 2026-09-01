@@ -1,4 +1,5 @@
 @use '../../../../shared/styles/variables' as v;
+@use '../../../../shared/styles/mixins' as m;
 
 .backdrop {
   display: none;
@@ -40,6 +41,7 @@
   transform: translateX(100%);
   transition: transform v.$transition-normal;
   overflow-y: auto;
+  @include m.scrollbar-right;
 
   @media (min-width: #{v.$breakpoint-md}) {
     display: none;

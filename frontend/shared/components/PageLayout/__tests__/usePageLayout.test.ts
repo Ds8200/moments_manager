@@ -59,4 +59,26 @@ describe('usePageLayout', () => {
     expect(result.current.filters).toBe(filters)
     expect(result.current.children).toBe(children)
   })
+
+  it('passes through actions', () => {
+    const actions = 'actions-node'
+    const { result } = renderHook(() =>
+      usePageLayout({ title: 'דוחות', actions, children: null })
+    )
+    expect(result.current.actions).toBe(actions)
+  })
+
+  it('scrollContent defaults to false', () => {
+    const { result } = renderHook(() =>
+      usePageLayout({ title: 'משתמשים', children: null })
+    )
+    expect(result.current.scrollContent).toBe(false)
+  })
+
+  it('scrollContent passes through true', () => {
+    const { result } = renderHook(() =>
+      usePageLayout({ title: 'דוחות', scrollContent: true, children: null })
+    )
+    expect(result.current.scrollContent).toBe(true)
+  })
 })

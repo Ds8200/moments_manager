@@ -16,6 +16,7 @@
   overflow-x: hidden;
   transition: transform v.$transition-normal;
   @include m.custom-scrollbar;
+  @include m.scrollbar-right;
 
   @media (max-width: #{v.$breakpoint-md - 1}) {
     display: none;

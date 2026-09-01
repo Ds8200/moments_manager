@@ -1,4 +1,5 @@
 @use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
 
 .container {
   position: relative;
@@ -62,6 +63,7 @@
   z-index: v.$z-dropdown;
   max-height: 240px;
   overflow-y: auto;
+  @include m.scrollbar-right;
   list-style: none;
   margin: 0;
   padding: v.$space-1 0;

@@ -1,4 +1,4 @@
-@use './variables' as v;
+@use '@/shared/styles/variables' as v;
 
 // Responsive breakpoints
 @mixin mobile {
@@ -53,12 +53,28 @@
   outline-offset: 2px;
 }
 
+// Vertical scrollbars sit on the "end" edge, which is the left under dir:rtl (the whole app).
+// Force the scrolling box itself to ltr — scrollbar moves to the right — then re-flip its
+// direct content back to rtl so text/table layout inside stays correct.
+@mixin scrollbar-right {
+  direction: ltr;
+
+  > * {
+    direction: rtl;
+  }
+}
+
 // Record detail pages (Customer/Product/Order/User detail views) — shared layout vocabulary so
-// every domain's detail page looks like one family even though their fields differ.
+// every domain's detail page looks like one family even though their fields differ. `main` no
+// longer scrolls the document, so each page fills it and scrolls its own content.
 @mixin record-detail-page {
   display: flex;
   flex-direction: column;
   gap: v.$space-6;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  @include scrollbar-right;
 }
 
 @mixin record-detail-body {
