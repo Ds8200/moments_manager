@@ -6,6 +6,7 @@ import styles from './FiltersBarControls.module.scss'
 
 export const FiltersBarControls = (props: FiltersBarControlsProps): ReactElement => {
   const {
+    isExpanded,
     selects,
     showDates,
     dateFrom,
@@ -17,7 +18,7 @@ export const FiltersBarControls = (props: FiltersBarControlsProps): ReactElement
   } = useFiltersBarControls(props)
 
   return (
-    <div className={styles.bar}>
+    <div className={styles.bar} data-expanded={isExpanded}>
       {selects.map((sel, idx) => (
         <select
           key={idx}

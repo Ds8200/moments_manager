@@ -5,6 +5,7 @@ import { FiltersBarControls } from '../FiltersBarControls'
 import type { FiltersBarControlsProps } from '../useFiltersBarControls'
 
 const buildProps = (overrides: Partial<FiltersBarControlsProps> = {}): FiltersBarControlsProps => ({
+  isExpanded: false,
   selects: [],
   showDates: false,
   dateFrom: '',
@@ -58,5 +59,13 @@ describe('FiltersBarControls', () => {
   it('omits the date range when showDates is false', () => {
     const { container } = render(<FiltersBarControls {...buildProps()} />)
     expect(container.querySelector('input[type="date"]')).toBeNull()
+  })
+
+  it('reflects isExpanded on the data-expanded attribute', () => {
+    const { container, rerender } = render(<FiltersBarControls {...buildProps()} />)
+    expect(container.querySelector('[data-expanded]')).toHaveAttribute('data-expanded', 'false')
+
+    rerender(<FiltersBarControls {...buildProps({ isExpanded: true })} />)
+    expect(container.querySelector('[data-expanded]')).toHaveAttribute('data-expanded', 'true')
   })
 })
