@@ -74,7 +74,7 @@ export const ReportsPage = (): ReactElement => {
                     <th rowSpan={2} className={styles.thFirstCol}>{REPORTS_LABELS.COL_MONTH}</th>
                     <th colSpan={4} className={styles.thGroup}>{REPORTS_LABELS.GROUP_ORDERS}</th>
                     <th colSpan={4} className={styles.thGroup}>{REPORTS_LABELS.GROUP_PAYMENTS}</th>
-                    <th colSpan={2} className={styles.thGroup}>{REPORTS_LABELS.GROUP_PROFIT}</th>
+                    <th colSpan={3} className={styles.thGroup}>{REPORTS_LABELS.GROUP_PROFIT}</th>
                   </tr>
                   <tr>
                     <th>{REPORTS_LABELS.COL_PAID_ORDERS}</th>
@@ -86,6 +86,7 @@ export const ReportsPage = (): ReactElement => {
                     <th>{REPORTS_LABELS.COL_UNPAID_AMOUNT}</th>
                     <th>{REPORTS_LABELS.COL_PAID_REVENUE}</th>
                     <th>{REPORTS_LABELS.COL_EXPENSES}</th>
+                    <th>{REPORTS_LABELS.COL_MATERIAL_COST}</th>
                     <th>{REPORTS_LABELS.COL_PROFIT}</th>
                   </tr>
                 </thead>
@@ -102,6 +103,7 @@ export const ReportsPage = (): ReactElement => {
                       <td className={`${styles.cell} ${styles.kpiNegative}`}>{formatAmount(m.unpaid_amount)}</td>
                       <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.paid_revenue)}</td>
                       <td className={styles.cell}>{formatAmount(m.total_expenses)}</td>
+                      <td className={styles.cell}>{formatAmount(m.total_cost)}</td>
                       <td className={`${styles.cell} ${styles.profit}`}>{formatAmount(m.net_profit)}</td>
                     </tr>
                   ))}

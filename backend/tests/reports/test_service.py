@@ -91,9 +91,11 @@ async def test_build_export_config_uses_net_profit_not_gross() -> None:
 
     config = service._build_export_config(data, 2025)
     profit_cell = config.rows[0][-1]
+    material_cost_cell = config.rows[0][-2]
 
     assert profit_cell == service._fmt(month.net_profit)
     assert profit_cell != service._fmt(month.total_profit)
+    assert material_cost_cell == service._fmt(month.total_cost)
 
 
 async def test_get_top_customers_maps_repo_rows() -> None:

@@ -18,8 +18,8 @@ function renderWithProviders(): ReturnType<typeof render> {
 describe('ReportsPage', () => {
   // Regression test: the monthly "רווח" column must render net profit
   // (after expenses), not gross profit. The MSW mock for REPORTS_FINANCIAL
-  // returns total_profit: '3000' and net_profit: '2000' precisely so these
-  // two values are distinguishable.
+  // returns total_profit: '3800' and net_profit: '2800' — distinct values —
+  // precisely so a regression to the pre-fix bug is detectable.
   it('renders net profit, not gross profit, in the monthly profit column', async () => {
     renderWithProviders()
 
@@ -29,8 +29,20 @@ describe('ReportsPage', () => {
     const cells = row.querySelectorAll('td')
     const profitCell = cells[cells.length - 1]
 
-    // net_profit ('2000') — correct; total_profit ('3000') would be the pre-fix bug.
-    expect(profitCell.textContent).toBe(formatCurrency('2000'))
-    expect(profitCell.textContent).not.toBe(formatCurrency('3000'))
+    // net_profit ('2800') — correct; total_profit ('3800') would be the pre-fix bug.
+    expect(profitCell.textContent).toBe(formatCurrency('2800'))
+    expect(profitCell.textContent).not.toBe(formatCurrency('3800'))
+  })
+
+  it('renders material cost (total_cost) as its own column, right before profit', async () => {
+    renderWithProviders()
+
+    const monthCell = await waitFor(() => screen.getByText('ינואר'))
+    const row = monthCell.closest('tr')
+    if (!row) throw new Error('month row not found')
+    const cells = row.querySelectorAll('td')
+    const materialCostCell = cells[cells.length - 2]
+
+    expect(materialCostCell.textContent).toBe(formatCurrency('1200'))
   })
 })
