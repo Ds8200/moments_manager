@@ -1,5 +1,5 @@
 'use client'
-import { useState, type MouseEvent } from 'react'
+import { type MouseEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSetAtom } from 'jotai'
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from '../../queries/useOrders'
@@ -8,13 +8,20 @@ import { formatCurrency, formatDateTime } from '@/shared/utils/formatters'
 import { useConfirm } from '@/shared/hooks/useConfirm'
 import { useTableRowInteraction } from '@/shared/hooks/useTableRowInteraction'
 import type { RowInteractionHandlers } from '@/shared/hooks/useTableRowInteraction'
-import type { OrderSummary, UrgencyLevel } from '../../types'
+import { useAnchoredPopover } from '@/shared/components/AnchoredPopover/useAnchoredPopover'
+import type { AnchoredPopoverState } from '@/shared/components/AnchoredPopover/useAnchoredPopover'
+import type { OrderSummary, OrderItemSummary, UrgencyLevel } from '../../types'
 import type { OrderStatus } from '@/shared/enums/statusEnums'
 import { PAYMENT_STATE_LABELS, getPaymentState } from '@/shared/enums/statusEnums'
 import { ORDERS_LABELS } from '../../constants/ordersLabels'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 import { ORDER_DETAIL_ROUTE, ROUTE_ICONS } from '@/shared/constants/routes'
 import type { DropdownMenuState } from '@/shared/components/DropdownMenu/useDropdownMenu'
+
+export interface ProductsPopoverData {
+  orderId: string
+  items: OrderItemSummary[]
+}
 
 export interface UseOrdersTableReturn {
   orders: OrderSummary[]
@@ -28,8 +35,9 @@ export interface UseOrdersTableReturn {
   closeMenu: () => void
   onStatusChange: (id: string, status: OrderStatus) => void
   onPageChange: (page: number) => void
-  expandedOrderId: string | null
-  toggleExpanded: (orderId: string, e: MouseEvent<Element>) => void
+  productsPopover: AnchoredPopoverState<ProductsPopoverData>
+  toggleProductsPopover: (order: OrderSummary, e: MouseEvent<Element>) => void
+  closeProductsPopover: () => void
   formatAmount: (amount: string) => string
   formatDate: (date: string) => string
   getUrgencyLabel: (urgency: UrgencyLevel) => string
@@ -58,7 +66,11 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
   const deleteOrder = useDeleteOrder()
   const confirm = useConfirm()
   const { menuState, closeMenu, getRowProps } = useTableRowInteraction()
-  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
+  const {
+    state: productsPopover,
+    open: openProductsPopover,
+    close: closeProductsPopover,
+  } = useAnchoredPopover<ProductsPopoverData>()
 
   const onDeleteOrder = (id: string): void => {
     confirm({
@@ -68,9 +80,15 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     })
   }
 
-  const toggleExpanded = (orderId: string, e: MouseEvent<Element>): void => {
+  const toggleProductsPopover = (order: OrderSummary, e: MouseEvent<Element>): void => {
     e.stopPropagation()
-    setExpandedOrderId((prev) => (prev === orderId ? null : orderId))
+    if (productsPopover.isOpen && productsPopover.data.orderId === order.id) {
+      closeProductsPopover()
+      return
+    }
+    // Close the row's action menu first — avoids two overlapping floating overlays.
+    closeMenu()
+    openProductsPopover({ orderId: order.id, items: order.items }, e)
   }
 
   return {
@@ -82,8 +100,9 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     isError,
     menuState,
     closeMenu,
-    expandedOrderId,
-    toggleExpanded,
+    productsPopover,
+    toggleProductsPopover,
+    closeProductsPopover,
 
     getRowProps: (order) => getRowProps({
       onActivate: () => router.push(ORDER_DETAIL_ROUTE(order.id)),
@@ -98,7 +117,7 @@ export const useOrdersTable = (): UseOrdersTableReturn => {
     },
 
     onPageChange: (page) => {
-      setExpandedOrderId(null)
+      closeProductsPopover()
       setFilters((prev) => ({ ...prev, page }))
     },
 
