@@ -37,6 +37,24 @@ describe('useInlineEditField', () => {
     expect(result.current.draft).toBe('2025-01-01')
   })
 
+  it('shows an em-dash placeholder instead of a blank when the value is empty', () => {
+    const { result } = renderHook(() =>
+      useInlineEditField({ label: 'טלפון', value: '', type: 'text', editable: true, onSave: vi.fn() })
+    )
+
+    expect(result.current.displayValue).toBe('—')
+  })
+
+  it('starting to edit an empty field seeds the draft with the real empty value, not the placeholder', () => {
+    const { result } = renderHook(() =>
+      useInlineEditField({ label: 'טלפון', value: '', type: 'text', editable: true, onSave: vi.fn() })
+    )
+
+    act(() => result.current.onStartEdit())
+
+    expect(result.current.draft).toBe('')
+  })
+
   it('onStartEdit does nothing when the field is not editable', () => {
     const { result } = renderHook(() =>
       useInlineEditField({ label: 'אימייל', value: 'a@b.com', type: 'text', editable: false, onSave: vi.fn() })
