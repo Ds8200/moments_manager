@@ -12,7 +12,10 @@
 // the single-column layout the key facts (info/status/summary) sit above the items table.
 .layout {
   display: grid;
-  grid-template-columns: 1fr;
+  // `minmax(0, 1fr)` (not a bare `1fr`) so the column can never grow past the container —
+  // otherwise the items table's wide min-content propagates up through the grid items and
+  // drags the shared column (and with it the info/summary field grid) off-screen on a phone.
+  grid-template-columns: minmax(0, 1fr);
   gap: v.$space-5;
   align-items: start;
 
@@ -25,6 +28,7 @@
   display: flex;
   flex-direction: column;
   gap: v.$space-5;
+  min-width: 0; // shrink to the column instead of the widest child
 
   @media (min-width: v.$breakpoint-xl) {
     grid-column: 2;
@@ -36,6 +40,7 @@
   display: flex;
   flex-direction: column;
   gap: v.$space-5;
+  min-width: 0; // lets the items table scroll inside its own wrapper instead of widening the page
 
   @media (min-width: v.$breakpoint-xl) {
     grid-column: 1;
