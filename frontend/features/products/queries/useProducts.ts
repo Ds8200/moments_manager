@@ -54,8 +54,9 @@ export const useUpdateProduct = (): UseMutationResult<
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: Partial<ProductFormValues> }) =>
       productsApi.update(id, payload),
-    onSuccess: () => {
+    onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: ['product', id] })
       notify.success(PRODUCTS_LABELS.UPDATED_SUCCESS)
     },
   })

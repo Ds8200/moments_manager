@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { ChangeEvent, KeyboardEvent } from 'react'
 import { UI_SYMBOLS } from '@/shared/constants/uiSymbols'
 
@@ -37,6 +37,7 @@ export const useInlineEditField = (props: InlineEditFieldProps): UseInlineEditFi
   const onStartEdit = (): void => {
     if (!editable) return
     setDraft(value)
+    isEditingRef.current = true
     setIsEditing(true)
   }
 
@@ -44,8 +45,19 @@ export const useInlineEditField = (props: InlineEditFieldProps): UseInlineEditFi
     setDraft(e.target.value)
   }
 
-  const commit = (): void => {
+  // Enter/Escape unmount the input, which can fire a follow-up blur. The ref (unlike the
+  // `isEditing` closure value) is updated synchronously, so that blur can't save a second time
+  // or save a draft the user just cancelled.
+  const isEditingRef = useRef(false)
+
+  const stopEditing = (): void => {
+    isEditingRef.current = false
     setIsEditing(false)
+  }
+
+  const commit = (): void => {
+    if (!isEditingRef.current) return
+    stopEditing()
     if (draft !== value) onSave(draft)
   }
 
@@ -57,11 +69,11 @@ export const useInlineEditField = (props: InlineEditFieldProps): UseInlineEditFi
     }
     if (e.key === 'Escape') {
       e.preventDefault()
-      setIsEditing(false)
+      stopEditing()
     }
   }
 
-  const onBlur = (): void => setIsEditing(false)
+  const onBlur = (): void => commit()
 
   // An empty value would render as a blank, zero-width span — nothing to see and nothing to
   // double-click to start editing. Show a placeholder instead so an empty editable field is
