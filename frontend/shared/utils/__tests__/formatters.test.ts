@@ -3,10 +3,15 @@ import { formatCurrency, formatDate, formatShortDate } from '../formatters'
 
 describe('formatters', () => {
   describe('formatCurrency', () => {
-    it('formats numeric values as ILS without fractional digits', () => {
+    it('formats whole amounts as ILS without a decimal part', () => {
       const result = formatCurrency(1234)
       expect(result).toContain('1,234')
       expect(result).not.toMatch(/\.\d/)
+    })
+
+    it('keeps one decimal digit instead of rounding to a whole shekel', () => {
+      expect(formatCurrency('5.5')).toContain('5.5')
+      expect(formatCurrency(1234.6)).toContain('1,234.6')
     })
 
     it('parses string amounts before formatting', () => {
