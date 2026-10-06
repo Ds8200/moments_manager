@@ -4,7 +4,7 @@ export function formatCurrency(amount: number | string): string {
     style: 'currency',
     currency: 'ILS',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 1,
   }).format(num)
 }
 
