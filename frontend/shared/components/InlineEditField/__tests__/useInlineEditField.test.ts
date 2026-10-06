@@ -117,7 +117,7 @@ describe('useInlineEditField', () => {
     expect(result.current.isEditing).toBe(false)
   })
 
-  it('blur exits edit mode without saving', () => {
+  it('blur saves the changed draft and exits edit mode', () => {
     const onSave = vi.fn()
     const { result } = renderHook(() =>
       useInlineEditField({ label: 'שם', value: 'דני', type: 'text', editable: true, onSave })
@@ -127,7 +127,48 @@ describe('useInlineEditField', () => {
     act(() => result.current.onDraftChange(makeChangeEvent('שינוי') as unknown as ChangeArg))
     act(() => result.current.onBlur())
 
+    expect(onSave).toHaveBeenCalledWith('שינוי')
+    expect(result.current.isEditing).toBe(false)
+  })
+
+  it('blur with an unchanged draft does not save', () => {
+    const onSave = vi.fn()
+    const { result } = renderHook(() =>
+      useInlineEditField({ label: 'שם', value: 'דני', type: 'text', editable: true, onSave })
+    )
+
+    act(() => result.current.onStartEdit())
+    act(() => result.current.onBlur())
+
     expect(onSave).not.toHaveBeenCalled()
     expect(result.current.isEditing).toBe(false)
+  })
+
+  it('a blur after Escape does not save the cancelled draft', () => {
+    const onSave = vi.fn()
+    const { result } = renderHook(() =>
+      useInlineEditField({ label: 'שם', value: 'דני', type: 'text', editable: true, onSave })
+    )
+
+    act(() => result.current.onStartEdit())
+    act(() => result.current.onDraftChange(makeChangeEvent('שינוי') as unknown as ChangeArg))
+    act(() => result.current.onKeyDown(makeKeyEvent('Escape') as unknown as KeyArg))
+    act(() => result.current.onBlur())
+
+    expect(onSave).not.toHaveBeenCalled()
+  })
+
+  it('a blur after Enter does not save a second time', () => {
+    const onSave = vi.fn()
+    const { result } = renderHook(() =>
+      useInlineEditField({ label: 'שם', value: 'דני', type: 'text', editable: true, onSave })
+    )
+
+    act(() => result.current.onStartEdit())
+    act(() => result.current.onDraftChange(makeChangeEvent('שינוי') as unknown as ChangeArg))
+    act(() => result.current.onKeyDown(makeKeyEvent('Enter') as unknown as KeyArg))
+    act(() => result.current.onBlur())
+
+    expect(onSave).toHaveBeenCalledTimes(1)
   })
 })
